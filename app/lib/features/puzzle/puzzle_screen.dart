@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mindmeld/ads/rewarded_ad_service.dart';
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
@@ -21,6 +23,7 @@ class PuzzleScreen extends StatefulWidget {
     required this.onWin,
     this.payloadClient,
     this.adStub,
+    this.hintGate,
   });
 
   final String lang;
@@ -35,7 +38,17 @@ class PuzzleScreen extends StatefulWidget {
   ///
   /// When null, a default [RewardedAdStub] is used (3-second simulated delay).
   /// Pass a stub with [simulatedDelay] of [Duration.zero] in widget tests.
+  ///
+  /// When [hintGate] is also provided, [adStub] is ignored; [hintGate] takes
+  /// precedence. Use [hintGate] for full gate injection in new tests.
   final RewardedAdStub? adStub;
+
+  /// Optional override for the hint gate (used in tests).
+  ///
+  /// When non-null, this gate is used directly instead of calling
+  /// [buildHintGate]. Allows tests to inject [AdMobRewardedGate] with a
+  /// fake [AdLoader] without touching dart-defines.
+  final HintGate? hintGate;
 
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
@@ -45,13 +58,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   late final PayloadClient _client;
-  late final RewardedAdStub _adStub;
+  late final HintGate _hintGate;
 
   @override
   void initState() {
     super.initState();
     _client = widget.payloadClient ?? PayloadClient();
-    _adStub = widget.adStub ?? const RewardedAdStub();
+    // Resolve the hint gate: explicit hintGate > buildHintGate(adStub).
+    _hintGate = widget.hintGate ?? buildHintGate(adStub: widget.adStub);
     _load();
   }
 
@@ -180,16 +194,21 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final payload = _payload!;
     final state = _dayState!;
     final hintsAvailable = payload.hints;
+
+    // Guard: no more payload hints left.
     if (state.hintsUsed >= hintsAvailable.length) return;
+
+    // Guard: daily frequency cap — product rule, applies in all modes.
+    if (state.revealedHints.length >= AppConfig.maxHintsPerDay) return;
 
     if (_showingAd) return;
     setState(() => _showingAd = true);
 
-    final granted = await _adStub.show(context);
+    final result = await _hintGate.requestHint(context);
 
     setState(() => _showingAd = false);
 
-    if (!granted) return;
+    if (!result.granted) return;
 
     final hint = hintsAvailable[state.hintsUsed];
     final newRevealedHints = [
@@ -206,6 +225,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       'lang': widget.lang,
       'hint_index': state.hintsUsed,
       'hint_rank': hint.rank,
+    });
+    await _analytics.logEvent(AnalyticsEvent.adWatched, {
+      'fallback': result.fallback,
+      'lang': widget.lang,
+      'day': widget.date,
     });
 
     if (mounted) {
@@ -302,6 +326,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final canGiveUp = state.guesses.length >= _giveUpMinGuesses;
     final hintsLeft = payload.hints.length - state.hintsUsed;
 
+    // Frequency cap: max [AppConfig.maxHintsPerDay] revealed hints per day.
+    // This is a product rule — applies in stub and real-AdMob modes alike.
+    final dailyCapReached =
+        state.revealedHints.length >= AppConfig.maxHintsPerDay;
+
     // Pinned hints sorted by rank ascending (rank 1 = secret = closest,
     // so lowest rank first gives the most-useful hint at the top).
     final pinnedHints = List<RevealedHint>.from(state.revealedHints)
@@ -358,10 +387,16 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               child: Row(
                 children: [
                   OutlinedButton.icon(
-                    onPressed: hintsLeft > 0 && !_showingAd ? _useHint : null,
+                    onPressed: hintsLeft > 0 && !_showingAd && !dailyCapReached
+                        ? _useHint
+                        : null,
                     icon: const Icon(Icons.lightbulb_outline, size: 18),
                     label: Text(
-                      hintsLeft > 0 ? 'Hint ($hintsLeft left)' : 'No hints left',
+                      dailyCapReached
+                          ? 'No more hints today'
+                          : hintsLeft > 0
+                              ? 'Hint ($hintsLeft left)'
+                              : 'No hints left',
                     ),
                   ),
                   const SizedBox(width: 8),

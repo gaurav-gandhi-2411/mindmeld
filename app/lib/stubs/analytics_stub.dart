@@ -6,6 +6,11 @@ class AnalyticsEvent {
   static const String hintUsed = 'hint_used';
   static const String win = 'win';
   static const String shareTapped = 'share_tapped';
+
+  /// Fired after every rewarded-ad gate pass (real or stub).
+  ///
+  /// Props: `{fallback: bool, lang: String?, day: String?}`
+  static const String adWatched = 'ad_watched';
 }
 
 /// Analytics stub — logs events to the local SQLite ring buffer.

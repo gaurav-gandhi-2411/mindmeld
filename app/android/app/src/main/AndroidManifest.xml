@@ -3,6 +3,19 @@
         android:label="mindmeld"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!--
+            AdMob APPLICATION_ID.
+
+            The manifest cannot read dart-define values at build time, so this
+            uses Google's official TEST app ID hardcoded here.
+
+            Phase-3 nicety: wire manifestPlaceholders in app/build.gradle.kts
+            with the production ID and change android:value to use the
+            admobAppId placeholder variable.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

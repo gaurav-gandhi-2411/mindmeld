@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
+import 'package:mindmeld/ads/consent_manager.dart';
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
@@ -56,6 +59,14 @@ class AppOverrides {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppPersistence.instance.init(); // production: uses platform default path
+
+  // AdMob initialisation and UMP consent — only executed in monetised builds.
+  // When adsEnabled=false (the default), zero ad/UMP code paths execute.
+  if (AppConfig.adsEnabled) {
+    await MobileAds.instance.initialize();
+    await ConsentManager.gatherConsent();
+  }
+
   runApp(const MindmeldApp());
 }
 
