@@ -20,6 +20,7 @@ class PuzzleScreen extends StatefulWidget {
     required this.date,
     required this.onWin,
     this.payloadClient,
+    this.adStub,
   });
 
   final String lang;
@@ -30,6 +31,12 @@ class PuzzleScreen extends StatefulWidget {
   /// When null, a default [PayloadClient] is constructed (production behaviour).
   final PayloadClient? payloadClient;
 
+  /// Optional override for the rewarded-ad stub (used in tests).
+  ///
+  /// When null, a default [RewardedAdStub] is used (3-second simulated delay).
+  /// Pass a stub with [simulatedDelay] of [Duration.zero] in widget tests.
+  final RewardedAdStub? adStub;
+
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
 }
@@ -38,12 +45,13 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   late final PayloadClient _client;
-  final _adStub = const RewardedAdStub();
+  late final RewardedAdStub _adStub;
 
   @override
   void initState() {
     super.initState();
     _client = widget.payloadClient ?? PayloadClient();
+    _adStub = widget.adStub ?? const RewardedAdStub();
     _load();
   }
 

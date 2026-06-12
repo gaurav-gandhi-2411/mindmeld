@@ -9,11 +9,29 @@ import 'package:mindmeld/core/config.dart';
 ///
 /// When [AppConfig.adsEnabled] is false (Phase 1), this stub:
 ///   - Shows a modal dialog informing the user that an ad is being simulated.
-///   - Waits 3 seconds (making the hint-gating flow fully testable without a
-///     real ad SDK).
+///   - Waits [simulatedDelay] (default 3 s; [Duration.zero] in tests keeps
+///     the timer drained by a single [WidgetTester.pump]).
 ///   - Returns true (reward granted).
+///
+/// ## Widget-test usage
+///
+/// Pass `simulatedDelay: const Duration(seconds: 4)` (or any non-zero value)
+/// and advance the fake clock with `tester.pump(const Duration(seconds: 5))`
+/// after tapping the hint button.  The fake-async clock advances instantly, so
+/// no real wall-clock time is consumed.
+///
+/// If you need the dialog to appear *before* the delay fires, pump once
+/// (shows the dialog), inspect, then pump with the target duration to fire the
+/// timer and dismiss the dialog.
 class RewardedAdStub {
-  const RewardedAdStub();
+  const RewardedAdStub({this.simulatedDelay = const Duration(seconds: 3)});
+
+  /// How long the simulated ad modal is displayed before auto-dismissing.
+  ///
+  /// In widget tests inject a short [Duration] (e.g. `Duration(seconds: 1)`)
+  /// and pump past it with `tester.pump(Duration(seconds: 4))`.
+  /// The fake-async clock advances instantly — no real time is consumed.
+  final Duration simulatedDelay;
 
   /// Show the rewarded ad (or stub) and return true if the reward was granted.
   ///
@@ -41,8 +59,10 @@ class RewardedAdStub {
       builder: (_) => const _SimulatedAdDialog(),
     );
 
-    // Simulate the 3-second ad watch period.
-    await Future<void>.delayed(const Duration(seconds: 3));
+    // Simulate the ad watch period.
+    // In widget tests the fake-async clock is advanced by pump(duration), so
+    // this Future resolves instantly from the test's perspective.
+    await Future<void>.delayed(simulatedDelay);
 
     // Dismiss the dialog if still mounted.
     if (context.mounted) {
