@@ -1,0 +1,246 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/core/payload_client.dart';
+import 'package:mindmeld/core/payload_codec.dart';
+import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/features/onboarding/onboarding_screen.dart';
+import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
+import 'package:mindmeld/features/settings/settings_screen.dart';
+import 'package:mindmeld/features/stats/stats_screen.dart';
+import 'package:mindmeld/features/win/win_screen.dart';
+
+/// Test-only overrides for the app shell.
+///
+/// Pass a non-null instance to [MindmeldApp] to:
+///   - Skip network fetches by injecting a pre-built [PayloadClient]
+///     (e.g. one backed by a [FileSystemAssetBundle] or mock HTTP).
+///   - Pin the puzzle date so integration tests don't depend on wall-clock time.
+///
+/// All fields are optional.  The real app always uses `null` overrides so
+/// production behaviour is fully preserved by default.
+class AppOverrides {
+  const AppOverrides({
+    this.payloadClient,
+    this.fixedDate,
+    this.skipOnboarding = false,
+  });
+
+  /// If non-null, [PuzzleScreen] uses this client instead of creating its own.
+  final PayloadClient? payloadClient;
+
+  /// If non-null, the app treats this as "today" instead of [DateTime.now()].
+  /// Format: "yyyy-MM-dd".
+  final String? fixedDate;
+
+  /// When true the onboarding gate is bypassed on first launch.
+  final bool skipOnboarding;
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppPersistence.instance.init();
+  runApp(const MindmeldApp());
+}
+
+class MindmeldApp extends StatelessWidget {
+  const MindmeldApp({super.key, this.overrides});
+
+  /// Test-only overrides; null in production.
+  final AppOverrides? overrides;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mindmeld',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorSchemeSeed: const Color(0xFF6200EE),
+        useMaterial3: true,
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: const Color(0xFF6200EE),
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
+      home: _AppShell(overrides: overrides),
+    );
+  }
+}
+
+/// Root shell: handles onboarding gate, language, win routing, and bottom nav.
+class _AppShell extends StatefulWidget {
+  const _AppShell({this.overrides});
+
+  final AppOverrides? overrides;
+
+  @override
+  State<_AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<_AppShell> {
+  bool _initialised = false;
+  bool _showOnboarding = false;
+  String _lang = 'en';
+  int _navIndex = 0;
+  bool _won = false;
+  String? _wonSecret;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final seen = await hasSeenOnboarding();
+    final lang = await loadSelectedLang();
+    if (mounted) {
+      setState(() {
+        // If skipOnboarding override is set, always bypass the gate.
+        _showOnboarding = !seen && !(widget.overrides?.skipOnboarding ?? false);
+        _lang = lang;
+        _initialised = true;
+      });
+    }
+  }
+
+  /// Returns today's date as "yyyy-MM-dd", honouring [AppOverrides.fixedDate].
+  String get _today =>
+      widget.overrides?.fixedDate ??
+      DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  Future<void> _handleWin() async {
+    try {
+      final client = widget.overrides?.payloadClient ?? PayloadClient();
+      final result = await client.fetch(_lang, _today);
+      final secret = PayloadCodec.decodeSecret(result.payload);
+      if (mounted) {
+        setState(() {
+          _won = true;
+          _wonSecret = secret;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _won = true;
+          _wonSecret = '(loading…)';
+        });
+      }
+    }
+  }
+
+  void _onLangChanged(String lang) {
+    setState(() {
+      _lang = lang;
+      _won = false;
+      _wonSecret = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialised) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_showOnboarding) {
+      return OnboardingScreen(
+        onDone: () => setState(() => _showOnboarding = false),
+      );
+    }
+
+    if (_won) {
+      return _WinShell(
+        lang: _lang,
+        date: _today,
+        secret: _wonSecret ?? '',
+        onClose: () => setState(() {
+          _won = false;
+          _wonSecret = null;
+        }),
+      );
+    }
+
+    return Scaffold(
+      body: IndexedStack(
+        index: _navIndex,
+        children: [
+          PuzzleScreen(
+            lang: _lang,
+            date: _today,
+            onWin: _handleWin,
+            payloadClient: widget.overrides?.payloadClient,
+          ),
+          StatsScreen(lang: _lang),
+          SettingsScreen(
+            currentLang: _lang,
+            onLangChanged: _onLangChanged,
+            onReplayOnboarding: () => setState(() => _showOnboarding = true),
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _navIndex,
+        onDestinationSelected: (i) => setState(() => _navIndex = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.grid_view), label: 'Puzzle'),
+          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Stats'),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        ],
+      ),
+    );
+  }
+}
+
+/// Intermediate widget that loads day state from persistence for the win screen.
+class _WinShell extends StatefulWidget {
+  const _WinShell({
+    required this.lang,
+    required this.date,
+    required this.secret,
+    required this.onClose,
+  });
+
+  final String lang;
+  final String date;
+  final String secret;
+  final VoidCallback onClose;
+
+  @override
+  State<_WinShell> createState() => _WinShellState();
+}
+
+class _WinShellState extends State<_WinShell> {
+  List<Guess>? _guesses;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final state = await AppPersistence.instance
+        .loadDayState(widget.date, widget.lang);
+    if (mounted) {
+      setState(() => _guesses = state?.guesses ?? []);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_guesses == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    return WinScreen(
+      secret: widget.secret,
+      guesses: _guesses!,
+      lang: widget.lang,
+      date: widget.date,
+      onPlayAgain: widget.onClose,
+    );
+  }
+}
