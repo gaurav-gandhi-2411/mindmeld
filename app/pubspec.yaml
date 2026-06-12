@@ -32,6 +32,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   sqflite_common_ffi: ^2.3.3
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
@@ -51,3 +52,15 @@ flutter:
     - assets/payloads/hi-en/2026-06-16.json.gz
     - assets/payloads/hi-en/2026-06-17.json.gz
     - assets/payloads/hi-en/2026-06-18.json.gz
+
+flutter_launcher_icons:
+  # Generate adaptive icons for Android (API 26+).
+  android: "launcher_icon"
+  # Background: the darkest gradient colour (Freezing blue) — solid fill
+  # so the icon looks good on any adaptive-icon shape.
+  adaptive_icon_background: "#1976D2"
+  # Foreground: the branded icon (M glyph + flame accent) with built-in padding.
+  adaptive_icon_foreground: "assets/icon-1024.png"
+  # Also replace the legacy mipmap ic_launcher for API < 26 devices.
+  image_path: "assets/icon-1024.png"
+  min_sdk_android: 21

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
+import 'package:mindmeld/ads/rewarded_ad_service.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
@@ -37,6 +38,7 @@ class AppOverrides {
     this.skipOnboarding = false,
     this.lang,
     this.dbPath,
+    this.hintGate,
   });
 
   /// If non-null, [PuzzleScreen] uses this client instead of creating its own.
@@ -60,6 +62,13 @@ class AppOverrides {
   /// Use in integration tests to get a fresh, isolated SQLite database per test
   /// run so that won/gave-up state from one test cannot bleed into the next.
   final String? dbPath;
+
+  /// If non-null, [PuzzleScreen] uses this hint gate instead of constructing
+  /// one from [buildHintGate].
+  ///
+  /// Use in integration tests to bypass the ad flow entirely (e.g. inject an
+  /// instant-grant gate so hints are revealed with zero delay).
+  final HintGate? hintGate;
 }
 
 void main() async {
@@ -261,6 +270,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             date: _today,
             onWin: _handleWin,
             payloadClient: widget.overrides?.payloadClient,
+            hintGate: widget.overrides?.hintGate,
           ),
           StatsScreen(lang: _lang),
           SettingsScreen(
