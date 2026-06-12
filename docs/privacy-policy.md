@@ -101,7 +101,7 @@ This policy describes how Mindmeld ("the app", "we") handles your data. Mindmeld
 
 To request deletion of any data associated with your device, contact us at:
 
-**<PLACEHOLDER: developer contact email>**
+**PLACEHOLDER_EMAIL**
 
 ---
 
@@ -113,9 +113,7 @@ This policy does not cover third-party websites or services linked from within t
 
 ## GDPR and UMP Consent
 
-For users in the European Economic Area (EEA) and United Kingdom, we rely on Google's User Messaging Platform (UMP) to collect consent before showing personalised ads. You may update your consent preferences at any time by clearing the app data or using the in-app consent reset option.
-
-**<PLACEHOLDER: link to in-app consent reset flow if implemented>**
+For users in the European Economic Area (EEA) and United Kingdom, we rely on Google's User Messaging Platform (UMP) to collect consent before showing personalised ads. You may change or withdraw your consent at any time via the app's **Settings → "Privacy options"** entry, which reopens the Google UMP privacy options form (implemented via the standard `google_mobile_ads` UMP `showPrivacyOptionsForm` mechanism). Ads will be served in a non-personalised mode if consent is denied or withdrawn.
 
 ---
 
@@ -129,6 +127,6 @@ We may update this policy from time to time. The "Last Updated" date at the top 
 
 For privacy questions, requests, or concerns:
 
-**Developer / Data Controller:** <PLACEHOLDER: developer full name or company name>
-**Contact Email:** <PLACEHOLDER: developer contact email>
+**Developer / Data Controller:** PLACEHOLDER_EMAIL
+**Contact Email:** PLACEHOLDER_EMAIL
 **App Package:** dev.gaurav.mindmeld
