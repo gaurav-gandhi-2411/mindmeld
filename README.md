@@ -72,14 +72,28 @@ flutter test integration_test/app_test.dart -d <device>   # full guess→win loo
 
 ## Web / PWA
 
-Play in the browser: **https://gaurav-gandhi-2411.github.io/mindmeld-payloads/play/**
-(installable PWA; same origin as the payloads, so no CORS surface).
+Play in the browser: **https://playmindmeld.vercel.app/**
+(installable PWA; hosted on Vercel). The old `/play/` path on GitHub Pages now serves a
+redirect to the Vercel URL.
 
 ```powershell
+# Build and deploy to Vercel (canonical production flow):
 cd app
-flutter build web --release --base-href=/mindmeld-payloads/play/ --no-web-resources-cdn
-Copy-Item build\web\* ..\..\mindmeld-payloads\play\ -Recurse -Force   # then commit+push there
+flutter build web --release --no-web-resources-cdn
+# Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap:
+cd ..
+uv run python scripts\make_web_sw.py --build-dir app\build\web
+Copy-Item app\build\web\* web-dist\ -Recurse -Force   # web-dist holds vercel.json
+cd web-dist
+npx vercel deploy --prod --yes
+
+# Publish payloads (unchanged — Pages repo, /play/ is now redirect-only):
+cd ..\generator
+uv run publish --days 30
 ```
+
+Payloads remain on GitHub Pages (`https://gaurav-gandhi-2411.github.io/mindmeld-payloads/`).
+The Vercel app fetches them from there; CORS is confirmed open on the Pages origin.
 
 Web specifics: storage tries WASM sqlite (`sqflite_common_ffi_web`, IndexedDB) and falls
 back to a `shared_preferences`-backed store on older browsers so the app never fails to
