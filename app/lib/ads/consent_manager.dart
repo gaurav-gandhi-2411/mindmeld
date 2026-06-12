@@ -12,13 +12,15 @@
 ///   Key methods:
 ///   `requestConsentInfoUpdate(params, onSuccess, onFailure)`
 ///   `canRequestAds() → Future<bool>`
+///   `getPrivacyOptionsRequirementStatus() → Future<PrivacyOptionsRequirementStatus>`
 ///
 /// - [ConsentForm] — show the consent form when required.
-///   Key static method:
-///   `loadAndShowConsentFormIfRequired(onDismissed)`
-///   This helper loads and shows a form only when the SDK determines the user
-///   is in a region that requires consent (EEA / UK). It is a no-op for users
-///   outside those regions, making it the recommended integration pattern.
+///   Key static methods:
+///   `loadAndShowConsentFormIfRequired(onDismissed)` — initial consent flow.
+///   `showPrivacyOptionsForm(onDismissed)` — reopen options form from Settings.
+///   The first helper loads and shows a form only when the SDK determines the
+///   user is in a region that requires consent (EEA / UK). It is a no-op for
+///   users outside those regions, making it the recommended integration pattern.
 ///
 /// After [gatherConsent] resolves, callers may load ads unconditionally:
 /// the SDK internally gates personalised vs non-personalised ad serving based
@@ -69,5 +71,37 @@ class ConsentManager {
       (FormError? formError) => formCompleter.complete(),
     );
     await formCompleter.future;
+  }
+
+  /// Returns whether the user's region requires a privacy options entry point.
+  ///
+  /// Uses [ConsentInformation.getPrivacyOptionsRequirementStatus] from the
+  /// google_mobile_ads 9.0.0 UMP API.
+  ///
+  /// Returns `false` immediately when [AppConfig.adsEnabled] is false, so no
+  /// platform channel call is made in non-monetised/test builds.
+  static Future<bool> isPrivacyOptionsRequired() async {
+    if (!AppConfig.adsEnabled) return false;
+    final status =
+        await ConsentInformation.instance.getPrivacyOptionsRequirementStatus();
+    return status == PrivacyOptionsRequirementStatus.required;
+  }
+
+  /// Presents the privacy options form to the user.
+  ///
+  /// Uses [ConsentForm.showPrivacyOptionsForm] from the google_mobile_ads 9.0.0
+  /// UMP API. This allows the user to update their consent choices after the
+  /// initial consent flow — e.g. via Settings → "Privacy options".
+  ///
+  /// Is a no-op when [AppConfig.adsEnabled] is false so no platform channel
+  /// call is made in non-monetised/test builds. Errors are silently swallowed
+  /// to keep the Settings screen stable.
+  static Future<void> showPrivacyOptions() async {
+    if (!AppConfig.adsEnabled) return;
+    final completer = Completer<void>();
+    ConsentForm.showPrivacyOptionsForm(
+      (FormError? formError) => completer.complete(),
+    );
+    await completer.future;
   }
 }

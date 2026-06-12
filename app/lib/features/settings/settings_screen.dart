@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
@@ -6,6 +7,13 @@ import 'package:mindmeld/stubs/iap_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kLangPref = 'selected_lang';
+
+/// URL shown in the privacy policy dialog.
+///
+/// url_launcher is not a current dependency; we show a selectable-text dialog
+/// so the user can copy the URL. Tracked as a named constant for easy update.
+const String _kPrivacyPolicyUrl =
+    'https://gaurav-gandhi-2411.github.io/mindmeld-payloads/privacy.html';
 
 /// Returns the currently selected language, defaulting to 'en'.
 Future<String> loadSelectedLang() async {
@@ -45,12 +53,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late String _lang;
   Entitlements _entitlements = Entitlements.empty;
 
+  /// Whether the UMP SDK requires a privacy options entry point in this region.
+  ///
+  /// Starts as false and is set asynchronously in [initState] so the tile
+  /// only appears once the SDK has confirmed it is needed. When adsEnabled is
+  /// false [ConsentManager.isPrivacyOptionsRequired] returns false immediately
+  /// without any platform channel call, so the tile never renders in test builds.
+  bool _privacyOptionsRequired = false;
+
   @override
   void initState() {
     super.initState();
     _lang = widget.currentLang;
     _gateway = widget.iapGateway ?? buildIapGateway();
     _loadEntitlements();
+    _checkPrivacyOptionsRequired();
+  }
+
+  Future<void> _checkPrivacyOptionsRequired() async {
+    final required = await ConsentManager.isPrivacyOptionsRequired();
+    if (mounted) setState(() => _privacyOptionsRequired = required);
   }
 
   Future<void> _loadEntitlements() async {
@@ -100,6 +122,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _archiveSubtitle() {
     if (_entitlements.archive) return 'Unlocked';
     return 'Coming soon';
+  }
+
+  /// Delegates to [ConsentManager.showPrivacyOptions].
+  ///
+  /// Only reachable when [AppConfig.adsEnabled] is true AND
+  /// [_privacyOptionsRequired] is true, so the platform channel call is always
+  /// appropriate.
+  Future<void> _showPrivacyOptions() async {
+    await ConsentManager.showPrivacyOptions();
+  }
+
+  /// Shows the privacy policy URL in a [SelectableText] dialog.
+  ///
+  /// url_launcher is not a current dependency; a dialog lets the user long-press
+  /// to copy the URL on any platform without adding a new package.
+  void _showPrivacyPolicyDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Privacy Policy'),
+        content: const SelectableText(_kPrivacyPolicyUrl),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -170,6 +221,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
 
           const Divider(),
+
+          // Privacy section
+          //
+          // "Privacy options" — only shown when adsEnabled AND the UMP SDK has
+          // confirmed a privacy-options entry point is required for this user's
+          // region (EEA/UK). In all test builds adsEnabled=false, so this tile
+          // never renders in tests.
+          if (AppConfig.adsEnabled && _privacyOptionsRequired)
+            ListTile(
+              leading: const Icon(Icons.shield_outlined),
+              title: const Text('Privacy options'),
+              onTap: _showPrivacyOptions,
+            ),
+
+          // "Privacy policy" — always visible regardless of monetisation flags.
+          // Opens a dialog with a selectable URL (url_launcher is not a dep).
+          ListTile(
+            leading: const Icon(Icons.policy_outlined),
+            title: const Text('Privacy policy'),
+            onTap: _showPrivacyPolicyDialog,
+          ),
 
           // Onboarding + About
           ListTile(

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/rewarded_ad_service.dart';
@@ -349,12 +351,18 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final sorted = _sortedGuesses;
     final latestGuess = state.guesses.isEmpty ? null : state.guesses.last;
     final canGiveUp = state.guesses.length >= _giveUpMinGuesses;
-    final hintsLeft = payload.hints.length - state.hintsUsed;
-
     // Frequency cap: max [AppConfig.maxHintsPerDay] revealed hints per day.
     // This is a product rule — applies in stub and real-AdMob modes alike.
     final dailyCapReached =
         state.revealedHints.length >= AppConfig.maxHintsPerDay;
+
+    // The displayed count is the effective remaining: bounded by both the
+    // payload's hint supply and the daily cap, so the label never promises
+    // more hints than the cap will allow.
+    final hintsLeft = math.min(
+      payload.hints.length - state.hintsUsed,
+      AppConfig.maxHintsPerDay - state.revealedHints.length,
+    );
 
     // Pinned hints sorted by rank ascending (rank 1 = secret = closest,
     // so lowest rank first gives the most-useful hint at the top).
