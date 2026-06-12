@@ -197,6 +197,82 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Day state lang isolation
+  // ---------------------------------------------------------------------------
+  //
+  // Regression for: integration test hi-en pass fails because the en win state
+  // (won: true) written in the en pass was read back when the hi-en pass opened
+  // the same database file and queried for the same date without a lang filter.
+  //
+  // day_state has a composite PRIMARY KEY (date, lang) so states for different
+  // langs must be independent.  These tests enforce that contract explicitly.
+  group('day state lang isolation', () {
+    test('en and hi-en states are stored and loaded independently', () async {
+      final (db, tmpDir) = await openTestDb();
+
+      try {
+        final enState = DayState(
+          date: '2026-06-12',
+          lang: 'en',
+          guesses: [],
+          hintsUsed: 0,
+          won: true,
+          gaveUp: false,
+        );
+        final hiEnState = DayState(
+          date: '2026-06-12',
+          lang: 'hi-en',
+          guesses: [],
+          hintsUsed: 0,
+          won: false,
+          gaveUp: false,
+        );
+
+        await db.saveDayState(enState);
+        await db.saveDayState(hiEnState);
+
+        final loadedEn = await db.loadDayState('2026-06-12', 'en');
+        final loadedHiEn = await db.loadDayState('2026-06-12', 'hi-en');
+
+        // en is won, hi-en is not — they must not share state.
+        expect(loadedEn, isNotNull);
+        expect(loadedEn!.won, isTrue,
+            reason: 'en day state should be marked won');
+
+        expect(loadedHiEn, isNotNull);
+        expect(loadedHiEn!.won, isFalse,
+            reason: 'hi-en day state must not inherit the en win');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('loading hi-en state returns null when only en state exists', () async {
+      final (db, tmpDir) = await openTestDb();
+
+      try {
+        final enState = DayState(
+          date: '2026-06-12',
+          lang: 'en',
+          guesses: [],
+          hintsUsed: 0,
+          won: true,
+          gaveUp: false,
+        );
+        await db.saveDayState(enState);
+
+        // hi-en was never saved — must return null, not the en row.
+        final loadedHiEn = await db.loadDayState('2026-06-12', 'hi-en');
+        expect(loadedHiEn, isNull,
+            reason: 'hi-en query must return null when only en row exists; '
+                'day_state keying by (date, lang) must prevent cross-lang bleed');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Day state persistence
   // ---------------------------------------------------------------------------
   group('day state persistence', () {

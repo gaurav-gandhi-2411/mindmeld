@@ -42,6 +42,7 @@ import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/main.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // ---------------------------------------------------------------------------
@@ -88,6 +89,16 @@ void _initSqfliteForPlatform() {
   }
 }
 
+/// Create a per-test temporary directory for an isolated SQLite database.
+///
+/// Prevents won/gave-up day state written in one test from bleeding into the
+/// next test when [AppPersistence] re-opens the same on-disk file.
+Future<(Directory, String)> _createTestDbPath() async {
+  final dir = await Directory.systemTemp.createTemp('mindmeld_itest_');
+  final path = p.join(dir.path, 'test.db');
+  return (dir, path);
+}
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -129,7 +140,11 @@ void main() {
   // Run each language pass in a separate test for clear CI reporting.
   for (final lang in ['en', 'hi-en']) {
     testWidgets('guess → win loop ($lang)', (tester) async {
-      // Reset persistence so each test starts fresh.
+      // Each test gets its own isolated SQLite file so won/gave-up state written
+      // during the en pass cannot bleed into the hi-en pass.
+      final (testDbDir, testDbPath) = await _createTestDbPath();
+
+      // Reset singleton so AppPersistence.init() opens the fresh per-test file.
       AppPersistence.resetForTest();
 
       final secret = lang == 'en' ? enSecret : hiEnSecret;
@@ -140,15 +155,19 @@ void main() {
       assert(hintWord != secret,
           'hintWord "$hintWord" must not equal secret "$secret"');
 
+      // Pass lang and dbPath through AppOverrides so:
+      //   - lang: the shell uses hi-en even if SharedPreferences holds 'en'.
+      //   - dbPath: persistence opens the per-test file, not the shared app DB.
       final overrides = AppOverrides(
         payloadClient: _BundleOnlyClient(),
         fixedDate: _testDate,
         skipOnboarding: true,
+        lang: lang,
+        dbPath: testDbPath,
       );
 
-      // Initialise persistence (uses real sqflite on device, ffi on desktop).
-      await AppPersistence.instance.init();
-
+      // Persistence is now initialised by _AppShellState._init() using the
+      // per-test dbPath from AppOverrides; no separate init() call needed.
       await tester.pumpWidget(MindmeldApp(overrides: overrides));
 
       // Allow the async app init + puzzle load to complete.
@@ -216,9 +235,10 @@ void main() {
                 'Share card "$text" must not contain the secret "$secret"');
       }
 
-      // Clean up persistence for next test.
+      // Clean up: close DB, reset singleton, delete the per-test temp directory.
       await AppPersistence.instance.close();
       AppPersistence.resetForTest();
+      await testDbDir.delete(recursive: true);
     });
   }
 }

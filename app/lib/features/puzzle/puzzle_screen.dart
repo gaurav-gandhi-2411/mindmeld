@@ -76,6 +76,17 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               );
           _loading = false;
         });
+
+        // If the puzzle was already won in a previous session (e.g. the app was
+        // restarted after winning), route the shell back to the win screen so the
+        // player sees their result instead of a locked-input puzzle screen.
+        if (existing != null && existing.won) {
+          // Schedule for next frame so the parent shell's setState is not called
+          // synchronously inside a build/setState cycle.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) widget.onWin();
+          });
+        }
       }
     } catch (e) {
       if (mounted) {

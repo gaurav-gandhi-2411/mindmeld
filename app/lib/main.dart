@@ -16,6 +16,8 @@ import 'package:mindmeld/features/win/win_screen.dart';
 ///   - Skip network fetches by injecting a pre-built [PayloadClient]
 ///     (e.g. one backed by a [FileSystemAssetBundle] or mock HTTP).
 ///   - Pin the puzzle date so integration tests don't depend on wall-clock time.
+///   - Override the language so tests don't depend on SharedPreferences state.
+///   - Point persistence at an isolated SQLite file so tests don't share DB state.
 ///
 /// All fields are optional.  The real app always uses `null` overrides so
 /// production behaviour is fully preserved by default.
@@ -24,6 +26,8 @@ class AppOverrides {
     this.payloadClient,
     this.fixedDate,
     this.skipOnboarding = false,
+    this.lang,
+    this.dbPath,
   });
 
   /// If non-null, [PuzzleScreen] uses this client instead of creating its own.
@@ -35,11 +39,23 @@ class AppOverrides {
 
   /// When true the onboarding gate is bypassed on first launch.
   final bool skipOnboarding;
+
+  /// If non-null, overrides the language loaded from SharedPreferences.
+  ///
+  /// Use in integration tests to pin the language without touching prefs state.
+  final String? lang;
+
+  /// If non-null, [AppPersistence] is initialised at this path instead of the
+  /// platform default documents directory.
+  ///
+  /// Use in integration tests to get a fresh, isolated SQLite database per test
+  /// run so that won/gave-up state from one test cannot bleed into the next.
+  final String? dbPath;
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppPersistence.instance.init();
+  await AppPersistence.instance.init(); // production: uses platform default path
   runApp(const MindmeldApp());
 }
 
@@ -94,8 +110,18 @@ class _AppShellState extends State<_AppShell> {
   }
 
   Future<void> _init() async {
+    // Initialise persistence before reading any state so the DB is open when
+    // PuzzleScreen._load() runs.  In tests, dbPath is a per-test temp file so
+    // no won/gave-up state bleeds between test runs.
+    await AppPersistence.instance.init(
+      dbPath: widget.overrides?.dbPath,
+    );
+
     final seen = await hasSeenOnboarding();
-    final lang = await loadSelectedLang();
+    // Honour the lang override so integration tests don't depend on whatever
+    // lang was last written to SharedPreferences by a previous test.
+    final lang =
+        widget.overrides?.lang ?? await loadSelectedLang();
     if (mounted) {
       setState(() {
         // If skipOnboarding override is set, always bypass the gate.
