@@ -6,6 +6,8 @@ import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/iap/entitlements.dart';
+import 'package:mindmeld/iap/revenuecat_gateway.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 import 'package:mindmeld/stubs/rewarded_ad_stub.dart';
 
@@ -24,6 +26,7 @@ class PuzzleScreen extends StatefulWidget {
     this.payloadClient,
     this.adStub,
     this.hintGate,
+    this.iapGateway,
   });
 
   final String lang;
@@ -50,6 +53,13 @@ class PuzzleScreen extends StatefulWidget {
   /// fake [AdLoader] without touching dart-defines.
   final HintGate? hintGate;
 
+  /// Optional IAP gateway override (used in tests).
+  ///
+  /// When non-null, entitlements are fetched from this gateway instead of
+  /// building one from [AppConfig]. Allows tests to grant removeAds without
+  /// touching dart-defines.
+  final IapGateway? iapGateway;
+
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
 }
@@ -59,6 +69,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   final _focusNode = FocusNode();
   late final PayloadClient _client;
   late final HintGate _hintGate;
+  late final IapGateway _iapGateway;
+  Entitlements _entitlements = Entitlements.empty;
 
   @override
   void initState() {
@@ -66,6 +78,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     _client = widget.payloadClient ?? PayloadClient();
     // Resolve the hint gate: explicit hintGate > buildHintGate(adStub).
     _hintGate = widget.hintGate ?? buildHintGate(adStub: widget.adStub);
+    _iapGateway = widget.iapGateway ?? buildIapGateway();
     _load();
   }
 
@@ -81,12 +94,17 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
   Future<void> _load() async {
     try {
-      final result = await _client.fetch(widget.lang, widget.date);
+      // Fetch payload and entitlements concurrently.
+      final payloadFuture = _client.fetch(widget.lang, widget.date);
+      final entitlementsFuture = _iapGateway.current();
+      final payloadResult = await payloadFuture;
+      final entitlements = await entitlementsFuture;
       final existing = await AppPersistence.instance
           .loadDayState(widget.date, widget.lang);
       if (mounted) {
         setState(() {
-          _payload = result.payload;
+          _payload = payloadResult.payload;
+          _entitlements = entitlements;
           _dayState = existing ??
               DayState(
                 date: widget.date,
@@ -204,7 +222,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (_showingAd) return;
     setState(() => _showingAd = true);
 
-    final result = await _hintGate.requestHint(context);
+    // removeAds entitlement: skip the ad modal entirely — grant hint instantly
+    // (still subject to the daily cap above).
+    final HintGateResult result;
+    if (_entitlements.removeAds) {
+      result = const HintGateResult(granted: true, fallback: true);
+    } else {
+      result = await _hintGate.requestHint(context);
+    }
 
     setState(() => _showingAd = false);
 

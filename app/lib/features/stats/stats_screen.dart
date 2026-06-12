@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/iap/entitlements.dart';
+import 'package:mindmeld/iap/revenuecat_gateway.dart';
 
-/// Displays player statistics: streak, max streak, played, win %, guess distribution.
+/// Displays player statistics: streak, max streak, played, win %, guess distribution,
+/// and streak-freeze count (sourced from the IAP gateway entitlements).
 class StatsScreen extends StatefulWidget {
-  const StatsScreen({super.key, required this.lang});
+  const StatsScreen({
+    super.key,
+    required this.lang,
+    /// Optional gateway override for tests. When null [buildIapGateway] is used.
+    this.iapGateway,
+  });
 
   final String lang;
+
+  /// Optional IAP gateway; package-accessible for test injection.
+  final IapGateway? iapGateway;
 
   @override
   State<StatsScreen> createState() => _StatsScreenState();
@@ -14,17 +25,28 @@ class StatsScreen extends StatefulWidget {
 
 class _StatsScreenState extends State<StatsScreen> {
   PlayerStats? _stats;
+  Entitlements _entitlements = Entitlements.empty;
   bool _loading = true;
+
+  late final IapGateway _gateway;
 
   @override
   void initState() {
     super.initState();
+    _gateway = widget.iapGateway ?? buildIapGateway();
     _load();
   }
 
   Future<void> _load() async {
     final s = await AppPersistence.instance.loadStats(widget.lang);
-    if (mounted) setState(() { _stats = s; _loading = false; });
+    final e = await _gateway.current();
+    if (mounted) {
+      setState(() {
+        _stats = s;
+        _entitlements = e;
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -66,6 +88,15 @@ class _StatsScreenState extends State<StatsScreen> {
               const Text('No wins yet — play a puzzle!')
             else
               ..._buildDistribution(context, stats),
+
+            // Streak-freeze count — surfaces non-zero values from IAP entitlements.
+            if (_entitlements.streakFreezes > 0) ...[
+              const SizedBox(height: 24),
+              Text(
+                'Streak freezes: ${_entitlements.streakFreezes}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
           ],
         ),
       ),

@@ -76,6 +76,17 @@ class AppConfig {
   static const int maxHintsPerDay = 5;
 
   // ---------------------------------------------------------------------------
+  // RevenueCat
+  // ---------------------------------------------------------------------------
+
+  /// RevenueCat public API key.
+  ///
+  /// Empty default keeps the app in stub mode so plain `flutter run` / `flutter
+  /// test` never touches RevenueCat infrastructure. Production builds must
+  /// supply the real key via `--dart-define=REVENUECAT_API_KEY=<key>`.
+  static const String revenueCatApiKey = String.fromEnvironment('REVENUECAT_API_KEY');
+
+  // ---------------------------------------------------------------------------
   // Base URL
   // ---------------------------------------------------------------------------
 
