@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:mindmeld/core/models.dart';
 
@@ -16,8 +16,11 @@ class PayloadCodec {
   static const String _obfuscateSuffix = 'mindmeld-secret-v1';
 
   /// Decompress gzip bytes and parse JSON into a [DailyPayload].
+  ///
+  /// Uses [archive.GZipDecoder] which works on all platforms including web,
+  /// unlike dart:io's [GZipCodec] which is unavailable in browser contexts.
   static DailyPayload decode(Uint8List gzBytes) {
-    final decompressed = GZipCodec().decode(gzBytes);
+    final decompressed = GZipDecoder().decodeBytes(gzBytes);
     final jsonStr = utf8.decode(decompressed);
     final json = jsonDecode(jsonStr) as Map<String, dynamic>;
     return DailyPayload.fromJson(json);

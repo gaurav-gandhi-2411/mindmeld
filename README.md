@@ -65,10 +65,27 @@ Requires Flutter ≥ 3.44 and an Android SDK.
 ```powershell
 cd app
 flutter pub get
-flutter test                      # 94 widget/unit tests
+flutter test --concurrency=1      # widget/unit tests
 flutter build apk --debug
 flutter test integration_test/app_test.dart -d <device>   # full guess→win loop, en + hi-en
 ```
+
+## Web / PWA
+
+Play in the browser: **https://gaurav-gandhi-2411.github.io/mindmeld-payloads/play/**
+(installable PWA; same origin as the payloads, so no CORS surface).
+
+```powershell
+cd app
+flutter build web --release --base-href=/mindmeld-payloads/play/ --no-web-resources-cdn
+Copy-Item build\web\* ..\..\mindmeld-payloads\play\ -Recurse -Force   # then commit+push there
+```
+
+Web specifics: storage tries WASM sqlite (`sqflite_common_ffi_web`, IndexedDB) and falls
+back to a `shared_preferences`-backed store on older browsers so the app never fails to
+render; ads/IAP are force-disabled on web (`*EnabledEffective` getters); share uses the Web
+Share API with clipboard fallback. Rewarded web ads via Google's Ad Placement API are a
+Phase 4 item (`docs/web-monetization.md`).
 
 ## Results (honest numbers)
 

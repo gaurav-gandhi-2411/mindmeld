@@ -1,15 +1,12 @@
-import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mindmeld/core/models.dart';
-import 'package:mindmeld/core/storage_factory_stub.dart'
-    // ignore: uri_does_not_exist
-    if (dart.library.io) 'package:mindmeld/core/storage_factory_io.dart'
-    // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/core/storage_factory_web.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite_common/sqlite_api.dart';
+import 'package:mindmeld/core/prefs_store.dart';
+import 'package:mindmeld/core/sqlite_store.dart';
+import 'package:mindmeld/core/storage_backend.dart';
+
+export 'package:mindmeld/core/storage_backend.dart' show StorageBackend, StorageBackendKind;
 
 /// Streak update result — returned by [updateStreak] for testability.
 class StreakResult {
@@ -70,205 +67,95 @@ StreakResult updateStreak({
   );
 }
 
-/// SQLite-backed persistence layer for Mindmeld.
+/// SQLite-backed persistence layer for Mindmeld with shared_preferences fallback.
 ///
-/// Tables:
-///   - day_state:   one row per (date, lang); stores guess history, hints used, won/gaveUp.
-///   - stats:       one row per lang; stores played, wins, streaks, guess distribution.
-///   - analytics:   ring buffer, max 500 rows; FIFO eviction.
+/// On web, SQLite is attempted first (sqflite_common_ffi_web / WASM).  If the
+/// WASM instantiation fails (e.g. Chrome 124 "Import #25 module='env'" error),
+/// the initialisation falls back to [PrefsStore] so the app NEVER renders blank.
+///
+/// On native platforms, [SqliteStore] is always used (no fallback needed).
+///
+/// Call [activeBackendKind] after [init] to verify which backend is active.
 class AppPersistence {
   AppPersistence._();
 
   static AppPersistence? _instance;
-  Database? _db;
+  StorageBackend? _backend;
 
   static AppPersistence get instance {
     _instance ??= AppPersistence._();
     return _instance!;
   }
 
-  static const int _analyticsMaxRows = 500;
+  /// Which backend is currently active.  Valid after [init].
+  StorageBackendKind? get activeBackendKind => _backend?.kind;
 
-  /// Initialise (or open) the database at [dbPath].
+  /// Initialise (or open) the underlying store.
   ///
-  /// If [dbPath] is null the platform default documents directory is used
-  /// (or the WASM/IndexedDB virtual path on web).
-  /// Pass an explicit path in tests (sqflite_common_ffi + temp dir).
+  /// On web: tries [SqliteStore] first; falls back to [PrefsStore] on error.
+  /// On native: always uses [SqliteStore].
+  ///
+  /// [dbPath] is forwarded to [SqliteStore.init]; ignored by [PrefsStore].
   Future<void> init({String? dbPath}) async {
-    if (_db != null) return;
+    if (_backend != null) return;
 
-    final factory = getPlatformDatabaseFactory();
-
-    // On web, path_provider is not available; use a fixed virtual path that
-    // sqflite_common_ffi_web maps to IndexedDB.
-    final String path;
     if (kIsWeb) {
-      path = dbPath ?? 'mindmeld.db';
+      await _initWeb(dbPath: dbPath);
     } else {
-      path = dbPath ?? p.join(
-        (await getApplicationDocumentsDirectory()).path,
-        'mindmeld.db',
-      );
+      final store = SqliteStore();
+      await store.init(dbPath: dbPath);
+      _backend = store;
+      dev.log('AppPersistence: SQLite backend active', name: 'AppPersistence');
     }
-
-    _db = await factory.openDatabase(
-      path,
-      options: OpenDatabaseOptions(
-        version: 3,
-        onCreate: _onCreate,
-        onUpgrade: _onUpgrade,
-      ),
-    );
   }
 
-  Database get _database {
-    if (_db == null) throw StateError('AppPersistence not initialised. Call init() first.');
-    return _db!;
+  /// Web-specific init: sqflite-first with PrefsStore fallback.
+  Future<void> _initWeb({String? dbPath}) async {
+    try {
+      final store = SqliteStore();
+      await store.init(dbPath: dbPath);
+      _backend = store;
+      dev.log('AppPersistence: SQLite/WASM backend active (web)',
+          name: 'AppPersistence');
+    } catch (e, st) {
+      dev.log(
+        'AppPersistence: SQLite/WASM init failed — falling back to PrefsStore. Error: $e',
+        name: 'AppPersistence',
+        error: e,
+        stackTrace: st,
+      );
+      final prefs = PrefsStore();
+      await prefs.init();
+      _backend = prefs;
+      dev.log('AppPersistence: PrefsStore backend active (web SQLite fallback)',
+          name: 'AppPersistence');
+    }
   }
 
-  Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE day_state (
-        date TEXT NOT NULL,
-        lang TEXT NOT NULL,
-        guesses_json TEXT NOT NULL DEFAULT '[]',
-        hints_used INTEGER NOT NULL DEFAULT 0,
-        won INTEGER NOT NULL DEFAULT 0,
-        gave_up INTEGER NOT NULL DEFAULT 0,
-        revealed_hints_json TEXT NOT NULL DEFAULT '[]',
-        PRIMARY KEY (date, lang)
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE stats (
-        lang TEXT PRIMARY KEY,
-        played INTEGER NOT NULL DEFAULT 0,
-        wins INTEGER NOT NULL DEFAULT 0,
-        current_streak INTEGER NOT NULL DEFAULT 0,
-        max_streak INTEGER NOT NULL DEFAULT 0,
-        last_win_date TEXT,
-        dist_json TEXT NOT NULL DEFAULT '{}'
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE analytics (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_name TEXT NOT NULL,
-        props_json TEXT NOT NULL DEFAULT '{}',
-        ts INTEGER NOT NULL,
-        flushed INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
-  }
-
-  /// Incremental schema migrations.
-  ///
-  /// v1 → v2: add [revealed_hints_json] column to [day_state].
-  /// v2 → v3: add [flushed] column to [analytics] for Firebase flush tracking.
-  ///           Existing rows default to 0 (unflushed) so they will be picked up
-  ///           by the first flush cycle after upgrade.
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute(
-        "ALTER TABLE day_state ADD COLUMN revealed_hints_json TEXT NOT NULL DEFAULT '[]'",
-      );
+  StorageBackend get _store {
+    if (_backend == null) {
+      throw StateError('AppPersistence not initialised. Call init() first.');
     }
-    if (oldVersion < 3) {
-      await db.execute(
-        'ALTER TABLE analytics ADD COLUMN flushed INTEGER NOT NULL DEFAULT 0',
-      );
-    }
+    return _backend!;
   }
 
   // ---------------------------------------------------------------------------
-  // Day state
+  // Day state (delegated to backend)
   // ---------------------------------------------------------------------------
 
-  Future<DayState?> loadDayState(String date, String lang) async {
-    final rows = await _database.query(
-      'day_state',
-      where: 'date = ? AND lang = ?',
-      whereArgs: [date, lang],
-    );
-    if (rows.isEmpty) return null;
-    final row = rows.first;
-    final guessesJson = jsonDecode(row['guesses_json'] as String) as List<dynamic>;
-    final guesses = guessesJson.map(_guessFromJson).toList();
-    // revealed_hints_json was added in schema v2; guard against missing column
-    // on old DBs that were upgraded before the DEFAULT filled in (belt-and-suspenders).
-    final rawHints = row['revealed_hints_json'];
-    final revealedHints = rawHints == null
-        ? <RevealedHint>[]
-        : (jsonDecode(rawHints as String) as List<dynamic>)
-            .map(_revealedHintFromJson)
-            .toList();
-    return DayState(
-      date: date,
-      lang: lang,
-      guesses: guesses,
-      hintsUsed: row['hints_used'] as int,
-      won: (row['won'] as int) == 1,
-      gaveUp: (row['gave_up'] as int) == 1,
-      revealedHints: revealedHints,
-    );
-  }
+  Future<DayState?> loadDayState(String date, String lang) =>
+      _store.loadDayState(date, lang);
 
-  Future<void> saveDayState(DayState state) async {
-    final guessesJson = jsonEncode(state.guesses.map(_guessToJson).toList());
-    final hintsJson =
-        jsonEncode(state.revealedHints.map(_revealedHintToJson).toList());
-    await _database.insert(
-      'day_state',
-      {
-        'date': state.date,
-        'lang': state.lang,
-        'guesses_json': guessesJson,
-        'hints_used': state.hintsUsed,
-        'won': state.won ? 1 : 0,
-        'gave_up': state.gaveUp ? 1 : 0,
-        'revealed_hints_json': hintsJson,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
+  Future<void> saveDayState(DayState state) => _store.saveDayState(state);
 
   // ---------------------------------------------------------------------------
   // Stats
   // ---------------------------------------------------------------------------
 
-  Future<PlayerStats> loadStats(String lang) async {
-    final rows = await _database.query(
-      'stats',
-      where: 'lang = ?',
-      whereArgs: [lang],
-    );
-    if (rows.isEmpty) return PlayerStats.empty;
-    final row = rows.first;
-    final distJson =
-        jsonDecode(row['dist_json'] as String) as Map<String, dynamic>;
-    return PlayerStats(
-      played: row['played'] as int,
-      wins: row['wins'] as int,
-      currentStreak: row['current_streak'] as int,
-      maxStreak: row['max_streak'] as int,
-      guessDistribution: distJson.map((k, v) => MapEntry(k, v as int)),
-    );
-  }
+  Future<PlayerStats> loadStats(String lang) => _store.loadStats(lang);
 
-  Future<DateTime?> loadLastWinDate(String lang) async {
-    final rows = await _database.query(
-      'stats',
-      columns: ['last_win_date'],
-      where: 'lang = ?',
-      whereArgs: [lang],
-    );
-    if (rows.isEmpty) return null;
-    final raw = rows.first['last_win_date'];
-    if (raw == null) return null;
-    return DateTime.tryParse(raw as String);
-  }
+  Future<DateTime?> loadLastWinDate(String lang) =>
+      _store.loadLastWinDate(lang);
 
   /// Record a win and update streaks atomically.
   ///
@@ -301,7 +188,7 @@ class AppPersistence {
       guessDistribution: dist,
     );
 
-    await _saveStats(lang, updated, today);
+    await _store.saveStats(lang, updated, today);
     return updated;
   }
 
@@ -313,28 +200,8 @@ class AppPersistence {
       // Losing resets streak to 0.
       currentStreak: 0,
     );
-    await _saveStats(lang, updated, null);
+    await _store.saveStats(lang, updated, null);
     return updated;
-  }
-
-  Future<void> _saveStats(
-    String lang,
-    PlayerStats stats,
-    DateTime? lastWinDate,
-  ) async {
-    await _database.insert(
-      'stats',
-      {
-        'lang': lang,
-        'played': stats.played,
-        'wins': stats.wins,
-        'current_streak': stats.currentStreak,
-        'max_streak': stats.maxStreak,
-        'last_win_date': lastWinDate?.toIso8601String(),
-        'dist_json': jsonEncode(stats.guessDistribution),
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
   }
 
   // ---------------------------------------------------------------------------
@@ -342,97 +209,45 @@ class AppPersistence {
   // ---------------------------------------------------------------------------
 
   /// Log an analytics event to the local ring buffer.
-  ///
-  /// Automatically evicts oldest rows when count exceeds [_analyticsMaxRows].
-  Future<void> logEvent(String name, Map<String, dynamic> props) async {
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    await _database.insert('analytics', {
-      'event_name': name,
-      'props_json': jsonEncode(props),
-      'ts': ts,
-    });
-
-    // Enforce ring buffer cap: delete oldest rows beyond the limit.
-    await _database.rawDelete('''
-      DELETE FROM analytics
-      WHERE id NOT IN (
-        SELECT id FROM analytics ORDER BY id DESC LIMIT $_analyticsMaxRows
-      )
-    ''');
-  }
+  Future<void> logEvent(String name, Map<String, dynamic> props) =>
+      _store.logEvent(name, props);
 
   /// Export all buffered analytics events (including already-flushed rows).
-  ///
-  /// Used by the Phase 2 Firebase exporter and existing tests that inspect the
-  /// full ring buffer contents regardless of flush state.
-  Future<List<Map<String, dynamic>>> exportAnalyticsBuffer() async {
-    return _database.query('analytics', orderBy: 'id ASC');
-  }
+  Future<List<Map<String, dynamic>>> exportAnalyticsBuffer() =>
+      _store.exportAnalyticsBuffer();
 
   /// Export only analytics events that have NOT yet been flushed to Firebase.
-  ///
-  /// Returns rows ordered by [id] ascending (oldest first).  Each row includes
-  /// all columns including [id], which callers must pass to [markEventsFlushed].
-  Future<List<Map<String, dynamic>>> exportUnflushedEvents({int limit = 500}) async {
-    return _database.query(
-      'analytics',
-      where: 'flushed = 0',
-      orderBy: 'id ASC',
-      limit: limit,
-    );
-  }
+  Future<List<Map<String, dynamic>>> exportUnflushedEvents({int limit = 500}) =>
+      _store.exportUnflushedEvents(limit: limit);
 
   /// Mark the given event [ids] as flushed so they are not re-sent.
-  ///
-  /// Called by [FirebaseExporter] after a successful batch upload.
-  Future<void> markEventsFlushed(List<int> ids) async {
-    if (ids.isEmpty) return;
-    final placeholders = List.filled(ids.length, '?').join(',');
-    await _database.rawUpdate(
-      'UPDATE analytics SET flushed = 1 WHERE id IN ($placeholders)',
-      ids,
-    );
-  }
+  Future<void> markEventsFlushed(List<int> ids) =>
+      _store.markEventsFlushed(ids);
 
   // ---------------------------------------------------------------------------
-  // Helpers
+  // Test utilities
   // ---------------------------------------------------------------------------
-
-  Map<String, dynamic> _guessToJson(Guess g) => {
-        'word': g.word,
-        'rank': g.rank,
-        'similarity': g.similarity,
-        'band': g.band.name,
-      };
-
-  Guess _guessFromJson(dynamic json) {
-    final m = json as Map<String, dynamic>;
-    return Guess(
-      word: m['word'] as String,
-      rank: m['rank'] as int,
-      similarity: (m['similarity'] as num).toDouble(),
-      band: TemperatureBand.values.firstWhere((b) => b.name == m['band']),
-    );
-  }
-
-  Map<String, dynamic> _revealedHintToJson(RevealedHint h) => {
-        'rank': h.rank,
-        'word': h.word,
-      };
-
-  RevealedHint _revealedHintFromJson(dynamic json) {
-    final m = json as Map<String, dynamic>;
-    return RevealedHint(rank: m['rank'] as int, word: m['word'] as String);
-  }
 
   /// Close the database (used in tests).
   Future<void> close() async {
-    await _db?.close();
-    _db = null;
+    await _backend?.close();
+    _backend = null;
   }
 
   /// Reset the singleton (used in tests to get a fresh instance).
   static void resetForTest() {
     _instance = null;
   }
+
+  /// Inject a specific backend (used in tests to bypass platform detection).
+  ///
+  /// Call [resetForTest] first, then [injectBackendForTest], then proceed.
+  static Future<AppPersistence> injectBackendForTest(
+    StorageBackend backend,
+  ) async {
+    _instance ??= AppPersistence._();
+    _instance!._backend = backend;
+    return _instance!;
+  }
 }
+
