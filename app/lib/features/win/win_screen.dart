@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 
+// Conditional import: web platforms get the real Web Share API impl;
+// native platforms get a stub that always returns false.
+import 'share_stub.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) 'share_web.dart';
+
 /// Generate the spoiler-free share card text.
 ///
-/// Format: "Mindmeld #N 🧠 X guesses\n[emoji grid]"
+/// Format:
+///   Mindmeld #N 🧠 X guesses
+///   [emoji grid]
+///   [play URL]
+///
 /// The secret word is NEVER included in the share text.
+/// The play URL is appended on all platforms to create a viral loop.
 String buildShareCard({
   required List<Guess> guesses,
   required int puzzleNumber,
 }) {
   final emojis = guesses.map((g) => g.band.emoji).join('');
   final count = guesses.length;
-  return 'Mindmeld #$puzzleNumber 🧠 $count guess${count == 1 ? '' : 'es'}\n$emojis';
+  final line1 = 'Mindmeld #$puzzleNumber 🧠 $count guess${count == 1 ? '' : 'es'}';
+  return '$line1\n$emojis\n${AppConfig.playUrl}';
 }
 
 /// Win screen — shown when the player guesses the secret word.
@@ -50,10 +63,24 @@ class WinScreen extends StatelessWidget {
   String get _shareText =>
       buildShareCard(guesses: guesses, puzzleNumber: _puzzleNumber);
 
+  /// Share handler — uses Web Share API on web when available, falls back to
+  /// clipboard+dialog on native and on desktop browsers without navigator.share.
   Future<void> _share(BuildContext context) async {
     await AnalyticsStub(AppPersistence.instance)
         .logEvent(AnalyticsEvent.shareTapped, {'lang': lang});
 
+    // Try the Web Share API first (mobile browsers, supported desktop browsers).
+    if (webShareAvailable()) {
+      final shared = await shareViaWebApi(
+        title: 'Mindmeld',
+        text: _shareText,
+        url: AppConfig.playUrl,
+      );
+      if (shared) return; // Share sheet shown — done.
+      // Fall through to clipboard if share was cancelled or failed.
+    }
+
+    // Fallback: clipboard + dialog (native, desktop browsers, cancelled shares).
     await Clipboard.setData(ClipboardData(text: _shareText));
 
     if (!context.mounted) return;

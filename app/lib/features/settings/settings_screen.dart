@@ -212,8 +212,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          // Restore purchases (only visible when iap is wired up)
-          if (AppConfig.iapEnabled)
+          // Restore purchases (only visible when iap is wired up on native).
+          // iapEnabledEffective is false on web (purchases_flutter is native-only).
+          if (AppConfig.iapEnabledEffective)
             ListTile(
               leading: const Icon(Icons.restore),
               title: const Text('Restore Purchases'),
@@ -228,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // confirmed a privacy-options entry point is required for this user's
           // region (EEA/UK). In all test builds adsEnabled=false, so this tile
           // never renders in tests.
-          if (AppConfig.adsEnabled && _privacyOptionsRequired)
+          if (AppConfig.adsEnabledEffective && _privacyOptionsRequired)
             ListTile(
               leading: const Icon(Icons.shield_outlined),
               title: const Text('Privacy options'),

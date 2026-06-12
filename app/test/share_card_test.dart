@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
 
@@ -105,6 +106,20 @@ void main() {
       final freezingIdx = text.indexOf('🟦');
       final scorchingIdx = text.indexOf('🟥');
       expect(freezingIdx, lessThan(scorchingIdx));
+    });
+
+    test('share text contains play URL for viral loop', () {
+      // The play URL is always appended so recipients can start playing.
+      final guesses = makeGuesses([TemperatureBand.scorching]);
+      final text = buildShareCard(guesses: guesses, puzzleNumber: 1);
+      expect(text, contains(AppConfig.playUrl));
+    });
+
+    test('play URL does not contain the secret word', () {
+      // Validate the URL itself is not a spoiler vector.
+      // The URL is a static constant — this test asserts it forever.
+      expect(AppConfig.playUrl, isNot(contains('ocean')));
+      expect(AppConfig.playUrl, isNot(contains('word0')));
     });
   });
 }

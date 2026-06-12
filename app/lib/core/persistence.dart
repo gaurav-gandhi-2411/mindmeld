@@ -1,9 +1,15 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/core/storage_factory_stub.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.io) 'package:mindmeld/core/storage_factory_io.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) 'package:mindmeld/core/storage_factory_web.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common/sqlite_api.dart';
 
 /// Streak update result — returned by [updateStreak] for testability.
 class StreakResult {
@@ -85,19 +91,33 @@ class AppPersistence {
 
   /// Initialise (or open) the database at [dbPath].
   ///
-  /// If [dbPath] is null the platform default documents directory is used.
+  /// If [dbPath] is null the platform default documents directory is used
+  /// (or the WASM/IndexedDB virtual path on web).
   /// Pass an explicit path in tests (sqflite_common_ffi + temp dir).
   Future<void> init({String? dbPath}) async {
     if (_db != null) return;
-    final path = dbPath ?? p.join(
-      (await getApplicationDocumentsDirectory()).path,
-      'mindmeld.db',
-    );
-    _db = await openDatabase(
+
+    final factory = getPlatformDatabaseFactory();
+
+    // On web, path_provider is not available; use a fixed virtual path that
+    // sqflite_common_ffi_web maps to IndexedDB.
+    final String path;
+    if (kIsWeb) {
+      path = dbPath ?? 'mindmeld.db';
+    } else {
+      path = dbPath ?? p.join(
+        (await getApplicationDocumentsDirectory()).path,
+        'mindmeld.db',
+      );
+    }
+
+    _db = await factory.openDatabase(
       path,
-      version: 3,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
+      options: OpenDatabaseOptions(
+        version: 3,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      ),
     );
   }
 

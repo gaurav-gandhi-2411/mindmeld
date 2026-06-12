@@ -307,11 +307,12 @@ class RevenueCatGateway implements IapGateway {
 /// without touching dart-defines.
 IapGateway buildIapGateway({RcClient? rcClient}) {
   final key = AppConfig.revenueCatApiKey;
-  if (AppConfig.iapEnabled && key.isNotEmpty) {
+  // iapEnabledEffective is false on web — purchases_flutter is native-only.
+  if (AppConfig.iapEnabledEffective && key.isNotEmpty) {
     return RevenueCatGateway(apiKey: key, rcClient: rcClient);
   }
   // rcClient is not used in stub mode; ignore the parameter.
-  if (AppConfig.iapEnabled && key.isEmpty) {
+  if (AppConfig.iapEnabledEffective && key.isEmpty) {
     dev.log(
       'iapEnabled=true but REVENUECAT_API_KEY is empty — falling back to stub',
       name: 'buildIapGateway',

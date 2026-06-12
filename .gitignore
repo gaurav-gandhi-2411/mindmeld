@@ -33,3 +33,7 @@ Thumbs.db
 
 # Claude worktrees
 .claude/worktrees/
+
+# Web deploy staging
+web-dist/
+

@@ -249,7 +249,9 @@ HintGate buildHintGate({
   RewardedAdStub? adStub,
   AdLoader? adLoader,
 }) {
-  if (AppConfig.adsEnabled) {
+  // adsEnabledEffective is false on web — web always gets the stub gate.
+  // google_mobile_ads is a native-only plugin; it must not be invoked on web.
+  if (AppConfig.adsEnabledEffective) {
     return AdMobRewardedGate(adLoader: adLoader);
   }
   return _StubGate(adStub ?? const RewardedAdStub());

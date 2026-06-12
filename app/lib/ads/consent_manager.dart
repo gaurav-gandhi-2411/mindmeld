@@ -51,7 +51,7 @@ class ConsentManager {
   /// Failures (network errors, form load errors) are silently swallowed so a
   /// consent hiccup never prevents the app from starting.
   static Future<void> gatherConsent() async {
-    if (!AppConfig.adsEnabled) return;
+    if (!AppConfig.adsEnabledEffective) return;
 
     // Step 1: refresh consent status.
     final updateCompleter = Completer<void>();
@@ -81,7 +81,7 @@ class ConsentManager {
   /// Returns `false` immediately when [AppConfig.adsEnabled] is false, so no
   /// platform channel call is made in non-monetised/test builds.
   static Future<bool> isPrivacyOptionsRequired() async {
-    if (!AppConfig.adsEnabled) return false;
+    if (!AppConfig.adsEnabledEffective) return false;
     final status =
         await ConsentInformation.instance.getPrivacyOptionsRequirementStatus();
     return status == PrivacyOptionsRequirementStatus.required;
@@ -97,7 +97,7 @@ class ConsentManager {
   /// call is made in non-monetised/test builds. Errors are silently swallowed
   /// to keep the Settings screen stable.
   static Future<void> showPrivacyOptions() async {
-    if (!AppConfig.adsEnabled) return;
+    if (!AppConfig.adsEnabledEffective) return;
     final completer = Completer<void>();
     ConsentForm.showPrivacyOptionsForm(
       (FormError? formError) => completer.complete(),

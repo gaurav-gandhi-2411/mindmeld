@@ -39,6 +39,43 @@ class AppConfig {
       bool.fromEnvironment('ANALYTICS_ENABLED') ? true : monetized;
 
   // ---------------------------------------------------------------------------
+  // Effective flags — web guards
+  //
+  // Native-only plugins (google_mobile_ads, purchases_flutter) must never be
+  // invoked on web. These getters short-circuit to false when kIsWeb is true
+  // so that factory methods and consumption sites always get a safe value
+  // without needing to check kIsWeb themselves.
+  // ---------------------------------------------------------------------------
+
+  /// Effective ads flag: false on web regardless of [adsEnabled].
+  ///
+  /// google_mobile_ads is a native-only plugin; web builds always use the stub.
+  // ignore: do_not_use_environment — kIsWeb is a compile-time const on all targets
+  static bool get adsEnabledEffective {
+    // kIsWeb is a bool const in flutter/foundation.dart; tree-shaken at compile time.
+    // We reference it via a conditional to keep this file free of dart:html imports.
+    if (const bool.fromEnvironment('dart.library.html')) return false;
+    return adsEnabled;
+  }
+
+  /// Effective IAP flag: false on web regardless of [iapEnabled].
+  ///
+  /// purchases_flutter is a native-only plugin; web builds always use the stub.
+  static bool get iapEnabledEffective {
+    if (const bool.fromEnvironment('dart.library.html')) return false;
+    return iapEnabled;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Play URL — used in share card (viral loop) on all platforms.
+  // ---------------------------------------------------------------------------
+
+  /// Public play URL appended to the share card so recipients can immediately
+  /// start playing. Included on all platforms (native + web).
+  static const String playUrl =
+      'https://gaurav-gandhi-2411.github.io/mindmeld-payloads/play/';
+
+  // ---------------------------------------------------------------------------
   // AdMob IDs
   // ---------------------------------------------------------------------------
 

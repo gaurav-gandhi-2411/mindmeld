@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/ads/rewarded_ad_service.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
+import 'package:mindmeld/analytics/firebase_web_options.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
@@ -78,8 +79,14 @@ void main() async {
   // Firebase init + Crashlytics error hooks — only when analyticsEnabled.
   // When analyticsEnabled=false (the default) zero Firebase calls are made,
   // keeping cold-start fast for non-monetised builds.
+  //
+  // On web, FirebaseOptions must be supplied explicitly (no google-services.json).
+  // The placeholder values in firebase_web_options.dart must be replaced before
+  // deploying a monetised web build. See docs/firebase-setup.md for instructions.
   if (AppConfig.analyticsEnabled) {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: kIsWeb ? firebaseWebOptions : null,
+    );
 
     // Wire Flutter framework errors to Crashlytics.
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -95,9 +102,10 @@ void main() async {
   final exporter = buildAnalyticsExporter();
   await exporter.init(); // flush any queued events from previous sessions.
 
-  // AdMob initialisation and UMP consent — only executed in monetised builds.
-  // When adsEnabled=false (the default), zero ad/UMP code paths execute.
-  if (AppConfig.adsEnabled) {
+  // AdMob initialisation and UMP consent — only executed in monetised native builds.
+  // adsEnabledEffective is false on web (google_mobile_ads is native-only),
+  // so zero ad/UMP code paths execute on web regardless of dart-defines.
+  if (AppConfig.adsEnabledEffective) {
     await MobileAds.instance.initialize();
     await ConsentManager.gatherConsent();
   }
