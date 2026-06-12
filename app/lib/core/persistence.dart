@@ -95,7 +95,7 @@ class AppPersistence {
     );
     _db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -137,7 +137,8 @@ class AppPersistence {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         event_name TEXT NOT NULL,
         props_json TEXT NOT NULL DEFAULT '{}',
-        ts INTEGER NOT NULL
+        ts INTEGER NOT NULL,
+        flushed INTEGER NOT NULL DEFAULT 0
       )
     ''');
   }
@@ -145,11 +146,18 @@ class AppPersistence {
   /// Incremental schema migrations.
   ///
   /// v1 → v2: add [revealed_hints_json] column to [day_state].
-  /// Existing rows get the DEFAULT value ('[]') automatically.
+  /// v2 → v3: add [flushed] column to [analytics] for Firebase flush tracking.
+  ///           Existing rows default to 0 (unflushed) so they will be picked up
+  ///           by the first flush cycle after upgrade.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
         "ALTER TABLE day_state ADD COLUMN revealed_hints_json TEXT NOT NULL DEFAULT '[]'",
+      );
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+        'ALTER TABLE analytics ADD COLUMN flushed INTEGER NOT NULL DEFAULT 0',
       );
     }
   }
@@ -333,9 +341,37 @@ class AppPersistence {
     ''');
   }
 
-  /// Export all buffered analytics events (explicit no-op stub; Phase 2 wires Firebase).
+  /// Export all buffered analytics events (including already-flushed rows).
+  ///
+  /// Used by the Phase 2 Firebase exporter and existing tests that inspect the
+  /// full ring buffer contents regardless of flush state.
   Future<List<Map<String, dynamic>>> exportAnalyticsBuffer() async {
     return _database.query('analytics', orderBy: 'id ASC');
+  }
+
+  /// Export only analytics events that have NOT yet been flushed to Firebase.
+  ///
+  /// Returns rows ordered by [id] ascending (oldest first).  Each row includes
+  /// all columns including [id], which callers must pass to [markEventsFlushed].
+  Future<List<Map<String, dynamic>>> exportUnflushedEvents({int limit = 500}) async {
+    return _database.query(
+      'analytics',
+      where: 'flushed = 0',
+      orderBy: 'id ASC',
+      limit: limit,
+    );
+  }
+
+  /// Mark the given event [ids] as flushed so they are not re-sent.
+  ///
+  /// Called by [FirebaseExporter] after a successful batch upload.
+  Future<void> markEventsFlushed(List<int> ids) async {
+    if (ids.isEmpty) return;
+    final placeholders = List.filled(ids.length, '?').join(',');
+    await _database.rawUpdate(
+      'UPDATE analytics SET flushed = 1 WHERE id IN ($placeholders)',
+      ids,
+    );
   }
 
   // ---------------------------------------------------------------------------

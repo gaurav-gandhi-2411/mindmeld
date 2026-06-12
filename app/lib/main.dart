@@ -1,7 +1,13 @@
+import 'dart:ui';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
+import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
@@ -60,6 +66,26 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppPersistence.instance.init(); // production: uses platform default path
 
+  // Firebase init + Crashlytics error hooks — only when analyticsEnabled.
+  // When analyticsEnabled=false (the default) zero Firebase calls are made,
+  // keeping cold-start fast for non-monetised builds.
+  if (AppConfig.analyticsEnabled) {
+    await Firebase.initializeApp();
+
+    // Wire Flutter framework errors to Crashlytics.
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Wire platform/isolate errors (non-Flutter zone) to Crashlytics.
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  // Build the exporter (FirebaseExporter or _NoOpExporter depending on flag).
+  final exporter = buildAnalyticsExporter();
+  await exporter.init(); // flush any queued events from previous sessions.
+
   // AdMob initialisation and UMP consent — only executed in monetised builds.
   // When adsEnabled=false (the default), zero ad/UMP code paths execute.
   if (AppConfig.adsEnabled) {
@@ -67,14 +93,20 @@ void main() async {
     await ConsentManager.gatherConsent();
   }
 
-  runApp(const MindmeldApp());
+  runApp(MindmeldApp(exporter: exporter));
 }
 
 class MindmeldApp extends StatelessWidget {
-  const MindmeldApp({super.key, this.overrides});
+  const MindmeldApp({super.key, this.overrides, this.exporter});
 
   /// Test-only overrides; null in production.
   final AppOverrides? overrides;
+
+  /// Analytics exporter — passed down so [_AppShell] can call [onResume].
+  ///
+  /// When null a default [_NoOpExporter] is constructed (used in widget tests
+  /// that call [MindmeldApp] directly without going through [main]).
+  final AnalyticsExporter? exporter;
 
   @override
   Widget build(BuildContext context) {
@@ -91,22 +123,23 @@ class MindmeldApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
       ),
-      home: _AppShell(overrides: overrides),
+      home: _AppShell(overrides: overrides, exporter: exporter),
     );
   }
 }
 
 /// Root shell: handles onboarding gate, language, win routing, and bottom nav.
 class _AppShell extends StatefulWidget {
-  const _AppShell({this.overrides});
+  const _AppShell({this.overrides, this.exporter});
 
   final AppOverrides? overrides;
+  final AnalyticsExporter? exporter;
 
   @override
   State<_AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<_AppShell> {
+class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   bool _initialised = false;
   bool _showOnboarding = false;
   String _lang = 'en';
@@ -114,10 +147,28 @@ class _AppShellState extends State<_AppShell> {
   bool _won = false;
   String? _wonSecret;
 
+  AnalyticsExporter get _exporter =>
+      widget.exporter ?? buildAnalyticsExporter();
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _init();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Flush queued events whenever the app returns to foreground.
+      _exporter.onResume();
+    }
   }
 
   Future<void> _init() async {

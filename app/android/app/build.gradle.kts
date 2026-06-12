@@ -2,6 +2,13 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Firebase: google-services processes google-services.json into generated resource files.
+    // The placeholder google-services.json (android/app/google-services.json) satisfies the
+    // plugin's parse requirements; replace it with the real file from Firebase console before
+    // a production release — see docs/firebase-setup.md.
+    id("com.google.gms.google-services")
+    // Crashlytics: uploads mapping files and NDK symbols for crash deobfuscation.
+    id("com.google.firebase.crashlytics")
 }
 
 android {

@@ -1,0 +1,35 @@
+{
+  "_comment": "===========================================================================",
+  "_comment2": "PLACEHOLDER — NOT A REAL FIREBASE PROJECT",
+  "_comment3": "Replace this file with the real google-services.json downloaded from the",
+  "_comment4": "Firebase console (Project Settings > Your apps > google-services.json).",
+  "_comment5": "See docs/firebase-setup.md for the full replacement procedure.",
+  "_comment6": "===========================================================================",
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "mindmeld-placeholder",
+    "storage_bucket": "mindmeld-placeholder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "dev.gaurav.mindmeld"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyPlaceholderKeyForBuildValidationOnly0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
