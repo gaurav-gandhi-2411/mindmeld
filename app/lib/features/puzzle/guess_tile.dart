@@ -1,6 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:mindmeld/core/models.dart';
 
+// ---------------------------------------------------------------------------
+// Hint tile
+// ---------------------------------------------------------------------------
+
+/// Key type used to locate [HintTile] widgets in tests without depending on
+/// string keys that could collide with guess tiles.
+///
+/// Usage: `find.byKey(HintTileKey('wave'))` in widget tests.
+class HintTileKey extends ValueKey<String> {
+  const HintTileKey(super.value);
+}
+
+/// A pinned tile displayed above the guess list for a revealed hint.
+///
+/// Visual identity: lightbulb icon, "Hint" chip badge, temperature-band colour
+/// derived from the hint's rank (same palette as [GuessTile]).
+class HintTile extends StatelessWidget {
+  const HintTile({
+    required this.hint,
+    required this.vocabSize,
+    super.key,
+  });
+
+  final RevealedHint hint;
+
+  /// Total vocabulary size — used by [bandForRank] for threshold computation.
+  final int vocabSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final band = bandForRank(hint.rank, vocabSize);
+    final color = bandColor(band);
+
+    return Container(
+      key: HintTileKey(hint.word),
+      margin: const EdgeInsets.symmetric(vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        border: Border.all(color: color, width: 1.5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+        dense: true,
+        leading: CircleAvatar(
+          backgroundColor: color.withValues(alpha: 0.20),
+          radius: 16,
+          child: Icon(Icons.lightbulb, color: color, size: 18),
+        ),
+        title: Text(
+          hint.word,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          'rank #${hint.rank}',
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall
+              ?.copyWith(color: color),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // "Hint" chip badge distinguishes pinned hints from guesses.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Hint',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              band.label,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Color mapping for temperature bands.
 Color bandColor(TemperatureBand band) {
   switch (band) {

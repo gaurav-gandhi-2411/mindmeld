@@ -192,7 +192,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (!granted) return;
 
     final hint = hintsAvailable[state.hintsUsed];
-    final newState = state.copyWith(hintsUsed: state.hintsUsed + 1);
+    final newRevealedHints = [
+      ...state.revealedHints,
+      RevealedHint(rank: hint.rank, word: hint.word),
+    ];
+    final newState = state.copyWith(
+      hintsUsed: state.hintsUsed + 1,
+      revealedHints: newRevealedHints,
+    );
 
     await AppPersistence.instance.saveDayState(newState);
     await _analytics.logEvent(AnalyticsEvent.hintUsed, {
@@ -203,14 +210,6 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     if (mounted) {
       setState(() => _dayState = newState);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Hint: "${hint.word}" is ranked #${hint.rank}',
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
     }
   }
 
@@ -302,6 +301,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final latestGuess = state.guesses.isEmpty ? null : state.guesses.last;
     final canGiveUp = state.guesses.length >= _giveUpMinGuesses;
     final hintsLeft = payload.hints.length - state.hintsUsed;
+
+    // Pinned hints sorted by rank ascending (rank 1 = secret = closest,
+    // so lowest rank first gives the most-useful hint at the top).
+    final pinnedHints = List<RevealedHint>.from(state.revealedHints)
+      ..sort((a, b) => a.rank.compareTo(b.rank));
 
     return Scaffold(
       appBar: AppBar(
@@ -395,13 +399,44 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
           const Divider(),
 
-          // Guess history
+          // Combined scrollable: pinned hint tiles first, then guess history.
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: sorted.length,
+              // Header items: hint section label + one HintTile per revealed hint
+              // + separator divider; guess tiles follow immediately after.
+              itemCount: (pinnedHints.isEmpty ? 0 : pinnedHints.length + 2) +
+                  sorted.length,
               itemBuilder: (ctx, i) {
-                final g = sorted[i];
+                // ── Pinned-hints header ─────────────────────────────────────
+                if (pinnedHints.isNotEmpty) {
+                  // Index 0: section label
+                  if (i == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 2),
+                      child: Text(
+                        'Hints revealed',
+                        style: Theme.of(ctx).textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    );
+                  }
+                  // Indices 1 … pinnedHints.length: one HintTile each.
+                  if (i <= pinnedHints.length) {
+                    return HintTile(
+                      hint: pinnedHints[i - 1],
+                      vocabSize: payload.n,
+                    );
+                  }
+                  // Index pinnedHints.length + 1: separator divider.
+                  if (i == pinnedHints.length + 1) {
+                    return const Divider(height: 12);
+                  }
+                }
+                // ── Guess tiles ──────────────────────────────────────────────
+                final guessOffset = pinnedHints.isEmpty ? 0 : pinnedHints.length + 2;
+                final g = sorted[i - guessOffset];
                 final isLatest = latestGuess != null && g.word == latestGuess.word;
                 return GuessTile(
                   guess: g,

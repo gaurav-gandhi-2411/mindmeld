@@ -95,8 +95,9 @@ class AppPersistence {
     );
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -114,6 +115,7 @@ class AppPersistence {
         hints_used INTEGER NOT NULL DEFAULT 0,
         won INTEGER NOT NULL DEFAULT 0,
         gave_up INTEGER NOT NULL DEFAULT 0,
+        revealed_hints_json TEXT NOT NULL DEFAULT '[]',
         PRIMARY KEY (date, lang)
       )
     ''');
@@ -140,6 +142,18 @@ class AppPersistence {
     ''');
   }
 
+  /// Incremental schema migrations.
+  ///
+  /// v1 → v2: add [revealed_hints_json] column to [day_state].
+  /// Existing rows get the DEFAULT value ('[]') automatically.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        "ALTER TABLE day_state ADD COLUMN revealed_hints_json TEXT NOT NULL DEFAULT '[]'",
+      );
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Day state
   // ---------------------------------------------------------------------------
@@ -154,6 +168,14 @@ class AppPersistence {
     final row = rows.first;
     final guessesJson = jsonDecode(row['guesses_json'] as String) as List<dynamic>;
     final guesses = guessesJson.map(_guessFromJson).toList();
+    // revealed_hints_json was added in schema v2; guard against missing column
+    // on old DBs that were upgraded before the DEFAULT filled in (belt-and-suspenders).
+    final rawHints = row['revealed_hints_json'];
+    final revealedHints = rawHints == null
+        ? <RevealedHint>[]
+        : (jsonDecode(rawHints as String) as List<dynamic>)
+            .map(_revealedHintFromJson)
+            .toList();
     return DayState(
       date: date,
       lang: lang,
@@ -161,11 +183,14 @@ class AppPersistence {
       hintsUsed: row['hints_used'] as int,
       won: (row['won'] as int) == 1,
       gaveUp: (row['gave_up'] as int) == 1,
+      revealedHints: revealedHints,
     );
   }
 
   Future<void> saveDayState(DayState state) async {
     final guessesJson = jsonEncode(state.guesses.map(_guessToJson).toList());
+    final hintsJson =
+        jsonEncode(state.revealedHints.map(_revealedHintToJson).toList());
     await _database.insert(
       'day_state',
       {
@@ -175,6 +200,7 @@ class AppPersistence {
         'hints_used': state.hintsUsed,
         'won': state.won ? 1 : 0,
         'gave_up': state.gaveUp ? 1 : 0,
+        'revealed_hints_json': hintsJson,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -331,6 +357,16 @@ class AppPersistence {
       similarity: (m['similarity'] as num).toDouble(),
       band: TemperatureBand.values.firstWhere((b) => b.name == m['band']),
     );
+  }
+
+  Map<String, dynamic> _revealedHintToJson(RevealedHint h) => {
+        'rank': h.rank,
+        'word': h.word,
+      };
+
+  RevealedHint _revealedHintFromJson(dynamic json) {
+    final m = json as Map<String, dynamic>;
+    return RevealedHint(rank: m['rank'] as int, word: m['word'] as String);
   }
 
   /// Close the database (used in tests).

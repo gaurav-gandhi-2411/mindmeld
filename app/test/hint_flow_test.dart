@@ -4,10 +4,13 @@
 /// These tests verify:
 ///   1. Tapping the hint button opens the RewardedAdStub's simulated-ad modal.
 ///   2. After the stub delay resolves, the modal is dismissed.
-///   3. The hint word from the payload appears in a snackbar in the UI.
+///   3. The hint word from the payload appears as a pinned [HintTile] at the
+///      top of the list (located by [HintTileKey]) — not a snackbar.
 ///   4. Second hint has a lower (closer-to-secret) rank than the first.
 ///   5. Analytics: after hint flow completes, the ring buffer contains a
 ///      hint_used event.
+///   6. Revealed hints persist across store re-instantiation (same sqflite_ffi
+///      temp DB, same pattern as the streak persistence test).
 ///
 /// Pump strategy
 /// -------------
@@ -30,6 +33,7 @@ import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/features/puzzle/guess_tile.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 import 'package:mindmeld/stubs/rewarded_ad_stub.dart';
@@ -55,8 +59,8 @@ const _kAdDelay = Duration(seconds: 1);
 /// and so [decodeSecret] decodes to "ocean" (the real s field is borrowed too).
 ///
 /// The vocab contains only one word (ocean at rank 1), which is sufficient
-/// for testing hint delivery — hints are shown via snackbar and do not require
-/// the hint word to be in the vocab lookup table.
+/// for testing hint delivery — hints are shown via pinned tiles and do not
+/// require the hint word to be in the vocab lookup table.
 Uint8List _buildHintPayloadBytes() {
   // Known values from the en/2026-06-12 payload.
   const salt = '7ca5996a071e2723';
@@ -64,8 +68,10 @@ Uint8List _buildHintPayloadBytes() {
 
   final oceanHash = PayloadCodec.hashWord('ocean', salt);
 
-  // n=10 lets bandForRank produce non-trivial bands without a huge vocab.
-  const n = 10;
+  // n=10000 satisfies the scorchingFloor (50) and hotFloor (500) clamp guards
+  // in bandForRank so that HintTile can compute a colour band for rank 8.
+  // n=10 would trigger clamp(50, 10) → ArgumentError (min > max).
+  const n = 10000;
 
   final json = jsonEncode({
     'v': 1,
@@ -135,7 +141,7 @@ Future<void> _pumpPuzzleScreen(
 
 /// Perform a complete hint flow: tap button → drain timer → drain DB writes.
 ///
-/// Returns after the snackbar setState has been flushed.
+/// Returns after the pinned tile [setState] has been flushed.
 Future<void> _triggerHint(WidgetTester tester, String buttonLabel) async {
   // 1. Tap the hint button.
   await tester.tap(find.widgetWithText(OutlinedButton, buttonLabel));
@@ -216,7 +222,7 @@ void main() {
     await _pumpPuzzleScreen(tester, hintPayload);
 
     // The hint button label includes the remaining hint count.
-    expect(find.textContaining('Hint'), findsOneWidget);
+    expect(find.textContaining('Hint'), findsWidgets);
     expect(find.textContaining('2 left'), findsOneWidget);
   });
 
@@ -251,11 +257,11 @@ void main() {
   );
 
   // -------------------------------------------------------------------------
-  // Modal dismisses and snackbar shows hint word
+  // Modal dismisses and PINNED TILE shows hint word (not a snackbar)
   // -------------------------------------------------------------------------
 
   testWidgets(
-    'after stub delay resolves, modal is dismissed and hint snackbar appears',
+    'after stub delay resolves, modal is dismissed and hint tile is pinned',
     (tester) async {
       await _pumpPuzzleScreen(tester, hintPayload);
 
@@ -264,15 +270,25 @@ void main() {
       // The "Watching ad…" dialog must be gone.
       expect(find.text('Watching ad…'), findsNothing);
 
-      // The snackbar with the first hint word ("wave") must be visible.
-      // PuzzleScreen._useHint shows: 'Hint: "$word" is ranked #$rank'
-      expect(find.textContaining('"wave"'), findsOneWidget);
-      expect(find.textContaining('ranked #8'), findsOneWidget);
+      // A HintTile keyed with the first hint word must be present in the tree.
+      // HintTileKey is a ValueKey<String> subclass — findable by key type.
+      expect(
+        find.byKey(const HintTileKey('wave')),
+        findsOneWidget,
+        reason: 'Pinned HintTile for "wave" must appear after hint is revealed',
+      );
+
+      // The tile should display the word and the rank.
+      expect(find.text('wave'), findsOneWidget);
+      expect(find.text('rank #8'), findsOneWidget);
+
+      // No snackbar should be present for hints.
+      expect(find.byType(SnackBar), findsNothing);
     },
   );
 
   // -------------------------------------------------------------------------
-  // Second hint has lower (closer) rank
+  // Second hint has lower (closer) rank — both tiles visible simultaneously
   // -------------------------------------------------------------------------
 
   testWidgets(
@@ -288,33 +304,30 @@ void main() {
       // ── First hint ──
       await _triggerHint(tester, 'Hint (2 left)');
 
-      // Snackbar for hint 1 ("wave", rank 8).
-      expect(find.textContaining('"wave"'), findsOneWidget);
+      // Pinned tile for hint 1 ("wave", rank 8).
+      expect(find.byKey(const HintTileKey('wave')), findsOneWidget);
+      expect(find.text('rank #8'), findsOneWidget);
 
-      // Advance fake clock past the snackbar's 5-second display duration,
-      // then pump through the exit animation (~300 ms).
-      await tester.pump(const Duration(seconds: 6));
-      await tester.pump(const Duration(milliseconds: 400));
-      await tester.pump(const Duration(milliseconds: 400));
+      // ── Second hint ──
+      await _triggerHint(tester, 'Hint (1 left)');
 
-      // ── Second hint — inline for precise control ──
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Hint (1 left)'));
-      // One pump: showDialog() fires, dialog appears.
-      await tester.pump();
-      // Advance past the _kAdDelay (1 s).
-      await tester.pump(const Duration(seconds: 4));
-      // DB writes and setState on OS threads.
-      await tester.runAsync(() async {
-        await Future<void>.delayed(const Duration(milliseconds: 800));
-      });
-      // Flush setState calls and let the snackbar enter animation start.
-      for (var i = 0; i < 5; i++) {
-        await tester.pump(const Duration(milliseconds: 100));
-      }
+      // Both tiles must now be visible simultaneously (pinned section stacks).
+      expect(find.byKey(const HintTileKey('wave')), findsOneWidget);
+      expect(find.byKey(const HintTileKey('shore')), findsOneWidget);
 
-      // Snackbar for hint 2 ("shore", rank 4) — lower rank means closer.
-      expect(find.textContaining('"shore"'), findsOneWidget);
-      expect(find.textContaining('ranked #4'), findsOneWidget);
+      // Rank labels for both hints.
+      expect(find.text('rank #8'), findsOneWidget);
+      expect(find.text('rank #4'), findsOneWidget);
+
+      // "shore" (rank 4) is closer — its tile is rendered above "wave" (rank 8)
+      // because pinnedHints are sorted ascending by rank in the UI.
+      final shorePos = tester.getTopLeft(find.byKey(const HintTileKey('shore')));
+      final wavePos = tester.getTopLeft(find.byKey(const HintTileKey('wave')));
+      expect(
+        shorePos.dy,
+        lessThan(wavePos.dy),
+        reason: '"shore" (rank 4) must appear above "wave" (rank 8) in the pinned section',
+      );
     },
   );
 
@@ -354,4 +367,37 @@ void main() {
       expect(props['hint_rank'], equals(8)); // first hint rank
     },
   );
+
+  // -------------------------------------------------------------------------
+  // Revealed hints persist across store re-instantiation
+  // -------------------------------------------------------------------------
+
+  test('revealed hints survive store close and re-open (persistence)', () async {
+    // Save a DayState with one revealed hint directly via the persistence API.
+    final stateWithHint = DayState(
+      date: '2099-01-01',
+      lang: 'en',
+      guesses: [],
+      hintsUsed: 1,
+      won: false,
+      gaveUp: false,
+      revealedHints: [const RevealedHint(rank: 8, word: 'wave')],
+    );
+
+    await AppPersistence.instance.saveDayState(stateWithHint);
+
+    // Re-open the same DB file by closing and resetting the singleton.
+    final dbPath = p.join(tmpDir.path, 'hint_test.db');
+    await AppPersistence.instance.close();
+    AppPersistence.resetForTest();
+    await AppPersistence.instance.init(dbPath: dbPath);
+
+    // Load the state back and verify the revealed hint survived.
+    final loaded = await AppPersistence.instance.loadDayState('2099-01-01', 'en');
+
+    expect(loaded, isNotNull);
+    expect(loaded!.revealedHints.length, equals(1));
+    expect(loaded.revealedHints.first.word, equals('wave'));
+    expect(loaded.revealedHints.first.rank, equals(8));
+  });
 }

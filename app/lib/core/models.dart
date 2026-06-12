@@ -231,6 +231,17 @@ class PlayerStats {
   );
 }
 
+/// A revealed hint entry stored in [DayState.revealedHints].
+///
+/// Mirrors the shape of [DailyPayload.hints] elements so serialisation is
+/// straightforward.
+class RevealedHint {
+  const RevealedHint({required this.rank, required this.word});
+
+  final int rank;
+  final String word;
+}
+
 /// Persisted daily game state for one (date, lang) pair.
 class DayState {
   const DayState({
@@ -240,6 +251,7 @@ class DayState {
     required this.hintsUsed,
     required this.won,
     required this.gaveUp,
+    this.revealedHints = const [],
   });
 
   final String date;
@@ -249,6 +261,12 @@ class DayState {
   final bool won;
   final bool gaveUp;
 
+  /// Hints the player has revealed, in the order they were unlocked.
+  ///
+  /// Pinned tiles are sorted by rank (lowest = closest to secret = top) in the
+  /// UI; the list itself retains insertion order for serialisation fidelity.
+  final List<RevealedHint> revealedHints;
+
   bool get isFinished => won || gaveUp;
 
   DayState copyWith({
@@ -256,6 +274,7 @@ class DayState {
     int? hintsUsed,
     bool? won,
     bool? gaveUp,
+    List<RevealedHint>? revealedHints,
   }) {
     return DayState(
       date: date,
@@ -264,6 +283,7 @@ class DayState {
       hintsUsed: hintsUsed ?? this.hintsUsed,
       won: won ?? this.won,
       gaveUp: gaveUp ?? this.gaveUp,
+      revealedHints: revealedHints ?? this.revealedHints,
     );
   }
 }
