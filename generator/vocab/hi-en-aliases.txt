@@ -1,0 +1,54 @@
+# Romanized-Hindi spelling aliases for Mindmeld hi-en payloads
+# Format: canonical: alias1, alias2, ...
+# Canonical is the authoritative spelling used in secrets_hi-en.txt / hinglish.txt.
+# Aliases are common alternate romanizations players might type.
+# Both canonical and aliases are normalized before storage (normalize.py rules apply).
+# Entries are LOOKUP-FOLDING — not linguistic ground truth.
+
+# Bedding / comfort
+razaai: razai, rajai
+
+# Garden
+bagicha: bageecha
+
+# Shadow
+parchhain: parchhai, parchhayi
+
+# Moon
+chaand: chand
+
+# Rain
+baarish: barish
+
+# Fragrance
+khushbu: khushboo
+
+# Candle
+mombatti: mombati
+
+# Laughter
+hansi: hasi
+
+# Wisdom / knowledge
+gyaan: gyan
+
+# Mirror (new secret — entry 26)
+aaina: aina, ayna
+
+# Picture / image (new secret — entry 32)
+tasveer: tasvir, tasweer
+
+# Mountain (new secret — entry 6)
+pahad: pahaad, pahar
+
+# Lamp / small flame (new secret — entry 32, diya replaces fanoos)
+diya: diyaa
+
+# Umbrella (new secret — entry 57)
+chhata: chata, chaata
+
+# Kite — no fold variants needed (patang normalizes cleanly); kept for completeness
+# patang: patang
+
+# Song — common over-romanization
+gaana: gana

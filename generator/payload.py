@@ -38,6 +38,7 @@ from config import (
     derive_salt,
 )
 from embeddings import cosine_similarities
+from normalize import load_alias_map, normalize
 
 
 def levenshtein(a: str, b: str) -> int:
@@ -192,6 +193,61 @@ def build_payload(
         seen_hashes.add(h)
         words_map[h] = [int(ranks[i]), quantize(float(sims[i]))]
 
+    # Alt map: hi-en only — variant spellings that hash to canonical word's [rank, qsim].
+    # For every vocab word w where normalize(w) != w, and for every alias from the alias
+    # file, emit hash12(variant+salt) → [rank, qsim] of the canonical word.
+    # Rules:
+    #   - Never overwrite a hash that already exists in words (canonical entries win).
+    #   - If two canonicals collide on the same variant, keep the lower (better) rank.
+    alt_map: dict[str, list[int]] = {}
+    if lang == "hi-en":
+        alias_map = load_alias_map()
+        # Build reverse map: canonical → [rank, qsim] from words_map
+        canonical_to_rv: dict[str, list[int]] = {}
+        for i, word in enumerate(vocab):
+            canonical_to_rv[word] = [int(ranks[i]), quantize(float(sims[i]))]
+
+        # Gather variants per canonical word
+        for _i, word in enumerate(vocab):
+            rv = canonical_to_rv[word]
+
+            # Variant 1: normalize(word) if it differs from word
+            norm = normalize(word)
+            # Use a set to deduplicate: the normalize path and alias path may both
+            # produce the same variant string (e.g. alias "barish"→"baarish" and
+            # normalize("baarish")="barish" are the same variant).
+            candidate_set: set[str] = set()
+            if norm != word:
+                candidate_set.add(norm)
+
+            # Variant 2+: all aliases from the alias file whose canonical resolves to this word
+            for alias_norm, alias_canonical in alias_map.items():
+                if alias_canonical == word:
+                    candidate_set.add(alias_norm)
+            candidates = list(candidate_set)
+
+            for variant in candidates:
+                variant_hash = _word_hash(variant, salt)
+                if variant_hash in seen_hashes:
+                    # Canonical entry already exists at this hash — canonical wins
+                    continue
+                if variant_hash in alt_map:
+                    # Another canonical already claimed this variant hash — keep lower rank
+                    existing_rank = alt_map[variant_hash][0]
+                    if rv[0] < existing_rank:
+                        print(
+                            f"[alt] collision on variant={variant!r} hash={variant_hash!r}: "
+                            f"replacing rank {existing_rank} with rank {rv[0]} (word={word!r})"
+                        )
+                        alt_map[variant_hash] = rv
+                    else:
+                        print(
+                            f"[alt] collision on variant={variant!r} hash={variant_hash!r}: "
+                            f"keeping rank {existing_rank} over rank {rv[0]} (word={word!r})"
+                        )
+                else:
+                    alt_map[variant_hash] = rv
+
     # Hints: plaintext words at specified ranks (never rank 1)
     n = len(vocab)
     hints: list[list] = []
@@ -222,7 +278,7 @@ def build_payload(
     # Obfuscated secret reveal field
     s_field = _obfuscate_secret(secret_lower, salt)
 
-    return {
+    result: dict = {
         "v": PAYLOAD_VERSION,
         "lang": lang,
         "date": puzzle_date.isoformat(),
@@ -233,6 +289,9 @@ def build_payload(
         "hints": hints,
         "s": s_field,
     }
+    if alt_map:
+        result["alt"] = alt_map
+    return result
 
 
 def write_payload(

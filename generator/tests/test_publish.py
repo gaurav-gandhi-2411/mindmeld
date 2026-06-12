@@ -342,6 +342,7 @@ class TestDryRunNoSideEffects:
         def fake_build(days: int, langs: list[str], out_dir: Path, start: date) -> None:
             dates = [start] * days
             from datetime import timedelta
+
             dates = [start + timedelta(days=i) for i in range(days)]
             _make_fake_build_output(out_dir, langs, dates[:2])  # 2 days is enough
 
@@ -349,9 +350,12 @@ class TestDryRunNoSideEffects:
 
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
                 "--dry-run",
             ]
         )
@@ -375,6 +379,7 @@ class TestDryRunNoSideEffects:
 
         def fake_build(days: int, langs: list[str], out_dir: Path, start: date) -> None:
             from datetime import timedelta
+
             dates = [start + timedelta(days=i) for i in range(days)]
             _make_fake_build_output(out_dir, langs, dates)
 
@@ -382,9 +387,12 @@ class TestDryRunNoSideEffects:
 
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
                 "--dry-run",
             ]
         )
@@ -414,6 +422,7 @@ class TestCommitAndPushLocal:
 
         def fake_build(days: int, langs: list[str], out_dir: Path, start: date) -> None:
             from datetime import timedelta
+
             dates = [start + timedelta(days=i) for i in range(days)]
             _make_fake_build_output(out_dir, langs, dates)
 
@@ -421,9 +430,12 @@ class TestCommitAndPushLocal:
 
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
             ]
         )
 
@@ -448,6 +460,7 @@ class TestCommitAndPushLocal:
 
         def fake_build(days: int, langs: list[str], out_dir: Path, start: date) -> None:
             from datetime import timedelta
+
             dates = [start + timedelta(days=i) for i in range(days)]
             _make_fake_build_output(out_dir, langs, dates)
 
@@ -456,36 +469,50 @@ class TestCommitAndPushLocal:
         # First publish — creates the files.
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
             ]
         )
 
-        log_before = subprocess.run(
-            ["git", "log", "--oneline"],
-            cwd=str(clone),
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip().splitlines()
+        log_before = (
+            subprocess.run(
+                ["git", "log", "--oneline"],
+                cwd=str(clone),
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            .stdout.strip()
+            .splitlines()
+        )
 
         # Second publish with identical content — should NOT add another commit.
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
             ]
         )
 
-        log_after = subprocess.run(
-            ["git", "log", "--oneline"],
-            cwd=str(clone),
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip().splitlines()
+        log_after = (
+            subprocess.run(
+                ["git", "log", "--oneline"],
+                cwd=str(clone),
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            .stdout.strip()
+            .splitlines()
+        )
 
         assert len(log_before) == len(log_after), (
             "A second commit was created despite no content change"
@@ -502,6 +529,7 @@ class TestCommitAndPushLocal:
 
         def fake_build(days: int, langs: list[str], out_dir: Path, start: date) -> None:
             from datetime import timedelta
+
             dates = [start + timedelta(days=i) for i in range(days)]
             _make_fake_build_output(out_dir, langs, dates)
 
@@ -509,9 +537,12 @@ class TestCommitAndPushLocal:
 
         main(
             argv=[
-                "--days", "2",
-                "--langs", "en",
-                "--payloads-repo", str(clone),
+                "--days",
+                "2",
+                "--langs",
+                "en",
+                "--payloads-repo",
+                str(clone),
             ]
         )
 

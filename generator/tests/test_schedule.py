@@ -114,3 +114,56 @@ class TestValidateSchedule:
         assert len(en_schedule) == len(hien_schedule), (
             f"Schedule length mismatch: en={len(en_schedule)}, hi-en={len(hien_schedule)}"
         )
+
+    def test_en_schedule_has_sixty_entries(self) -> None:
+        """Real en schedule must have exactly 60 entries."""
+        en_schedule = load_schedule("en")
+        assert len(en_schedule) == 60, f"Expected 60 en entries, got {len(en_schedule)}"
+
+    def test_hien_schedule_has_sixty_entries(self) -> None:
+        """Real hi-en schedule must have exactly 60 entries."""
+        hien_schedule = load_schedule("hi-en")
+        assert len(hien_schedule) == 60, f"Expected 60 hi-en entries, got {len(hien_schedule)}"
+
+    def test_en_schedule_no_duplicates(self) -> None:
+        """No word should appear more than once in the en schedule."""
+        en_schedule = load_schedule("en")
+        duplicates = [w for w in set(en_schedule) if en_schedule.count(w) > 1]
+        assert not duplicates, f"Duplicate en secrets: {duplicates}"
+
+    def test_hien_schedule_no_duplicates(self) -> None:
+        """No word should appear more than once in the hi-en schedule."""
+        hien_schedule = load_schedule("hi-en")
+        duplicates = [w for w in set(hien_schedule) if hien_schedule.count(w) > 1]
+        assert not duplicates, f"Duplicate hi-en secrets: {duplicates}"
+
+    def test_en_schedule_contains_new_words(self) -> None:
+        """Replacement words from the schedule edit must be present in en."""
+        en_schedule = load_schedule("en")
+        expected_new = ["lamp", "lightning", "picture", "train", "umbrella", "kite", "butterfly"]
+        for word in expected_new:
+            assert word in en_schedule, f"Expected new en word {word!r} not in schedule"
+
+    def test_hien_schedule_contains_new_words(self) -> None:
+        """Replacement words from the schedule edit must be present in hi-en."""
+        hien_schedule = load_schedule("hi-en")
+        expected_new = ["pahad", "aaina", "diya", "train", "island", "tasveer", "chhata", "patang"]
+        for word in expected_new:
+            assert word in hien_schedule, f"Expected new hi-en word {word!r} not in schedule"
+
+    def test_swap_entry_29_31(self) -> None:
+        """After the swap: entry 29 = butterfly/titli, entry 31 = courage/himmat."""
+        en_schedule = load_schedule("en")
+        hien_schedule = load_schedule("hi-en")
+        assert en_schedule[28] == "butterfly", (
+            f"en entry 29 should be 'butterfly', got {en_schedule[28]!r}"
+        )
+        assert en_schedule[30] == "courage", (
+            f"en entry 31 should be 'courage', got {en_schedule[30]!r}"
+        )
+        assert hien_schedule[28] == "titli", (
+            f"hi-en entry 29 should be 'titli', got {hien_schedule[28]!r}"
+        )
+        assert hien_schedule[30] == "himmat", (
+            f"hi-en entry 31 should be 'himmat', got {hien_schedule[30]!r}"
+        )

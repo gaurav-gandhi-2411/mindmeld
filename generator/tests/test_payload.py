@@ -5,6 +5,10 @@ Unit tests for payload schema, anti-cheat keying, and secret obfuscation.
 
 Uses a tiny stub vocab (10 words) with hardcoded numpy arrays so no
 sentence-transformers model is needed.
+
+Section F: alt-map tests use a hi-en stub vocab that includes words with
+doubled-vowel canonicals (baarish, chaand, gyaan) so the normalize() and
+alias rules produce variant hashes to test against.
 """
 
 import base64
@@ -16,6 +20,7 @@ from datetime import date
 import numpy as np
 import pytest
 
+from normalize import normalize
 from payload import (
     _is_morphological_variant,
     _word_hash,
@@ -359,3 +364,116 @@ class TestGzipReproducibility:
         first = compress_with_mtime0(data)
         second = compress_with_mtime0(data)
         assert first == second, "mtime=0 gzip compression must be deterministic"
+
+
+# ---------------------------------------------------------------------------
+# Alt-map tests (hi-en only)
+# ---------------------------------------------------------------------------
+
+# Hi-en stub vocab with words that have normalization variants and aliases.
+# "baarish" normalizes to "barish" (aa→a) — variant hash goes into alt.
+# "chaand" normalizes to "chand" (aa→a) — variant hash goes into alt.
+# "gyaan" normalizes to "gyan" (aa→a) — variant hash goes into alt.
+# The English words (rain, friend, cloud) have no normalization variants.
+_HIEN_STUB_VOCAB = [
+    "baarish",  # secret — index 0, rank 1; normalizes to "barish"
+    "chaand",  # rank 2+; normalizes to "chand"
+    "gyaan",  # rank 3+; normalizes to "gyan"
+    "rain",  # plain English — no variants
+    "friend",  # plain English — no variants
+    "cloud",  # plain English — no variants
+]
+_HIEN_DIM = 4
+_hien_rng = np.random.default_rng(7)
+_hien_raw = _hien_rng.standard_normal((len(_HIEN_STUB_VOCAB), _HIEN_DIM)).astype(np.float32)
+_hien_norms = np.linalg.norm(_hien_raw, axis=1, keepdims=True)
+_HIEN_STUB_MATRIX = (_hien_raw / _hien_norms).astype(np.float32)
+
+_HIEN_DATE = date(2026, 6, 13)
+_HIEN_LANG = "hi-en"
+_HIEN_SECRET = "baarish"
+
+
+@pytest.fixture()
+def hien_payload() -> dict:
+    """Build a hi-en payload from stub hi-en data. baarish is the secret."""
+    return build_payload(_HIEN_STUB_VOCAB, _HIEN_STUB_MATRIX, _HIEN_SECRET, _HIEN_LANG, _HIEN_DATE)
+
+
+class TestAltMap:
+    """Tests for the hi-en alt map (variant spelling → canonical rank/qsim)."""
+
+    def test_en_payload_has_no_alt_key(self, payload: dict) -> None:
+        """English payloads must NOT have an 'alt' key."""
+        assert "alt" not in payload, "en payload must not have an 'alt' map"
+
+    def test_hien_payload_has_alt_key(self, hien_payload: dict) -> None:
+        """hi-en payloads with normalization variants must have an 'alt' key."""
+        assert "alt" in hien_payload, "hi-en payload must have an 'alt' map"
+
+    def test_alt_keys_are_12char_hex(self, hien_payload: dict) -> None:
+        """Every key in the alt map must be a 12-char hex string."""
+        for k in hien_payload.get("alt", {}):
+            assert len(k) == 12, f"alt key {k!r} is not 12 chars"
+            int(k, 16)  # raises if not valid hex
+
+    def test_alt_values_are_rank_qsim_pairs(self, hien_payload: dict) -> None:
+        """Every value in the alt map must be [rank, qsim] with valid ranges."""
+        for _k, v in hien_payload.get("alt", {}).items():
+            assert isinstance(v, list) and len(v) == 2
+            rank, qsim = v
+            assert isinstance(rank, int) and rank >= 1
+            assert isinstance(qsim, int) and 0 <= qsim <= 65535
+
+    def test_alt_has_no_overlap_with_words(self, hien_payload: dict) -> None:
+        """No hash in alt must also appear in words — canonical entries always win."""
+        words_keys = set(hien_payload["words"].keys())
+        for alt_hash in hien_payload.get("alt", {}):
+            assert alt_hash not in words_keys, (
+                f"alt hash {alt_hash!r} also present in words — canonical should win"
+            )
+
+    def test_secret_variant_maps_to_rank_one(self, hien_payload: dict) -> None:
+        """
+        The normalized variant of the secret must map to rank 1 in the alt map.
+
+        baarish normalizes to barish (aa→a); hash12("barish"+salt) → [1, qsim_of_baarish].
+        """
+        salt = hien_payload["salt"]
+        norm_secret = normalize(_HIEN_SECRET)
+        assert norm_secret != _HIEN_SECRET, (
+            "Test precondition: secret must have a normalize variant"
+        )
+
+        variant_hash = _word_hash(norm_secret, salt)
+        alt = hien_payload.get("alt", {})
+        assert variant_hash in alt, f"Normalized variant {norm_secret!r} hash not found in alt map"
+        rank, _ = alt[variant_hash]
+        assert rank == 1, f"Secret variant {norm_secret!r} has rank {rank}, expected 1"
+
+    def test_non_secret_variant_maps_to_correct_rank(self, hien_payload: dict) -> None:
+        """
+        A non-secret word's variant must map to that word's rank (not 1).
+
+        chaand normalizes to chand; its alt entry rank must match its words entry rank.
+        """
+        salt = hien_payload["salt"]
+        # Find rank of "chaand" in words
+        chaand_hash = _word_hash("chaand", salt)
+        chaand_rv = hien_payload["words"].get(chaand_hash)
+        assert chaand_rv is not None, "'chaand' not found in words"
+        expected_rank = chaand_rv[0]
+        assert expected_rank != 1  # it's not the secret
+
+        # Find variant hash for "chand" (normalize("chaand") == "chand")
+        variant_hash = _word_hash("chand", salt)
+        alt = hien_payload.get("alt", {})
+        assert variant_hash in alt, "Variant 'chand' hash not in alt"
+        actual_rank, _ = alt[variant_hash]
+        assert actual_rank == expected_rank, (
+            f"'chand' variant rank {actual_rank} != chaand rank {expected_rank}"
+        )
+
+    def test_n_unchanged_by_alt(self, hien_payload: dict) -> None:
+        """n must equal len(words), not len(words)+len(alt)."""
+        assert hien_payload["n"] == len(hien_payload["words"])

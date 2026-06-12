@@ -500,3 +500,9 @@ hansi	laughter
 yatra	journey
 rainbow	rainbow
 birthday	birthday
+pahad	mountain
+aaina	mirror
+diya	lamp
+tasveer	picture
+chhata	umbrella
+patang	kite

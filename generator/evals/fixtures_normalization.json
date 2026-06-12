@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {"input": "barish", "canonical": "baarish"},
+    {"input": "bageecha", "canonical": "bagicha"},
+    {"input": "GANA  ", "canonical": "gaana"},
+    {"input": "chand", "canonical": "chaand"},
+    {"input": "khushboo", "canonical": "khushbu"},
+    {"input": "razai", "canonical": "razaai"},
+    {"input": "rajai", "canonical": "razaai"},
+    {"input": "gyan", "canonical": "gyaan"},
+    {"input": "parchhayi", "canonical": "parchhain"},
+    {"input": "aina", "canonical": "aaina"},
+    {"input": "tasvir", "canonical": "tasveer"},
+    {"input": "chata", "canonical": "chhata"},
+    {"input": "ayna", "canonical": "aaina"},
+    {"input": "mombati", "canonical": "mombatti"},
+    {"input": "hasi", "canonical": "hansi"},
+    {"input": "pahar", "canonical": "pahad"},
+    {"input": "parchhai", "canonical": "parchhain"},
+    {"input": "tasweer", "canonical": "tasveer"},
+    {"input": "diyaa", "canonical": "diya"},
+    {"input": "gaana", "canonical": "gaana"},
+    {"input": "mombatti", "canonical": "mombatti"},
+    {"input": "chaata", "canonical": "chhata"}
+  ]
+}
