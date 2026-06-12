@@ -35,16 +35,28 @@ the secret. Gzip is written with `mtime=0` so identical content produces identic
 
 ## Payload hosting
 
-Upload `payloads/` to any static host; the app fetches `payloads/{lang}/{date}.json.gz`:
+Payloads are published to the sibling repo
+[mindmeld-payloads](https://github.com/gaurav-gandhi-2411/mindmeld-payloads), served via
+GitHub Pages at `https://gaurav-gandhi-2411.github.io/mindmeld-payloads`. Any static host
+works — the base URL lives in `app/lib/core/config.dart` (`payloadBaseUrl`).
 
 ```powershell
-# GCS
-gsutil -m rsync -r payloads gs://<bucket>/payloads
-# or GitHub Pages: commit payloads/ to a gh-pages branch / docs folder
+cd generator
+uv run publish --days 30                        # build + commit + push (live)
+uv run publish --days 30 --dry-run             # read-only: print what would happen
+uv run publish --days 30 --langs en            # English only
+uv run publish --days 30 --payloads-repo C:\other\path\mindmeld-payloads
 ```
 
-Set the base URL in `app/lib/core/config.dart` (`payloadBaseUrl`). The app bundles 7 days of
-payloads as assets (`app/assets/payloads/`) and falls back to them on any fetch failure.
+The `publish` command:
+1. Runs the build internally (no subprocess) into a temp directory.
+2. Copies `en/`, `hi-en/`, and `manifest.json` into the payloads repo (overwrite; preserves
+   `README.md`, `.nojekyll`, and any other unrelated files).
+3. `git add -A` → commit (`chore: payload drop <first>..<last> (<langs>) [skip ci]`) →
+   `git push origin main`. Skips commit/push if nothing changed.
+
+The app bundles 7 days of payloads as assets (`app/assets/payloads/`) and falls back to them
+on any fetch failure.
 
 ## Quick start — app
 
