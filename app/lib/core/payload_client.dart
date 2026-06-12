@@ -38,10 +38,18 @@ class PayloadClient {
 
   static const Duration _timeout = Duration(seconds: 10);
 
+  /// The source used by the most recent [fetch] call.
+  ///
+  /// Null before the first call completes.  Updated atomically inside [fetch]
+  /// so integration tests can assert which path was taken without needing to
+  /// thread a result value back through the widget tree.
+  PayloadSource? lastSource;
+
   /// Fetch the payload for [lang] and [date] (format: yyyy-MM-dd).
   ///
   /// Tries network first; falls back to bundled asset on any error.
   /// Throws [Exception] only if both sources fail.
+  /// Sets [lastSource] to reflect which path was used.
   Future<PayloadResult> fetch(String lang, String date) async {
     // 1. Try network
     try {
@@ -51,14 +59,19 @@ class PayloadClient {
         final payload = PayloadCodec.decode(
           Uint8List.fromList(response.bodyBytes),
         );
-        return PayloadResult(payload: payload, source: PayloadSource.network);
+        final result =
+            PayloadResult(payload: payload, source: PayloadSource.network);
+        lastSource = result.source;
+        return result;
       }
     } catch (_) {
       // Fall through to bundled asset.
     }
 
     // 2. Fall back to bundled asset
-    return _loadFromAsset(lang, date);
+    final result = await _loadFromAsset(lang, date);
+    lastSource = result.source;
+    return result;
   }
 
   /// Load payload directly from bundled assets (used by tests and offline mode).

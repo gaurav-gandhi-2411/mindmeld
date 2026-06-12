@@ -15,7 +15,9 @@ class AppConfig {
 
   /// Base URL for fetching daily payloads.
   /// Override with an environment variable or build arg in production.
-  static const String payloadBaseUrl = 'https://example.com/payloads';
+  /// Points to the GitHub Pages host serving {lang}/{yyyy-MM-dd}.json.gz.
+  static const String payloadBaseUrl =
+      'https://gaurav-gandhi-2411.github.io/mindmeld-payloads';
 
   /// Languages supported in Phase 1.
   static const List<String> supportedLangs = ['en', 'hi-en'];

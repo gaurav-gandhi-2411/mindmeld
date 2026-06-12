@@ -4,6 +4,8 @@
 ///   - Bundled payloads for 2026-06-12 must be present in assets/.
 ///   - Run on an Android emulator: `flutter test integration_test` with a
 ///     connected device.
+///   - Emulator must have network access to reach
+///     https://gaurav-gandhi-2411.github.io/mindmeld-payloads
 ///
 /// What this test covers per language:
 ///   1. App launches with the puzzle screen (onboarding skipped, date pinned).
@@ -14,11 +16,12 @@
 ///      produces the win screen showing the revealed word.
 ///   5. The share card text visible on the win screen does NOT contain the
 ///      secret word.
+///   6. The payload was fetched from the LIVE network URL (PayloadSource.network).
 ///
 /// The test uses [AppOverrides] to:
 ///   - Pin the puzzle date to 2026-06-12 regardless of device clock.
-///   - Inject a [_BundleOnlyClient] that throws on network so the app always
-///     uses the bundled asset (no network dependency in CI).
+///   - Inject a real [PayloadClient] (live network) so emulator tests verify
+///     end-to-end connectivity against the GitHub Pages host.
 ///   - Skip the onboarding gate.
 ///
 /// Sanity checks asserted in setUp (not hardcoded blindly):
@@ -37,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
@@ -51,8 +55,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// [PayloadClient] that always serves the bundled asset, skipping network.
 ///
-/// [fetch] overrides the default network-first strategy with a direct
-/// [loadBundled] call so integration tests are fully offline.
+/// Used only for pre-test setup helpers ([_decodeSecret], [_firstHintWord])
+/// that read known data from the APK assets without hitting the network.
 class _BundleOnlyClient extends PayloadClient {
   _BundleOnlyClient() : super(assetBundle: rootBundle);
 
@@ -64,7 +68,8 @@ class _BundleOnlyClient extends PayloadClient {
 /// Decode the secret for [lang]/[date] from the bundled asset at test time.
 ///
 /// Used to sanity-check known secrets and to obtain the winning word without
-/// hardcoding it blindly.
+/// hardcoding it blindly.  Uses [_BundleOnlyClient] so setup never hits the
+/// network.
 Future<String> _decodeSecret(String lang, String date) async {
   final client = _BundleOnlyClient();
   final result = await client.fetch(lang, date);
@@ -74,7 +79,8 @@ Future<String> _decodeSecret(String lang, String date) async {
 /// Return a non-secret in-vocab word for [lang]/[date].
 ///
 /// Uses the first hint word from the payload — hints are guaranteed to be
-/// in-vocab and have rank > 1 (i.e. not the secret).
+/// in-vocab and have rank > 1 (i.e. not the secret).  Uses [_BundleOnlyClient]
+/// so setup never hits the network.
 Future<String> _firstHintWord(String lang, String date) async {
   final client = _BundleOnlyClient();
   final result = await client.fetch(lang, date);
@@ -106,7 +112,9 @@ Future<(Directory, String)> _createTestDbPath() async {
 const _testDate = '2026-06-12';
 const _garbageWord = 'zzzqqq';
 
-// Bundled range for both langs: 2026-06-12..18 — date is within range.
+// Live payload host — payloads for 2026-06-12..2026-07-11 are served.
+// The emulator must have network access to this URL.
+const _liveBaseUrl = AppConfig.payloadBaseUrl;
 
 // ---------------------------------------------------------------------------
 // Test body
@@ -139,7 +147,7 @@ void main() {
 
   // Run each language pass in a separate test for clear CI reporting.
   for (final lang in ['en', 'hi-en']) {
-    testWidgets('guess → win loop ($lang)', (tester) async {
+    testWidgets('guess → win loop ($lang) [source=network]', (tester) async {
       // Each test gets its own isolated SQLite file so won/gave-up state written
       // during the en pass cannot bleed into the hi-en pass.
       final (testDbDir, testDbPath) = await _createTestDbPath();
@@ -155,11 +163,18 @@ void main() {
       assert(hintWord != secret,
           'hintWord "$hintWord" must not equal secret "$secret"');
 
+      // Real PayloadClient pointing at the live GitHub Pages host.
+      // lastSource will be set to PayloadSource.network once fetch() resolves.
+      // The client falls back to bundled assets automatically if network is
+      // unavailable, but we assert network was used after the fact.
+      final liveClient = PayloadClient(baseUrl: _liveBaseUrl);
+
       // Pass lang and dbPath through AppOverrides so:
       //   - lang: the shell uses hi-en even if SharedPreferences holds 'en'.
       //   - dbPath: persistence opens the per-test file, not the shared app DB.
+      //   - payloadClient: the real PayloadClient fetches from the live URL.
       final overrides = AppOverrides(
-        payloadClient: _BundleOnlyClient(),
+        payloadClient: liveClient,
         fixedDate: _testDate,
         skipOnboarding: true,
         lang: lang,
@@ -170,8 +185,22 @@ void main() {
       // per-test dbPath from AppOverrides; no separate init() call needed.
       await tester.pumpWidget(MindmeldApp(overrides: overrides));
 
-      // Allow the async app init + puzzle load to complete.
+      // Allow the async app init + payload network fetch to complete.
+      // 10 s is generous; the live host returns in < 2 s on a healthy emulator.
       await tester.pumpAndSettle(const Duration(seconds: 10));
+
+      // ── Network source assertion ───────────────────────────────────────────
+      // Verify the payload came from the live network URL, not the bundled
+      // asset fallback.  If lastSource is not network, the emulator had no
+      // connectivity — report clearly rather than silently passing on stale data.
+      expect(
+        liveClient.lastSource,
+        equals(PayloadSource.network),
+        reason: 'Payload for $lang/$_testDate must have been fetched from the '
+            'live network host ($_liveBaseUrl).  '
+            'If this fails, the emulator has no network access or the host '
+            'returned a non-200 response.',
+      );
 
       // ── Step 1: Verify puzzle screen is shown ──────────────────────────────
       expect(find.byType(TextField), findsOneWidget,
