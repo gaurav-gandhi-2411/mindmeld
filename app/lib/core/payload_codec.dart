@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/core/normalize.dart';
 
 /// Mirrors the Python generator's codec exactly.
 ///
@@ -37,12 +38,54 @@ class PayloadCodec {
     return digest.toString().substring(0, 12);
   }
 
-  /// Look up a (lowercased, trimmed) word in the payload.
+  /// Look up a player guess in the payload using a 4-step tolerance chain.
   ///
-  /// Returns null if the word is not in the vocab (i.e. hash not found).
+  /// For lang 'hi-en', the lookup order is:
+  ///   1. exact:  hash(lower(guess)) in words
+  ///   2. alt:    hash(lower(guess)) in alt
+  ///   3. fold:   hash(normalizeHiEn(guess)) in words
+  ///   4. alt+fold: hash(normalizeHiEn(guess)) in alt
+  ///   First hit wins.
+  ///
+  /// For lang 'en', only step 1 is used (exact words lookup, no fold).
+  /// This intentionally prevents e.g. 'cofi' matching 'coffee' via fold
+  /// in English mode — the fold rules are hi-en-specific romanization
+  /// conventions, not valid English transformations.
+  ///
+  /// The returned [WordEntry] carries the rank/qsim of the canonical word
+  /// (variant spellings resolve to the same rank as their canonical form).
+  ///
+  /// Returns null if no step finds a match (word not in vocab or alt map).
   static WordEntry? lookupWord(String word, DailyPayload payload) {
-    final hash = hashWord(word, payload.salt);
-    return payload.words[hash];
+    final lower = word.trim().toLowerCase();
+
+    // Step 1: exact match in words map (all langs)
+    final h1 = hashWord(lower, payload.salt);
+    final step1 = payload.words[h1];
+    if (step1 != null) return step1;
+
+    // Steps 2-4 are hi-en only; English uses exact lookup only.
+    if (payload.lang != 'hi-en') return null;
+
+    // Step 2: exact lower hash in alt map
+    final step2 = payload.alt[h1];
+    if (step2 != null) return step2;
+
+    // Steps 3-4: normalize via romanization fold
+    final norm = normalizeHiEn(lower);
+    if (norm != lower) {
+      final h3 = hashWord(norm, payload.salt);
+
+      // Step 3: normalized form in words map
+      final step3 = payload.words[h3];
+      if (step3 != null) return step3;
+
+      // Step 4: normalized form in alt map
+      final step4 = payload.alt[h3];
+      if (step4 != null) return step4;
+    }
+
+    return null;
   }
 
   /// Decode the obfuscated secret field.

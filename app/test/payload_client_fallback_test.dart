@@ -104,7 +104,8 @@ void main() {
       final result = await client.fetch('hi-en', '2026-06-12');
       expect(result.source, equals(PayloadSource.bundledAsset));
       expect(result.payload.lang, equals('hi-en'));
-      expect(result.payload.n, equals(10439));
+      // Refreshed 2026-06-12 hi-en payload (with alt map) has n=10445.
+      expect(result.payload.n, equals(10445));
     });
   });
 }

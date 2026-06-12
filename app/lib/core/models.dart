@@ -112,6 +112,7 @@ class DailyPayload {
     required this.words,
     required this.hints,
     required this.s,
+    this.alt = const {},
   });
 
   /// Payload schema version.
@@ -135,6 +136,10 @@ class DailyPayload {
   /// Word lookup: 12-char hash → [rank, qsim].
   final Map<String, WordEntry> words;
 
+  /// Alt-spelling lookup (hi-en only): hash of normalized variant → [rank, qsim]
+  /// of the canonical word. Absent in non-hi-en payloads; defaults to empty map.
+  final Map<String, WordEntry> alt;
+
   /// Ordered hint list: each entry is [rank, plaintext_word].
   final List<({int rank, String word})> hints;
 
@@ -151,6 +156,21 @@ class DailyPayload {
       );
     });
 
+    // Parse optional alt map; absent in en payloads and older hi-en payloads.
+    final Map<String, WordEntry> alt;
+    if (json.containsKey('alt')) {
+      final rawAlt = json['alt'] as Map<String, dynamic>;
+      alt = rawAlt.map((hash, value) {
+        final list = value as List<dynamic>;
+        return MapEntry(
+          hash,
+          WordEntry(rank: list[0] as int, qsim: list[1] as int),
+        );
+      });
+    } else {
+      alt = const {};
+    }
+
     final rawHints = json['hints'] as List<dynamic>;
     final hints = rawHints.map((h) {
       final list = h as List<dynamic>;
@@ -165,6 +185,7 @@ class DailyPayload {
       n: json['n'] as int,
       salt: json['salt'] as String,
       words: words,
+      alt: alt,
       hints: hints,
       s: json['s'] as String,
     );

@@ -149,20 +149,25 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     if (state.isFinished) return;
 
-    // Duplicate check
-    if (state.guesses.any((g) => g.word == raw)) {
-      setState(() => _inputError = 'Already guessed "$raw"');
-      return;
-    }
-
-    // Vocab lookup
+    // Vocab lookup first (needed for rank-based duplicate detection).
     final entry = PayloadCodec.lookupWord(raw, payload);
     if (entry == null) {
       setState(() => _inputError = 'Not in word list');
       return;
     }
 
+    // Duplicate check: compare by resolved rank, not raw string.
+    // A variant spelling that resolves to the same canonical word (same rank)
+    // counts as a duplicate — ranks belong to the canonical word, not the typed
+    // variant. This prevents e.g. 'gana' being accepted after 'gaana' was guessed.
+    if (state.guesses.any((g) => g.rank == entry.rank)) {
+      setState(() => _inputError = 'Already guessed that word');
+      return;
+    }
+
     final band = bandForRank(entry.rank, payload.n);
+    // word records what the player typed (display fidelity); rank/similarity
+    // belong to the canonical word resolved by the lookup.
     final guess = Guess(
       word: raw,
       rank: entry.rank,

@@ -99,8 +99,9 @@ void main() {
       expect(payload.lang, equals('hi-en'));
     });
 
-    test('n is 10439', () {
-      expect(payload.n, equals(10439));
+    test('n is 10445', () {
+      // Refreshed 2026-06-12 hi-en payload (with alt map) has n=10445.
+      expect(payload.n, equals(10445));
     });
 
     test('exactly one rank-1 entry exists', () {
