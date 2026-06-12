@@ -1,0 +1,8 @@
+{
+  "id": "E24",
+  "lang": "hi-en",
+  "anchor": "soldier",
+  "closer": "army",
+  "farther": "flower",
+  "note": "soldier/army same domain; flower is unrelated"
+}

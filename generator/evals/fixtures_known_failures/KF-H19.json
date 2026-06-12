@@ -1,0 +1,9 @@
+{
+  "id": "KF-H19",
+  "lang": "hi-en",
+  "anchor": "baarish",
+  "closer": "rain",
+  "farther": "bread",
+  "note": "baarish=rain but 'baarish' clusters with other Hindi tokens not English 'rain'",
+  "reason": "paraphrase-multilingual-MiniLM-L12-v2 maps romanized Hindi weather words closer to English food words than their direct translations. baarish(rain)=0.39 < baarish(bread)=0.51. Model limitation: Hinglish romanization not well-represented in multilingual training data."
+}

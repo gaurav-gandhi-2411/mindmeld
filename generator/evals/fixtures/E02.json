@@ -1,0 +1,8 @@
+{
+  "id": "E02",
+  "lang": "hi-en",
+  "anchor": "music",
+  "closer": "song",
+  "farther": "water",
+  "note": "music and song are close; water is unrelated"
+}

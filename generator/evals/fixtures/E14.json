@@ -1,0 +1,8 @@
+{
+  "id": "E14",
+  "lang": "hi-en",
+  "anchor": "book",
+  "closer": "library",
+  "farther": "rain",
+  "note": "book/library same domain; rain is unrelated"
+}

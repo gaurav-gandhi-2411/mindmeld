@@ -1,0 +1,8 @@
+{
+  "id": "H02",
+  "lang": "hi-en",
+  "anchor": "roti",
+  "closer": "bread",
+  "farther": "doctor",
+  "note": "roti=bread; semantically food vs medical domain"
+}

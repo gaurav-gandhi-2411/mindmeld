@@ -1,0 +1,8 @@
+{
+  "id": "H07",
+  "lang": "hi-en",
+  "anchor": "jungle",
+  "closer": "forest",
+  "farther": "doctor",
+  "note": "jungle=forest; nature vs medical domain"
+}

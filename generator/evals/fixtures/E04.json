@@ -1,0 +1,8 @@
+{
+  "id": "E04",
+  "lang": "hi-en",
+  "anchor": "school",
+  "closer": "education",
+  "farther": "rain",
+  "note": "school/education are same domain; rain is unrelated"
+}

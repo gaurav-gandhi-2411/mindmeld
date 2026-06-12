@@ -1,0 +1,9 @@
+{
+  "id": "KF-H35",
+  "lang": "hi-en",
+  "anchor": "paani",
+  "closer": "water",
+  "farther": "battle",
+  "note": "paani=water but model places it closer to battle than water",
+  "reason": "paani(water)=0.40 < paani(battle)=0.51. 'paani' does not reliably cluster with English 'water' in this multilingual model. Romanized Hindi phonology does not match English equivalent tokens."
+}

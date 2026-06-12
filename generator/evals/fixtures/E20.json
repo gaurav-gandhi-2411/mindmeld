@@ -1,0 +1,8 @@
+{
+  "id": "E20",
+  "lang": "hi-en",
+  "anchor": "city",
+  "closer": "town",
+  "farther": "forest",
+  "note": "city/town are similar settlements; forest is contrasting"
+}

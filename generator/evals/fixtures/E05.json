@@ -1,0 +1,8 @@
+{
+  "id": "E05",
+  "lang": "hi-en",
+  "anchor": "doctor",
+  "closer": "medicine",
+  "farther": "rain",
+  "note": "doctor/medicine are same domain; rain is unrelated"
+}

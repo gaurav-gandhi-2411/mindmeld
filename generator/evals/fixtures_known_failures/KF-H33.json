@@ -1,0 +1,9 @@
+{
+  "id": "KF-H33",
+  "lang": "hi-en",
+  "anchor": "khana",
+  "closer": "food",
+  "farther": "battle",
+  "note": "khana=food but model places it closer to battle than food",
+  "reason": "khana(food)=0.29 < khana(battle)=0.36. 'khana' as romanized Hindi food word is poorly grounded; model may map to 'khan' (title) or other non-food senses in multilingual space."
+}

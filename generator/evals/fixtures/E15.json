@@ -1,0 +1,8 @@
+{
+  "id": "E15",
+  "lang": "hi-en",
+  "anchor": "flower",
+  "closer": "garden",
+  "farther": "war",
+  "note": "flower/garden same domain; war is unrelated"
+}

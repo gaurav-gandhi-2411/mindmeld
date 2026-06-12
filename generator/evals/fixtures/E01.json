@@ -1,0 +1,8 @@
+{
+  "id": "E01",
+  "lang": "hi-en",
+  "anchor": "ocean",
+  "closer": "sea",
+  "farther": "mountain",
+  "note": "ocean and sea are near-synonyms; mountain is unrelated geography"
+}

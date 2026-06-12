@@ -1,0 +1,9 @@
+{
+  "id": "KF-H27",
+  "lang": "hi-en",
+  "anchor": "subah",
+  "closer": "morning",
+  "farther": "medicine",
+  "note": "subah=morning but model places subah closer to medicine than morning",
+  "reason": "subah(morning)=0.47 < subah(medicine)=0.50. Marginal failure. The romanized time-of-day word 'subah' is not reliably grounded in multilingual model."
+}

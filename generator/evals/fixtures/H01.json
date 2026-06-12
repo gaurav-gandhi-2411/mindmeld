@@ -1,0 +1,8 @@
+{
+  "id": "H01",
+  "lang": "hi-en",
+  "anchor": "roti",
+  "closer": "bread",
+  "farther": "ocean",
+  "note": "roti=bread; bread is far closer to ocean than bread (cross-lingual synonym)"
+}

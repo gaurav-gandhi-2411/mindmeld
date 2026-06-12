@@ -1,0 +1,9 @@
+{
+  "id": "KF-H20",
+  "lang": "hi-en",
+  "anchor": "baarish",
+  "closer": "rain",
+  "farther": "music",
+  "note": "baarish=rain but model places it closer to music than rain",
+  "reason": "Same as KF-H19: baarish(rain)=0.39 < baarish(music)=0.50. Model does not reliably ground romanized Hindi weather terms to English equivalents."
+}

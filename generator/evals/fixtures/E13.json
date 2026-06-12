@@ -1,0 +1,8 @@
+{
+  "id": "E13",
+  "lang": "hi-en",
+  "anchor": "hospital",
+  "closer": "medicine",
+  "farther": "music",
+  "note": "hospital/medicine same domain; music is unrelated"
+}
