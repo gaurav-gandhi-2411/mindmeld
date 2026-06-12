@@ -1,0 +1,40 @@
+# Romanized Hindi / Hinglish profanity blocklist — one word per line (lowercase)
+# Conservative family-friendly list for a word game targeting Indian audiences.
+# Maintained offline to avoid API dependency at build time.
+behen chod
+bhosdike
+bhosdi
+chod
+chodu
+chutiya
+chut
+gaand
+gandmara
+gaandu
+harami
+kamina
+kamini
+kutti
+lauda
+launde
+lawda
+loda
+lodu
+madarchod
+maderchod
+maa ki aankh
+maa ki
+randi
+raandi
+saala
+saali
+sala
+sali
+suar
+suwar
+tere maa ki
+teri maa
+ullu
+ullu ka pattha
+behenchod
+bakwaas

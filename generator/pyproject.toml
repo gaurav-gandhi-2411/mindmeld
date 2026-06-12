@@ -1,0 +1,51 @@
+[project]
+name = "mindmeld-generator"
+version = "0.1.0"
+description = "Puzzle generator for Mindmeld semantic word game"
+requires-python = ">=3.11"
+dependencies = [
+    "sentence-transformers>=3.0.0",
+    "wordfreq>=3.1.0",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+# E402 fires when a module docstring precedes `from __future__ import annotations`
+# and then regular imports follow. This is the correct Python pattern for scripts
+# that need both a module docstring and future imports; suppressing globally
+# since all files in this package follow the same pattern intentionally.
+ignore = ["E402"]
+
+[tool.ruff.lint.per-file-ignores]
+# check_candidates*.py and gen_fixtures.py are one-time dev analysis scripts;
+# long lines in print statements and data literals are acceptable there.
+"evals/check_candidates*.py" = ["E501"]
+"evals/gen_fixtures.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.17",
+]
