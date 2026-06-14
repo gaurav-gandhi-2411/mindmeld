@@ -19,7 +19,7 @@ void main() {
     });
 
     test('payload fields parse correctly', () {
-      expect(payload.v, equals(1));
+      expect(payload.v, equals(2));
       expect(payload.lang, equals('en'));
       expect(payload.date, equals('2026-06-12'));
       expect(payload.n, equals(55000));
@@ -128,7 +128,7 @@ void main() {
 
       // qsim for sim=1.0: round((1.0 + 1.0) * 32767.5) = 65535
       final miniJson = '''{
-        "v":1,"lang":"en","date":"2026-06-12",
+        "v":2,"lang":"en","date":"2026-06-12",
         "model":"test","n":1,"salt":"$salt",
         "words":{"$hash":[1,65535]},
         "hints":[[2,"sea"]],
