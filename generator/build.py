@@ -130,6 +130,7 @@ def main() -> None:
 
         day_records: list[dict] = []
         day_sizes: list[int] = []
+        day_par_values: list[int] = []
 
         for puzzle_date in days:
             secret = secret_for_date(puzzle_date, lang, schedule)
@@ -137,6 +138,7 @@ def main() -> None:
             out_path = write_payload(payload, out_dir, lang, puzzle_date)
             file_bytes = out_path.stat().st_size
             day_sizes.append(file_bytes)
+            day_par_values.append(payload["parGuesses"])
 
             target = SIZE_TARGETS[lang]
             size_ok = file_bytes <= target
@@ -154,6 +156,15 @@ def main() -> None:
             day_records.append(
                 {"date": puzzle_date.isoformat(), "file": rel_path, "bytes": file_bytes}
             )
+
+        par_sorted = sorted(day_par_values)
+        par_min = par_sorted[0]
+        par_median = par_sorted[len(par_sorted) // 2]
+        par_max = par_sorted[-1]
+        print(
+            f"[{lang}] Par distribution: min={par_min} median={par_median} max={par_max} "
+            f"(target median 8-12, max 15)"
+        )
 
         lang_days[lang] = day_records
         print(
