@@ -8,10 +8,12 @@ import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/core/rival_state.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 import 'package:mindmeld/stubs/rewarded_ad_stub.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'guess_tile.dart';
 
@@ -29,11 +31,15 @@ class PuzzleScreen extends StatefulWidget {
     this.adStub,
     this.hintGate,
     this.iapGateway,
+    this.isPractice = false,
   });
 
   final String lang;
   final String date;
   final VoidCallback onWin;
+
+  /// When true, wins and losses are not recorded to persistent stats.
+  final bool isPractice;
 
   /// Optional override for the payload client (used in tests/integration tests).
   /// When null, a default [PayloadClient] is constructed (production behaviour).
@@ -82,6 +88,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     _hintGate = widget.hintGate ?? buildHintGate(adStub: widget.adStub);
     _iapGateway = widget.iapGateway ?? buildIapGateway();
     _load();
+    _loadRivalSettings();
   }
 
   DailyPayload? _payload;
@@ -90,6 +97,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   bool _loading = true;
   String? _loadError;
   bool _showingAd = false;
+  bool _rivalEnabled = true;
+  String _rivalTier = 'even';
 
   AnalyticsStub get _analytics =>
       AnalyticsStub(AppPersistence.instance);
@@ -137,6 +146,21 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           _loading = false;
         });
       }
+    }
+  }
+
+  Future<void> _loadRivalSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (mounted) {
+        setState(() {
+          _rivalEnabled = prefs.getBool('rival_enabled') ?? true;
+          _rivalTier = prefs.getString('rival_tier') ?? 'even';
+        });
+      }
+    } catch (_) {
+      // SharedPreferences not available in test environments without mock setup;
+      // silently retain default values (_rivalEnabled=true, _rivalTier='even').
     }
   }
 
@@ -190,7 +214,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       'guess_number': newGuesses.length,
     });
 
-    if (won) {
+    if (won && !widget.isPractice) {
       await AppPersistence.instance.recordWin(
         lang: widget.lang,
         guessCount: newGuesses.length,
@@ -299,7 +323,9 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     final newState = state.copyWith(gaveUp: true);
     await AppPersistence.instance.saveDayState(newState);
-    await AppPersistence.instance.recordLoss(lang: widget.lang);
+    if (!widget.isPractice) {
+      await AppPersistence.instance.recordLoss(lang: widget.lang);
+    }
 
     if (mounted) {
       setState(() => _dayState = newState);
@@ -312,10 +338,100 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     }
   }
 
+  RivalState? get _rivalState {
+    final payload = _payload;
+    final state = _dayState;
+    if (payload == null || state == null || !_rivalEnabled) return null;
+    final rivalData = payload.rival;
+    if (rivalData == null) return null;
+    return RivalState.fromGuesses(
+      guesses: state.guesses,
+      tierData: rivalData.forTier(_rivalTier),
+      playerWon: state.won,
+    );
+  }
+
   List<Guess> get _sortedGuesses {
     final guesses = List<Guess>.from(_dayState?.guesses ?? []);
     guesses.sort((a, b) => a.rank.compareTo(b.rank));
     return guesses;
+  }
+
+  Widget _buildRivalStrip(RivalState rivalState, BuildContext context) {
+    final guessCount = rivalState.guessCount;
+    final solveAt = rivalState.solveAt;
+
+    String rivalLabel;
+    if (rivalState.rivalSolved) {
+      rivalLabel = 'Rival finished in $solveAt ${solveAt == 1 ? 'guess' : 'guesses'}';
+    } else if (guessCount == 0) {
+      rivalLabel = 'Rival ready…';
+    } else {
+      final step = rivalState.rivalCurrentStep;
+      final label = step?.temperatureBand.label ?? '';
+      final emoji = step?.temperatureBand.emoji ?? '';
+      rivalLabel = 'Rival: $emoji $label (best #${rivalState.rivalBestRank})';
+    }
+
+    final outcomeEmoji = switch (rivalState.outcome) {
+      RivalOutcome.playerWon => ' 🏆',
+      RivalOutcome.rivalWon => ' 🤖',
+      RivalOutcome.tie => ' 🤝',
+      RivalOutcome.racing => '',
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Row(
+        children: [
+          const Text('🤖', style: TextStyle(fontSize: 14)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(rivalLabel,
+                style: Theme.of(context).textTheme.bodySmall),
+          ),
+          Text(
+            'You $guessCount · Bot ${rivalState.rivalSolved ? solveAt : '?'}$outcomeEmoji',
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressRow(DailyPayload payload, DayState state, BuildContext context) {
+    if (state.guesses.isEmpty) return const SizedBox.shrink();
+
+    final bestGuess =
+        state.guesses.reduce((a, b) => a.rank < b.rank ? a : b);
+    final percentile = ((1.0 - bestGuess.rank / payload.n) * 100);
+    final pctStr = percentile >= 99.0
+        ? percentile.toStringAsFixed(1)
+        : percentile.toStringAsFixed(0);
+
+    // Par scoring
+    String parStr = '';
+    final par = payload.parGuesses;
+    if (par != null) {
+      final effective = state.guesses.length + state.hintsUsed;
+      final delta = effective - par;
+      if (delta < 0) {
+        parStr = ' · Par $delta 🎯';
+      } else if (delta == 0) {
+        parStr = ' · Par 🎯';
+      } else {
+        parStr = ' · Par +$delta';
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Text(
+        'Best: ${bestGuess.band.emoji} #${bestGuess.rank} · Top $pctStr%$parStr',
+        style: Theme.of(context).textTheme.labelSmall,
+      ),
+    );
   }
 
   String _formatDate() {
@@ -389,6 +505,10 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       ),
       body: Column(
         children: [
+          // Rival strip (shown during active play only, hidden after game over)
+          if (_rivalState != null && !state.isFinished)
+            _buildRivalStrip(_rivalState!, context),
+
           // Guess input
           if (!state.isFinished)
             Padding(
@@ -451,7 +571,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ),
             ),
 
-          // Guess count
+          // Guess count + progress row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -469,6 +589,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ],
             ),
           ),
+          _buildProgressRow(payload, state, context),
 
           const Divider(),
 

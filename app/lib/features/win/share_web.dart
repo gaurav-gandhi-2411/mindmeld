@@ -10,42 +10,47 @@
 /// clipboard+dialog path.
 library;
 
+import 'dart:convert';
 import 'dart:js_interop';
+import 'dart:typed_data';
 
-import 'package:web/web.dart' show ShareData, window;
+import 'package:web/web.dart' as web;
 
 /// Returns true if the Web Share API is available in this browser.
-///
-/// Uses [Navigator.canShare] which is the spec-approved capability check.
-/// Desktop Chrome and most desktop browsers do not expose navigator.share;
-/// mobile browsers (Chrome Android, Safari iOS) typically do.
 bool webShareAvailable() {
-  // canShare() returns false if the API is unsupported, which avoids the
-  // share() tear-off restriction that affects external interop members.
   try {
-    // Passing an empty ShareData checks API availability without specifying
-    // actual data — any exception means the API is not supported.
-    return window.navigator.canShare(ShareData());
+    return web.window.navigator.canShare(web.ShareData());
   } catch (_) {
     return false;
   }
 }
 
 /// Invoke the Web Share API with [title], [text], and [url].
-///
-/// Returns true if the share sheet was successfully invoked, false if the API
-/// is unavailable or the share was cancelled/rejected.
 Future<bool> shareViaWebApi({
   required String title,
   required String text,
   required String url,
 }) async {
   try {
-    final data = ShareData(title: title, text: text, url: url);
-    await window.navigator.share(data).toDart;
+    final data = web.ShareData(title: title, text: text, url: url);
+    await web.window.navigator.share(data).toDart;
     return true;
   } catch (_) {
-    // navigator.share throws DOMException on cancellation or if unsupported.
     return false;
   }
+}
+
+/// Download a PNG image by triggering a browser download.
+Future<void> shareOrDownloadPng(Uint8List pngBytes) async {
+  try {
+    final base64Data = base64Encode(pngBytes);
+    final dataUrl = 'data:image/png;base64,$base64Data';
+    final anchor =
+        web.window.document.createElement('a') as web.HTMLAnchorElement;
+    anchor.href = dataUrl;
+    anchor.download = 'mindmeld.png';
+    web.window.document.body?.appendChild(anchor);
+    anchor.click();
+    web.window.document.body?.removeChild(anchor);
+  } catch (_) {}
 }

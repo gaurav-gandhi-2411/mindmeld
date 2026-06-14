@@ -7,6 +7,8 @@ import 'package:mindmeld/stubs/iap_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kLangPref = 'selected_lang';
+const String _kRivalEnabledPref = 'rival_enabled';
+const String _kRivalTierPref = 'rival_tier';
 
 /// URL shown in the privacy policy dialog.
 ///
@@ -60,6 +62,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// false [ConsentManager.isPrivacyOptionsRequired] returns false immediately
   /// without any platform channel call, so the tile never renders in test builds.
   bool _privacyOptionsRequired = false;
+  bool _rivalEnabled = true;
+  String _rivalTier = 'even';
 
   @override
   void initState() {
@@ -68,11 +72,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _gateway = widget.iapGateway ?? buildIapGateway();
     _loadEntitlements();
     _checkPrivacyOptionsRequired();
+    _loadRivalSettings();
   }
 
   Future<void> _checkPrivacyOptionsRequired() async {
     final required = await ConsentManager.isPrivacyOptionsRequired();
     if (mounted) setState(() => _privacyOptionsRequired = required);
+  }
+
+  Future<void> _loadRivalSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (mounted) {
+        setState(() {
+          _rivalEnabled = prefs.getBool(_kRivalEnabledPref) ?? true;
+          _rivalTier = prefs.getString(_kRivalTierPref) ?? 'even';
+        });
+      }
+    } catch (_) {
+      // SharedPreferences not available in test environments without mock setup;
+      // silently retain default values.
+    }
+  }
+
+  Future<void> _setRivalEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kRivalEnabledPref, value);
+    if (mounted) setState(() => _rivalEnabled = value);
+  }
+
+  Future<void> _setRivalTier(String tier) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kRivalTierPref, tier);
+    if (mounted) setState(() => _rivalTier = tier);
   }
 
   Future<void> _loadEntitlements() async {
@@ -255,6 +287,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text('About'),
             subtitle: Text('Mindmeld v1.0.0 — Semantic Daily Word Game'),
           ),
+
+          const Divider(),
+
+          // Race the Bot
+          const ListTile(
+            title: Text('Race the Bot'),
+            dense: true,
+            enabled: false,
+          ),
+          SwitchListTile(
+            title: const Text('Enable rival'),
+            subtitle: const Text('Race an AI opponent each day'),
+            value: _rivalEnabled,
+            onChanged: _setRivalEnabled,
+          ),
+          if (_rivalEnabled) ...[
+            const Padding(
+              padding: EdgeInsets.only(left: 16, top: 4, bottom: 2),
+              child: Text('Difficulty',
+                  style: TextStyle(fontWeight: FontWeight.w500)),
+            ),
+            RadioListTile<String>(
+              title: const Text('Chill'),
+              subtitle: const Text('Easier — slower solver (~par +4)'),
+              value: 'chill',
+              // ignore: deprecated_member_use
+              groupValue: _rivalTier,
+              // ignore: deprecated_member_use
+              onChanged: (v) {
+                if (v != null) _setRivalTier(v);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Even'),
+              subtitle: const Text('Matched — similar pace (~par)'),
+              value: 'even',
+              // ignore: deprecated_member_use
+              groupValue: _rivalTier,
+              // ignore: deprecated_member_use
+              onChanged: (v) {
+                if (v != null) _setRivalTier(v);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Sharp'),
+              subtitle: const Text('Harder — fast solver (~par −2)'),
+              value: 'sharp',
+              // ignore: deprecated_member_use
+              groupValue: _rivalTier,
+              // ignore: deprecated_member_use
+              onChanged: (v) {
+                if (v != null) _setRivalTier(v);
+              },
+            ),
+          ],
         ],
       ),
     );

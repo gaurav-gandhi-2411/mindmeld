@@ -113,6 +113,8 @@ class DailyPayload {
     required this.hints,
     required this.s,
     this.alt = const {},
+    this.rival,
+    this.parGuesses,
   });
 
   /// Payload schema version.
@@ -146,6 +148,12 @@ class DailyPayload {
   /// Obfuscated secret field (base64-encoded XOR).
   final String s;
 
+  /// Rival precomputed paths; null for pre-v2 payloads.
+  final RivalData? rival;
+
+  /// Par guess count; null for pre-v2 payloads.
+  final int? parGuesses;
+
   factory DailyPayload.fromJson(Map<String, dynamic> json) {
     final rawWords = json['words'] as Map<String, dynamic>;
     final words = rawWords.map((hash, value) {
@@ -177,6 +185,16 @@ class DailyPayload {
       return (rank: list[0] as int, word: list[1] as String);
     }).toList();
 
+    // v2+ optional fields — present only when v >= 2.
+    RivalData? rival;
+    int? parGuesses;
+    if ((json['v'] as int) >= 2) {
+      if (json.containsKey('rival')) {
+        rival = RivalData.fromJson(json['rival'] as Map<String, dynamic>);
+      }
+      parGuesses = json['parGuesses'] as int?;
+    }
+
     return DailyPayload(
       v: json['v'] as int,
       lang: json['lang'] as String,
@@ -188,6 +206,8 @@ class DailyPayload {
       alt: alt,
       hints: hints,
       s: json['s'] as String,
+      rival: rival,
+      parGuesses: parGuesses,
     );
   }
 }
@@ -307,4 +327,74 @@ class DayState {
       revealedHints: revealedHints ?? this.revealedHints,
     );
   }
+}
+
+/// A single step in the rival's precomputed path.
+///
+/// Contains only rank and band ordinal — no word strings (spoiler-safe).
+class RivalStep {
+  const RivalStep({required this.rank, required this.band});
+
+  final int rank;
+
+  /// TemperatureBand ordinal: 0=win, 1=scorching, 2=hot, 3=warm, 4=cold, 5=freezing.
+  final int band;
+
+  TemperatureBand get temperatureBand =>
+      TemperatureBand.values[band.clamp(0, TemperatureBand.values.length - 1)];
+
+  factory RivalStep.fromJson(Map<String, dynamic> json) => RivalStep(
+        rank: json['rank'] as int,
+        band: json['band'] as int,
+      );
+}
+
+/// Precomputed path data for one difficulty tier.
+class RivalTierData {
+  const RivalTierData({required this.path, required this.solveAt});
+
+  final List<RivalStep> path;
+
+  /// Step count for the rival to solve (= path.length).
+  final int solveAt;
+
+  factory RivalTierData.fromJson(Map<String, dynamic> json) {
+    final rawPath = json['path'] as List<dynamic>;
+    return RivalTierData(
+      path: rawPath
+          .map((s) => RivalStep.fromJson(s as Map<String, dynamic>))
+          .toList(),
+      solveAt: json['solveAt'] as int,
+    );
+  }
+}
+
+/// All rival data for one day's puzzle (three difficulty tiers).
+class RivalData {
+  const RivalData({
+    required this.even,
+    required this.chill,
+    required this.sharp,
+  });
+
+  final RivalTierData even;
+  final RivalTierData chill;
+  final RivalTierData sharp;
+
+  RivalTierData forTier(String tier) {
+    switch (tier) {
+      case 'chill':
+        return chill;
+      case 'sharp':
+        return sharp;
+      default:
+        return even;
+    }
+  }
+
+  factory RivalData.fromJson(Map<String, dynamic> json) => RivalData(
+        even: RivalTierData.fromJson(json['even'] as Map<String, dynamic>),
+        chill: RivalTierData.fromJson(json['chill'] as Map<String, dynamic>),
+        sharp: RivalTierData.fromJson(json['sharp'] as Map<String, dynamic>),
+      );
 }

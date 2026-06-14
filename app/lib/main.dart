@@ -15,11 +15,13 @@ import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/features/archive/archive_screen.dart';
 import 'package:mindmeld/features/onboarding/onboarding_screen.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
 import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
 ///
@@ -163,6 +165,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   int _navIndex = 0;
   bool _won = false;
   String? _wonSecret;
+  DailyPayload? _wonPayload;
 
   AnalyticsExporter get _exporter =>
       widget.exporter ?? buildAnalyticsExporter();
@@ -225,6 +228,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         setState(() {
           _won = true;
           _wonSecret = secret;
+          _wonPayload = result.payload;
         });
       }
     } catch (_) {
@@ -232,6 +236,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         setState(() {
           _won = true;
           _wonSecret = '(loading…)';
+          _wonPayload = null;
         });
       }
     }
@@ -242,6 +247,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       _lang = lang;
       _won = false;
       _wonSecret = null;
+      _wonPayload = null;
     });
   }
 
@@ -262,9 +268,11 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         lang: _lang,
         date: _today,
         secret: _wonSecret ?? '',
+        payload: _wonPayload,
         onClose: () => setState(() {
           _won = false;
           _wonSecret = null;
+          _wonPayload = null;
         }),
       );
     }
@@ -280,6 +288,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             payloadClient: widget.overrides?.payloadClient,
             hintGate: widget.overrides?.hintGate,
           ),
+          ArchiveScreen(lang: _lang),
           StatsScreen(lang: _lang),
           SettingsScreen(
             currentLang: _lang,
@@ -293,6 +302,8 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         onDestinationSelected: (i) => setState(() => _navIndex = i),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.grid_view), label: 'Puzzle'),
+          NavigationDestination(
+              icon: Icon(Icons.history_edu_outlined), label: 'Practice'),
           NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Stats'),
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
         ],
@@ -308,19 +319,23 @@ class _WinShell extends StatefulWidget {
     required this.date,
     required this.secret,
     required this.onClose,
+    this.payload,
   });
 
   final String lang;
   final String date;
   final String secret;
   final VoidCallback onClose;
+  final DailyPayload? payload;
 
   @override
   State<_WinShell> createState() => _WinShellState();
 }
 
 class _WinShellState extends State<_WinShell> {
-  List<Guess>? _guesses;
+  DayState? _dayState;
+  PlayerStats? _stats;
+  String _rivalTier = 'even';
 
   @override
   void initState() {
@@ -331,22 +346,35 @@ class _WinShellState extends State<_WinShell> {
   Future<void> _load() async {
     final state = await AppPersistence.instance
         .loadDayState(widget.date, widget.lang);
+    final stats = await AppPersistence.instance.loadStats(widget.lang);
+    final prefs = await SharedPreferences.getInstance();
+    final rivalTier = prefs.getString('rival_tier') ?? 'even';
     if (mounted) {
-      setState(() => _guesses = state?.guesses ?? []);
+      setState(() {
+        _dayState = state;
+        _stats = stats;
+        _rivalTier = rivalTier;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_guesses == null) {
+    if (_dayState == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    final payload = widget.payload;
+    final rivalData = payload?.rival?.forTier(_rivalTier);
     return WinScreen(
       secret: widget.secret,
-      guesses: _guesses!,
+      guesses: _dayState!.guesses,
       lang: widget.lang,
       date: widget.date,
       onPlayAgain: widget.onClose,
+      parGuesses: payload?.parGuesses,
+      rivalSolveAt: rivalData?.solveAt,
+      hintsUsed: _dayState!.hintsUsed,
+      currentStreak: _stats?.currentStreak ?? 0,
     );
   }
 }

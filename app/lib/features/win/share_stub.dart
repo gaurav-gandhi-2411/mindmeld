@@ -8,6 +8,8 @@
 /// returns false so the caller falls back to the clipboard+dialog path.
 library;
 
+import 'dart:typed_data';
+
 /// Returns true if the Web Share API is available in this browser.
 ///
 /// Always false on native platforms.
@@ -23,3 +25,6 @@ Future<bool> shareViaWebApi({
   required String url,
 }) async =>
     false;
+
+/// Download or share a PNG on native — not implemented on native.
+Future<void> shareOrDownloadPng(Uint8List pngBytes) async {}
