@@ -50,20 +50,32 @@ def band_for_rank(rank: int, n: int) -> int:
     return 5
 
 
-# Per-tier: (start_pct, jump_mean, jump_std, lateral_prob)
+# Per-tier: (start_pct, lateral_prob, early_factor, late_factor)
 # start_pct    — initial rank as fraction of vocab size n
-# jump_mean    — mean fractional improvement per forward step
-# jump_std     — std deviation of fractional improvement
-# lateral_prob — probability of a lateral/slight-regression step (human realism)
+# lateral_prob — probability of a regression (backslide) step
+# early_factor — fractional rank reduction per step when rank > warm_threshold (cold/freezing)
+# late_factor  — fractional rank reduction per step when rank <= hot_threshold (hot/scorching)
 #
-# Calibration target (evaluated via sanity print in build.py):
-#   sharp: ~par-2  (about 2 fewer guesses than even)
-#   even:  ~par    (the par baseline)
-#   chill: ~par+4  (about 4 more guesses than even)
+# Calibration target (median over 30-day window, both en and hi-en):
+#   even:  par ∈ [4, 16], median 8–12
+#   chill: chill.solveAt - par ∈ [2, 8]
+#   sharp: par - sharp.solveAt ∈ [1, 5]
+#
+# Adaptive jump model: large reductions when cold (orienting sweep) and finer
+# adjustments when hot/scorching (precision tuning near the secret). This mirrors
+# how a competent human actually plays, yielding much lower par than the old fixed
+# jump_mean=0.43 which required ~17 geometric steps from rank 22000 to rank 1.
 _TIER_PARAMS: dict[str, tuple[float, float, float, float]] = {
-    "sharp": (0.25, 0.52, 0.08, 0.05),
-    "even":  (0.40, 0.43, 0.10, 0.12),
-    "chill": (0.55, 0.33, 0.09, 0.22),
+    # (start_pct, lateral_prob, early_factor, late_factor)
+    #
+    # lateral_prob=0 for all tiers: the gate test requires every puzzle across
+    # the 30-day window to satisfy chill_spread ∈ [2,8] and sharp_spread ∈ [1,5].
+    # With any non-zero lateral_prob, a single unlucky RNG draw (2+ regressions on
+    # even tier) can violate the sharp_spread upper bound deterministically. The
+    # Gaussian noise on early/late factors already provides enough path variety.
+    "sharp": (0.20, 0.00, 0.90, 0.84),
+    "even":  (0.40, 0.00, 0.85, 0.62),
+    "chill": (0.60, 0.00, 0.75, 0.42),
 }
 
 # Independent per-tier seed offsets so tiers don't share correlated RNG state.
@@ -77,25 +89,55 @@ _MAX_PATH_STEPS = 40
 
 
 def _generate_path(n: int, rng: random.Random, tier: str) -> list[dict]:
-    """Generate a single rival path for one tier from a seeded RNG."""
-    start_pct, jump_mean, jump_std, lateral_prob = _TIER_PARAMS[tier]
+    """Generate a single rival path for one tier from a seeded RNG.
 
-    noise = rng.randint(-max(1, n // 20), max(1, n // 20))
-    start_rank = max(2, min(n, int(n * start_pct) + noise))
+    Uses an adaptive jump model: large fractional reductions when far from the
+    secret (cold/freezing) and progressively finer adjustments as rank improves
+    (warm → hot → scorching). This mirrors how a competent human actually plays:
+    orient fast with big sweeps, then zero in with precision near the secret.
+    """
+    start_pct, lateral_prob, early_factor, late_factor = _TIER_PARAMS[tier]
+
+    noise_range = max(1, n // 20)
+    noise = rng.randint(-noise_range, noise_range)
+    start_rank = max(2, min(n - 1, int(n * start_pct) + noise))
 
     path: list[dict] = [{"rank": start_rank, "band": band_for_rank(start_rank, n)}]
     best_rank = start_rank
+
+    # Band boundary ranks for adaptive convergence (mirror band_for_rank thresholds).
+    hot_threshold = max(500, int(n * 0.01))
+    warm_threshold = int(n * 0.05)
 
     for _ in range(_MAX_PATH_STEPS - 1):
         if best_rank == 1:
             break
 
         if rng.random() < lateral_prob:
-            regression = rng.randint(1, max(2, best_rank // 4))
-            next_rank = min(n, best_rank + regression)
+            # Regression step: slight backslide to simulate human dead ends.
+            regression = rng.randint(1, max(2, best_rank // 6))
+            next_rank = min(n - 1, best_rank + regression)
         else:
-            jump = max(0.05, min(0.92, rng.gauss(jump_mean, jump_std)))
-            next_rank = max(1, int(best_rank * (1.0 - jump)))
+            # Adaptive reduction: scale aggressiveness by current distance from secret.
+            if best_rank > warm_threshold:
+                # Cold / freezing — big orienting sweeps.
+                base = early_factor
+                noise_std = 0.06
+                lo, hi = 0.10, 0.97
+            elif best_rank > hot_threshold:
+                # Warm — transition zone.
+                base = (early_factor + late_factor) / 2.0
+                noise_std = 0.05
+                lo, hi = 0.10, 0.97
+            else:
+                # Hot / scorching — precise fine-tuning near the secret.
+                # Tight noise band keeps tiers well-separated so spread gates hold.
+                base = late_factor
+                noise_std = 0.03
+                lo, hi = late_factor - 0.05, late_factor + 0.05
+
+            reduction = max(lo, min(hi, base + rng.gauss(0.0, noise_std)))
+            next_rank = max(1, int(best_rank * (1.0 - reduction)))
 
         path.append({"rank": next_rank, "band": band_for_rank(next_rank, n)})
         if next_rank < best_rank:
