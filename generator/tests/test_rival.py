@@ -8,7 +8,7 @@ path termination, par computation, payload schema integration.
 """
 
 import json
-from datetime import date
+from datetime import date, timedelta
 
 import numpy as np
 import pytest
@@ -315,10 +315,10 @@ class TestLargeVocabBehavior:
             )
 
     def test_large_vocab_par_in_sane_range(self) -> None:
-        """Par should be between 5 and 35 guesses for a typical puzzle."""
+        """Par should land in [4, 16] after recalibration (target median 8–12)."""
         n = 55000
         _, par = generate_rival_data(n, "ocean", "2026-06-15")
-        assert 5 <= par <= 35, f"Par={par} outside expected range [5, 35]"
+        assert 4 <= par <= 16, f"Par={par} outside calibrated range [4, 16]"
 
     def test_large_vocab_no_word_leak(self) -> None:
         """No string values at all in rival section for large vocab."""
@@ -330,3 +330,68 @@ class TestLargeVocabBehavior:
         for step in rival["even"]["path"]:
             for key, val in step.items():
                 assert isinstance(val, int), f"Non-int value in large vocab rival: {key}={val!r}"
+
+
+class TestTierSpreadGate:
+    """
+    Gate test: rival tier spreads must stay within calibrated bounds across
+    the full 30-day puzzle window for both languages.
+
+    Acceptance criteria:
+      par (= even.solveAt) in [4, 16]
+      chill.solveAt - par  in [2, 8]
+      par - sharp.solveAt  in [1, 5]
+
+    Calls generate_rival_data() with real schedule secrets; no embedding model
+    is needed because rival paths are derived from the seed only.
+    """
+
+    _START = date(2026, 6, 12)
+    _DAYS = 30
+
+    def _window(self, lang: str, n: int) -> list[tuple[str, str, int]]:
+        """Return list of (date_iso, secret, n) for every day in the window."""
+        import os
+        import sys
+
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from schedule import load_schedule, secret_for_date
+
+        schedule = load_schedule(lang)
+        return [
+            (
+                (self._START + timedelta(days=i)).isoformat(),
+                secret_for_date(self._START + timedelta(days=i), lang, schedule),
+                n,
+            )
+            for i in range(self._DAYS)
+        ]
+
+    @pytest.mark.parametrize("lang,n", [("en", 55000), ("hi-en", 10445)])
+    def test_par_in_range_full_window(self, lang: str, n: int) -> None:
+        """par ∈ [4, 16] for every puzzle in the 30-day window."""
+        for d, secret, vocab_n in self._window(lang, n):
+            _, par = generate_rival_data(vocab_n, secret, d)
+            assert 4 <= par <= 16, (
+                f"[{lang}] {d} secret={secret!r}: par={par} outside [4,16]"
+            )
+
+    @pytest.mark.parametrize("lang,n", [("en", 55000), ("hi-en", 10445)])
+    def test_chill_spread_full_window(self, lang: str, n: int) -> None:
+        """chill.solveAt - par ∈ [2, 8] for every puzzle."""
+        for d, secret, vocab_n in self._window(lang, n):
+            rival, par = generate_rival_data(vocab_n, secret, d)
+            spread = rival["chill"]["solveAt"] - par
+            assert 2 <= spread <= 8, (
+                f"[{lang}] {d} secret={secret!r}: chill-par={spread} outside [2,8] (par={par})"
+            )
+
+    @pytest.mark.parametrize("lang,n", [("en", 55000), ("hi-en", 10445)])
+    def test_sharp_spread_full_window(self, lang: str, n: int) -> None:
+        """par - sharp.solveAt ∈ [1, 5] for every puzzle."""
+        for d, secret, vocab_n in self._window(lang, n):
+            rival, par = generate_rival_data(vocab_n, secret, d)
+            spread = par - rival["sharp"]["solveAt"]
+            assert 1 <= spread <= 5, (
+                f"[{lang}] {d} secret={secret!r}: par-sharp={spread} outside [1,5] (par={par})"
+            )
