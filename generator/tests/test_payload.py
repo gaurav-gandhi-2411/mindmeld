@@ -69,7 +69,7 @@ class TestPayloadSchema:
     """Test that required keys exist and have correct types."""
 
     def test_version_key(self, payload: dict) -> None:
-        assert payload["v"] == 1
+        assert payload["v"] == 2
 
     def test_lang_key(self, payload: dict) -> None:
         assert payload["lang"] == _LANG

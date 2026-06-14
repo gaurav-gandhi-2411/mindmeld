@@ -39,6 +39,7 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
+from rival import band_for_rank as _band_for_rank_check, generate_rival_data
 
 
 def levenshtein(a: str, b: str) -> int:
@@ -278,6 +279,10 @@ def build_payload(
     # Obfuscated secret reveal field
     s_field = _obfuscate_secret(secret_lower, salt)
 
+    # Generate rival paths (three tiers) and par guess count.
+    # Paths contain only rank+band integers — no word strings.
+    rival_data, par_guesses = generate_rival_data(n, secret_lower, puzzle_date.isoformat())
+
     result: dict = {
         "v": PAYLOAD_VERSION,
         "lang": lang,
@@ -287,6 +292,8 @@ def build_payload(
         "salt": salt,
         "words": words_map,
         "hints": hints,
+        "parGuesses": par_guesses,
+        "rival": rival_data,
         "s": s_field,
     }
     if alt_map:
