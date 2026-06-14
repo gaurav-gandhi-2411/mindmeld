@@ -39,7 +39,7 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
-from rival import band_for_rank as _band_for_rank_check, generate_rival_data
+from rival import generate_rival_data
 
 
 def levenshtein(a: str, b: str) -> int:

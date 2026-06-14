@@ -1,82 +1,113 @@
-# Mindmeld — Semantic Daily Word Game
+# Mindmeld — Phase 4: Make It Hinge (Rival + Progress + Share)
 
-## Vision
-A daily word-guessing game where players guess a secret word and an embedding model scores how semantically close each guess is (rank + "temperature"). Wordle-grade streak retention, Semantle-grade depth, productized for mobile with a Hinglish/Hindi edition no global competitor offers. Hybrid monetization: rewarded ads (hints) + IAP (ad removal, archive, streak freeze, themed packs).
+## Why this phase
+Solo cold/hot guessing has a mass-market ceiling: no competition, a frustration curve that doesn't guarantee progress, long sessions, and a weak/spammy share. This phase fixes all three WITHOUT a backend, reusing the existing embedding engine, payload pipeline, hosting, and Flutter app. The social group-duel (Phase 5) builds on top of this once the loop is proven.
 
-## Commercial thesis
-- Marginal cost per DAU ≈ $0: all ML is offline. No runtime model serving, no per-session inference cost — works at India ad eCPMs and global alike.
-- Daily-puzzle format drives habitual return (streaks, share cards) → organic viral loop, zero paid UA needed to validate.
-- Hinglish edition is the differentiated wedge for India; English edition rides global demand proven by Semantle/Contexto.
+Three pillars: **② AI Rival**, **③ Progress/Pace fixes**, **④ Heat-trail share**.
 
-## Phase 1 scope (this build)
-A playable, polished daily puzzle in Flutter (Android-first, iOS-compatible code) with English + Hinglish word lists. Ads and IAP are **stubbed behind a config flag** — UI hooks exist, no SDK integration yet.
+## Non-negotiable principles (unchanged)
+- Zero runtime model inference. All ML stays offline in the generator. The rival is deterministic and precomputed — NOT a live model call.
+- Zero new paid platforms/backend this phase. Web (Vercel) + payloads (Pages) topology stays.
+- Monetization flags stay default-off on web; native builds parked behind flags.
+- One puzzle per language per day. No retry on the daily (retry itch goes to archive/practice mode).
+- Engagement is Wordle-style (ritual, competition, bragging), explicitly NOT predatory (no timed-pressure economies, loot, or dependency loops).
 
-### In scope
-1. **Puzzle generator (Python, offline)**
-   - Vocab: ~40–60k English words (frequency-filtered, profanity-filtered); ~10–15k Hinglish/Hindi-romanized words (curated seed list, expandable).
-   - Embeddings: SBERT-family model for English (e.g. `all-MiniLM-L6-v2`); multilingual model (e.g. `paraphrase-multilingual-MiniLM-L12-v2`) for Hinglish so `khushi` ≈ `happiness` scores sensibly.
-   - For each day's secret word: compute cosine similarity of every vocab word → emit ranked payload `{word: {rank, similarity}}`, quantized/compressed (gzip JSON or binary). Target <1.5 MB/day English, <400 KB Hinglish.
-   - Generate N days ahead; secret-word schedule in a manifest. Secret words hand-curated for guessability (no obscure words).
-2. **Payload hosting**
-   - Static hosting (GCS bucket or GitHub Pages). App fetches `payloads/{lang}/{yyyy-mm-dd}.json.gz`. Bundle 7 days in the APK as offline fallback.
-   - Secret word never transmitted in plaintext at a guessable key — payload keyed by date, secret revealed only on win/give-up (obfuscated field).
-3. **Flutter app**
-   - Screens: daily puzzle, guess history (sorted by rank, color temperature gradient hot→cold), win screen with share card (emoji-grid style, spoiler-free), streak/stats, settings (language toggle EN/Hinglish), how-to-play onboarding.
-   - Guess input with fuzzy validation against vocab (reject non-vocab words gracefully).
-   - Hint system: reveal a word at rank ~N (progressively closer). Each hint gated behind `RewardedAdStub` (config flag `ads_enabled=false` → hint free with fake 3s delay so the flow is testable).
-   - IAP stubs behind `iap_enabled=false`: Remove Ads, Archive (play past days), Streak Freeze, Themed Packs (greyed "coming soon").
-   - Local persistence (streaks, stats, current-day state) via shared_prefs/sqflite. No accounts in Phase 1.
-   - Analytics events logged locally to a ring buffer (guess_made, hint_used, win, share_tapped) — exporter stubbed; wire Firebase in Phase 2.
-4. **Hinglish quality gate**
-   - Eval fixture set (~50 word pairs) asserting expected similarity orderings (e.g. `dost` closer to `friend` than to `paisa`). Generator CI fails if orderings break after model/vocab changes.
+---
 
-### Out of scope (Phase 2+)
-AdMob/RevenueCat integration, accounts/cloud sync, leaderboards, "Convince the AI" mode, Hindi (Devanagari) edition, iOS store submission.
+## ② AI Rival ("Race the Bot")
 
-## Architecture
+### Concept
+An AI opponent solves the same daily secret beside the player. It's a race of **efficiency**: whoever reaches rank 1 in fewer guesses wins. The rival advances exactly one guess each time the player submits a guess (turn-based — player sets the pace, no background timers, no live server).
+
+### Determinism & fairness
+- The rival's full guess path is **precomputed in the generator** and shipped in the daily payload as `rival: { difficulty, path: [{rank, temperatureBand}], parGuesses }`. Same rival for everyone on a given day/language → fair, consistent across devices, reproducible builds.
+- The path is generated by a deterministic, seeded solver over the day's rank table that simulates a plausible human-ish convergence: starts mid-pack, makes realistic jumps toward the secret with seeded noise so it's neither robotic-perfect nor random. Seed = `sha1(secret + date + 'rival')` for reproducibility.
+- **Spoiler safety:** the payload exposes only each rival step's `rank` and `temperatureBand` — never the rival's actual words (a word would leak semantic neighbors of the secret). The app shows "Rival: Hot 🔥 (best rank 14)", never a word.
+
+### Difficulty tiers
+Three precomputed paths per puzzle: `chill` (solves ~par+4), `even` (~par), `sharp` (~par-2, tough). Player picks tier in settings; default `even`. Tier choice is local, doesn't change the secret.
+
+### UX
+- A compact rival strip above the guess input: rival's current best temperature band + a "guesses used: you N / rival M" counter.
+- Each player guess triggers the rival's next step with a subtle reveal animation ("Rival warmed up to 🔥").
+- End states: **You won** (reached rank 1 in ≤ rival's guesses), **Rival won** (it reached rank 1 first — player can keep going to finish, framed as "finish your run"), **Photo finish** (tie). All spoiler-safe.
+- Rival can be toggled off entirely (pure solo) for players who don't want the race — setting `rivalEnabled` (default on).
+
+---
+
+## ③ Progress & Pace fixes (kill the frustration)
+
+### Always-visible progress
+- **Best-rank tracker**: persistent tile showing the closest guess so far, its temperature band, and a percentile framing computed from the payload's rank distribution: "Closer than 99.2% of all words." (percentile = `1 - rank/n`). Guarantees a sense of forward motion even when stuck.
+- **Par system**: each puzzle ships a `parGuesses` (derived from the rival `even` path length / neighborhood density). Player score shown golf-style: "−2 (under par)", "+5". Par makes a clear, low target so victory feels reachable and sessions stay short.
+
+### Pace
+- Soft guess-pacing: no hard cap on the daily (capping kills casual players), but the par + rival create natural 2–3 min sessions.
+- **Retry itch → practice/archive**: surface the already-built archive (past puzzles) as a clearly separate "Practice" entry, so heavy players have somewhere to go WITHOUT a retry button on today's daily. Practice puzzles also support the rival. (Archive remains the `archive_access` IAP on native; free on web during validation.)
+
+### Hint integration
+- Hints already exist (pinned tiles, rewarded-ad-gated on native, free stub on web). Reframe a hint as costing the player guesses-vs-par (a hint counts as +1 guess) so it's a real strategic trade, not a free pass — keeps the par meaningful.
+
+---
+
+## ④ Heat-trail share (Wordle-grade artifact)
+
+### The artifact
+Replace the current share card with a spoiler-free **heat trail**: the player's guess journey as a sequence of colored squares by temperature band (Freezing→Scorching using the existing band palette), reading like Wordle's grid but representing *semantic closeness over time*. Includes par result and the rival outcome.
+
+Example share text (NO link in the first line; brand name is the searchable hook):
 ```
-[Python generator (offline, cron/manual)]
-   vocab + SBERT models → daily payloads (.json.gz) + manifest
-        │ upload
-        ▼
-[Static hosting: GCS bucket / GitHub Pages]
-        │ HTTPS fetch (with 7-day bundled fallback)
-        ▼
-[Flutter app] ── local state (sqflite) ── stubs: RewardedAdStub, IapStub, AnalyticsStub
+Mindmeld #28 (Hinglish)  🟦🟦🟨🟧🟥🟥⭐
+Par −1 · Beat the bot 🤖✓
+Play the daily: mindmeld <searchable>
+```
+- ⭐ = solved (rank 1). Squares = the band of each guess in order. Spoiler-free (shows path shape, not words).
+- Brand name leads; URL is a short trailing line, deprioritized (research: link-first shares get flagged as spam and down-ranked).
+- Web Share API with clipboard fallback (existing infra). Render the trail as both text (emoji squares) and an optional PNG image for platforms that prefer images.
+
+### Streak hook
+- Keep/strengthen the existing streak. Surface "Day N streak" on the share and win screen (streak-freeze IAP already built). The morning-ritual anchor.
+
+---
+
+## Architecture deltas (small)
+```
+Generator: add rival-path solver (deterministic, seeded) + par computation;
+           extend payload schema with rival{} and parGuesses; bump payload
+           schema version; keep byte-reproducible gzip.
+App:       rival state machine (turn-based, local), best-rank/percentile
+           tracker, par scoring, heat-trail share renderer (text + PNG),
+           practice-mode entry surfacing the archive, settings for
+           rivalEnabled + difficulty tier.
+No backend. No new SDKs. No new hosting.
 ```
 
-## Repo layout
+## Payload schema additions (per day, per language)
 ```
-mindmeld/
-  generator/        # Python: vocab build, embedding, payload emit, eval fixtures
-    vocab/          # en.txt, hinglish.txt, profanity lists, secret-word schedule
-    tests/
-  app/              # Flutter
-    lib/
-      core/         # config flags, payload client, models
-      features/     # puzzle, stats, settings, onboarding
-      stubs/        # ads, iap, analytics
-    test/
-  payloads/         # generated output (gitignored except samples)
-  spec.md
+parGuesses: int
+rival: {
+  even:  { path: [{rank:int, band:int}], solveAt:int },
+  chill: { ... },
+  sharp: { ... }
+}
 ```
-
-## Key decisions locked
-- Flutter (single codebase, Play + App Store later).
-- Similarity = precomputed lookup, never on-device or runtime inference.
-- Rank-based feedback (1 = secret) + temperature label (Scorching/Hot/Warm/Cold/Freezing) — rank is the primary signal, similarity score secondary.
-- One puzzle per language per day; same secret concept across languages where possible (translation-paired) for shared social moment.
-- All monetization behind config flags so Phase 1 ships to internal testing without store-policy friction.
+Size budget: rival paths are tiny (≤ ~40 steps × 3 tiers × 2 ints) — well under existing size targets; gzip impact negligible. Verify against the <1.5 MB en / <400 KB hi-en gates.
 
 ## Acceptance criteria
-1. `python generator/build.py --days 14 --langs en,hi-en` emits valid payloads + manifest; eval fixtures pass.
-2. Flutter app runs on Android emulator: fetches today's payload (or bundled fallback), full guess→feedback→win loop works in both languages.
-3. Hint flow works end-to-end via stub; IAP screens render via stub.
-4. Streaks persist across app restarts; share card generates correct spoiler-free text.
-5. Widget tests for guess validation, rank coloring, streak logic; generator unit tests for payload schema + quantization round-trip.
-6. README documents generator run, payload upload, app build.
+1. Generator emits valid rival paths (3 tiers) + parGuesses for all days/langs; deterministic across reruns (byte-identical); eval gate + size gates still pass.
+2. Rival solver never exposes a word in the payload; a test asserts no word strings under `rival`.
+3. App: full daily run with rival — turn-based advance, correct win/lose/tie end states, all spoiler-safe; rival toggle + difficulty tier work.
+4. Best-rank tracker + percentile + par scoring display correctly; hint counts as +1 guess against par.
+5. Practice mode plays past puzzles (with rival), separate from the daily; daily still has no retry.
+6. Heat-trail share: correct band sequence, par + rival outcome, brand-name-first text, PNG renders, spoiler-free; Web Share + clipboard fallback both work.
+7. Hinglish parity: rival, par, percentile, and share all work identically in hi-en, including alias-resolved guesses counting correctly toward the trail.
+8. Full test suite green (generator + Dart); new tests for rival state machine, par/percentile math, share-trail rendering, payload schema v-bump round-trip.
+9. Live verify on playmindmeld.vercel.app: a full rival race + heat-trail share in mobile Chrome, both languages.
+
+## Out of scope (Phase 5+)
+Friend-group duel + leaderboards (the backend bet), accounts/cloud sync, Ad Placement API web monetization, store launch.
 
 ## Risks
-- **Hinglish vocab quality** — biggest content risk; start small/curated, grow via eval-gated additions.
-- **Payload size on Indian networks** — quantize aggressively, gzip, bundle fallback days.
-- **Guessability tuning** — secret words must be common nouns/concepts; playtest before widening vocab.
+- **Rival "feel"**: a robotic or unfair-seeming rival is worse than none. Tune the seeded noise so it feels human; playtest the `even` tier against your own solves before widening.
+- **Par calibration**: bad par makes scoring meaningless. Derive from real rank-distribution stats, sanity-check across the 30-day window.
+- **Schema bump**: old cached payloads/clients must degrade gracefully — version the schema and fall back (rival simply hidden) if a payload predates it.
