@@ -18,7 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'guess_tile.dart';
 
 /// Minimum guesses before the "give up" option is unlocked.
-const int _giveUpMinGuesses = 30;
+const int _giveUpMinGuesses = 1;
 
 /// Main puzzle screen: guess input, history, hints, give-up.
 class PuzzleScreen extends StatefulWidget {
@@ -27,6 +27,7 @@ class PuzzleScreen extends StatefulWidget {
     required this.lang,
     required this.date,
     required this.onWin,
+    required this.onLoss,
     this.payloadClient,
     this.adStub,
     this.hintGate,
@@ -37,6 +38,9 @@ class PuzzleScreen extends StatefulWidget {
   final String lang;
   final String date;
   final VoidCallback onWin;
+
+  /// Called when the player exhausts the guess budget or gives up.
+  final VoidCallback onLoss;
 
   /// When true, wins and losses are not recorded to persistent stats.
   final bool isPractice;
@@ -128,14 +132,19 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           _loading = false;
         });
 
-        // If the puzzle was already won in a previous session (e.g. the app was
-        // restarted after winning), route the shell back to the win screen so the
-        // player sees their result instead of a locked-input puzzle screen.
+        // If the puzzle was already finished in a previous session (e.g. the app
+        // was restarted after winning or losing), route the shell to the
+        // appropriate result screen so the player sees their result instead of a
+        // locked-input puzzle screen.
         if (existing != null && existing.won) {
           // Schedule for next frame so the parent shell's setState is not called
           // synchronously inside a build/setState cycle.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onWin();
+          });
+        } else if (existing != null && existing.isFinished && !existing.won) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) widget.onLoss();
           });
         }
       }
@@ -202,9 +211,16 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final newGuesses = [...state.guesses, guess];
     final won = entry.rank == 1;
 
+    // Budget check: effective usage = guesses + hints already used (newState
+    // has same hintsUsed as state since this is a guess, not a hint).
+    final maxG = _payload!.maxGuesses;
+    final budgetExhausted =
+        !won && maxG != null && (newGuesses.length + state.hintsUsed) >= maxG;
+
     final newState = state.copyWith(
       guesses: newGuesses,
       won: won,
+      gaveUp: budgetExhausted, // budget exhaustion treated as a loss
     );
 
     await AppPersistence.instance.saveDayState(newState);
@@ -226,6 +242,10 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       });
     }
 
+    if (budgetExhausted && !widget.isPractice) {
+      await AppPersistence.instance.recordLoss(lang: widget.lang);
+    }
+
     setState(() {
       _dayState = newState;
       _inputError = null;
@@ -236,6 +256,9 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       // Brief delay so the user sees the win flash before navigating.
       await Future<void>.delayed(const Duration(milliseconds: 600));
       widget.onWin();
+    } else if (budgetExhausted) {
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      widget.onLoss();
     }
   }
 
@@ -291,21 +314,32 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (mounted) {
       setState(() => _dayState = newState);
     }
+
+    // Check if this hint consumed the last budget slot.
+    final maxG = payload.maxGuesses;
+    if (maxG != null) {
+      final effective = newState.guesses.length + newState.hintsUsed;
+      if (effective >= maxG) {
+        if (!widget.isPractice) {
+          await AppPersistence.instance.recordLoss(lang: widget.lang);
+        }
+        final lostState = newState.copyWith(gaveUp: true);
+        await AppPersistence.instance.saveDayState(lostState);
+        if (mounted) setState(() => _dayState = lostState);
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+        if (mounted) widget.onLoss();
+      }
+    }
   }
 
   Future<void> _giveUp() async {
     final state = _dayState!;
-    final payload = _payload!;
-    final secret = PayloadCodec.decodeSecret(payload);
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Give up?'),
-        content: Text(
-          'You need at least $_giveUpMinGuesses guesses before giving up. '
-          'You have ${state.guesses.length}.',
-        ),
+        content: const Text('The word will be revealed. This counts as a loss.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -326,16 +360,10 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (!widget.isPractice) {
       await AppPersistence.instance.recordLoss(lang: widget.lang);
     }
-
     if (mounted) {
       setState(() => _dayState = newState);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('The word was: $secret'),
-          duration: const Duration(seconds: 10),
-        ),
-      );
     }
+    widget.onLoss();
   }
 
   RivalState? get _rivalState {
@@ -509,6 +537,25 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           if (_rivalState != null && !state.isFinished)
             _buildRivalStrip(_rivalState!, context),
 
+          // Clue display (Phase 5 — shown from puzzle start until game over)
+          if (payload.clue != null && payload.clue!.isNotEmpty && !state.isFinished)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '💡 ${payload.clue}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ),
+
           // Guess input
           if (!state.isFinished)
             Padding(
@@ -576,10 +623,24 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Text(
-                  '${state.guesses.length} guess${state.guesses.length == 1 ? '' : 'es'}',
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
+                Builder(builder: (ctx) {
+                  final maxG = payload.maxGuesses;
+                  if (maxG != null) {
+                    final remaining = maxG - state.guesses.length - state.hintsUsed;
+                    return Text(
+                      '${state.guesses.length}/$maxG · $remaining left',
+                      style: Theme.of(ctx).textTheme.labelMedium?.copyWith(
+                            color: remaining <= 3
+                                ? Theme.of(ctx).colorScheme.error
+                                : null,
+                          ),
+                    );
+                  }
+                  return Text(
+                    '${state.guesses.length} guess${state.guesses.length == 1 ? '' : 'es'}',
+                    style: Theme.of(ctx).textTheme.labelMedium,
+                  );
+                }),
                 const Spacer(),
                 if (latestGuess != null)
                   Text(
