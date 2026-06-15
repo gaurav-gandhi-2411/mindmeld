@@ -266,8 +266,8 @@ class TestPayloadSchemaV2:
     def payload(self) -> dict:
         return build_payload(_STUB_VOCAB, _STUB_MATRIX, _SECRET, _LANG, _PUZZLE_DATE)
 
-    def test_version_is_2(self, payload: dict) -> None:
-        assert payload["v"] == 2
+    def test_version_is_3(self, payload: dict) -> None:
+        assert payload["v"] == 3
 
     def test_par_guesses_key_exists(self, payload: dict) -> None:
         assert "parGuesses" in payload

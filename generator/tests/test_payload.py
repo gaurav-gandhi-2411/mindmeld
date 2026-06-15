@@ -69,7 +69,7 @@ class TestPayloadSchema:
     """Test that required keys exist and have correct types."""
 
     def test_version_key(self, payload: dict) -> None:
-        assert payload["v"] == 2
+        assert payload["v"] == 3
 
     def test_lang_key(self, payload: dict) -> None:
         assert payload["lang"] == _LANG
@@ -102,6 +102,15 @@ class TestPayloadSchema:
 
     def test_s_is_base64(self, payload: dict) -> None:
         base64.b64decode(payload["s"])  # should not raise
+
+    def test_clue_key_exists(self, payload: dict) -> None:
+        assert "clue" in payload
+        assert isinstance(payload["clue"], str)
+
+    def test_max_guesses_key_exists(self, payload: dict) -> None:
+        assert "maxGuesses" in payload
+        assert isinstance(payload["maxGuesses"], int)
+        assert payload["maxGuesses"] > 0
 
 
 class TestAntiCheatKeying:
