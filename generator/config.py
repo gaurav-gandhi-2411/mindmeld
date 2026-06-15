@@ -119,5 +119,5 @@ HINT_RANKS = [1000, 750, 500, 300, 200, 100, 50, 25, 10, 5, 2]
 # Payload version
 # ---------------------------------------------------------------------------
 
-PAYLOAD_VERSION = 2
+PAYLOAD_VERSION = 3
 MANIFEST_VERSION = 1
