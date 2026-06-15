@@ -115,6 +115,8 @@ class DailyPayload {
     this.alt = const {},
     this.rival,
     this.parGuesses,
+    this.clue,
+    this.maxGuesses,
   });
 
   /// Payload schema version.
@@ -153,6 +155,14 @@ class DailyPayload {
 
   /// Par guess count; null for pre-v2 payloads.
   final int? parGuesses;
+
+  /// Optional clue string shown to the player from the start of the puzzle.
+  /// Null for pre-v3 payloads.
+  final String? clue;
+
+  /// Maximum guesses (guesses + hints) before budget exhaustion triggers a
+  /// loss. Null for pre-v3 payloads (no budget limit).
+  final int? maxGuesses;
 
   factory DailyPayload.fromJson(Map<String, dynamic> json) {
     final rawWords = json['words'] as Map<String, dynamic>;
@@ -195,6 +205,14 @@ class DailyPayload {
       parGuesses = json['parGuesses'] as int?;
     }
 
+    // v3+ optional fields — clue and budget cap.
+    String? clue;
+    int? maxGuesses;
+    if ((json['v'] as int) >= 3) {
+      clue = json['clue'] as String?;
+      maxGuesses = json['maxGuesses'] as int?;
+    }
+
     return DailyPayload(
       v: json['v'] as int,
       lang: json['lang'] as String,
@@ -208,6 +226,8 @@ class DailyPayload {
       s: json['s'] as String,
       rival: rival,
       parGuesses: parGuesses,
+      clue: clue,
+      maxGuesses: maxGuesses,
     );
   }
 }
