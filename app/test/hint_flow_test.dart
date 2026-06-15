@@ -131,6 +131,7 @@ Future<void> _pumpPuzzleScreen(
         lang: 'en',
         date: '2099-01-01',
         onWin: () {},
+        onLoss: () {},
         payloadClient: _PreloadedClient(payload),
         adStub: const RewardedAdStub(simulatedDelay: _kAdDelay),
       ),

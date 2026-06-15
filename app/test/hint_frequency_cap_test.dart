@@ -98,6 +98,7 @@ Future<void> _pumpPuzzleScreen(
         lang: 'en',
         date: '2099-02-01',
         onWin: () {},
+        onLoss: () {},
         payloadClient: _PreloadedClient(payload),
         // Stub with short non-zero delay; Duration.zero can cause fakeAsync
         // timing issues. This stub is only triggered if the cap is NOT reached

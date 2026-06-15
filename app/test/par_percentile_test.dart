@@ -19,7 +19,8 @@ void main() {
           guesses: makeGuesses(6),
           puzzleNumber: 1,
           lang: 'en',
-          parGuesses: 9);
+          parGuesses: 9,
+          won: true);
       expect(text, contains('Par -3'));
     });
 
@@ -28,7 +29,8 @@ void main() {
           guesses: makeGuesses(8),
           puzzleNumber: 1,
           lang: 'en',
-          parGuesses: 8);
+          parGuesses: 8,
+          won: true);
       // "Par\n" because no delta appended
       expect(text, contains('Par\n'));
     });
@@ -38,7 +40,8 @@ void main() {
           guesses: makeGuesses(12),
           puzzleNumber: 1,
           lang: 'en',
-          parGuesses: 8);
+          parGuesses: 8,
+          won: true);
       expect(text, contains('Par +4'));
     });
 
@@ -49,13 +52,14 @@ void main() {
           puzzleNumber: 1,
           lang: 'en',
           parGuesses: 8,
-          hintsUsed: 3);
+          hintsUsed: 3,
+          won: true);
       expect(text, contains('Par\n'));
     });
 
     test('no par line when parGuesses null', () {
       final text = buildShareCard(
-          guesses: makeGuesses(5), puzzleNumber: 1, lang: 'en');
+          guesses: makeGuesses(5), puzzleNumber: 1, lang: 'en', won: true);
       expect(text, isNot(contains('Par')));
     });
   });

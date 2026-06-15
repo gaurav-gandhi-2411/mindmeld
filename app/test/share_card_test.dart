@@ -22,7 +22,9 @@ void main() {
       expect(text, contains('#42'));
     });
 
-    test('share text contains emoji trail', () {
+    test('share text contains emoji trail (loss path — last becomes 💀)', () {
+      // In the loss path the terminal emoji is 💀 so the last guess's band
+      // emoji (🟥) is replaced. All earlier band emojis still appear.
       final guesses = makeGuesses([
         TemperatureBand.freezing,
         TemperatureBand.cold,
@@ -31,12 +33,13 @@ void main() {
         TemperatureBand.scorching,
       ]);
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en');
+          guesses: guesses, puzzleNumber: 1, lang: 'en', won: false);
       expect(text, contains('🟦'));
       expect(text, contains('🟩'));
       expect(text, contains('🟨'));
       expect(text, contains('🟧'));
-      expect(text, contains('🟥'));
+      // Last emoji replaced by 💀 in loss path.
+      expect(text, contains('💀'));
     });
 
     test('won guess replaced by star emoji', () {
@@ -94,14 +97,20 @@ void main() {
     });
 
     test('emoji order matches guess chronological order', () {
+      // Use win path so the last guess retains its band emoji (replaced by ⭐).
+      // We need 3 guesses so the middle scorching is NOT the last.
       final guesses = makeGuesses([
         TemperatureBand.freezing,
         TemperatureBand.scorching,
+        TemperatureBand.win,
       ]);
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en');
+          guesses: guesses, puzzleNumber: 1, lang: 'en', won: true);
       final freezingIdx = text.indexOf('🟦');
       final scorchingIdx = text.indexOf('🟥');
+      // Both must appear and freezing (🟦) must come before scorching (🟥).
+      expect(freezingIdx, greaterThanOrEqualTo(0));
+      expect(scorchingIdx, greaterThanOrEqualTo(0));
       expect(freezingIdx, lessThan(scorchingIdx));
     });
 
@@ -120,17 +129,19 @@ void main() {
     });
 
     test('par under par shows negative delta', () {
-      // 5 guesses - par 8 = -3
+      // 5 guesses - par 8 = -3; win path to get par line
       final guesses = makeGuesses(List.generate(5, (_) => TemperatureBand.hot));
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8);
+          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8,
+          won: true);
       expect(text, contains('Par -3'));
     });
 
     test('par at par shows Par with no delta', () {
       final guesses = makeGuesses(List.generate(8, (_) => TemperatureBand.hot));
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8);
+          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8,
+          won: true);
       expect(text, contains('Par\n'));
     });
 
@@ -138,26 +149,28 @@ void main() {
       final guesses =
           makeGuesses(List.generate(12, (_) => TemperatureBand.hot));
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8);
+          guesses: guesses, puzzleNumber: 1, lang: 'en', parGuesses: 8,
+          won: true);
       expect(text, contains('Par +4'));
     });
 
     test('hints count against par', () {
-      // 5 guesses + 2 hints = 7; 7 - 8 = -1
+      // 5 guesses + 2 hints = 7; 7 - 8 = -1; win path to get par line
       final guesses = makeGuesses(List.generate(5, (_) => TemperatureBand.hot));
       final text = buildShareCard(
           guesses: guesses,
           puzzleNumber: 1,
           lang: 'en',
           parGuesses: 8,
-          hintsUsed: 2);
+          hintsUsed: 2,
+          won: true);
       expect(text, contains('Par -1'));
     });
 
     test('no par line when parGuesses is null', () {
       final guesses = makeGuesses(List.generate(5, (_) => TemperatureBand.hot));
       final text = buildShareCard(
-          guesses: guesses, puzzleNumber: 1, lang: 'en');
+          guesses: guesses, puzzleNumber: 1, lang: 'en', won: true);
       expect(text, isNot(contains('Par')));
     });
 
@@ -168,7 +181,8 @@ void main() {
           puzzleNumber: 1,
           lang: 'en',
           parGuesses: 8,
-          rivalSolveAt: 8);
+          rivalSolveAt: 8,
+          won: true);
       expect(text, contains('Beat the bot'));
     });
 
@@ -179,7 +193,8 @@ void main() {
           puzzleNumber: 1,
           lang: 'en',
           parGuesses: 8,
-          rivalSolveAt: 8);
+          rivalSolveAt: 8,
+          won: true);
       expect(text, contains('Tied the bot'));
     });
 
@@ -191,7 +206,8 @@ void main() {
           puzzleNumber: 1,
           lang: 'en',
           parGuesses: 8,
-          rivalSolveAt: 8);
+          rivalSolveAt: 8,
+          won: true);
       expect(text, contains('Bot won'));
     });
 
@@ -201,18 +217,21 @@ void main() {
           guesses: guesses,
           puzzleNumber: 1,
           lang: 'en',
-          currentStreak: 5);
+          currentStreak: 5,
+          won: true);
       expect(text, contains('5 day streak'));
     });
 
-    test('streak not shown when currentStreak <= 1', () {
+    test('streak count not shown in win path when currentStreak <= 1', () {
+      // Win path: streak count only shown when > 1.
       final guesses = makeGuesses([TemperatureBand.hot]);
       final text = buildShareCard(
           guesses: guesses,
           puzzleNumber: 1,
           lang: 'en',
-          currentStreak: 1);
-      expect(text, isNot(contains('streak')));
+          currentStreak: 1,
+          won: true);
+      expect(text, isNot(contains('day streak')));
     });
   });
 }
