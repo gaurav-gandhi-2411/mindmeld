@@ -92,6 +92,7 @@ def _run_build(
 
     import build as _build  # local module inside generator/
 
+    from clues import clue_for_date, load_clues
     from embeddings import embed_vocab
     from manifest import build_manifest, write_manifest
     from payload import build_payload, write_payload
@@ -114,6 +115,9 @@ def _run_build(
         print(f"[{lang}] Loading schedule...")
         schedule = load_schedule(lang)
 
+        print(f"[{lang}] Loading clues...")
+        clues = load_clues(lang)
+
         print(f"[{lang}] Validating schedule...")
         try:
             validate_schedule(lang, vocab, schedule)
@@ -127,7 +131,8 @@ def _run_build(
         day_records: list[dict] = []
         for puzzle_date in days_list:
             secret = secret_for_date(puzzle_date, lang, schedule)
-            payload = build_payload(vocab, matrix, secret, lang, puzzle_date)
+            clue = clue_for_date(puzzle_date, lang, clues)
+            payload = build_payload(vocab, matrix, secret, lang, puzzle_date, clue=clue)
             out_path = write_payload(payload, out_dir, lang, puzzle_date)
             file_bytes = out_path.stat().st_size
             rel = str(out_path.relative_to(out_dir)).replace("\\", "/")
