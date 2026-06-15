@@ -39,6 +39,7 @@ class ArchiveScreen extends StatelessWidget {
           date: date,
           isPractice: true,
           onWin: () => Navigator.pop(context),
+          onLoss: () => Navigator.pop(context),
         ),
       ),
     );

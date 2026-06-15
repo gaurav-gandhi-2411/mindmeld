@@ -166,6 +166,9 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   bool _won = false;
   String? _wonSecret;
   DailyPayload? _wonPayload;
+  bool _lost = false;
+  String? _lostSecret;
+  DailyPayload? _lostPayload;
 
   AnalyticsExporter get _exporter =>
       widget.exporter ?? buildAnalyticsExporter();
@@ -242,12 +245,38 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _handleLoss() async {
+    try {
+      final client = widget.overrides?.payloadClient ?? PayloadClient();
+      final result = await client.fetch(_lang, _today);
+      final secret = PayloadCodec.decodeSecret(result.payload);
+      if (mounted) {
+        setState(() {
+          _lost = true;
+          _lostSecret = secret;
+          _lostPayload = result.payload;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _lost = true;
+          _lostSecret = '(loading…)';
+          _lostPayload = null;
+        });
+      }
+    }
+  }
+
   void _onLangChanged(String lang) {
     setState(() {
       _lang = lang;
       _won = false;
       _wonSecret = null;
       _wonPayload = null;
+      _lost = false;
+      _lostSecret = null;
+      _lostPayload = null;
     });
   }
 
@@ -277,6 +306,20 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       );
     }
 
+    if (_lost) {
+      return _LossShell(
+        lang: _lang,
+        date: _today,
+        secret: _lostSecret ?? '',
+        payload: _lostPayload,
+        onClose: () => setState(() {
+          _lost = false;
+          _lostSecret = null;
+          _lostPayload = null;
+        }),
+      );
+    }
+
     return Scaffold(
       body: IndexedStack(
         index: _navIndex,
@@ -285,6 +328,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             lang: _lang,
             date: _today,
             onWin: _handleWin,
+            onLoss: _handleLoss,
             payloadClient: widget.overrides?.payloadClient,
             hintGate: widget.overrides?.hintGate,
           ),
@@ -372,9 +416,78 @@ class _WinShellState extends State<_WinShell> {
       date: widget.date,
       onPlayAgain: widget.onClose,
       parGuesses: payload?.parGuesses,
+      maxGuesses: payload?.maxGuesses,
       rivalSolveAt: rivalData?.solveAt,
       hintsUsed: _dayState!.hintsUsed,
       currentStreak: _stats?.currentStreak ?? 0,
+    );
+  }
+}
+
+/// Intermediate widget that loads day state from persistence for the loss screen.
+class _LossShell extends StatefulWidget {
+  const _LossShell({
+    required this.lang,
+    required this.date,
+    required this.secret,
+    required this.onClose,
+    this.payload,
+  });
+
+  final String lang;
+  final String date;
+  final String secret;
+  final VoidCallback onClose;
+  final DailyPayload? payload;
+
+  @override
+  State<_LossShell> createState() => _LossShellState();
+}
+
+class _LossShellState extends State<_LossShell> {
+  DayState? _dayState;
+  String _rivalTier = 'even';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final state = await AppPersistence.instance
+        .loadDayState(widget.date, widget.lang);
+    final prefs = await SharedPreferences.getInstance();
+    final rivalTier = prefs.getString('rival_tier') ?? 'even';
+    if (mounted) {
+      setState(() {
+        _dayState = state;
+        _rivalTier = rivalTier;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_dayState == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    final payload = widget.payload;
+    final rivalData = payload?.rival?.forTier(_rivalTier);
+    // Determine display reason: gaveUp=true from explicit give-up; budget
+    // exhaustion also sets gaveUp=true in the DB so we use it for both.
+    final gaveUp = _dayState!.gaveUp;
+    return LossScreen(
+      secret: widget.secret,
+      guesses: _dayState!.guesses,
+      lang: widget.lang,
+      date: widget.date,
+      onClose: widget.onClose,
+      parGuesses: payload?.parGuesses,
+      maxGuesses: payload?.maxGuesses,
+      rivalSolveAt: rivalData?.solveAt,
+      hintsUsed: _dayState!.hintsUsed,
+      gaveUp: gaveUp,
     );
   }
 }
