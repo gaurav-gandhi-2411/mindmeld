@@ -85,7 +85,11 @@ void main() async {
   // On web, FirebaseOptions must be supplied explicitly (no google-services.json).
   // The placeholder values in firebase_web_options.dart must be replaced before
   // deploying a monetised web build. See docs/firebase-setup.md for instructions.
-  if (AppConfig.analyticsEnabled) {
+  // Skip Firebase init if the web config is still placeholder (pre-project-creation).
+  final webConfigReady =
+      !kIsWeb || firebaseWebOptions.apiKey != 'PLACEHOLDER';
+
+  if (AppConfig.analyticsEnabled && webConfigReady) {
     await Firebase.initializeApp(
       options: kIsWeb ? firebaseWebOptions : null,
     );
