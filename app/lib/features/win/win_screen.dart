@@ -13,59 +13,87 @@ import 'share_stub.dart'
 
 /// Generate the spoiler-free heat-trail share card text.
 ///
-/// Format (brand name first, URL last):
+/// Format for wins (brand name first, URL last):
 ///   Mindmeld #N (English)  🟦🟦🟨🟧🟥⭐
-///   Par −2 · Beat the bot 🤖✓
+///   6/15 · Par −2 · Beat the bot 🤖✓
 ///   🔥 3 day streak
 ///   playmindmeld.vercel.app
 ///
-/// - ⭐ replaces the last emoji when the player solved (rank 1).
+/// Format for losses:
+///   Mindmeld #N (English)  🟦🟦🟨🟧🟥💀
+///   Didn't get it — best: 🟥 · streak reset
+///   playmindmeld.vercel.app
+///
+/// - [won] controls the terminal emoji (⭐ for win, 💀 for loss).
 /// - Par and rival lines are omitted when payload is v1 (parGuesses null).
+/// - [maxGuesses] shows the budget fraction on the par line (e.g. 6/15).
 /// - No secret word or guess words are ever included.
 String buildShareCard({
   required List<Guess> guesses,
   required int puzzleNumber,
   required String lang,
   int? parGuesses,
+  int? maxGuesses,
   int hintsUsed = 0,
   int? rivalSolveAt,
   int currentStreak = 0,
+  /// Pass [true] for wins (⭐ terminal) or [false] for losses (💀 terminal).
+  /// When null (the default), win is auto-detected from whether the last guess
+  /// has [TemperatureBand.win] — preserving backward compatibility.
+  bool? won,
 }) {
   final langLabel = lang == 'hi-en' ? '(Hinglish)' : '(English)';
 
-  // Emoji trail: chronological, last replaced by ⭐ if player won
-  final won = guesses.isNotEmpty && guesses.last.band == TemperatureBand.win;
+  // Auto-detect win when the caller doesn't specify (backward compat).
+  final effectiveWon =
+      won ?? (guesses.isNotEmpty && guesses.last.band == TemperatureBand.win);
+
+  // Emoji trail: chronological, last replaced by ⭐ (win) or 💀 (loss).
   final emojis = guesses.asMap().entries.map((e) {
-    if (won && e.key == guesses.length - 1) return '⭐';
+    final isLast = e.key == guesses.length - 1;
+    if (isLast && effectiveWon) return '⭐';
+    if (isLast && !effectiveWon) return '💀';
     return e.value.band.emoji;
   }).join('');
 
   final line1 = 'Mindmeld #$puzzleNumber $langLabel  $emojis';
   final lines = <String>[line1];
 
-  // Par + rival outcome line
-  if (parGuesses != null) {
-    final effectiveGuesses = guesses.length + hintsUsed;
-    final delta = effectiveGuesses - parGuesses;
-    final parStr =
-        delta == 0 ? 'Par' : (delta > 0 ? 'Par +$delta' : 'Par $delta');
+  if (effectiveWon) {
+    // Par + rival outcome line (wins only).
+    if (parGuesses != null) {
+      final effectiveGuesses = guesses.length + hintsUsed;
+      final delta = effectiveGuesses - parGuesses;
+      final parStr =
+          delta == 0 ? 'Par' : (delta > 0 ? 'Par +$delta' : 'Par $delta');
 
-    String rivalStr = '';
-    if (rivalSolveAt != null) {
-      if (guesses.length < rivalSolveAt) {
-        rivalStr = ' · Beat the bot 🤖✓';
-      } else if (guesses.length == rivalSolveAt) {
-        rivalStr = ' · Tied the bot 🤖=';
-      } else {
-        rivalStr = ' · Bot won 🤖✗';
+      final budgetStr =
+          maxGuesses != null ? '${guesses.length}/$maxGuesses' : '${guesses.length}';
+
+      String rivalStr = '';
+      if (rivalSolveAt != null) {
+        if (guesses.length < rivalSolveAt) {
+          rivalStr = ' · Beat the bot 🤖✓';
+        } else if (guesses.length == rivalSolveAt) {
+          rivalStr = ' · Tied the bot 🤖=';
+        } else {
+          rivalStr = ' · Bot won 🤖✗';
+        }
       }
+      lines.add('$budgetStr · $parStr$rivalStr');
     }
-    lines.add('$parStr$rivalStr');
-  }
 
-  // Streak line (only when > 1 day to avoid noise for new players)
-  if (currentStreak > 1) {
-    lines.add('🔥 $currentStreak day streak');
+    // Streak line (only when > 1 day to avoid noise for new players).
+    if (currentStreak > 1) {
+      lines.add('🔥 $currentStreak day streak');
+    }
+  } else {
+    // Loss outcome line: best band reached + streak reset notice.
+    final bestGuess = guesses.isEmpty
+        ? null
+        : guesses.reduce((a, b) => a.rank < b.rank ? a : b);
+    final bestEmoji = bestGuess?.band.emoji ?? '❓';
+    lines.add("Didn't get it — best: $bestEmoji · streak reset");
   }
 
   lines.add('playmindmeld.vercel.app');
@@ -82,6 +110,7 @@ class WinScreen extends StatefulWidget {
     required this.date,
     required this.onPlayAgain,
     this.parGuesses,
+    this.maxGuesses,
     this.rivalSolveAt,
     this.hintsUsed = 0,
     this.currentStreak = 0,
@@ -95,6 +124,9 @@ class WinScreen extends StatefulWidget {
 
   /// Par guess count from payload; null for pre-v2 payloads.
   final int? parGuesses;
+
+  /// Maximum guess budget from payload; null for pre-v3 payloads.
+  final int? maxGuesses;
 
   /// Rival's solve step count for the selected tier; null when rival disabled/v1.
   final int? rivalSolveAt;
@@ -127,9 +159,11 @@ class _WinScreenState extends State<WinScreen> {
         puzzleNumber: _puzzleNumber,
         lang: widget.lang,
         parGuesses: widget.parGuesses,
+        maxGuesses: widget.maxGuesses,
         hintsUsed: widget.hintsUsed,
         rivalSolveAt: widget.rivalSolveAt,
         currentStreak: widget.currentStreak,
+        won: true,
       );
 
   Future<void> _share(BuildContext context) async {
@@ -332,6 +366,252 @@ class _WinScreenState extends State<WinScreen> {
             const SizedBox(height: 32),
             TextButton(
               onPressed: widget.onPlayAgain,
+              child: const Text('Back'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Loss screen — shown when the player runs out of guesses or gives up.
+class LossScreen extends StatefulWidget {
+  const LossScreen({
+    super.key,
+    required this.secret,
+    required this.guesses,
+    required this.lang,
+    required this.date,
+    required this.onClose,
+    this.parGuesses,
+    this.maxGuesses,
+    this.rivalSolveAt,
+    this.hintsUsed = 0,
+    this.gaveUp = false,
+  });
+
+  final String secret;
+  final List<Guess> guesses;
+  final String lang;
+  final String date;
+  final VoidCallback onClose;
+
+  /// Par guess count from payload; null for pre-v2 payloads.
+  final int? parGuesses;
+
+  /// Maximum guess budget from payload; null for pre-v3 payloads.
+  final int? maxGuesses;
+
+  /// Rival's solve step count for the selected tier; null when rival disabled/v1.
+  final int? rivalSolveAt;
+
+  /// Hints used in this session.
+  final int hintsUsed;
+
+  /// True when the player explicitly chose to give up (vs budget exhaustion).
+  final bool gaveUp;
+
+  @override
+  State<LossScreen> createState() => _LossScreenState();
+}
+
+class _LossScreenState extends State<LossScreen> {
+  final _shareCardKey = GlobalKey();
+
+  int get _puzzleNumber {
+    try {
+      final start = DateTime(2026, 6, 12);
+      final d = DateTime.parse(widget.date);
+      return d.difference(start).inDays + 1;
+    } catch (_) {
+      return 1;
+    }
+  }
+
+  String get _shareText => buildShareCard(
+        guesses: widget.guesses,
+        puzzleNumber: _puzzleNumber,
+        lang: widget.lang,
+        parGuesses: widget.parGuesses,
+        maxGuesses: widget.maxGuesses,
+        hintsUsed: widget.hintsUsed,
+        rivalSolveAt: widget.rivalSolveAt,
+        won: false,
+      );
+
+  Future<void> _share(BuildContext context) async {
+    await AnalyticsStub(AppPersistence.instance)
+        .logEvent(AnalyticsEvent.shareTapped, {'lang': widget.lang, 'outcome': 'loss'});
+
+    if (webShareAvailable()) {
+      final shared = await shareViaWebApi(
+        title: 'Mindmeld',
+        text: _shareText,
+        url: 'https://playmindmeld.vercel.app/',
+      );
+      if (shared) return;
+    }
+
+    await Clipboard.setData(ClipboardData(text: _shareText));
+    if (!context.mounted) return;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Share your result'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(ctx).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                _shareText,
+                style: const TextStyle(fontFamily: 'monospace'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text('Copied to clipboard!'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sharePng(BuildContext context) async {
+    try {
+      final boundary = _shareCardKey.currentContext?.findRenderObject();
+      if (boundary is! RenderRepaintBoundary) return;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      await shareOrDownloadPng(byteData.buffer.asUint8List());
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not render image on this device.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = List<Guess>.from(widget.guesses)
+      ..sort((a, b) => a.rank.compareTo(b.rank));
+    final bestGuess = sorted.isEmpty ? null : sorted.first;
+
+    final langLabel = widget.lang == 'hi-en' ? 'Hinglish' : 'English';
+    final reasonText = widget.gaveUp ? 'You gave up' : 'Budget exhausted';
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Better luck next time 🌙')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(Icons.sentiment_dissatisfied, size: 80, color: Color(0xFF9E9E9E)),
+            const SizedBox(height: 16),
+            Text(
+              widget.secret.toUpperCase(),
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Puzzle #$_puzzleNumber · $langLabel · $reasonText',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            if (bestGuess != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Your best: ${bestGuess.band.emoji} #${bestGuess.rank} — so close!',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            RepaintBoundary(
+              key: _shareCardKey,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _shareText,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => _share(context),
+                  icon: const Icon(Icons.share),
+                  label: const Text('Copy & Share'),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () => _sharePng(context),
+                  icon: const Icon(Icons.image_outlined),
+                  label: const Text('Image'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            if (widget.guesses.isNotEmpty) ...[
+              Text(
+                'Your guesses this round:',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              ...sorted.take(5).map(
+                    (g) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Text(
+                            '#${g.rank}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(g.word),
+                          const Spacer(),
+                          Text(g.band.label),
+                        ],
+                      ),
+                    ),
+                  ),
+            ],
+            const SizedBox(height: 32),
+            TextButton(
+              onPressed: widget.onClose,
               child: const Text('Back'),
             ),
           ],
