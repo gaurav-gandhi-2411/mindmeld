@@ -143,6 +143,7 @@ def build_payload(
     secret: str,
     lang: str,
     puzzle_date: date,
+    clue: str = "",
 ) -> dict:
     """
     Build the full payload dict for one day's puzzle.
@@ -293,6 +294,8 @@ def build_payload(
         "words": words_map,
         "hints": hints,
         "parGuesses": par_guesses,
+        "maxGuesses": par_guesses + 6,
+        "clue": clue,
         "rival": rival_data,
         "s": s_field,
     }
