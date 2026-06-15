@@ -37,6 +37,7 @@ from config import (  # noqa: E402
 from embeddings import embed_vocab  # noqa: E402
 from manifest import build_manifest, write_manifest  # noqa: E402
 from payload import build_payload, write_payload  # noqa: E402
+from clues import load_clues, clue_for_date  # noqa: E402
 from schedule import load_schedule, secret_for_date, validate_schedule  # noqa: E402
 from vocab import load_en_vocab, load_hien_vocab  # noqa: E402
 
@@ -116,6 +117,10 @@ def main() -> None:
         schedule = load_schedule(lang)
         print(f"[{lang}] Schedule length: {len(schedule)} entries")
 
+        print(f"[{lang}] Loading clues...")
+        clues = load_clues(lang)
+        print(f"[{lang}] Clues loaded: {len(clues)} entries")
+
         print(f"[{lang}] Validating schedule against vocab...")
         try:
             validate_schedule(lang, vocab, schedule)
@@ -131,14 +136,17 @@ def main() -> None:
         day_records: list[dict] = []
         day_sizes: list[int] = []
         day_par_values: list[int] = []
+        day_max_guesses_values: list[int] = []
 
         for puzzle_date in days:
             secret = secret_for_date(puzzle_date, lang, schedule)
-            payload = build_payload(vocab, matrix, secret, lang, puzzle_date)
+            clue = clue_for_date(puzzle_date, lang, clues)
+            payload = build_payload(vocab, matrix, secret, lang, puzzle_date, clue=clue)
             out_path = write_payload(payload, out_dir, lang, puzzle_date)
             file_bytes = out_path.stat().st_size
             day_sizes.append(file_bytes)
             day_par_values.append(payload["parGuesses"])
+            day_max_guesses_values.append(payload["maxGuesses"])
 
             target = SIZE_TARGETS[lang]
             size_ok = file_bytes <= target
@@ -164,6 +172,14 @@ def main() -> None:
         print(
             f"[{lang}] Par distribution: min={par_min} median={par_median} max={par_max} "
             f"(target median 8-12, max 15)"
+        )
+
+        mg_sorted = sorted(day_max_guesses_values)
+        mg_min = mg_sorted[0]
+        mg_median = mg_sorted[len(mg_sorted) // 2]
+        mg_max = mg_sorted[-1]
+        print(
+            f"[{lang}] maxGuesses distribution: min={mg_min} median={mg_median} max={mg_max}"
         )
 
         lang_days[lang] = day_records
