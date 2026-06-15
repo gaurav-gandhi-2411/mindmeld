@@ -30,11 +30,11 @@ import 'package:firebase_core/firebase_core.dart';
 /// analyticsEnabled=true on web.
 const FirebaseOptions firebaseWebOptions = FirebaseOptions(
   // From Firebase Console → Project Settings → Web app → SDK setup and config.
-  apiKey: 'PLACEHOLDER',
-  appId: 'PLACEHOLDER',
-  messagingSenderId: 'PLACEHOLDER',
-  projectId: 'PLACEHOLDER',
-  authDomain: 'PLACEHOLDER',
-  storageBucket: 'PLACEHOLDER',
-  measurementId: 'PLACEHOLDER', // Analytics stream measurement ID (G-XXXXXXXX).
+  apiKey: "AIzaSyC999pJZXIAHE_kPQDNryTlcgekhoj92bk",
+  authDomain: "mindmeld-c4bba.firebaseapp.com",
+  projectId: "mindmeld-c4bba",
+  storageBucket: "mindmeld-c4bba.firebasestorage.app",
+  messagingSenderId: "376728425568",
+  appId: "1:376728425568:web:3b309894293175630e9f05",
+  measurementId: "G-RERQZ48NPX" // Analytics stream measurement ID (G-XXXXXXXX).
 );
