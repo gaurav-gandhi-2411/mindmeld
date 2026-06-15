@@ -11,6 +11,10 @@ class AnalyticsEvent {
   ///
   /// Props: `{fallback: bool, lang: String?, day: String?}`
   static const String adWatched = 'ad_watched';
+  static const String puzzleStarted = 'puzzle_started';
+  static const String loss = 'loss';
+  static const String rivalOutcome = 'rival_outcome';
+  static const String returningPlayer = 'returning_player';
 }
 
 /// Analytics stub — logs events to the local SQLite ring buffer.

@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/models.dart';
-import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 
 import 'share_stub.dart'
@@ -114,6 +114,7 @@ class WinScreen extends StatefulWidget {
     this.rivalSolveAt,
     this.hintsUsed = 0,
     this.currentStreak = 0,
+    this.exporter,
   });
 
   final String secret;
@@ -136,6 +137,12 @@ class WinScreen extends StatefulWidget {
 
   /// Player's current streak (shown on share card when > 1).
   final int currentStreak;
+
+  /// Optional analytics exporter override.
+  ///
+  /// When null, [buildAnalyticsExporter] is called to construct the default
+  /// exporter.
+  final AnalyticsExporter? exporter;
 
   @override
   State<WinScreen> createState() => _WinScreenState();
@@ -167,8 +174,15 @@ class _WinScreenState extends State<WinScreen> {
       );
 
   Future<void> _share(BuildContext context) async {
-    await AnalyticsStub(AppPersistence.instance)
-        .logEvent(AnalyticsEvent.shareTapped, {'lang': widget.lang});
+    final analytics = widget.exporter ?? buildAnalyticsExporter();
+    await analytics.logEvent(AnalyticsEvent.shareTapped, {
+      'lang': widget.lang,
+      'day': widget.date,
+      'guesses_used': widget.guesses.length + widget.hintsUsed,
+      'max_guesses': widget.maxGuesses ?? 0,
+      'par': widget.parGuesses ?? 0,
+      'outcome': 'win',
+    });
 
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
@@ -389,6 +403,7 @@ class LossScreen extends StatefulWidget {
     this.rivalSolveAt,
     this.hintsUsed = 0,
     this.gaveUp = false,
+    this.exporter,
   });
 
   final String secret;
@@ -411,6 +426,12 @@ class LossScreen extends StatefulWidget {
 
   /// True when the player explicitly chose to give up (vs budget exhaustion).
   final bool gaveUp;
+
+  /// Optional analytics exporter override.
+  ///
+  /// When null, [buildAnalyticsExporter] is called to construct the default
+  /// exporter.
+  final AnalyticsExporter? exporter;
 
   @override
   State<LossScreen> createState() => _LossScreenState();
@@ -441,8 +462,15 @@ class _LossScreenState extends State<LossScreen> {
       );
 
   Future<void> _share(BuildContext context) async {
-    await AnalyticsStub(AppPersistence.instance)
-        .logEvent(AnalyticsEvent.shareTapped, {'lang': widget.lang, 'outcome': 'loss'});
+    final analytics = widget.exporter ?? buildAnalyticsExporter();
+    await analytics.logEvent(AnalyticsEvent.shareTapped, {
+      'lang': widget.lang,
+      'day': widget.date,
+      'guesses_used': widget.guesses.length + widget.hintsUsed,
+      'max_guesses': widget.maxGuesses ?? 0,
+      'par': widget.parGuesses ?? 0,
+      'outcome': 'loss',
+    });
 
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(

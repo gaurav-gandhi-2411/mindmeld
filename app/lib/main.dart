@@ -298,6 +298,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         date: _today,
         secret: _wonSecret ?? '',
         payload: _wonPayload,
+        exporter: _exporter,
         onClose: () => setState(() {
           _won = false;
           _wonSecret = null;
@@ -312,6 +313,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         date: _today,
         secret: _lostSecret ?? '',
         payload: _lostPayload,
+        exporter: _exporter,
         onClose: () => setState(() {
           _lost = false;
           _lostSecret = null;
@@ -331,6 +333,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             onLoss: _handleLoss,
             payloadClient: widget.overrides?.payloadClient,
             hintGate: widget.overrides?.hintGate,
+            exporter: _exporter,
           ),
           ArchiveScreen(lang: _lang),
           StatsScreen(lang: _lang),
@@ -364,6 +367,7 @@ class _WinShell extends StatefulWidget {
     required this.secret,
     required this.onClose,
     this.payload,
+    this.exporter,
   });
 
   final String lang;
@@ -371,6 +375,7 @@ class _WinShell extends StatefulWidget {
   final String secret;
   final VoidCallback onClose;
   final DailyPayload? payload;
+  final AnalyticsExporter? exporter;
 
   @override
   State<_WinShell> createState() => _WinShellState();
@@ -420,6 +425,7 @@ class _WinShellState extends State<_WinShell> {
       rivalSolveAt: rivalData?.solveAt,
       hintsUsed: _dayState!.hintsUsed,
       currentStreak: _stats?.currentStreak ?? 0,
+      exporter: widget.exporter,
     );
   }
 }
@@ -432,6 +438,7 @@ class _LossShell extends StatefulWidget {
     required this.secret,
     required this.onClose,
     this.payload,
+    this.exporter,
   });
 
   final String lang;
@@ -439,6 +446,7 @@ class _LossShell extends StatefulWidget {
   final String secret;
   final VoidCallback onClose;
   final DailyPayload? payload;
+  final AnalyticsExporter? exporter;
 
   @override
   State<_LossShell> createState() => _LossShellState();
@@ -488,6 +496,7 @@ class _LossShellState extends State<_LossShell> {
       rivalSolveAt: rivalData?.solveAt,
       hintsUsed: _dayState!.hintsUsed,
       gaveUp: gaveUp,
+      exporter: widget.exporter,
     );
   }
 }

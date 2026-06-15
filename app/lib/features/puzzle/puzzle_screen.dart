@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/rewarded_ad_service.dart';
+import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
@@ -33,6 +34,7 @@ class PuzzleScreen extends StatefulWidget {
     this.hintGate,
     this.iapGateway,
     this.isPractice = false,
+    this.exporter,
   });
 
   final String lang;
@@ -72,6 +74,12 @@ class PuzzleScreen extends StatefulWidget {
   /// touching dart-defines.
   final IapGateway? iapGateway;
 
+  /// Optional analytics exporter override (used in tests).
+  ///
+  /// When null, [buildAnalyticsExporter] is called to construct the default
+  /// exporter based on the ANALYTICS_ENABLED dart-define flag.
+  final AnalyticsExporter? exporter;
+
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
 }
@@ -82,6 +90,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   late final PayloadClient _client;
   late final HintGate _hintGate;
   late final IapGateway _iapGateway;
+  late final AnalyticsExporter _analytics;
   Entitlements _entitlements = Entitlements.empty;
 
   @override
@@ -91,6 +100,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     // Resolve the hint gate: explicit hintGate > buildHintGate(adStub).
     _hintGate = widget.hintGate ?? buildHintGate(adStub: widget.adStub);
     _iapGateway = widget.iapGateway ?? buildIapGateway();
+    _analytics = widget.exporter ?? buildAnalyticsExporter();
     _load();
     _loadRivalSettings();
   }
@@ -103,9 +113,6 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   bool _showingAd = false;
   bool _rivalEnabled = true;
   String _rivalTier = 'even';
-
-  AnalyticsStub get _analytics =>
-      AnalyticsStub(AppPersistence.instance);
 
   Future<void> _load() async {
     try {
@@ -137,8 +144,6 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         // appropriate result screen so the player sees their result instead of a
         // locked-input puzzle screen.
         if (existing != null && existing.won) {
-          // Schedule for next frame so the parent shell's setState is not called
-          // synchronously inside a build/setState cycle.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onWin();
           });
@@ -146,6 +151,24 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onLoss();
           });
+        } else if (existing == null && !widget.isPractice) {
+          // Fresh start — fire puzzle_started and check day-2 return.
+          final p = payloadResult.payload;
+          await _analytics.logEvent(AnalyticsEvent.puzzleStarted, {
+            'lang': widget.lang,
+            'day': widget.date,
+            'max_guesses': p.maxGuesses ?? 0,
+            'par': p.parGuesses ?? 0,
+          });
+          final yesterdayState = await AppPersistence.instance
+              .loadDayState(_yesterday(widget.date), widget.lang);
+          if (yesterdayState != null) {
+            await _analytics.logEvent(AnalyticsEvent.returningPlayer, {
+              'lang': widget.lang,
+              'day': widget.date,
+              'days_since_last_play': 1,
+            });
+          }
         }
       }
     } catch (e) {
@@ -171,6 +194,41 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       // SharedPreferences not available in test environments without mock setup;
       // silently retain default values (_rivalEnabled=true, _rivalTier='even').
     }
+  }
+
+  String _yesterday(String date) {
+    final dt = DateTime.parse(date);
+    return DateFormat('yyyy-MM-dd').format(dt.subtract(const Duration(days: 1)));
+  }
+
+  Future<void> _logRivalOutcome(
+    DailyPayload payload,
+    List<Guess> guesses,
+    int hintsUsed, {
+    required bool won,
+  }) async {
+    final rivalD = payload.rival?.forTier(_rivalTier);
+    if (rivalD == null || !_rivalEnabled) return;
+    final rivalS = RivalState.fromGuesses(
+      guesses: guesses,
+      tierData: rivalD,
+      playerWon: won,
+    );
+    final outcomeStr = switch (rivalS.outcome) {
+      RivalOutcome.playerWon => 'player_won',
+      RivalOutcome.rivalWon => 'rival_won',
+      RivalOutcome.tie => 'tie',
+      _ => 'unknown',
+    };
+    await _analytics.logEvent(AnalyticsEvent.rivalOutcome, {
+      'lang': widget.lang,
+      'day': widget.date,
+      'guesses_used': guesses.length + hintsUsed,
+      'max_guesses': payload.maxGuesses ?? 0,
+      'par': payload.parGuesses ?? 0,
+      'outcome': outcomeStr,
+      'rival_solve_at': rivalD.solveAt,
+    });
   }
 
   Future<void> _submitGuess() async {
@@ -238,12 +296,24 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       );
       await _analytics.logEvent(AnalyticsEvent.win, {
         'lang': widget.lang,
-        'guess_count': newGuesses.length,
+        'day': widget.date,
+        'guesses_used': newGuesses.length + state.hintsUsed,
+        'max_guesses': payload.maxGuesses ?? 0,
+        'par': payload.parGuesses ?? 0,
       });
+      await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
     }
 
     if (budgetExhausted && !widget.isPractice) {
       await AppPersistence.instance.recordLoss(lang: widget.lang);
+      await _analytics.logEvent(AnalyticsEvent.loss, {
+        'lang': widget.lang,
+        'day': widget.date,
+        'guesses_used': newGuesses.length + state.hintsUsed,
+        'max_guesses': payload.maxGuesses ?? 0,
+        'par': payload.parGuesses ?? 0,
+      });
+      await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: false);
     }
 
     setState(() {
@@ -302,8 +372,12 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     await AppPersistence.instance.saveDayState(newState);
     await _analytics.logEvent(AnalyticsEvent.hintUsed, {
       'lang': widget.lang,
+      'day': widget.date,
       'hint_index': state.hintsUsed,
       'hint_rank': hint.rank,
+      'guesses_used': newState.guesses.length + newState.hintsUsed,
+      'max_guesses': payload.maxGuesses ?? 0,
+      'par': payload.parGuesses ?? 0,
     });
     await _analytics.logEvent(AnalyticsEvent.adWatched, {
       'fallback': result.fallback,
@@ -355,10 +429,20 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     if (confirmed != true) return;
 
+    final payload = _payload!;
     final newState = state.copyWith(gaveUp: true);
     await AppPersistence.instance.saveDayState(newState);
     if (!widget.isPractice) {
       await AppPersistence.instance.recordLoss(lang: widget.lang);
+      await _analytics.logEvent(AnalyticsEvent.loss, {
+        'lang': widget.lang,
+        'day': widget.date,
+        'guesses_used': state.guesses.length + state.hintsUsed,
+        'max_guesses': payload.maxGuesses ?? 0,
+        'par': payload.parGuesses ?? 0,
+        'gave_up': 1,
+      });
+      await _logRivalOutcome(payload, state.guesses, state.hintsUsed, won: false);
     }
     if (mounted) {
       setState(() => _dayState = newState);
