@@ -19,12 +19,15 @@ void main() {
     });
 
     test('payload fields parse correctly', () {
-      expect(payload.v, equals(2));
+      expect(payload.v, equals(3));
       expect(payload.lang, equals('en'));
       expect(payload.date, equals('2026-06-12'));
       expect(payload.n, equals(55000));
       expect(payload.salt, equals('7ca5996a071e2723'));
       expect(payload.words.length, equals(55000));
+      // Phase 5 fields
+      expect(payload.clue, equals('The biggest blue thing on any map'));
+      expect(payload.maxGuesses, equals(16)); // par=10, maxGuesses=par+6=16
     });
 
     test('exactly one rank-1 entry exists', () {
