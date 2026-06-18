@@ -68,8 +68,9 @@ void main() {
       expect(entry, isNotNull);
     });
 
-    test('duplicate guess detection logic', () {
-      // Simulate adding two guesses for "water" and checking deduplication
+    test('duplicate guess detection by rank (alias-aware)', () {
+      // The real code compares by rank, not word string, so that alternate
+      // spellings resolving to the same canonical word (same rank) are caught.
       final guess1 = Guess(
         word: 'water',
         rank: 79,
@@ -78,13 +79,15 @@ void main() {
       );
       final guesses = [guess1];
 
-      // Check if "water" already in guesses
-      final isDuplicate = guesses.any((g) => g.word == 'water');
-      expect(isDuplicate, isTrue);
+      // Same rank → duplicate regardless of word string.
+      final isDuplicateByRank = guesses.any((g) => g.rank == 79);
+      expect(isDuplicateByRank, isTrue,
+          reason: 'Same rank should be detected as duplicate');
 
-      // Check "music" is not a duplicate
-      final isNotDuplicate = guesses.any((g) => g.word == 'music');
-      expect(isNotDuplicate, isFalse);
+      // Different rank → not duplicate.
+      final isNotDuplicate = guesses.any((g) => g.rank == 42);
+      expect(isNotDuplicate, isFalse,
+          reason: 'Different rank should not be a duplicate');
     });
   });
 }
