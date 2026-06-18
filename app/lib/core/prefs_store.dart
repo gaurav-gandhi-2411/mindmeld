@@ -240,6 +240,14 @@ class PrefsStore implements StorageBackend {
     await _saveBuffer(buf);
   }
 
+  @override
+  Future<void> clearAll() async {
+    final keys = _p.getKeys().where((k) => k.startsWith('mm_')).toList();
+    for (final k in keys) {
+      await _p.remove(k);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Serialisation helpers (shared with SqliteStore shape for compatibility)
   // ---------------------------------------------------------------------------

@@ -287,6 +287,13 @@ class SqliteStore implements StorageBackend {
     );
   }
 
+  @override
+  Future<void> clearAll() async {
+    await _database.delete('day_state');
+    await _database.delete('stats');
+    await _database.delete('analytics');
+  }
+
   // ---------------------------------------------------------------------------
   // Serialisation helpers
   // ---------------------------------------------------------------------------

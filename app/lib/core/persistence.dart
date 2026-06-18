@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:mindmeld/core/memory_store.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/prefs_store.dart';
 import 'package:mindmeld/core/sqlite_store.dart';
@@ -109,7 +110,7 @@ class AppPersistence {
     }
   }
 
-  /// Web-specific init: sqflite-first with PrefsStore fallback.
+  /// Web-specific init: sqflite-first with PrefsStore fallback, then MemoryStore.
   Future<void> _initWeb({String? dbPath}) async {
     try {
       final store = SqliteStore();
@@ -124,11 +125,27 @@ class AppPersistence {
         error: e,
         stackTrace: st,
       );
-      final prefs = PrefsStore();
-      await prefs.init();
-      _backend = prefs;
-      dev.log('AppPersistence: PrefsStore backend active (web SQLite fallback)',
-          name: 'AppPersistence');
+      try {
+        final prefs = PrefsStore();
+        await prefs.init();
+        _backend = prefs;
+        dev.log(
+            'AppPersistence: PrefsStore backend active (web SQLite fallback)',
+            name: 'AppPersistence');
+      } catch (e2, st2) {
+        dev.log(
+          'AppPersistence: PrefsStore also failed — falling back to MemoryStore. Error: $e2',
+          name: 'AppPersistence',
+          error: e2,
+          stackTrace: st2,
+        );
+        final mem = MemoryStore();
+        await mem.init();
+        _backend = mem;
+        dev.log(
+            'AppPersistence: MemoryStore active (all storage unavailable)',
+            name: 'AppPersistence');
+      }
     }
   }
 
@@ -223,6 +240,15 @@ class AppPersistence {
   /// Mark the given event [ids] as flushed so they are not re-sent.
   Future<void> markEventsFlushed(List<int> ids) =>
       _store.markEventsFlushed(ids);
+
+  // ---------------------------------------------------------------------------
+  // Reset
+  // ---------------------------------------------------------------------------
+
+  /// Delete ALL game data (day states, stats, analytics).
+  ///
+  /// Exposed for the ?reset=1 developer hook (web only).
+  Future<void> clearAll() => _store.clearAll();
 
   // ---------------------------------------------------------------------------
   // Test utilities

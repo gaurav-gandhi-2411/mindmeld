@@ -11,7 +11,7 @@ library;
 import 'package:mindmeld/core/models.dart';
 
 /// Identifies which storage backend is active.
-enum StorageBackendKind { sqlite, prefs }
+enum StorageBackendKind { sqlite, prefs, memory }
 
 /// Narrow persistence contract used by [AppPersistence].
 ///
@@ -70,4 +70,13 @@ abstract class StorageBackend {
 
   /// Mark the given event [ids] as flushed.
   Future<void> markEventsFlushed(List<int> ids);
+
+  // ---------------------------------------------------------------------------
+  // Reset
+  // ---------------------------------------------------------------------------
+
+  /// Delete ALL game data: day states, stats, analytics.
+  ///
+  /// Used by the ?reset=1 developer hook to simulate a first-time user.
+  Future<void> clearAll();
 }
