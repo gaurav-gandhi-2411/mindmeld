@@ -111,6 +111,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   bool _loading = true;
   String? _loadError;
   bool _showingAd = false;
+  bool _submitting = false;
   bool _rivalEnabled = true;
   String _rivalTier = 'even';
 
@@ -232,109 +233,118 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   }
 
   Future<void> _submitGuess() async {
+    if (_submitting) return;
     final raw = _controller.text.trim().toLowerCase();
     if (raw.isEmpty) return;
+    setState(() => _submitting = true);
+    try {
+      final payload = _payload!;
+      final state = _dayState!;
 
-    final payload = _payload!;
-    final state = _dayState!;
+      if (state.isFinished) return;
 
-    if (state.isFinished) return;
+      // Vocab lookup first (needed for rank-based duplicate detection).
+      final entry = PayloadCodec.lookupWord(raw, payload);
+      if (entry == null) {
+        setState(() => _inputError = 'Not in word list');
+        return;
+      }
 
-    // Vocab lookup first (needed for rank-based duplicate detection).
-    final entry = PayloadCodec.lookupWord(raw, payload);
-    if (entry == null) {
-      setState(() => _inputError = 'Not in word list');
-      return;
-    }
+      // Duplicate check: compare by resolved rank, not raw string.
+      // A variant spelling that resolves to the same canonical word (same rank)
+      // counts as a duplicate — ranks belong to the canonical word, not the typed
+      // variant. This prevents e.g. 'gana' being accepted after 'gaana' was guessed.
+      if (state.guesses.any((g) => g.rank == entry.rank)) {
+        setState(() => _inputError = 'Already guessed that word');
+        return;
+      }
 
-    // Duplicate check: compare by resolved rank, not raw string.
-    // A variant spelling that resolves to the same canonical word (same rank)
-    // counts as a duplicate — ranks belong to the canonical word, not the typed
-    // variant. This prevents e.g. 'gana' being accepted after 'gaana' was guessed.
-    if (state.guesses.any((g) => g.rank == entry.rank)) {
-      setState(() => _inputError = 'Already guessed that word');
-      return;
-    }
-
-    final band = bandForRank(entry.rank, payload.n);
-    // word records what the player typed (display fidelity); rank/similarity
-    // belong to the canonical word resolved by the lookup.
-    final guess = Guess(
-      word: raw,
-      rank: entry.rank,
-      similarity: entry.similarity,
-      band: band,
-    );
-
-    final newGuesses = [...state.guesses, guess];
-    final won = entry.rank == 1;
-
-    // Budget check: effective usage = guesses + hints already used (newState
-    // has same hintsUsed as state since this is a guess, not a hint).
-    final maxG = _payload!.maxGuesses;
-    final budgetExhausted =
-        !won && maxG != null && (newGuesses.length + state.hintsUsed) >= maxG;
-
-    final newState = state.copyWith(
-      guesses: newGuesses,
-      won: won,
-      gaveUp: budgetExhausted, // budget exhaustion treated as a loss
-    );
-
-    await AppPersistence.instance.saveDayState(newState);
-    await _analytics.logEvent(AnalyticsEvent.guessMade, {
-      'lang': widget.lang,
-      'rank': entry.rank,
-      'guess_number': newGuesses.length,
-    });
-
-    if (won && !widget.isPractice) {
-      await AppPersistence.instance.recordWin(
-        lang: widget.lang,
-        guessCount: newGuesses.length,
-        today: DateTime.parse(widget.date),
+      final band = bandForRank(entry.rank, payload.n);
+      // word records what the player typed (display fidelity); rank/similarity
+      // belong to the canonical word resolved by the lookup.
+      final guess = Guess(
+        word: raw,
+        rank: entry.rank,
+        similarity: entry.similarity,
+        band: band,
       );
-      await _analytics.logEvent(AnalyticsEvent.win, {
+
+      final newGuesses = [...state.guesses, guess];
+      final won = entry.rank == 1;
+
+      // Budget check: effective usage = guesses + hints already used (newState
+      // has same hintsUsed as state since this is a guess, not a hint).
+      final maxG = _payload!.maxGuesses;
+      final budgetExhausted =
+          !won && maxG != null && (newGuesses.length + state.hintsUsed) >= maxG;
+
+      final newState = state.copyWith(
+        guesses: newGuesses,
+        won: won,
+        gaveUp: budgetExhausted, // budget exhaustion treated as a loss
+      );
+
+      await AppPersistence.instance.saveDayState(newState);
+      await _analytics.logEvent(AnalyticsEvent.guessMade, {
         'lang': widget.lang,
-        'day': widget.date,
-        'guesses_used': newGuesses.length + state.hintsUsed,
-        'max_guesses': payload.maxGuesses ?? 0,
-        'par': payload.parGuesses ?? 0,
+        'rank': entry.rank,
+        'guess_number': newGuesses.length,
       });
-      await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
-    }
 
-    if (budgetExhausted && !widget.isPractice) {
-      await AppPersistence.instance.recordLoss(lang: widget.lang);
-      await _analytics.logEvent(AnalyticsEvent.loss, {
-        'lang': widget.lang,
-        'day': widget.date,
-        'guesses_used': newGuesses.length + state.hintsUsed,
-        'max_guesses': payload.maxGuesses ?? 0,
-        'par': payload.parGuesses ?? 0,
+      if (won && !widget.isPractice) {
+        await AppPersistence.instance.recordWin(
+          lang: widget.lang,
+          guessCount: newGuesses.length,
+          today: DateTime.parse(widget.date),
+        );
+        await _analytics.logEvent(AnalyticsEvent.win, {
+          'lang': widget.lang,
+          'day': widget.date,
+          'guesses_used': newGuesses.length + state.hintsUsed,
+          'max_guesses': payload.maxGuesses ?? 0,
+          'par': payload.parGuesses ?? 0,
+        });
+        await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
+      }
+
+      if (budgetExhausted && !widget.isPractice) {
+        await AppPersistence.instance.recordLoss(lang: widget.lang);
+        await _analytics.logEvent(AnalyticsEvent.loss, {
+          'lang': widget.lang,
+          'day': widget.date,
+          'guesses_used': newGuesses.length + state.hintsUsed,
+          'max_guesses': payload.maxGuesses ?? 0,
+          'par': payload.parGuesses ?? 0,
+        });
+        await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: false);
+      }
+
+      setState(() {
+        _dayState = newState;
+        _inputError = null;
+        _controller.clear();
       });
-      await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: false);
-    }
 
-    setState(() {
-      _dayState = newState;
-      _inputError = null;
-      _controller.clear();
-    });
-
-    if (won) {
-      // Brief delay so the user sees the win flash before navigating.
-      await Future<void>.delayed(const Duration(milliseconds: 600));
-      widget.onWin();
-    } else if (budgetExhausted) {
-      await Future<void>.delayed(const Duration(milliseconds: 400));
-      widget.onLoss();
+      if (won) {
+        // Brief delay so the user sees the win flash before navigating.
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+        widget.onWin();
+      } else if (budgetExhausted) {
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+        widget.onLoss();
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
     }
   }
 
   Future<void> _useHint() async {
     final payload = _payload!;
     final state = _dayState!;
+
+    // Guard: puzzle already over (race condition with UI hide).
+    if (state.isFinished) return;
+
     final hintsAvailable = payload.hints;
 
     // Guard: no more payload hints left.
