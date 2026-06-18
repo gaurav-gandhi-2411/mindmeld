@@ -128,6 +128,21 @@ app/         Flutter: lib/core (config, codec, client, persistence), lib/feature
 payloads/    generated output (gitignored except samples/)
 ```
 
+## Developer reset hook
+
+Browse to `https://playmindmeld.vercel.app/?reset=1` to wipe all local
+state (today's puzzle for both languages, streaks, stats, hints,
+onboarding flag) and reload as a first-time user.
+
+**Web only.** The `?reset=1` parameter is stripped from the URL after the
+reset so normal navigation is not affected. In a normal session the
+parameter is never present, so the hook cannot fire accidentally.
+
+Useful for:
+- Testing the onboarding flow end-to-end
+- Simulating a first-time user on a device that has prior play history
+- Verifying that win/loss screens survive app reopen
+
 ## LLM usage
 
 Built with Claude Code orchestrating executor/verifier subagents; architecture decisions,
