@@ -21,6 +21,9 @@ import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
 import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
+import 'package:mindmeld/core/reset_stub.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) 'package:mindmeld/core/reset_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
@@ -206,6 +209,21 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       dbPath: widget.overrides?.dbPath,
     );
 
+    // ?reset=1: wipe all local state to simulate a first-time user (web-only dev hook).
+    if (kIsWeb && hasResetParam()) {
+      await AppPersistence.instance.clearAll();
+      final prefs = await SharedPreferences.getInstance();
+      for (final key in [
+        'onboarding_done',
+        'selected_lang',
+        'rival_enabled',
+        'rival_tier',
+      ]) {
+        await prefs.remove(key);
+      }
+      stripResetParam();
+    }
+
     final seen = await hasSeenOnboarding();
     // Honour the lang override so integration tests don't depend on whatever
     // lang was last written to SharedPreferences by a previous test.
@@ -331,6 +349,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         index: _navIndex,
         children: [
           PuzzleScreen(
+            key: ValueKey('puzzle-$_lang'),
             lang: _lang,
             date: _today,
             onWin: _handleWin,
