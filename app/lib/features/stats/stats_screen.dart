@@ -38,8 +38,30 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Future<void> _load() async {
-    final s = await AppPersistence.instance.loadStats(widget.lang);
-    final e = await _gateway.current();
+    final today = DateTime.now();
+    var e = await _gateway.current();
+    var s = await AppPersistence.instance.loadStats(widget.lang);
+
+    // Passive streak reset: fix stale streak display when the player missed day(s).
+    if (s.currentStreak > 0) {
+      final lastWin = await AppPersistence.instance.loadLastWinDate(widget.lang);
+      if (_isStreakBroken(lastWin, today)) {
+        if (e.streakFreezes > 0) {
+          await _gateway.consumeStreakFreeze();
+          e = Entitlements(
+            removeAds: e.removeAds,
+            archive: e.archive,
+            streakFreezes: e.streakFreezes - 1,
+          );
+        } else {
+          s = await AppPersistence.instance.applyPassiveStreakReset(
+            lang: widget.lang,
+            today: today,
+          );
+        }
+      }
+    }
+
     if (mounted) {
       setState(() {
         _stats = s;
@@ -47,6 +69,13 @@ class _StatsScreenState extends State<StatsScreen> {
         _loading = false;
       });
     }
+  }
+
+  static bool _isStreakBroken(DateTime? lastWin, DateTime today) {
+    if (lastWin == null) return false;
+    final todayNorm = DateTime(today.year, today.month, today.day);
+    final lastNorm = DateTime(lastWin.year, lastWin.month, lastWin.day);
+    return todayNorm.difference(lastNorm).inDays > 1;
   }
 
   @override

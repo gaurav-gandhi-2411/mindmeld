@@ -309,4 +309,94 @@ void main() {
       }
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Passive streak reset (on Stats screen open)
+  // ---------------------------------------------------------------------------
+  group('applyPassiveStreakReset', () {
+    test('gap > 1 day resets streak to 0 and persists', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final day1 = DateTime(2026, 6, 10);
+        final day5 = DateTime(2026, 6, 15);
+        await db.recordWin(lang: 'en', guessCount: 5, today: day1);
+
+        final reset = await db.applyPassiveStreakReset(lang: 'en', today: day5);
+        expect(reset.currentStreak, equals(0),
+            reason: 'streak reset to 0 after gap');
+        expect(reset.maxStreak, equals(1), reason: 'maxStreak unchanged');
+        expect(reset.played, equals(1), reason: 'played count unchanged');
+        expect(reset.wins, equals(1), reason: 'wins unchanged');
+
+        // Confirm persisted to DB.
+        final reloaded = await db.loadStats('en');
+        expect(reloaded.currentStreak, equals(0),
+            reason: 'persisted streak is 0');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('consecutive day (gap=1) does not reset streak', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final day1 = DateTime(2026, 6, 10);
+        final day2 = DateTime(2026, 6, 11);
+        await db.recordWin(lang: 'en', guessCount: 5, today: day1);
+
+        final result =
+            await db.applyPassiveStreakReset(lang: 'en', today: day2);
+        expect(result.currentStreak, equals(1),
+            reason: 'consecutive day preserves streak');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('same-day return (gap=0) does not reset streak', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final day1 = DateTime(2026, 6, 10);
+        await db.recordWin(lang: 'en', guessCount: 5, today: day1);
+
+        final result =
+            await db.applyPassiveStreakReset(lang: 'en', today: day1);
+        expect(result.currentStreak, equals(1),
+            reason: 'same-day return preserves streak');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('already-zero streak is a no-op', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final day1 = DateTime(2026, 6, 10);
+        final day5 = DateTime(2026, 6, 15);
+        await db.recordWin(lang: 'en', guessCount: 5, today: day1);
+        await db.recordLoss(lang: 'en');
+
+        final result =
+            await db.applyPassiveStreakReset(lang: 'en', today: day5);
+        expect(result.currentStreak, equals(0),
+            reason: 'already 0 — no-op');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('no prior win is a no-op', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final result = await db.applyPassiveStreakReset(
+          lang: 'en',
+          today: DateTime(2026, 6, 15),
+        );
+        expect(result.currentStreak, equals(0),
+            reason: 'no prior win — nothing to reset');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+  });
 }

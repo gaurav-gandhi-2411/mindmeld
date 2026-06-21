@@ -221,6 +221,33 @@ class AppPersistence {
     return updated;
   }
 
+  /// Passive streak reset called on Stats screen open.
+  ///
+  /// If today is more than 1 day after the last win, the streak is broken.
+  /// Resets [currentStreak] to 0 and persists the change (preserving
+  /// [lastWinDate] and all other stats). Streak-freeze consumption is the
+  /// caller's responsibility before invoking this.
+  ///
+  /// Returns the (possibly updated) stats.
+  Future<PlayerStats> applyPassiveStreakReset({
+    required String lang,
+    required DateTime today,
+  }) async {
+    final current = await loadStats(lang);
+    if (current.currentStreak == 0) return current;
+
+    final lastWin = await loadLastWinDate(lang);
+    if (lastWin == null) return current;
+
+    final todayNorm = DateTime(today.year, today.month, today.day);
+    final lastNorm = DateTime(lastWin.year, lastWin.month, lastWin.day);
+    if (todayNorm.difference(lastNorm).inDays <= 1) return current;
+
+    final updated = current.copyWith(currentStreak: 0);
+    await _store.saveStats(lang, updated, null);
+    return updated;
+  }
+
   // ---------------------------------------------------------------------------
   // Analytics ring buffer
   // ---------------------------------------------------------------------------

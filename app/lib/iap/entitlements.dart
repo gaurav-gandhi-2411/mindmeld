@@ -93,4 +93,10 @@ abstract class IapGateway {
   /// Implementations should cache; this is called on every settings-screen
   /// build to decide which rows show "unlocked".
   Future<Entitlements> current();
+
+  /// Consume one streak-freeze use (decrement the counter by 1).
+  ///
+  /// No-op when zero freezes remain. Implementations that do not track
+  /// freezes may treat this as a no-op.
+  Future<void> consumeStreakFreeze();
 }

@@ -41,6 +41,9 @@ class _RemoveAdsGateway implements IapGateway {
   @override
   Future<Entitlements> current() async =>
       const Entitlements(removeAds: true, archive: false, streakFreezes: 0);
+
+  @override
+  Future<void> consumeStreakFreeze() async {}
 }
 
 // ---------------------------------------------------------------------------

@@ -262,6 +262,11 @@ class RevenueCatGateway implements IapGateway {
   }
 
   @override
+  Future<void> consumeStreakFreeze() async {
+    if (_streakFreezes > 0) _streakFreezes--;
+  }
+
+  @override
   Future<Entitlements> current() async {
     try {
       await _ensureConfigured();

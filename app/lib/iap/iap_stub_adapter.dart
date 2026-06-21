@@ -32,5 +32,8 @@ class IapStubAdapter implements IapGateway {
   }
 
   @override
+  Future<void> consumeStreakFreeze() async {}
+
+  @override
   Future<Entitlements> current() async => Entitlements.empty;
 }
