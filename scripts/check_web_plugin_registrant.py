@@ -31,6 +31,7 @@ REQUIRED_REGISTRATIONS: tuple[str, ...] = (
     "FirebaseAuthWeb",
     "FirebaseFirestoreWeb",
     "FirebaseAnalyticsWeb",
+    "FirebaseMessagingWeb",
 )
 
 # Known locations Flutter has generated the web plugin registrant to across
