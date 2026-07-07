@@ -36,6 +36,7 @@ from config import (
     QSIM_SCALE,
     derive_obfuscate_key,
     derive_salt,
+    derive_salt_for_key,
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
@@ -137,16 +138,17 @@ def decode_secret(payload: dict) -> str:
     return plain.decode("utf-8")
 
 
-def build_payload(
+def _build_payload_core(
     vocab: list[str],
     matrix: NDArray[np.float32],
     secret: str,
     lang: str,
-    puzzle_date: date,
-    clue: str = "",
+    salt: str,
+    key_str: str,
+    clue: str,
 ) -> dict:
     """
-    Build the full payload dict for one day's puzzle.
+    Build the full payload dict shared by daily and pack puzzles.
 
     Parameters
     ----------
@@ -158,8 +160,15 @@ def build_payload(
         The secret word for this puzzle. Must be in vocab.
     lang:
         Language key ("en" or "hi-en").
-    puzzle_date:
-        Date of the puzzle (determines salt).
+    salt:
+        Pre-derived anti-cheat salt for this puzzle (see derive_salt /
+        derive_salt_for_key in config.py).
+    key_str:
+        The value stored in the "date" field and used to seed the rival
+        paths — an ISO date for daily puzzles, or an opaque "{packId}-{NNN}"
+        key for pack puzzles.
+    clue:
+        Plaintext clue string for this puzzle.
 
     Returns
     -------
@@ -181,9 +190,6 @@ def build_payload(
     ranks = np.empty(len(vocab), dtype=np.int32)
     for rank_minus1, idx in enumerate(order):
         ranks[idx] = rank_minus1 + 1
-
-    # Salt for this (date, lang) pair
-    salt = derive_salt(puzzle_date, lang)
 
     # Build words dict: {hash12: [rank, qsim]}
     words_map: dict[str, list[int]] = {}
@@ -282,12 +288,12 @@ def build_payload(
 
     # Generate rival paths (three tiers) and par guess count.
     # Paths contain only rank+band integers — no word strings.
-    rival_data, par_guesses = generate_rival_data(n, secret_lower, puzzle_date.isoformat())
+    rival_data, par_guesses = generate_rival_data(n, secret_lower, key_str)
 
     result: dict = {
         "v": PAYLOAD_VERSION,
         "lang": lang,
-        "date": puzzle_date.isoformat(),
+        "date": key_str,
         "model": MODELS[lang],
         "n": n,
         "salt": salt,
@@ -301,6 +307,81 @@ def build_payload(
     }
     if alt_map:
         result["alt"] = alt_map
+    return result
+
+
+def build_payload(
+    vocab: list[str],
+    matrix: NDArray[np.float32],
+    secret: str,
+    lang: str,
+    puzzle_date: date,
+    clue: str = "",
+) -> dict:
+    """
+    Build the full payload dict for one day's puzzle.
+
+    Parameters
+    ----------
+    vocab:
+        Ordered word list; matrix[i] is the embedding for vocab[i].
+    matrix:
+        L2-normalised embedding matrix, shape (len(vocab), D).
+    secret:
+        The secret word for this puzzle. Must be in vocab.
+    lang:
+        Language key ("en" or "hi-en").
+    puzzle_date:
+        Date of the puzzle (determines salt).
+
+    Returns
+    -------
+    dict
+        Payload ready for json.dumps + gzip.
+    """
+    salt = derive_salt(puzzle_date, lang)
+    return _build_payload_core(vocab, matrix, secret, lang, salt, puzzle_date.isoformat(), clue)
+
+
+def build_pack_payload(
+    vocab: list[str],
+    matrix: NDArray[np.float32],
+    secret: str,
+    lang: str,
+    key: str,
+    pack_id: str,
+    idx: int,
+    clue: str = "",
+) -> dict:
+    """
+    Build the full payload dict for one themed-pack puzzle.
+
+    Identical schema to build_payload's daily output, plus two extra fields:
+    "pack" (the pack id) and "idx" (1-based puzzle index within the pack).
+    The opaque `key` (e.g. "bollywood-001") is stored in the "date" field and
+    used to seed the rival paths, exactly mirroring how daily puzzles use the
+    ISO date string in both roles.
+
+    Parameters
+    ----------
+    vocab, matrix, secret, lang, clue:
+        Same meaning as build_payload.
+    key:
+        Opaque puzzle key, e.g. "{packId}-{NNN}".
+    pack_id:
+        The pack this puzzle belongs to.
+    idx:
+        1-based index of this puzzle within the pack.
+
+    Returns
+    -------
+    dict
+        Payload ready for json.dumps + gzip.
+    """
+    salt = derive_salt_for_key(key, lang)
+    result = _build_payload_core(vocab, matrix, secret, lang, salt, key, clue)
+    result["pack"] = pack_id
+    result["idx"] = idx
     return result
 
 
@@ -318,14 +399,39 @@ def write_payload(
     lang_dir = out_dir / lang
     lang_dir.mkdir(parents=True, exist_ok=True)
     out_path = lang_dir / f"{puzzle_date.isoformat()}.json.gz"
+    out_path.write_bytes(_gzip_json(payload))
+    return out_path
 
+
+def write_pack_payload(
+    payload: dict,
+    out_dir: Path,
+    pack_id: str,
+    lang: str,
+    idx: int,
+) -> Path:
+    """
+    Gzip-compress and write `payload` to out_dir/packs/{pack_id}/{lang}/{NNN}.json.gz.
+
+    NNN is `idx` zero-padded to 3 digits (1-based). Returns the written file path.
+    """
+    lang_dir = out_dir / "packs" / pack_id / lang
+    lang_dir.mkdir(parents=True, exist_ok=True)
+    out_path = lang_dir / f"{idx:03d}.json.gz"
+    out_path.write_bytes(_gzip_json(payload))
+    return out_path
+
+
+def _gzip_json(payload: dict) -> bytes:
+    """
+    Serialize `payload` as compact JSON and gzip-compress it deterministically.
+
+    Uses mtime=0 so identical content produces identical bytes across runs —
+    gzip.compress() embeds the current timestamp by default, which would
+    otherwise break reproducibility.
+    """
     json_bytes = json.dumps(payload, separators=(",", ":")).encode("utf-8")
-    # Use mtime=0 so identical content produces identical bytes across runs.
-    # gzip.compress() embeds the current timestamp by default, breaking reproducibility.
     buf = io.BytesIO()
     with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=9, mtime=0) as gz:
         gz.write(json_bytes)
-    gz_bytes = buf.getvalue()
-
-    out_path.write_bytes(gz_bytes)
-    return out_path
+    return buf.getvalue()

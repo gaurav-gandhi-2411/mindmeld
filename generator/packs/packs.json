@@ -1,0 +1,58 @@
+[
+  {
+    "id": "bollywood",
+    "title": { "en": "Bollywood", "hi-en": "Bollywood" },
+    "tagline": {
+      "en": "The masala every blockbuster runs on",
+      "hi-en": "Full filmy feels — dil se"
+    },
+    "free": true,
+    "status": "live",
+    "accent": "#E8B23A",
+    "accentDark": "#8E1A2B",
+    "icon": "film",
+    "langs": ["en", "hi-en"]
+  },
+  {
+    "id": "cricket",
+    "title": { "en": "Cricket", "hi-en": "Cricket" },
+    "tagline": {
+      "en": "Howzat! The gentleman's game",
+      "hi-en": "Gully se stadium tak"
+    },
+    "free": false,
+    "status": "coming_soon",
+    "accent": "#2E7D32",
+    "accentDark": "#1B4D20",
+    "icon": "cricket",
+    "langs": ["en", "hi-en"]
+  },
+  {
+    "id": "indian-food",
+    "title": { "en": "Indian Food", "hi-en": "Indian Food" },
+    "tagline": {
+      "en": "Spice, sizzle, and comfort",
+      "hi-en": "Ghar ka khana, dil ka sukoon"
+    },
+    "free": false,
+    "status": "coming_soon",
+    "accent": "#E65100",
+    "accentDark": "#8F3300",
+    "icon": "food",
+    "langs": ["en", "hi-en"]
+  },
+  {
+    "id": "nature-wild",
+    "title": { "en": "Nature & Wild", "hi-en": "Nature & Wild" },
+    "tagline": {
+      "en": "The untamed world",
+      "hi-en": "Jungle jungle baat chali hai"
+    },
+    "free": false,
+    "status": "coming_soon",
+    "accent": "#00695C",
+    "accentDark": "#003D33",
+    "icon": "nature",
+    "langs": ["en", "hi-en"]
+  }
+]

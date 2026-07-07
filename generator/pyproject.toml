@@ -18,6 +18,7 @@ dev = [
 
 [project.scripts]
 publish = "publish:main"
+build-packs = "build_packs:main"
 
 [build-system]
 requires = ["hatchling"]

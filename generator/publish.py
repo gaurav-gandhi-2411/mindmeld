@@ -159,8 +159,9 @@ def _collect_sync_plan(
     """
     Return a list of (src_file, dst_file) pairs that represent the sync plan.
 
-    Covers each lang subdirectory and manifest.json. Does NOT touch README.md,
-    .nojekyll, or any file not produced by the build.
+    Covers each lang subdirectory, manifest.json, and — if present — the
+    themed-pack tree (packs/{packId}/{lang}/*.json.gz + packs/manifest.json).
+    Does NOT touch README.md, .nojekyll, or any file not produced by the build.
     """
     plan: list[tuple[Path, Path]] = []
 
@@ -178,6 +179,15 @@ def _collect_sync_plan(
     src_manifest = src_dir / "manifest.json"
     if src_manifest.exists():
         plan.append((src_manifest, payloads_repo / "manifest.json"))
+
+    # Themed packs (Phase 6c): sync the whole packs/ tree verbatim if the
+    # pack builder produced one. No packs built this run → plan is unchanged.
+    src_packs_dir = src_dir / "packs"
+    if src_packs_dir.exists():
+        for src_file in sorted(src_packs_dir.rglob("*")):
+            if src_file.is_file():
+                rel = src_file.relative_to(src_packs_dir)
+                plan.append((src_file, payloads_repo / "packs" / rel))
 
     return plan
 

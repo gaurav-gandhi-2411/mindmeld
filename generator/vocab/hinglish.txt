@@ -506,3 +506,15 @@ diya	lamp
 tasveer	picture
 chhata	umbrella
 patang	kite
+# Phase 6c — Bollywood pack additions (eval-gated, fixtures P01–P11)
+natak	drama
+geet	song
+aansoo	tears
+kismat	destiny
+badla	revenge
+vaada	promise
+qurbani	sacrifice
+kahani	story
+sitara	star
+ladai	fight
+jawaani	youth

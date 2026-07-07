@@ -1,0 +1,3 @@
+# Cricket pack — Hinglish clues, one per line, keyed line-by-line to secrets_hi-en.txt
+# ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
+# Status: coming_soon, content pending authorship — do not add clues here (Phase 6c)

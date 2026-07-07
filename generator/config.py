@@ -87,6 +87,19 @@ def derive_salt(puzzle_date: date, lang: str) -> str:
     return hashlib.sha1(raw.encode()).hexdigest()[:16]  # noqa: S324
 
 
+def derive_salt_for_key(key: str, lang: str) -> str:
+    """
+    Return a 16-char hex salt for an opaque key (e.g. a pack puzzle key).
+
+    Same recipe as derive_salt, but takes an arbitrary opaque string in place
+    of a calendar date — used for themed-pack puzzles, which are keyed by
+    "{packId}-{NNN}" rather than an ISO date. derive_salt itself is left
+    untouched so daily payloads remain byte-identical.
+    """
+    raw = f"{key}{lang}{SALT_SUFFIX}"
+    return hashlib.sha1(raw.encode()).hexdigest()[:16]  # noqa: S324
+
+
 # ---------------------------------------------------------------------------
 # Obfuscation key for the secret reveal field "s"
 # ---------------------------------------------------------------------------

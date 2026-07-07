@@ -2,59 +2,26 @@ from __future__ import annotations
 
 """
 Spoiler gate: verify no clue leaks its own secret, alias, or morphological
-variant across the full 60-day window for both languages.
+variant across the full 60-day window for both languages, and across all
+themed-pack content (Phase 6c) that has been authored so far.
 
-Reuses payload._is_morphological_variant for token-level checks (same logic
-that caught 'oceans' for 'ocean' in the hint filter).
+Reuses build_packs.clue_leak_reason for the substring + token-level checks
+(the same predicate build_packs.py uses to gate pack builds at build time),
+which in turn reuses payload._is_morphological_variant (same logic that
+caught 'oceans' for 'ocean' in the hint filter).
 """
-
-import re
-from pathlib import Path
 
 import pytest
 
+from build_packs import aliases_for_secret, clue_leak_reason
 from clues import load_clues
-from normalize import load_alias_map
-from payload import _is_morphological_variant
+from packs import load_pack_clues, load_pack_secrets, load_packs_meta
 from schedule import load_schedule
-
-
-def _extract_tokens(text: str) -> list[str]:
-    """Return lowercase alpha tokens longer than 2 characters from text."""
-    return [t for t in re.findall(r"[a-z]+", text.lower()) if len(t) > 2]
-
-
-def _clue_leaks(clue: str, secret: str, aliases: list[str]) -> str | None:
-    """
-    Return an error description if the clue leaks the secret, else None.
-
-    Checks (in order):
-    1. Secret (or alias) appears as a substring anywhere in the lowercased clue.
-    2. Any token in the clue is a morphological variant of the secret or alias
-       (e.g. 'fires' → 'fire', 'campfire' contains 'fire').
-    """
-    clue_lower = clue.lower()
-    targets = [secret] + aliases
-
-    for target in targets:
-        # Check 1: direct substring
-        if target in clue_lower:
-            return f"direct substring '{target}'"
-
-        # Check 2: token-level morphological variant
-        for token in _extract_tokens(clue_lower):
-            if _is_morphological_variant(token, target):
-                return f"token '{token}' is morphological variant of '{target}'"
-
-    return None
 
 
 def _get_aliases(secret: str, lang: str) -> list[str]:
     """Return all aliases for `secret` in `lang` (hi-en only; returns [] for en)."""
-    if lang != "hi-en":
-        return []
-    alias_map = load_alias_map()
-    return [alias for alias, canonical in alias_map.items() if canonical == secret]
+    return aliases_for_secret(secret, lang)
 
 
 @pytest.mark.parametrize("lang", ["en", "hi-en"])
@@ -68,12 +35,58 @@ def test_spoiler_gate_full_window(lang: str) -> None:
     )
 
     failures: list[str] = []
-    for i, (clue, secret) in enumerate(zip(clues, schedule)):
+    for i, (clue, secret) in enumerate(zip(clues, schedule, strict=True)):
         aliases = _get_aliases(secret, lang)
-        leak = _clue_leaks(clue, secret, aliases)
+        leak = clue_leak_reason(clue, secret, aliases)
         if leak is not None:
-            failures.append(f"  [{lang}] line {i + 1}: secret='{secret}' — {leak}\n  Clue: {clue!r}")
+            failures.append(
+                f"  [{lang}] line {i + 1}: secret='{secret}' — {leak}\n  Clue: {clue!r}"
+            )
 
-    assert not failures, (
-        f"Spoiler gate FAILED for {len(failures)} clue(s):\n" + "\n".join(failures)
+    assert not failures, f"Spoiler gate FAILED for {len(failures)} clue(s):\n" + "\n".join(
+        failures
+    )
+
+
+def _pack_lang_cases() -> list[tuple[str, str]]:
+    """Return (pack_id, lang) pairs for every pack × lang declared in packs.json."""
+    return [(pack.id, lang) for pack in load_packs_meta() for lang in pack.langs]
+
+
+@pytest.mark.parametrize(("pack_id", "lang"), _pack_lang_cases())
+def test_spoiler_gate_pack_content(pack_id: str, lang: str) -> None:
+    """
+    No pack clue leaks its own secret, alias, or morphological variant.
+
+    Packs with comment-only content (0 secrets, e.g. bollywood pending
+    authorship) are skipped — this test automatically starts gating each
+    pack's clues the moment real content is authored, with no test changes
+    required.
+    """
+    packs_by_id = {pack.id: pack for pack in load_packs_meta()}
+    pack = packs_by_id[pack_id]
+
+    secrets = load_pack_secrets(pack, lang)
+    clues = load_pack_clues(pack, lang)
+
+    if not secrets:
+        pytest.skip(f"[{pack_id}/{lang}] no content authored yet")
+
+    assert len(clues) == len(secrets), (
+        f"[{pack_id}/{lang}] clue/secret count mismatch: "
+        f"{len(clues)} clues vs {len(secrets)} secrets"
+    )
+
+    failures: list[str] = []
+    for i, (secret, clue) in enumerate(zip(secrets, clues, strict=True)):
+        aliases = _get_aliases(secret, lang)
+        leak = clue_leak_reason(clue, secret, aliases)
+        if leak is not None:
+            failures.append(
+                f"  [{pack_id}/{lang}] line {i + 1}: secret='{secret}' — {leak}\n"
+                f"  Clue: {clue!r}"
+            )
+
+    assert not failures, f"Spoiler gate FAILED for {len(failures)} clue(s):\n" + "\n".join(
+        failures
     )

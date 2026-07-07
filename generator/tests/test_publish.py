@@ -65,6 +65,18 @@ def _make_fake_build_output(out_dir: Path, langs: list[str], puzzle_dates: list[
     (out_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 
 
+def _make_fake_pack_output(out_dir: Path, pack_id: str, langs: list[str], count: int) -> None:
+    """Create a realistic-looking themed-pack build output tree under out_dir/packs/."""
+    for lang in langs:
+        for idx in range(1, count + 1):
+            _write_gz(
+                out_dir / "packs" / pack_id / lang / f"{idx:03d}.json.gz",
+                {"pack": pack_id, "idx": idx},
+            )
+    manifest = {"v": 1, "packs": [{"id": pack_id, "count": count}]}
+    (out_dir / "packs" / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+
 def _init_local_git_remote(tmp_path: Path) -> tuple[Path, Path]:
     """
     Create a bare 'remote' repo and a clone of it.
@@ -228,6 +240,72 @@ class TestCollectSyncPlan:
         # Should not raise; hi-en simply not included.
         parents = {dst.parent.name for _, dst in plan if dst.name.endswith(".json.gz")}
         assert "hi-en" not in parents
+
+
+# ---------------------------------------------------------------------------
+# Tests: _collect_sync_plan — themed packs (Phase 6c)
+# ---------------------------------------------------------------------------
+
+
+class TestCollectSyncPlanPacks:
+    """Verify the sync plan picks up the packs/ tree when present, unchanged otherwise."""
+
+    def test_no_packs_dir_leaves_plan_unchanged(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        dates = [date(2026, 6, 12)]
+        _make_fake_build_output(src, ["en"], dates)
+        plan = _collect_sync_plan(src, payloads, ["en"])
+        assert not any("packs" in dst.parts for _, dst in plan)
+
+    def test_pack_payload_files_included(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_pack_output(src, "bollywood", ["en", "hi-en"], count=2)
+
+        plan = _collect_sync_plan(src, payloads, ["en", "hi-en"])
+        dst_paths = {dst for _, dst in plan}
+
+        for lang in ("en", "hi-en"):
+            for idx in ("001", "002"):
+                assert (payloads / "packs" / "bollywood" / lang / f"{idx}.json.gz") in dst_paths
+
+    def test_pack_manifest_included(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_pack_output(src, "bollywood", ["en"], count=1)
+
+        plan = _collect_sync_plan(src, payloads, ["en"])
+        dst_paths = {dst for _, dst in plan}
+        assert (payloads / "packs" / "manifest.json") in dst_paths
+
+    def test_daily_manifest_and_pack_manifest_do_not_collide(self, tmp_path: Path) -> None:
+        """The daily manifest.json and packs/manifest.json are distinct destinations."""
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_pack_output(src, "bollywood", ["en"], count=1)
+
+        plan = _collect_sync_plan(src, payloads, ["en"])
+        manifest_dsts = [dst for _, dst in plan if dst.name == "manifest.json"]
+        assert payloads / "manifest.json" in manifest_dsts
+        assert payloads / "packs" / "manifest.json" in manifest_dsts
+        assert len(manifest_dsts) == 2
+
+    def test_multiple_packs_all_included(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_pack_output(src, "bollywood", ["en", "hi-en"], count=1)
+        _make_fake_pack_output(src, "cricket", ["en", "hi-en"], count=0)
+
+        plan = _collect_sync_plan(src, payloads, ["en", "hi-en"])
+        dst_paths = {dst for _, dst in plan}
+        assert (payloads / "packs" / "bollywood" / "en" / "001.json.gz") in dst_paths
+        # cricket has count=0 → no payload files, but its manifest is a single
+        # shared packs/manifest.json, already asserted included above.
 
 
 # ---------------------------------------------------------------------------

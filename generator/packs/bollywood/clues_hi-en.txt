@@ -1,0 +1,29 @@
+# Bollywood pack — Hinglish clues, one per line, keyed line-by-line to secrets_hi-en.txt
+# ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
+# Written for an Indian player — culturally native, not translated
+# Phase 6c — authored for Mindmeld; pending GG review
+'Palat!' — woh palat gayi, toh samjho ho gaya
+Entry pe seeti, aakhri reel mein sau gundo pe akela bhaari
+Gabbar, Mogambo, Shakaal — sab ka ek hi dhandha
+Shaadi ho ya item number, yeh hona hi hai
+Har mood ka Bollywood ilaaj — lyrics bhool jao toh la-la-la
+Nirupa Roy waala role — Deewar ki asli jeet
+Rona jhootha, awaaz uchi — ghar ho ya screen, full show
+Emotional scene ka proof — glycerine ho ya asli
+Woh line jis pe seetiyan aur taaliyan girti hain
+Jo likha hai, hoke rahega — filmo ka sabse bada bahana
+Chaand gawah — saat janam tak nibhana padega
+Bachpan ka zulm, ab bas ek hi mission
+Climax ke baad aati hai — 'inhe giraftaar kar lo!'
+Khandaan ki sabse keemti cheez — roz daav pe lagti hai
+Bade bhai ka signature move — apni khushi, bhai ke naam
+Picture ki jaan — jo aunty log pehle hi suna deti hain
+Interval se theek pehle — 'kya?! aisa socha bhi nahi tha!'
+Aasman mein bhi chamakta hai, poster pe bhi
+Aankhen laal, muthhi band — ab kuch tootne wala hai
+Ek akela, bees gunde — dhishoom dhishoom
+Building ki aunty se filmy magazine tak — sabka favourite time-pass
+Seeti bajaye, taali maare, first row se sikke phenke
+Item song ke hisaab se yeh phir kabhi nahi aati
+First day first show ka jugaad — housefull ho toh black mein
+Filmfare ki black lady — speech mein sab ko dhanyawaad
