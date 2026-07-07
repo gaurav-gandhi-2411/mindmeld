@@ -19,18 +19,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
+import 'package:mindmeld/notifications/notification_service.dart';
+import 'package:mindmeld/social/social_service.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 /// Wraps [SettingsScreen] in a [MaterialApp] so dialogs have a valid overlay.
+///
+/// `firebaseInitializer: () async => false` keeps the Notifications section
+/// (6b) from attempting a real `Firebase.initializeApp()` on the test VM —
+/// see the matching comment in iap_stub_test.dart for why that would
+/// otherwise hang until a 20s timeout and fail the test on a dangling Timer.
 Widget _buildSettings() {
   return MaterialApp(
     home: SettingsScreen(
       currentLang: 'en',
       onLangChanged: (_) {},
       onReplayOnboarding: () {},
+      notificationService: NotificationService(
+        socialService: SocialService(firebaseInitializer: () async => false),
+      ),
     ),
   );
 }

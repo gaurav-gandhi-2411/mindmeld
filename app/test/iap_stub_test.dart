@@ -12,6 +12,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
+import 'package:mindmeld/notifications/notification_service.dart';
+import 'package:mindmeld/social/social_service.dart';
 import 'package:mindmeld/stubs/iap_stub.dart';
 
 // ---------------------------------------------------------------------------
@@ -20,6 +22,16 @@ import 'package:mindmeld/stubs/iap_stub.dart';
 
 /// Wraps [SettingsScreen] in a [MaterialApp] with a [ScaffoldMessenger] so
 /// snackbars triggered by IAP taps have a valid overlay context.
+///
+/// [SettingsScreen]'s Notifications section (6b) calls
+/// [NotificationService.currentPermission] from initState, which now ensures
+/// Firebase is ready first (see notification_service_test.dart's "Firebase
+/// readiness gate" regression tests). Without a `firebaseInitializer`
+/// override here, that would attempt a REAL `Firebase.initializeApp()` on
+/// the test VM and hang until its 20s timeout, leaving a dangling Timer the
+/// test framework flags as a leak. `firebaseInitializer: () async => false`
+/// short-circuits before either the real Firebase or FCM client is ever
+/// touched — this test suite doesn't exercise notifications at all.
 Widget _buildSettingsScreen({
   String currentLang = 'en',
 }) {
@@ -28,6 +40,9 @@ Widget _buildSettingsScreen({
       currentLang: currentLang,
       onLangChanged: (_) {},
       onReplayOnboarding: () {},
+      notificationService: NotificationService(
+        socialService: SocialService(firebaseInitializer: () async => false),
+      ),
     ),
   );
 }

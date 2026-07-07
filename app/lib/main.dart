@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,7 @@ import 'package:mindmeld/features/social/social_home_screen.dart';
 import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
 import 'package:mindmeld/social/social_service.dart';
+import 'package:mindmeld/stubs/analytics_stub.dart' show AnalyticsEvent;
 import 'package:mindmeld/core/reset_stub.dart'
     // ignore: uri_does_not_exist
     if (dart.library.html) 'package:mindmeld/core/reset_web.dart';
@@ -245,6 +247,15 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
     // Web-only /join/{code} deep link — a no-op stub on native.
     final joinCode = kIsWeb ? extractJoinCode() : null;
     if (joinCode != null) clearJoinPath();
+
+    // ?notif=1: a real click-through from a delivered daily notification
+    // (phase 6b). Fire-and-forget so a slow/offline analytics write never
+    // delays boot; the app already lands on today's puzzle with no special
+    // routing needed.
+    if (kIsWeb && hasNotifOpenParam()) {
+      unawaited(_exporter.logEvent(AnalyticsEvent.notificationOpened));
+      stripNotifOpenParam();
+    }
 
     if (mounted) {
       setState(() {

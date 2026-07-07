@@ -5,6 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/features/notifications/notification_opt_in_card.dart';
+import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 
 import 'share_stub.dart'
@@ -116,6 +118,7 @@ class WinScreen extends StatefulWidget {
     this.currentStreak = 0,
     this.exporter,
     this.onChallengeGroup,
+    this.notificationService,
   });
 
   final String secret;
@@ -149,12 +152,28 @@ class WinScreen extends StatefulWidget {
   /// the button (e.g. in tests that don't wire social navigation).
   final VoidCallback? onChallengeGroup;
 
+  /// Optional [NotificationService] override for tests. When null
+  /// [buildNotificationService] is used by [NotificationOptInCard].
+  final NotificationService? notificationService;
+
   @override
   State<WinScreen> createState() => _WinScreenState();
 }
 
 class _WinScreenState extends State<WinScreen> {
   final _shareCardKey = GlobalKey();
+  bool _showNotifCard = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotifCard();
+  }
+
+  Future<void> _checkNotifCard() async {
+    final show = await shouldShowNotificationOptInCard(service: widget.notificationService);
+    if (mounted) setState(() => _showNotifCard = show);
+  }
 
   int get _puzzleNumber {
     try {
@@ -366,6 +385,16 @@ class _WinScreenState extends State<WinScreen> {
               ),
             ],
 
+            if (_showNotifCard) ...[
+              const SizedBox(height: 16),
+              NotificationOptInCard(
+                lang: widget.lang,
+                notificationService: widget.notificationService,
+                exporter: widget.exporter,
+                onDismissed: () => setState(() => _showNotifCard = false),
+              ),
+            ],
+
             const SizedBox(height: 32),
 
             Text(
@@ -419,6 +448,7 @@ class LossScreen extends StatefulWidget {
     this.gaveUp = false,
     this.exporter,
     this.onChallengeGroup,
+    this.notificationService,
   });
 
   final String secret;
@@ -452,12 +482,28 @@ class LossScreen extends StatefulWidget {
   /// the button (e.g. in tests that don't wire social navigation).
   final VoidCallback? onChallengeGroup;
 
+  /// Optional [NotificationService] override for tests. When null
+  /// [buildNotificationService] is used by [NotificationOptInCard].
+  final NotificationService? notificationService;
+
   @override
   State<LossScreen> createState() => _LossScreenState();
 }
 
 class _LossScreenState extends State<LossScreen> {
   final _shareCardKey = GlobalKey();
+  bool _showNotifCard = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotifCard();
+  }
+
+  Future<void> _checkNotifCard() async {
+    final show = await shouldShowNotificationOptInCard(service: widget.notificationService);
+    if (mounted) setState(() => _showNotifCard = show);
+  }
 
   int get _puzzleNumber {
     try {
@@ -637,6 +683,15 @@ class _LossScreenState extends State<LossScreen> {
                 onPressed: widget.onChallengeGroup,
                 icon: const Icon(Icons.groups),
                 label: const Text('Challenge your group'),
+              ),
+            ],
+            if (_showNotifCard) ...[
+              const SizedBox(height: 16),
+              NotificationOptInCard(
+                lang: widget.lang,
+                notificationService: widget.notificationService,
+                exporter: widget.exporter,
+                onDismissed: () => setState(() => _showNotifCard = false),
               ),
             ],
             const SizedBox(height: 32),

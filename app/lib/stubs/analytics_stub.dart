@@ -15,6 +15,18 @@ class AnalyticsEvent {
   static const String loss = 'loss';
   static const String rivalOutcome = 'rival_outcome';
   static const String returningPlayer = 'returning_player';
+
+  /// Fired when a player grants browser notification permission via the
+  /// win/loss-screen opt-in card or the Settings toggle (phase 6b).
+  static const String notificationPermissionGranted = 'notification_permission_granted';
+
+  /// Fired when a player dismisses the win/loss-screen opt-in card without
+  /// opting in (phase 6b) — never shown again after this per spec's "never nag".
+  static const String notificationOptInDismissed = 'notification_opt_in_dismissed';
+
+  /// Fired on cold boot when the app is opened via a `?notif=1` deep link —
+  /// i.e. a real click-through from a delivered daily notification (phase 6b).
+  static const String notificationOpened = 'notification_opened';
 }
 
 /// Analytics stub — logs events to the local SQLite ring buffer.

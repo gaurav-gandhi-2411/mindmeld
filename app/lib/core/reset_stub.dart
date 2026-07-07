@@ -3,3 +3,5 @@ library;
 
 void stripResetParam() {}
 bool hasResetParam() => false;
+void stripNotifOpenParam() {}
+bool hasNotifOpenParam() => false;

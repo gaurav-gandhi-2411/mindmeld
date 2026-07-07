@@ -3,6 +3,8 @@ import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
+import 'package:mindmeld/notifications/notification_client.dart';
+import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/iap_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,6 +38,9 @@ class SettingsScreen extends StatefulWidget {
     required this.onReplayOnboarding,
     /// Optional gateway override for tests. When null [buildIapGateway] is used.
     this.iapGateway,
+    /// Optional notification service override for tests. When null
+    /// [buildNotificationService] is used.
+    this.notificationService,
   });
 
   final String currentLang;
@@ -44,6 +49,9 @@ class SettingsScreen extends StatefulWidget {
 
   /// Optional IAP gateway; package-private for test injection.
   final IapGateway? iapGateway;
+
+  /// Optional notification service override; package-private for test injection.
+  final NotificationService? notificationService;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -65,14 +73,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _rivalEnabled = true;
   String _rivalTier = 'even';
 
+  late final NotificationService _notifService;
+  NotifPermission _notifPermission = NotifPermission.notDetermined;
+  bool _notifSubscribedLocally = false;
+  bool _notifBusy = false;
+
   @override
   void initState() {
     super.initState();
     _lang = widget.currentLang;
     _gateway = widget.iapGateway ?? buildIapGateway();
+    _notifService = widget.notificationService ?? buildNotificationService();
     _loadEntitlements();
     _checkPrivacyOptionsRequired();
     _loadRivalSettings();
+    _loadNotifState();
+  }
+
+  Future<void> _loadNotifState() async {
+    final permission = await _notifService.currentPermission();
+    final subscribed = await _notifService.isSubscribedLocally();
+    if (mounted) {
+      setState(() {
+        _notifPermission = permission;
+        _notifSubscribedLocally = subscribed;
+      });
+    }
+  }
+
+  /// Turning the Notifications toggle on/off. Denial at the browser level is
+  /// never re-prompted — [NotificationService.optIn] already enforces this,
+  /// but the honest subtitle text (see [_notifStatusText]) is what actually
+  /// prevents the user from expecting a prompt that will never come.
+  Future<void> _setNotifEnabled(bool value) async {
+    setState(() => _notifBusy = true);
+    try {
+      if (value) {
+        final result = await _notifService.optIn(lang: _lang);
+        if (!mounted) return;
+        final message = switch (result) {
+          OptInResult.success => 'Reminders are on.',
+          OptInResult.permissionDenied =>
+            'Notifications are blocked in your browser settings.',
+          OptInResult.iosNotInstalled =>
+            'Add Mindmeld to your Home Screen first to enable reminders.',
+          OptInResult.offlineOrError =>
+            "Couldn't turn on reminders — check your connection and try again.",
+        };
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      } else {
+        await _notifService.optOut();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Reminders are off.')),
+        );
+      }
+    } finally {
+      await _loadNotifState();
+      if (mounted) setState(() => _notifBusy = false);
+    }
+  }
+
+  /// Honest state text for the Notifications section — never claims a state
+  /// the app hasn't actually verified.
+  String _notifStatusText(bool enabled) {
+    if (_notifService.iosNotInstalled) {
+      return 'Add to Home Screen to enable notifications';
+    }
+    if (_notifPermission == NotifPermission.denied) {
+      return 'Notifications blocked in your browser settings';
+    }
+    return enabled ? 'On' : 'Off';
   }
 
   Future<void> _checkPrivacyOptionsRequired() async {
@@ -342,6 +413,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
           ],
+
+          // Notifications — real push delivery is web-only this phase
+          // (native push out of scope, see spec-phase6b.md); the toggle
+          // itself renders cross-platform since [NotificationService]
+          // degrades gracefully everywhere.
+          const Divider(),
+          const ListTile(
+            title: Text('Notifications'),
+            dense: true,
+            enabled: false,
+          ),
+          SwitchListTile(
+            title: const Text('Daily puzzle reminder'),
+            subtitle: Text(
+              _notifStatusText(_notifPermission == NotifPermission.granted &&
+                  _notifSubscribedLocally),
+            ),
+            value: _notifPermission == NotifPermission.granted && _notifSubscribedLocally,
+            onChanged: _notifBusy ? null : _setNotifEnabled,
+          ),
         ],
       ),
     );

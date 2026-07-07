@@ -102,6 +102,23 @@ class SocialService {
     return _firebaseReady && _client.currentUid != null;
   }
 
+  /// True if Firebase has ALREADY been initialised by some other explicit
+  /// action — zero network calls, and critically, never triggers
+  /// initialisation itself. Same local-only re-derivation as
+  /// [hasLocalIdentity] (see its doc comment), extracted as its own getter
+  /// for 6b: [NotificationService.currentPermission] is reachable from
+  /// `initState` of screens main.dart mounts eagerly via `IndexedStack`
+  /// (Settings — always; the win/loss opt-in card — on every win/loss), so
+  /// it must be able to answer honestly WITHOUT provisioning Firebase for a
+  /// player who has touched neither Social nor Notifications yet. Contrast
+  /// with [ensureFirebaseReady], which DOES trigger initialisation — correct
+  /// for [ensureSignedIn] and [NotificationService.optIn], both only ever
+  /// called after an explicit user action.
+  bool get isFirebaseReadyLocally {
+    if (!_firebaseReady) _firebaseReady = Firebase.apps.isNotEmpty;
+    return _firebaseReady;
+  }
+
   /// The signed-in uid, or null if there's no local identity yet. Used by UI
   /// to highlight "your" row in a leaderboard.
   String? get selfUidOrNull => hasLocalIdentity ? _client.currentUid : null;
@@ -154,13 +171,33 @@ class SocialService {
     }
   }
 
-  /// Silently provision (or resume) an anonymous identity. Returns null on
-  /// any failure (offline, misconfigured, timed out) — never throws.
-  Future<String?> ensureSignedIn() async {
+  /// Ensure `Firebase.initializeApp()` has run — WITHOUT signing in.
+  ///
+  /// Added for 6b: [NotificationClient.currentPermission] (checking browser
+  /// notification permission status) needs a live [FirebaseApp] to resolve
+  /// `FirebaseMessaging.instance` against, but must NOT force an anonymous
+  /// sign-in just to read local status — that would make merely opening the
+  /// Settings tab (mounted eagerly by main.dart's `IndexedStack`, well before
+  /// any explicit social/notification action) silently provision an identity
+  /// for every visitor, violating the "Firebase touched only on explicit
+  /// action" invariant far more than the bug this fixes. Returns false on any
+  /// failure (offline, misconfigured, timed out) — never throws. Idempotent
+  /// and safe to call from multiple independent [SocialService]/
+  /// [NotificationService] instances (see [hasLocalIdentity]'s doc comment
+  /// for why re-deriving from [Firebase.apps] rather than trusting a
+  /// per-instance cache matters).
+  Future<bool> ensureFirebaseReady() async {
+    if (!_firebaseReady) _firebaseReady = Firebase.apps.isNotEmpty;
     if (!_firebaseReady) {
       _firebaseReady = await _firebaseInitializer();
     }
-    if (!_firebaseReady) return null;
+    return _firebaseReady;
+  }
+
+  /// Silently provision (or resume) an anonymous identity. Returns null on
+  /// any failure (offline, misconfigured, timed out) — never throws.
+  Future<String?> ensureSignedIn() async {
+    if (!await ensureFirebaseReady()) return null;
     try {
       debugPrint('SocialService: [2/4] signInAnonymously() starting…');
       final uid = await _client.signInAnonymously().timeout(_kSocialOpTimeout);
