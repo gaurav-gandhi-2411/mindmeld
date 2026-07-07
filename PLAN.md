@@ -27,7 +27,7 @@ Spec: `spec-phase6c.md` (source of truth). Scope: pack SYSTEM + Bollywood flagsh
 - [x] 6b pushed; HEAD=origin/main=85979bc → spec committed 8b4e064
 - [x] Executor A done: packs.py, build_packs.py (`uv run build-packs --packs all --langs en,hi-en --out ../payloads --strict-sizes`), publish syncs packs/ tree, 4-pack scaffolding, pytest 336 passed + 8 pack-gate skips (activate with content), ruff clean on touched files. NOTE: publish.py does NOT invoke build-packs — pack publish = run build-packs into the dir publish syncs from (orchestrate at drop time).
 - [x] Bollywood content files written (packs/bollywood/*), hinglish.txt +11 words, hi-en-aliases.txt +14 entries, eval fixtures P01–P11. Generator suite GREEN: 349 passed, 6 skipped (empty stubs). Spoiler gate caught 5 subtle leaks during authoring (agar~pyar, paas~maa, her⊂mother, the⊂mother, one~song) — all reworded; audit script confirms 0 leaks across all 50 clues.
-- [ ] Executor B: Flutter pack system (catalog, selector, pack play, persistence v4, IAP, share, identity, tests)
+- [x] Executor B done: Flutter pack system (catalog, selector, pack play, persistence v4, IAP, share, identity). flutter test 376/376, analyze clean. Committed 83d98a8 (generator) + b3e75c4 (app), pushed.
 - [x] Bollywood content validated over 3 embedding rounds. FINAL 25 pairs (EN/hi-en):
   romance/pyaar, hero/hero, villain/villain, dance/naach, song/geet, mother/maa, drama/natak,
   tears/aansoo, dialogue/dialogue, destiny/kismat, promise/vaada, revenge/badla, police/police,
