@@ -19,8 +19,11 @@
 /// true, a flush loop drains unflushed events to Firebase:
 ///
 ///   - On [init] (app start).
-///   - After each successful [logEvent] call that pushes the unflushed count to
-///     a multiple of [_kFlushBatchSize] (10).
+///   - After each successful [logEvent] call: on web, every event triggers an
+///     immediate flush (tabs are usually closed rather than backgrounded, so
+///     [onResume] can't be relied on to ever fire). On native platforms, a
+///     flush triggers once the unflushed count reaches a multiple of
+///     [_kFlushBatchSize] (10), since [onResume] reliably fires there.
 ///   - On [onResume] (lifecycle hook — wired in main.dart via [WidgetsBinding]).
 ///
 /// Failed flushes (client throws) leave events in the ring buffer with
@@ -42,6 +45,7 @@ import 'dart:developer' as dev;
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/persistence.dart';
@@ -179,9 +183,17 @@ class FirebaseExporter implements AnalyticsExporter {
     // Always write to local ring buffer first — offline queue.
     await _persistence.logEvent(name, props ?? {});
 
-    // Trigger a proactive flush every [_kFlushBatchSize] unflushed events.
+    // Trigger a proactive flush. On web, flush every event: browser tabs are
+    // usually closed outright rather than backgrounded, so [onResume] often
+    // never fires and a batch-of-10 threshold would silently drop most short
+    // sessions' events. Native platforms keep the battery/network-friendly
+    // batch-of-[_kFlushBatchSize] behavior since [onResume] reliably fires
+    // when the OS backgrounds/foregrounds the app.
     final unflushed = await _persistence.exportUnflushedEvents();
-    if (unflushed.length % _kFlushBatchSize == 0 && unflushed.isNotEmpty) {
+    final shouldFlush = kIsWeb
+        ? unflushed.isNotEmpty
+        : unflushed.length % _kFlushBatchSize == 0 && unflushed.isNotEmpty;
+    if (shouldFlush) {
       await _flush();
     }
   }

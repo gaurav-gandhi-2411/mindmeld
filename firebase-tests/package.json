@@ -1,0 +1,19 @@
+{
+  "name": "firebase-tests",
+  "version": "1.0.0",
+  "description": "Firestore security rules emulator tests for spec.md #6a (Social). MUST be run from the REPO ROOT (not this dir) so firebase-tools picks up ../firebase.json (which points at ../firestore.rules) — see the run command below and docs/firebase-setup.md.",
+  "main": "rules.test.js",
+  "scripts": {
+    "test": "echo 'Run from the repo root instead: JAVA_HOME=<jdk21+> firebase-tests/node_modules/.bin/firebase emulators:exec --project demo-mindmeld-rules-test --only firestore \"node firebase-tests/rules.test.js\"' && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "firebase": "^12.15.0",
+    "firebase-tools": "^15.22.4",
+    "puppeteer-core": "^25.3.0"
+  }
+}

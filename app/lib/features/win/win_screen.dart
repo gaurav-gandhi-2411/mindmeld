@@ -115,6 +115,7 @@ class WinScreen extends StatefulWidget {
     this.hintsUsed = 0,
     this.currentStreak = 0,
     this.exporter,
+    this.onChallengeGroup,
   });
 
   final String secret;
@@ -143,6 +144,10 @@ class WinScreen extends StatefulWidget {
   /// When null, [buildAnalyticsExporter] is called to construct the default
   /// exporter.
   final AnalyticsExporter? exporter;
+
+  /// "Challenge your group" CTA — opens the social/groups screen. Null hides
+  /// the button (e.g. in tests that don't wire social navigation).
+  final VoidCallback? onChallengeGroup;
 
   @override
   State<WinScreen> createState() => _WinScreenState();
@@ -352,6 +357,15 @@ class _WinScreenState extends State<WinScreen> {
               ],
             ),
 
+            if (widget.onChallengeGroup != null) ...[
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: widget.onChallengeGroup,
+                icon: const Icon(Icons.groups),
+                label: const Text('Challenge your group'),
+              ),
+            ],
+
             const SizedBox(height: 32),
 
             Text(
@@ -404,6 +418,7 @@ class LossScreen extends StatefulWidget {
     this.hintsUsed = 0,
     this.gaveUp = false,
     this.exporter,
+    this.onChallengeGroup,
   });
 
   final String secret;
@@ -432,6 +447,10 @@ class LossScreen extends StatefulWidget {
   /// When null, [buildAnalyticsExporter] is called to construct the default
   /// exporter.
   final AnalyticsExporter? exporter;
+
+  /// "Challenge your group" CTA — opens the social/groups screen. Null hides
+  /// the button (e.g. in tests that don't wire social navigation).
+  final VoidCallback? onChallengeGroup;
 
   @override
   State<LossScreen> createState() => _LossScreenState();
@@ -612,6 +631,14 @@ class _LossScreenState extends State<LossScreen> {
                 ),
               ],
             ),
+            if (widget.onChallengeGroup != null) ...[
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: widget.onChallengeGroup,
+                icon: const Icon(Icons.groups),
+                label: const Text('Challenge your group'),
+              ),
+            ],
             const SizedBox(height: 32),
             if (widget.guesses.isNotEmpty) ...[
               Text(

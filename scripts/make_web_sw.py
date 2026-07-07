@@ -27,6 +27,14 @@ Fix: this script patches ``flutter_bootstrap.js`` to add
 and the registration runs normally.  We must keep ``serviceWorkerVersion``
 untouched so flutter.js's ``_getNewServiceWorker`` comparison still works.
 
+vercel.json
+-----------
+The canonical, version-controlled ``vercel.json`` (the ``/join/{code}`` SPA
+rewrite + Cache-Control headers) lives at ``app/web/vercel.json``. This
+script copies it into ``--build-dir`` on every run — see
+``_copy_vercel_config`` — so it's always present by the time the existing
+``Copy-Item ... web-dist/`` deploy step runs.
+
 Fetch strategy
 --------------
 - Same-origin GET for a pre-cached URL → cache-first (ignore query params,
@@ -49,6 +57,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -61,8 +70,23 @@ EXCLUDE_NAMES: frozenset[str] = frozenset(
     {
         "flutter_service_worker.js",
         ".last_build_id",
+        "vercel.json",
     }
 )
+
+# Canonical, VERSION-CONTROLLED source of vercel.json (rewrites + Cache-Control
+# headers). `flutter build web` does NOT copy arbitrary files out of app/web/
+# into the build output (verified empirically — it only handles a fixed set
+# of known assets: index.html, manifest.json, icons/, favicon.png, and files
+# referenced by web plugins), so this script copies it into the build dir
+# itself, once, right before the existing `Copy-Item ... web-dist/` deploy
+# step picks it up. This exists because a prior version of this file lived
+# ONLY inside web-dist/ (gitignored deploy-staging dir) with no tracked
+# source anywhere — an `rm -rf web-dist/*.json` during a later deploy
+# destroyed it with no way to recover the original rewrite + cache-control
+# rules from git history. Keeping the source of truth here means that
+# mistake is now a one-line `git checkout` away from being fixed.
+VERCEL_CONFIG_SOURCE: Path = Path(__file__).resolve().parent.parent / "app" / "web" / "vercel.json"
 
 # Directory segments that exclude any file underneath them.
 EXCLUDE_DIR_SEGMENTS: frozenset[str] = frozenset({".well-known"})
@@ -75,6 +99,29 @@ PAYLOAD_ORIGIN: str = "https://gaurav-gandhi-2411.github.io"
 
 # Maximum number of payload responses to keep in the runtime cache.
 PAYLOAD_CACHE_MAX: int = 8
+
+# Cap on how long Flutter's own bootstrap loader blocks app startup waiting
+# for the service worker to register/activate, in milliseconds.
+#
+# Root-caused live 2026-07-07 while chasing "create-group only works on the
+# SECOND cold-start attempt": Flutter's flutter.js loader (FlutterServiceWorkerLoader
+# class) calls `_flutter.loader.load({serviceWorkerSettings: {...}})`, and its
+# `load()` method AWAITS `loadServiceWorker()` before it ever loads
+# main.dart.js -- the whole app, including onboarding and every button, is
+# unpainted (a blank white page) until that promise settles. Flutter's own
+# default `timeoutMillis` for that wait is 4000ms, and a fresh registration on
+# a cold profile routinely takes 4000-4700ms wall-clock (confirmed via a
+# cold-profile headless-Chrome repro: "prepareServiceWorker took more than
+# 4000ms to resolve"), which was a BLANK, unresponsive page -- any tap in that
+# window (including the very first tap of a first-time visitor) lands on
+# nothing and is silently lost, forcing a second, later attempt after the app
+# finally paints. This is a regression from _patch_flutter_bootstrap() itself:
+# before it added `serviceWorkerUrl`, a fresh session had no existing
+# registration so the SW step short-circuited to Promise.resolve() with zero
+# delay. Registration keeps running in the background past the timeout (it is
+# a race, not a cancellation), so shortening the cap only shrinks the blank
+# window -- it does not disable caching.
+SW_REGISTRATION_TIMEOUT_MILLIS: int = 1000
 
 
 # ---------------------------------------------------------------------------
@@ -266,6 +313,24 @@ async function trimCache(cache, max) {{
 """
 
 
+def _copy_vercel_config(build_dir: Path) -> None:
+    """Copy the tracked vercel.json into *build_dir*. Fails loudly if missing.
+
+    A missing or forgotten vercel.json means the deployed site loses its
+    /join/{code} rewrite and its Cache-Control policy silently — better to
+    stop the deploy flow here than ship that regression.
+    """
+    if not VERCEL_CONFIG_SOURCE.is_file():
+        print(
+            f"ERROR: canonical vercel.json not found at {VERCEL_CONFIG_SOURCE}. "
+            "The deploy would ship without the /join/{code} rewrite or Cache-Control "
+            "headers. Restore it (git checkout) before deploying.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    shutil.copyfile(VERCEL_CONFIG_SOURCE, build_dir / "vercel.json")
+
+
 def _patch_flutter_bootstrap(build_dir: Path) -> bool:
     """Add ``serviceWorkerUrl`` to flutter_bootstrap.js so the SW is registered.
 
@@ -274,8 +339,9 @@ def _patch_flutter_bootstrap(build_dir: Path) -> bool:
     bootstrap only supplies ``serviceWorkerVersion``, so on a fresh session
     (no existing registration) the SW is silently skipped.
 
-    This function injects ``serviceWorkerUrl: 'flutter_service_worker.js?v=<ver>'``
-    next to ``serviceWorkerVersion`` to trigger the registration path.
+    This function injects ``serviceWorkerUrl: '/flutter_service_worker.js?v=<ver>'``
+    (root-absolute — see below) next to ``serviceWorkerVersion`` to trigger the
+    registration path.
 
     Returns True if the patch was applied (or was already present), False if
     the expected pattern was not found and no change was made.
@@ -307,9 +373,18 @@ def _patch_flutter_bootstrap(build_dir: Path) -> bool:
         return True
 
     # Inject serviceWorkerUrl immediately after the serviceWorkerVersion entry.
+    # MUST be root-absolute ("/flutter_service_worker.js"), not relative —
+    # verified live 2026-07-07: a user's first visit can be a deep link like
+    # /join/{code} (shared via WhatsApp before they've ever hit "/"), and a
+    # relative URL there resolves to /join/flutter_service_worker.js, which
+    # doesn't exist (only /join/(.*) itself is rewritten to index.html — see
+    # web-dist/vercel.json). That 404s as text/html, and the browser rejects
+    # the registration with "unsupported MIME type" — the SW silently never
+    # installs on exactly the entry point most first-time players use.
     replacement = (
         f'{match.group(1)},\n'
-        f'    serviceWorkerUrl: "flutter_service_worker.js?v={version}"'
+        f'    serviceWorkerUrl: "/flutter_service_worker.js?v={version}",\n'
+        f'    timeoutMillis: {SW_REGISTRATION_TIMEOUT_MILLIS}'
     )
     patched = source[: match.start()] + replacement + source[match.end() :]
     bootstrap_path.write_text(patched, encoding="utf-8")
@@ -343,6 +418,10 @@ def main(argv: list[str] | None = None) -> None:
     if not build_dir.is_dir():
         print(f"ERROR: build-dir does not exist: {build_dir}", file=sys.stderr)
         sys.exit(1)
+
+    if not args.dry_run:
+        _copy_vercel_config(build_dir)
+        print(f"Copied: {VERCEL_CONFIG_SOURCE} -> {build_dir / 'vercel.json'}")
 
     urls = _collect_files(build_dir)
     cache_name = _build_cache_name(build_dir)

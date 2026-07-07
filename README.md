@@ -80,10 +80,20 @@ redirect to the Vercel URL.
 # Build and deploy to Vercel (canonical production flow):
 cd app
 flutter build web --release --no-web-resources-cdn
-# Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap:
+# Guard: fails loudly if a Firebase web plugin (auth/firestore/analytics/core)
+# didn't register — see scripts/check_web_plugin_registrant.py docstring for why.
 cd ..
+uv run python scripts\check_web_plugin_registrant.py --project-dir app
+# Guard: fails loudly if the deploy domain isn't in Firebase Auth's authorized
+# domains — see scripts/check_authorized_domains.py docstring and the
+# "Authorized domains" section in docs/firebase-setup.md.
+uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --domain playmindmeld.vercel.app
+# Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap.
+# This also copies the tracked app/web/vercel.json (rewrites + Cache-Control
+# headers) into the build dir — web-dist/ is gitignored deploy staging only,
+# never the source of truth for vercel.json.
 uv run python scripts\make_web_sw.py --build-dir app\build\web
-Copy-Item app\build\web\* web-dist\ -Recurse -Force   # web-dist holds vercel.json
+Copy-Item app\build\web\* web-dist\ -Recurse -Force
 cd web-dist
 npx vercel deploy --prod --yes
 
@@ -91,6 +101,18 @@ npx vercel deploy --prod --yes
 cd ..\generator
 uv run publish --days 30
 ```
+
+**Deploying to a new/changed domain?** Firebase Auth only allows sign-in from
+domains in the project's *Authorized domains* list (Authentication → Settings
+→ Authorized domains in the Firebase console; `localhost` and the default
+`*.firebaseapp.com`/`*.web.app` domains are the only ones added automatically —
+a custom domain like `playmindmeld.vercel.app` is NOT added for you). Forgetting
+this step makes `signInAnonymously()` fail with a `[firebase_auth/channel-error]`
+that looks like a plugin-registration bug but isn't — see the 2026-07-07 incident
+note in `docs/firebase-setup.md`. `scripts/check_authorized_domains.py` (wired
+into the deploy flow above) checks this automatically and fails loudly instead
+of letting it happen silently again — add any new domain to the `--domain`
+flags in the README deploy block when it's added to the project.
 
 Payloads remain on GitHub Pages (`https://gaurav-gandhi-2411.github.io/mindmeld-payloads/`).
 The Vercel app fetches them from there; CORS is confirmed open on the Pages origin.

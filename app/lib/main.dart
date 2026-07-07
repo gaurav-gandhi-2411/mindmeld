@@ -19,11 +19,17 @@ import 'package:mindmeld/features/archive/archive_screen.dart';
 import 'package:mindmeld/features/onboarding/onboarding_screen.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
+import 'package:mindmeld/features/social/join_flow_screen.dart';
+import 'package:mindmeld/features/social/social_home_screen.dart';
 import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
+import 'package:mindmeld/social/social_service.dart';
 import 'package:mindmeld/core/reset_stub.dart'
     // ignore: uri_does_not_exist
     if (dart.library.html) 'package:mindmeld/core/reset_web.dart';
+import 'package:mindmeld/social/deep_link_stub.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) 'package:mindmeld/social/deep_link_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
@@ -177,6 +183,12 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   String? _lostSecret;
   DailyPayload? _lostPayload;
 
+  /// Join code extracted from a `/join/{code}` deep link on cold boot, or
+  /// null. Consumed (cleared) once [JoinFlowScreen] is dismissed. Shown
+  /// AFTER onboarding so a first-time user gets onboard -> name -> join,
+  /// while a returning user goes straight to the join confirm screen.
+  String? _pendingJoinCode;
+
   AnalyticsExporter get _exporter =>
       widget.exporter ?? buildAnalyticsExporter();
 
@@ -229,11 +241,17 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
     // lang was last written to SharedPreferences by a previous test.
     final lang =
         widget.overrides?.lang ?? await loadSelectedLang();
+
+    // Web-only /join/{code} deep link — a no-op stub on native.
+    final joinCode = kIsWeb ? extractJoinCode() : null;
+    if (joinCode != null) clearJoinPath();
+
     if (mounted) {
       setState(() {
         // If skipOnboarding override is set, always bypass the gate.
         _showOnboarding = !seen && !(widget.overrides?.skipOnboarding ?? false);
         _lang = lang;
+        _pendingJoinCode = joinCode;
         _initialised = true;
       });
     }
@@ -314,6 +332,15 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       );
     }
 
+    if (_pendingJoinCode != null) {
+      return JoinFlowScreen(
+        code: _pendingJoinCode!,
+        date: _today,
+        lang: _lang,
+        onDone: () => setState(() => _pendingJoinCode = null),
+      );
+    }
+
     if (_won) {
       return _WinShell(
         lang: _lang,
@@ -365,6 +392,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             onLangChanged: _onLangChanged,
             onReplayOnboarding: () => setState(() => _showOnboarding = true),
           ),
+          SocialHomeScreen(date: _today, lang: _lang),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -376,6 +404,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
               icon: Icon(Icons.history_edu_outlined), label: 'Practice'),
           NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Stats'),
           NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+          NavigationDestination(icon: Icon(Icons.groups), label: 'Friends'),
         ],
       ),
     );
@@ -428,6 +457,22 @@ class _WinShellState extends State<_WinShell> {
         _rivalTier = rivalTier;
       });
     }
+
+    // Fire-and-forget: writes to every group the player belongs to (no-op
+    // for solo/offline/signed-out players — see SocialService.hasLocalIdentity).
+    // Never awaited so the win screen never blocks on a network round-trip.
+    final par = widget.payload?.parGuesses;
+    if (state != null && par != null) {
+      final guessesUsed = state.guesses.length + state.hintsUsed;
+      buildSocialService().writeResultToAllGroups(
+        date: widget.date,
+        outcome: 'win',
+        guessesUsed: guessesUsed,
+        par: par,
+        scoreVsPar: guessesUsed - par,
+        lang: widget.lang,
+      );
+    }
   }
 
   @override
@@ -449,6 +494,9 @@ class _WinShellState extends State<_WinShell> {
       hintsUsed: _dayState!.hintsUsed,
       currentStreak: _stats?.currentStreak ?? 0,
       exporter: widget.exporter,
+      onChallengeGroup: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => SocialHomeScreen(date: widget.date, lang: widget.lang),
+      )),
     );
   }
 }
@@ -496,6 +544,20 @@ class _LossShellState extends State<_LossShell> {
         _rivalTier = rivalTier;
       });
     }
+
+    // Fire-and-forget (see _WinShellState._load for the matching win path).
+    final par = widget.payload?.parGuesses;
+    if (state != null && par != null) {
+      final guessesUsed = state.guesses.length + state.hintsUsed;
+      buildSocialService().writeResultToAllGroups(
+        date: widget.date,
+        outcome: 'loss',
+        guessesUsed: guessesUsed,
+        par: par,
+        scoreVsPar: guessesUsed - par,
+        lang: widget.lang,
+      );
+    }
   }
 
   @override
@@ -520,6 +582,9 @@ class _LossShellState extends State<_LossShell> {
       hintsUsed: _dayState!.hintsUsed,
       gaveUp: gaveUp,
       exporter: widget.exporter,
+      onChallengeGroup: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => SocialHomeScreen(date: widget.date, lang: widget.lang),
+      )),
     );
   }
 }
