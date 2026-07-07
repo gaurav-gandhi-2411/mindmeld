@@ -35,6 +35,24 @@ script copies it into ``--build-dir`` on every run — see
 ``_copy_vercel_config`` — so it's always present by the time the existing
 ``Copy-Item ... web-dist/`` deploy step runs.
 
+FCM background messaging (firebase-messaging-sw.js) — NOT in this file
+------------------------------------------------------------------------
+This SW (the one this script generates, registered at scope ``/``) does
+**not** contain any FCM/push-messaging code. firebase_messaging_web's
+``getToken()`` has no supported way to redirect to a custom-named SW — the
+Firebase JS SDK always registers a SW literally named
+``firebase-messaging-sw.js`` at the site root, scoped to
+``/firebase-cloud-messaging-push-scope``. That registration is lazy (only
+triggered the first time a user opts into notifications, never during
+initial page load) and its scope never competes with this SW's ``/`` scope
+for real page/asset traffic, so the two coexist safely as genuinely separate
+files. ``firebase-messaging-sw.js`` is copied+templated into the build dir
+by ``_copy_firebase_messaging_sw`` the same way ``vercel.json`` is, and is
+excluded from this SW's own PRECACHE list (see ``EXCLUDE_NAMES``) since it
+is a separate SW, not an app-shell asset for this one to manage. See
+spec-phase6b.md's "Service worker integration (PRIME technical risk)"
+section for the full rationale.
+
 Fetch strategy
 --------------
 - Same-origin GET for a pre-cached URL → cache-first (ignore query params,
@@ -71,6 +89,7 @@ EXCLUDE_NAMES: frozenset[str] = frozenset(
         "flutter_service_worker.js",
         ".last_build_id",
         "vercel.json",
+        "firebase-messaging-sw.js",
     }
 )
 
@@ -87,6 +106,42 @@ EXCLUDE_NAMES: frozenset[str] = frozenset(
 # rules from git history. Keeping the source of truth here means that
 # mistake is now a one-line `git checkout` away from being fixed.
 VERCEL_CONFIG_SOURCE: Path = Path(__file__).resolve().parent.parent / "app" / "web" / "vercel.json"
+
+# Canonical, VERSION-CONTROLLED source of the FCM background-message SW. See
+# _copy_firebase_messaging_sw() for why this is copied+templated the same way
+# vercel.json is above, and spec-phase6b.md's "Service worker integration
+# (PRIME technical risk)" section for why it is a genuinely separate file from
+# flutter_service_worker.js rather than merged into it.
+FIREBASE_MESSAGING_SW_SOURCE: Path = (
+    Path(__file__).resolve().parent.parent / "app" / "web" / "firebase-messaging-sw.js"
+)
+
+# Single source of truth for the Firebase web config values templated into
+# firebase-messaging-sw.js — keeps the messaging SW's config from drifting
+# out of step with the Dart app's own Firebase.initializeApp() config.
+FIREBASE_WEB_OPTIONS_SOURCE: Path = (
+    Path(__file__).resolve().parent.parent
+    / "app"
+    / "lib"
+    / "analytics"
+    / "firebase_web_options.dart"
+)
+
+# Placeholder marker in the tracked firebase-messaging-sw.js source that gets
+# string-replaced with the real, extracted Firebase config object.
+FIREBASE_CONFIG_PLACEHOLDER: str = "__FIREBASE_CONFIG__"
+
+# Fields extracted from firebase_web_options.dart and templated into the
+# messaging SW's firebaseConfig object. measurementId is deliberately
+# excluded — it's Analytics-specific and not needed for messaging.
+FIREBASE_CONFIG_FIELDS: tuple[str, ...] = (
+    "apiKey",
+    "authDomain",
+    "projectId",
+    "storageBucket",
+    "messagingSenderId",
+    "appId",
+)
 
 # Directory segments that exclude any file underneath them.
 EXCLUDE_DIR_SEGMENTS: frozenset[str] = frozenset({".well-known"})
@@ -331,6 +386,85 @@ def _copy_vercel_config(build_dir: Path) -> None:
     shutil.copyfile(VERCEL_CONFIG_SOURCE, build_dir / "vercel.json")
 
 
+def _extract_firebase_web_config() -> dict[str, str]:
+    """Regex-extract the Firebase web config fields out of the tracked Dart source.
+
+    Reads ``FIREBASE_WEB_OPTIONS_SOURCE`` (the single source of truth for the
+    Dart app's own ``FirebaseOptions``) and pulls each name in
+    ``FIREBASE_CONFIG_FIELDS`` out with a named-capture regex of the form
+    ``field:\\s*"value"``. Exits loudly (``sys.exit(1)``) if the source file is
+    missing or any expected field can't be found — a silently-stale or
+    partially-extracted config would ship a messaging SW that can never
+    authenticate, and that failure mode is invisible until a real device
+    tries to subscribe.
+    """
+    if not FIREBASE_WEB_OPTIONS_SOURCE.is_file():
+        print(
+            f"ERROR: firebase_web_options.dart not found at {FIREBASE_WEB_OPTIONS_SOURCE}. "
+            "Cannot extract the Firebase web config needed by firebase-messaging-sw.js.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    source = FIREBASE_WEB_OPTIONS_SOURCE.read_text(encoding="utf-8")
+    config: dict[str, str] = {}
+    for field in FIREBASE_CONFIG_FIELDS:
+        match = re.search(rf'{field}:\s*"([^"]+)"', source)
+        if match is None:
+            print(
+                f"ERROR: could not extract '{field}' from {FIREBASE_WEB_OPTIONS_SOURCE}. "
+                "The Firebase web config is incomplete — fix the Dart source before "
+                "building.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        config[field] = match.group(1)
+    return config
+
+
+def _copy_firebase_messaging_sw(build_dir: Path) -> None:
+    """Copy+template the tracked firebase-messaging-sw.js into *build_dir*.
+
+    Mirrors ``_copy_vercel_config`` above: the canonical source lives under
+    version control at ``app/web/`` (not just in gitignored build/deploy
+    output), and this script is responsible for getting it into the build
+    dir on every run. Additionally templates the real Firebase web config
+    values (extracted from ``firebase_web_options.dart``) over the
+    ``__FIREBASE_CONFIG__`` placeholder in the tracked source, mirroring how
+    ``_patch_flutter_bootstrap`` does targeted string patching — this keeps
+    the messaging SW's config from ever drifting out of step with the Dart
+    app's own Firebase config, since there is exactly one place the values
+    are hand-typed.
+
+    Fails loudly if the tracked source is missing or the placeholder marker
+    is not found (the latter would silently ship a SW that can't
+    initialize).
+    """
+    if not FIREBASE_MESSAGING_SW_SOURCE.is_file():
+        print(
+            f"ERROR: canonical firebase-messaging-sw.js not found at "
+            f"{FIREBASE_MESSAGING_SW_SOURCE}. Background push notifications would "
+            "silently fail to register. Restore it (git checkout) before deploying.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    template = FIREBASE_MESSAGING_SW_SOURCE.read_text(encoding="utf-8")
+    if FIREBASE_CONFIG_PLACEHOLDER not in template:
+        print(
+            f"ERROR: {FIREBASE_MESSAGING_SW_SOURCE} is missing the "
+            f"{FIREBASE_CONFIG_PLACEHOLDER} placeholder — cannot template in the real "
+            "Firebase config.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    config = _extract_firebase_web_config()
+    config_literal = json.dumps(config, indent=2)
+    rendered = template.replace(FIREBASE_CONFIG_PLACEHOLDER, config_literal)
+    (build_dir / "firebase-messaging-sw.js").write_text(rendered, encoding="utf-8")
+
+
 def _patch_flutter_bootstrap(build_dir: Path) -> bool:
     """Add ``serviceWorkerUrl`` to flutter_bootstrap.js so the SW is registered.
 
@@ -422,6 +556,11 @@ def main(argv: list[str] | None = None) -> None:
     if not args.dry_run:
         _copy_vercel_config(build_dir)
         print(f"Copied: {VERCEL_CONFIG_SOURCE} -> {build_dir / 'vercel.json'}")
+        _copy_firebase_messaging_sw(build_dir)
+        print(
+            f"Copied+templated: {FIREBASE_MESSAGING_SW_SOURCE} -> "
+            f"{build_dir / 'firebase-messaging-sw.js'}"
+        )
 
     urls = _collect_files(build_dir)
     cache_name = _build_cache_name(build_dir)
