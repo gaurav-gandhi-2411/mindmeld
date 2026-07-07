@@ -44,6 +44,10 @@ class _RemoveAdsGateway implements IapGateway {
 
   @override
   Future<void> consumeStreakFreeze() async {}
+
+  @override
+  Future<PurchaseOutcome> purchasePack(String packId) async =>
+      PurchaseOutcome.comingSoon;
 }
 
 // ---------------------------------------------------------------------------

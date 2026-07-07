@@ -233,5 +233,55 @@ void main() {
           won: true);
       expect(text, isNot(contains('day streak')));
     });
+
+    // -----------------------------------------------------------------------
+    // Themed packs (phase 6c) — packName changes line 1's format; daily output
+    // (packName omitted) must stay byte-identical to every test above.
+    // -----------------------------------------------------------------------
+
+    test('pack game renders "Mindmeld · Bollywood #3 ..." on line 1', () {
+      final guesses = makeGuesses([TemperatureBand.win]);
+      final text = buildShareCard(
+        guesses: guesses,
+        puzzleNumber: 3,
+        lang: 'en',
+        packName: 'Bollywood',
+        won: true,
+      );
+      final line1 = text.split('\n').first;
+      expect(line1, startsWith('Mindmeld · Bollywood #3 (English)'));
+    });
+
+    test('pack game with Hinglish lang shows the Hinglish label after the pack name', () {
+      final guesses = makeGuesses([TemperatureBand.hot]);
+      final text = buildShareCard(
+        guesses: guesses,
+        puzzleNumber: 12,
+        lang: 'hi-en',
+        packName: 'Cricket',
+        won: false,
+      );
+      final line1 = text.split('\n').first;
+      expect(line1, startsWith('Mindmeld · Cricket #12 (Hinglish)'));
+    });
+
+    test('daily game (packName omitted) is byte-identical to the pre-pack format', () {
+      final guesses = makeGuesses([TemperatureBand.scorching]);
+      final withoutPackName = buildShareCard(
+        guesses: guesses,
+        puzzleNumber: 42,
+        lang: 'en',
+      );
+      final explicitNullPackName = buildShareCard(
+        guesses: guesses,
+        puzzleNumber: 42,
+        lang: 'en',
+        packName: null,
+      );
+      expect(withoutPackName, equals(explicitNullPackName));
+      final line1 = withoutPackName.split('\n').first;
+      expect(line1, equals('Mindmeld #42 (English)  💀'));
+      expect(line1, isNot(contains('·')));
+    });
   });
 }

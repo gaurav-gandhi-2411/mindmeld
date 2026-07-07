@@ -3,10 +3,13 @@
 /// On native platforms the sqflite platform-channel factory is used.
 /// On web, sqflite_common_ffi_web provides a WASM/IndexedDB backend.
 ///
-/// Schema (v3):
-///   day_state  — one row per (date, lang): guess history, hints, won/gaveUp.
-///   stats      — one row per lang: played, wins, streaks, distribution.
-///   analytics  — ring buffer max 500 rows; FIFO eviction; flushed flag.
+/// Schema (v4):
+///   day_state      — one row per (date, lang): guess history, hints, won/gaveUp.
+///   stats          — one row per lang: played, wins, streaks, distribution.
+///   analytics      — ring buffer max 500 rows; FIFO eviction; flushed flag.
+///   pack_progress  — one row per (pack_id, idx, lang): themed-pack puzzle
+///                    state (phase 6c). Deliberately separate from day_state/
+///                    stats so pack play never touches the daily streak.
 library;
 
 import 'dart:convert';
@@ -56,7 +59,7 @@ class SqliteStore implements StorageBackend {
     _db = await factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: 3,
+        version: 4,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       ),
@@ -111,10 +114,13 @@ class SqliteStore implements StorageBackend {
         flushed INTEGER NOT NULL DEFAULT 0
       )
     ''');
+
+    await db.execute(_createPackProgressSql);
   }
 
   /// v1 → v2: add revealed_hints_json to day_state.
   /// v2 → v3: add flushed column to analytics.
+  /// v3 → v4: add pack_progress table (phase 6c themed packs).
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
@@ -126,7 +132,24 @@ class SqliteStore implements StorageBackend {
         'ALTER TABLE analytics ADD COLUMN flushed INTEGER NOT NULL DEFAULT 0',
       );
     }
+    if (oldVersion < 4) {
+      await db.execute(_createPackProgressSql);
+    }
   }
+
+  static const String _createPackProgressSql = '''
+    CREATE TABLE IF NOT EXISTS pack_progress (
+      pack_id TEXT NOT NULL,
+      idx INTEGER NOT NULL,
+      lang TEXT NOT NULL,
+      guesses_json TEXT NOT NULL DEFAULT '[]',
+      hints_used INTEGER NOT NULL DEFAULT 0,
+      won INTEGER NOT NULL DEFAULT 0,
+      gave_up INTEGER NOT NULL DEFAULT 0,
+      revealed_hints_json TEXT NOT NULL DEFAULT '[]',
+      PRIMARY KEY (pack_id, idx, lang)
+    )
+  ''';
 
   // ---------------------------------------------------------------------------
   // Day state
@@ -178,6 +201,83 @@ class SqliteStore implements StorageBackend {
         'revealed_hints_json': hintsJson,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Themed-pack progress (phase 6c) — see class doc for the isolation invariant.
+  // ---------------------------------------------------------------------------
+
+  @override
+  Future<PackPuzzleState?> loadPackState(
+      String packId, int idx, String lang) async {
+    final rows = await _database.query(
+      'pack_progress',
+      where: 'pack_id = ? AND idx = ? AND lang = ?',
+      whereArgs: [packId, idx, lang],
+    );
+    if (rows.isEmpty) return null;
+    return _packStateFromRow(rows.first, packId, idx, lang);
+  }
+
+  @override
+  Future<void> savePackState(PackPuzzleState state) async {
+    final guessesJson = jsonEncode(state.guesses.map(_guessToJson).toList());
+    final hintsJson =
+        jsonEncode(state.revealedHints.map(_revealedHintToJson).toList());
+    await _database.insert(
+      'pack_progress',
+      {
+        'pack_id': state.packId,
+        'idx': state.idx,
+        'lang': state.lang,
+        'guesses_json': guessesJson,
+        'hints_used': state.hintsUsed,
+        'won': state.won ? 1 : 0,
+        'gave_up': state.gaveUp ? 1 : 0,
+        'revealed_hints_json': hintsJson,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  @override
+  Future<List<PackPuzzleState>> loadPackStatesForPack(
+      String packId, String lang) async {
+    final rows = await _database.query(
+      'pack_progress',
+      where: 'pack_id = ? AND lang = ?',
+      whereArgs: [packId, lang],
+    );
+    return rows
+        .map((row) => _packStateFromRow(row, packId, row['idx'] as int, lang))
+        .toList();
+  }
+
+  PackPuzzleState _packStateFromRow(
+    Map<String, dynamic> row,
+    String packId,
+    int idx,
+    String lang,
+  ) {
+    final guessesJson =
+        jsonDecode(row['guesses_json'] as String) as List<dynamic>;
+    final guesses = guessesJson.map(_guessFromJson).toList();
+    final rawHints = row['revealed_hints_json'];
+    final revealedHints = rawHints == null
+        ? <RevealedHint>[]
+        : (jsonDecode(rawHints as String) as List<dynamic>)
+            .map(_revealedHintFromJson)
+            .toList();
+    return PackPuzzleState(
+      packId: packId,
+      idx: idx,
+      lang: lang,
+      guesses: guesses,
+      hintsUsed: row['hints_used'] as int,
+      won: (row['won'] as int) == 1,
+      gaveUp: (row['gave_up'] as int) == 1,
+      revealedHints: revealedHints,
     );
   }
 
@@ -292,6 +392,7 @@ class SqliteStore implements StorageBackend {
     await _database.delete('day_state');
     await _database.delete('stats');
     await _database.delete('analytics');
+    await _database.delete('pack_progress');
   }
 
   // ---------------------------------------------------------------------------

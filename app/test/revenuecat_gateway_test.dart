@@ -15,6 +15,9 @@
 ///   6. Cancellation PlatformException → PurchaseOutcome.cancelled.
 ///   7. themedPacks always returns comingSoon without touching SDK.
 ///   8. buildIapGateway() returns stub when iapEnabled=false (default).
+///   9. (phase 6c) purchasePack(packId) maps to product id mm_pack_{packId}.
+///  10. (phase 6c) entitlement ids "pack_{packId}" parse into Entitlements.packs.
+///  11. (phase 6c) IapStubAdapter.purchasePack always returns comingSoon.
 library;
 
 import 'dart:io';
@@ -295,5 +298,59 @@ void main() {
     expect(e.removeAds, isFalse);
     expect(e.archive, isFalse);
     expect(e.streakFreezes, equals(0));
+    expect(e.packs, isEmpty);
+  });
+
+  // -------------------------------------------------------------------------
+  // Phase 6c: themed-pack purchases (purchasePack, not the generic enum flow)
+  // -------------------------------------------------------------------------
+
+  group('Themed pack purchases (phase 6c)', () {
+    test('purchasePack maps packId to RC product id mm_pack_{packId}',
+        () async {
+      final fake = FakeRcClient(purchaseEntitlements: {'pack_bollywood'});
+      final gateway = RevenueCatGateway(apiKey: 'test_key', rcClient: fake);
+
+      final outcome = await gateway.purchasePack('bollywood');
+
+      expect(outcome, equals(PurchaseOutcome.success));
+      expect(fake.lastPurchasedProductId, equals('mm_pack_bollywood'));
+    });
+
+    test('entitlement ids "pack_{packId}" parse into Entitlements.packs',
+        () async {
+      final fake = FakeRcClient(
+        customerEntitlements: {'pack_bollywood', 'pack_cricket', kRcEntitlementRemoveAds},
+      );
+      final gateway = RevenueCatGateway(apiKey: 'test_key', rcClient: fake);
+
+      final entitlements = await gateway.current();
+
+      expect(entitlements.packs, equals({'bollywood', 'cricket'}));
+      expect(entitlements.removeAds, isTrue);
+    });
+
+    test('purchasePack SDK exception → PurchaseOutcome.failed without throwing',
+        () async {
+      final fake = FakeRcClient(shouldThrow: Exception('store unavailable'));
+      final gateway = RevenueCatGateway(apiKey: 'test_key', rcClient: fake);
+
+      final outcome = await gateway.purchasePack('bollywood');
+      expect(outcome, equals(PurchaseOutcome.failed));
+    });
+
+    test('purchasePack cancellation → PurchaseOutcome.cancelled', () async {
+      final fake = FakeRcClient(cancelPurchase: true);
+      final gateway = RevenueCatGateway(apiKey: 'test_key', rcClient: fake);
+
+      final outcome = await gateway.purchasePack('bollywood');
+      expect(outcome, equals(PurchaseOutcome.cancelled));
+    });
+
+    test('IapStubAdapter.purchasePack always returns comingSoon', () async {
+      final adapter = IapStubAdapter();
+      final outcome = await adapter.purchasePack('bollywood');
+      expect(outcome, equals(PurchaseOutcome.comingSoon));
+    });
   });
 }

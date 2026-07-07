@@ -2,9 +2,12 @@
 ///
 /// Storage layout (all keys prefixed "mm_"):
 ///
-///   mm_day_{date}_{lang}   → JSON object: DayState fields
-///   mm_stats_{lang}        → JSON object: PlayerStats + last_win_date
-///   mm_analytics           → JSON array: up to [_kMaxRows] event objects
+///   mm_day_{date}_{lang}                 → JSON object: DayState fields
+///   mm_stats_{lang}                      → JSON object: PlayerStats + last_win_date
+///   mm_analytics                         → JSON array: up to [_kMaxRows] event objects
+///   mm_pack_{packId}__{lang}__{idx}      → JSON object: PackPuzzleState fields
+///     (phase 6c; stored separately from mm_day_*/mm_stats_* so pack play can
+///     never affect the daily streak — see [AppPersistence] class doc).
 ///
 /// Analytics ring buffer:
 ///   Each event is a JSON object with keys:
@@ -104,6 +107,89 @@ class PrefsStore implements StorageBackend {
     final revealedHints = rawHints.map(_revealedHintFromJson).toList();
     return DayState(
       date: date,
+      lang: lang,
+      guesses: guesses,
+      hintsUsed: (m['hints_used'] as num).toInt(),
+      won: m['won'] as bool,
+      gaveUp: m['gave_up'] as bool,
+      revealedHints: revealedHints,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Themed-pack progress (phase 6c) — see class doc for the isolation invariant.
+  // ---------------------------------------------------------------------------
+
+  static String _packKeyPrefix(String packId, String lang) =>
+      'mm_pack_${packId}__${lang}__';
+
+  static String _packKey(String packId, int idx, String lang) =>
+      '${_packKeyPrefix(packId, lang)}$idx';
+
+  @override
+  Future<PackPuzzleState?> loadPackState(
+      String packId, int idx, String lang) async {
+    final raw = _p.getString(_packKey(packId, idx, lang));
+    if (raw == null) return null;
+    try {
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      return _packStateFromMap(m, packId, idx, lang);
+    } catch (e) {
+      dev.log('PrefsStore.loadPackState decode error: $e', name: 'PrefsStore');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> savePackState(PackPuzzleState state) async {
+    final m = {
+      'guesses': state.guesses.map(_guessToJson).toList(),
+      'hints_used': state.hintsUsed,
+      'won': state.won,
+      'gave_up': state.gaveUp,
+      'revealed_hints': state.revealedHints.map(_revealedHintToJson).toList(),
+    };
+    await _p.setString(
+      _packKey(state.packId, state.idx, state.lang),
+      jsonEncode(m),
+    );
+  }
+
+  @override
+  Future<List<PackPuzzleState>> loadPackStatesForPack(
+      String packId, String lang) async {
+    final prefix = _packKeyPrefix(packId, lang);
+    final keys = _p.getKeys().where((k) => k.startsWith(prefix));
+    final states = <PackPuzzleState>[];
+    for (final key in keys) {
+      final idx = int.tryParse(key.substring(prefix.length));
+      if (idx == null) continue;
+      final raw = _p.getString(key);
+      if (raw == null) continue;
+      try {
+        final m = jsonDecode(raw) as Map<String, dynamic>;
+        states.add(_packStateFromMap(m, packId, idx, lang));
+      } catch (e) {
+        dev.log('PrefsStore.loadPackStatesForPack decode error: $e',
+            name: 'PrefsStore');
+      }
+    }
+    return states;
+  }
+
+  PackPuzzleState _packStateFromMap(
+    Map<String, dynamic> m,
+    String packId,
+    int idx,
+    String lang,
+  ) {
+    final rawGuesses = m['guesses'] as List<dynamic>;
+    final guesses = rawGuesses.map(_guessFromJson).toList();
+    final rawHints = m['revealed_hints'] as List<dynamic>? ?? [];
+    final revealedHints = rawHints.map(_revealedHintFromJson).toList();
+    return PackPuzzleState(
+      packId: packId,
+      idx: idx,
       lang: lang,
       guesses: guesses,
       hintsUsed: (m['hints_used'] as num).toInt(),

@@ -117,6 +117,8 @@ class DailyPayload {
     this.parGuesses,
     this.clue,
     this.maxGuesses,
+    this.pack,
+    this.idx,
   });
 
   /// Payload schema version.
@@ -163,6 +165,12 @@ class DailyPayload {
   /// Maximum guesses (guesses + hints) before budget exhaustion triggers a
   /// loss. Null for pre-v3 payloads (no budget limit).
   final int? maxGuesses;
+
+  /// Themed-pack id this puzzle belongs to (phase 6c); null for daily payloads.
+  final String? pack;
+
+  /// 1-based puzzle index within [pack] (phase 6c); null for daily payloads.
+  final int? idx;
 
   factory DailyPayload.fromJson(Map<String, dynamic> json) {
     final rawWords = json['words'] as Map<String, dynamic>;
@@ -228,6 +236,9 @@ class DailyPayload {
       parGuesses: parGuesses,
       clue: clue,
       maxGuesses: maxGuesses,
+      // Phase 6c themed-pack fields — absent on daily payloads.
+      pack: json['pack'] as String?,
+      idx: json['idx'] as int?,
     );
   }
 }
@@ -339,6 +350,55 @@ class DayState {
   }) {
     return DayState(
       date: date,
+      lang: lang,
+      guesses: guesses ?? this.guesses,
+      hintsUsed: hintsUsed ?? this.hintsUsed,
+      won: won ?? this.won,
+      gaveUp: gaveUp ?? this.gaveUp,
+      revealedHints: revealedHints ?? this.revealedHints,
+    );
+  }
+}
+
+/// Persisted game state for one themed-pack puzzle (phase 6c).
+///
+/// Mirrors [DayState]'s shape exactly but is keyed by (packId, idx, lang)
+/// instead of (date, lang), and is persisted to a dedicated `pack_progress`
+/// table/store — never `day_state` or `stats` — so pack play can never affect
+/// the daily streak or stats.
+class PackPuzzleState {
+  const PackPuzzleState({
+    required this.packId,
+    required this.idx,
+    required this.lang,
+    required this.guesses,
+    required this.hintsUsed,
+    required this.won,
+    required this.gaveUp,
+    this.revealedHints = const [],
+  });
+
+  final String packId;
+  final int idx;
+  final String lang;
+  final List<Guess> guesses;
+  final int hintsUsed;
+  final bool won;
+  final bool gaveUp;
+  final List<RevealedHint> revealedHints;
+
+  bool get isFinished => won || gaveUp;
+
+  PackPuzzleState copyWith({
+    List<Guess>? guesses,
+    int? hintsUsed,
+    bool? won,
+    bool? gaveUp,
+    List<RevealedHint>? revealedHints,
+  }) {
+    return PackPuzzleState(
+      packId: packId,
+      idx: idx,
       lang: lang,
       guesses: guesses ?? this.guesses,
       hintsUsed: hintsUsed ?? this.hintsUsed,

@@ -3,10 +3,12 @@
 ///
 /// These tests verify:
 ///   1. All four IAP products are rendered in the settings screen.
-///   2. Themed Packs is visually distinguished as "coming soon" / disabled.
+///   2. Themed Packs (phase 6c) is a navigation row into the pack selector —
+///      not a purchase row — and is enabled/tappable.
 ///   3. Tapping a purchasable product surfaces the stub "coming soon" result
 ///      without crashing (snackbar appears).
-///   4. Tapping the disabled Themed Packs product has no effect.
+///   4. IapStub.isAvailable(themedPacks) stays false — it is no longer part
+///      of the generic purchase() flow (packs use IapGateway.purchasePack).
 library;
 
 import 'package:flutter/material.dart';
@@ -99,12 +101,12 @@ void main() {
   });
 
   // -------------------------------------------------------------------------
-  // Themed Packs is greyed / disabled
+  // Themed Packs is a navigation row (phase 6c)
   // -------------------------------------------------------------------------
 
-  group('Themed Packs is marked as coming soon and disabled', () {
+  group('Themed Packs is a navigation row into the pack selector', () {
     testWidgets(
-      'Themed Packs ListTile is disabled (enabled == false)',
+      'Themed Packs ListTile is enabled (enabled == true)',
       (tester) async {
         await tester.pumpWidget(_buildSettingsScreen());
         await tester.pump();
@@ -123,37 +125,50 @@ void main() {
           reason: 'Themed Packs ListTile must exist',
         );
 
-        // The tile should be disabled (enabled: false in SettingsScreen).
+        // The tile is now a navigation row (opens PackSelectorScreen), so it
+        // must be enabled/tappable rather than disabled.
         for (final tile in themedPacksTile) {
           expect(
             tile.enabled,
-            isFalse,
-            reason: 'Themed Packs must be disabled in Phase 1',
+            isTrue,
+            reason: 'Themed Packs is a navigation row, not a purchase row',
           );
         }
       },
     );
 
     testWidgets(
-      'Themed Packs shows a "Soon" chip as its trailing widget',
+      'Themed Packs no longer shows a "Soon" chip',
       (tester) async {
         await tester.pumpWidget(_buildSettingsScreen());
         await tester.pump();
 
-        // The settings screen renders a Chip(label: Text('Soon')) for
-        // unavailable products.
-        expect(find.widgetWithText(Chip, 'Soon'), findsOneWidget);
+        // No product row shows a "Soon" chip any more — Themed Packs was the
+        // only product with isAvailable==false, and it's now a nav row.
+        expect(find.widgetWithText(Chip, 'Soon'), findsNothing);
       },
     );
 
     testWidgets(
-      'Themed Packs ListTile onTap is null (not tappable)',
+      'tapping Themed Packs navigates away from Settings',
       (tester) async {
         await tester.pumpWidget(_buildSettingsScreen());
         await tester.pump();
 
-        // IapStub.isAvailable(themedPacks) == false → onTap set to null.
-        expect(IapStub.isAvailable(IapProduct.themedPacks), isFalse);
+        await tester.tap(
+          find.text(IapStub.productNames[IapProduct.themedPacks]!),
+        );
+        await tester.pump();
+        await tester.pump(); // let the pushed route's first frame build
+
+        // Settings' own "Themed Packs" row text is still mounted underneath
+        // (Navigator keeps prior routes in the tree), so a successful push
+        // means the label now appears TWICE: once in the Settings row, once
+        // as PackSelectorScreen's AppBar title. This is timing-independent —
+        // no need to wait on (or mock) the real manifest fetch.
+        expect(find.text(IapStub.productNames[IapProduct.themedPacks]!),
+            findsNWidgets(2),
+            reason: 'Navigating to PackSelectorScreen adds its own AppBar title');
       },
     );
   });

@@ -12,6 +12,9 @@ class MemoryStore implements StorageBackend {
   final Map<String, DayState> _days = {};
   final Map<String, _StatsRow> _stats = {};
   final List<Map<String, dynamic>> _analytics = [];
+  // Phase 6c themed-pack progress — separate map so pack play can never touch
+  // _days/_stats (see AppPersistence class doc for the isolation invariant).
+  final Map<String, PackPuzzleState> _packStates = {};
   int _nextId = 0;
 
   static const int _kMaxRows = 500;
@@ -27,6 +30,7 @@ class MemoryStore implements StorageBackend {
     _days.clear();
     _stats.clear();
     _analytics.clear();
+    _packStates.clear();
   }
 
   @override
@@ -36,6 +40,31 @@ class MemoryStore implements StorageBackend {
   @override
   Future<void> saveDayState(DayState state) async {
     _days['${state.date}_${state.lang}'] = state;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Themed-pack progress (phase 6c) — see class doc for the isolation invariant.
+  // ---------------------------------------------------------------------------
+
+  static String _packKey(String packId, int idx, String lang) =>
+      '${packId}_${idx}_$lang';
+
+  @override
+  Future<PackPuzzleState?> loadPackState(
+          String packId, int idx, String lang) async =>
+      _packStates[_packKey(packId, idx, lang)];
+
+  @override
+  Future<void> savePackState(PackPuzzleState state) async {
+    _packStates[_packKey(state.packId, state.idx, state.lang)] = state;
+  }
+
+  @override
+  Future<List<PackPuzzleState>> loadPackStatesForPack(
+      String packId, String lang) async {
+    return _packStates.values
+        .where((s) => s.packId == packId && s.lang == lang)
+        .toList();
   }
 
   @override
@@ -94,6 +123,7 @@ class MemoryStore implements StorageBackend {
     _days.clear();
     _stats.clear();
     _analytics.clear();
+    _packStates.clear();
     _nextId = 0;
   }
 }

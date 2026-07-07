@@ -166,6 +166,33 @@ class AppPersistence {
   Future<void> saveDayState(DayState state) => _store.saveDayState(state);
 
   // ---------------------------------------------------------------------------
+  // Themed-pack progress (phase 6c)
+  //
+  // CRITICAL INVARIANT: none of these methods ever touch day_state or stats —
+  // they are backed by a dedicated pack_progress table/store so pack play can
+  // never affect the daily streak. See test: pack_isolation_test.dart.
+  // ---------------------------------------------------------------------------
+
+  Future<PackPuzzleState?> loadPackState(String packId, int idx, String lang) =>
+      _store.loadPackState(packId, idx, lang);
+
+  Future<void> savePackState(PackPuzzleState state) =>
+      _store.savePackState(state);
+
+  /// Number of puzzles won so far in [packId] for [lang] — used by the pack
+  /// selector to render "x/count" progress.
+  Future<int> packProgress(String packId, String lang) async {
+    final states = await _store.loadPackStatesForPack(packId, lang);
+    return states.where((s) => s.won).length;
+  }
+
+  /// All persisted puzzle states for [packId] + [lang] — used by the pack
+  /// puzzle list screen to render per-puzzle won/attempted/unplayed status.
+  Future<List<PackPuzzleState>> loadPackStatesForPack(
+          String packId, String lang) =>
+      _store.loadPackStatesForPack(packId, lang);
+
+  // ---------------------------------------------------------------------------
   // Stats
   // ---------------------------------------------------------------------------
 

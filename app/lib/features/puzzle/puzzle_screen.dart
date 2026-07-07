@@ -35,7 +35,11 @@ class PuzzleScreen extends StatefulWidget {
     this.iapGateway,
     this.isPractice = false,
     this.exporter,
-  });
+    this.packId,
+    this.packIdx,
+    this.packTitle,
+  }) : assert(packId == null || packIdx != null,
+            'packIdx is required when packId is set');
 
   final String lang;
   final String date;
@@ -46,6 +50,18 @@ class PuzzleScreen extends StatefulWidget {
 
   /// When true, wins and losses are not recorded to persistent stats.
   final bool isPractice;
+
+  /// Themed-pack id (phase 6c). Non-null puts the screen into "pack mode":
+  /// the puzzle is fetched via [PayloadClient.fetchPack], progress is
+  /// persisted to the pack_progress store (never day_state/stats — see
+  /// [AppPersistence] class doc), and [packIdx]/[packTitle] must also be set.
+  final String? packId;
+
+  /// 1-based puzzle index within [packId]'s pack. Required when [packId] is set.
+  final int? packIdx;
+
+  /// Themed-pack display name shown in the app bar (phase 6c).
+  final String? packTitle;
 
   /// Optional override for the payload client (used in tests/integration tests).
   /// When null, a default [PayloadClient] is constructed (production behaviour).
@@ -115,15 +131,71 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   bool _rivalEnabled = true;
   String _rivalTier = 'even';
 
+  /// True when this screen is playing a themed-pack puzzle (phase 6c) rather
+  /// than the daily puzzle.
+  bool get _isPackMode => widget.packId != null;
+
+  /// True when guess/hint/give-up outcomes must NOT be written to the daily
+  /// stats/streak — practice mode and pack mode both qualify. Pack mode
+  /// additionally routes state through pack_progress instead of day_state
+  /// (see [_loadState]/[_saveState]).
+  bool get _skipStatsWrites => widget.isPractice || _isPackMode;
+
+  /// Converts a persisted [PackPuzzleState] into the local [DayState] shape
+  /// used by the rest of this widget, keyed by [widget.date] (the caller
+  /// passes the pack's synthetic "{packId}-{NNN}" date string).
+  DayState _fromPackState(PackPuzzleState p) => DayState(
+        date: widget.date,
+        lang: p.lang,
+        guesses: p.guesses,
+        hintsUsed: p.hintsUsed,
+        won: p.won,
+        gaveUp: p.gaveUp,
+        revealedHints: p.revealedHints,
+      );
+
+  PackPuzzleState _toPackState(DayState d) => PackPuzzleState(
+        packId: widget.packId!,
+        idx: widget.packIdx!,
+        lang: d.lang,
+        guesses: d.guesses,
+        hintsUsed: d.hintsUsed,
+        won: d.won,
+        gaveUp: d.gaveUp,
+        revealedHints: d.revealedHints,
+      );
+
+  /// Loads persisted state via the pack_progress path in pack mode, or
+  /// day_state otherwise.
+  Future<DayState?> _loadState() async {
+    if (_isPackMode) {
+      final packState = await AppPersistence.instance
+          .loadPackState(widget.packId!, widget.packIdx!, widget.lang);
+      return packState == null ? null : _fromPackState(packState);
+    }
+    return AppPersistence.instance.loadDayState(widget.date, widget.lang);
+  }
+
+  /// Persists [state] via the pack_progress path in pack mode, or day_state
+  /// otherwise. CRITICAL INVARIANT: pack mode never calls saveDayState.
+  Future<void> _saveState(DayState state) async {
+    if (_isPackMode) {
+      await AppPersistence.instance.savePackState(_toPackState(state));
+    } else {
+      await AppPersistence.instance.saveDayState(state);
+    }
+  }
+
   Future<void> _load() async {
     try {
       // Fetch payload and entitlements concurrently.
-      final payloadFuture = _client.fetch(widget.lang, widget.date);
+      final payloadFuture = _isPackMode
+          ? _client.fetchPack(widget.packId!, widget.packIdx!, widget.lang)
+          : _client.fetch(widget.lang, widget.date);
       final entitlementsFuture = _iapGateway.current();
       final payloadResult = await payloadFuture;
       final entitlements = await entitlementsFuture;
-      final existing = await AppPersistence.instance
-          .loadDayState(widget.date, widget.lang);
+      final existing = await _loadState();
       if (mounted) {
         setState(() {
           _payload = payloadResult.payload;
@@ -152,7 +224,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onLoss();
           });
-        } else if (existing == null && !widget.isPractice) {
+        } else if (existing == null && !_skipStatsWrites) {
           // Fresh start — fire puzzle_started and check day-2 return.
           final p = payloadResult.payload;
           await _analytics.logEvent(AnalyticsEvent.puzzleStarted, {
@@ -284,14 +356,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         gaveUp: budgetExhausted, // budget exhaustion treated as a loss
       );
 
-      await AppPersistence.instance.saveDayState(newState);
+      await _saveState(newState);
       await _analytics.logEvent(AnalyticsEvent.guessMade, {
         'lang': widget.lang,
         'rank': entry.rank,
         'guess_number': newGuesses.length,
       });
 
-      if (won && !widget.isPractice) {
+      if (won && !_skipStatsWrites) {
         await AppPersistence.instance.recordWin(
           lang: widget.lang,
           guessCount: newGuesses.length,
@@ -307,7 +379,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
       }
 
-      if (budgetExhausted && !widget.isPractice) {
+      if (budgetExhausted && !_skipStatsWrites) {
         await AppPersistence.instance.recordLoss(lang: widget.lang);
         await _analytics.logEvent(AnalyticsEvent.loss, {
           'lang': widget.lang,
@@ -379,7 +451,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       revealedHints: newRevealedHints,
     );
 
-    await AppPersistence.instance.saveDayState(newState);
+    await _saveState(newState);
     await _analytics.logEvent(AnalyticsEvent.hintUsed, {
       'lang': widget.lang,
       'day': widget.date,
@@ -404,11 +476,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (maxG != null) {
       final effective = newState.guesses.length + newState.hintsUsed;
       if (effective >= maxG) {
-        if (!widget.isPractice) {
+        if (!_skipStatsWrites) {
           await AppPersistence.instance.recordLoss(lang: widget.lang);
         }
         final lostState = newState.copyWith(gaveUp: true);
-        await AppPersistence.instance.saveDayState(lostState);
+        await _saveState(lostState);
         if (mounted) setState(() => _dayState = lostState);
         await Future<void>.delayed(const Duration(milliseconds: 400));
         if (mounted) widget.onLoss();
@@ -441,8 +513,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     final payload = _payload!;
     final newState = state.copyWith(gaveUp: true);
-    await AppPersistence.instance.saveDayState(newState);
-    if (!widget.isPractice) {
+    await _saveState(newState);
+    if (!_skipStatsWrites) {
       await AppPersistence.instance.recordLoss(lang: widget.lang);
       await _analytics.logEvent(AnalyticsEvent.loss, {
         'lang': widget.lang,
@@ -616,9 +688,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       appBar: AppBar(
         title: Column(
           children: [
-            const Text('Mindmeld'),
+            Text(_isPackMode ? (widget.packTitle ?? 'Mindmeld') : 'Mindmeld'),
             Text(
-              '${_formatDate()}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}',
+              _isPackMode
+                  ? 'Puzzle #${widget.packIdx}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}'
+                  : '${_formatDate()}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}',
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],

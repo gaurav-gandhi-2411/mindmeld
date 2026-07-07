@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/features/packs/pack_selector_screen.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
 import 'package:mindmeld/notifications/notification_client.dart';
@@ -212,6 +213,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  /// Opens the themed-pack selector (phase 6c) — replaces the old "Soon"
+  /// stub row now that packs have a real purchase/play flow.
+  void _openPacks() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(builder: (_) => PackSelectorScreen(lang: _lang)),
+    );
+  }
+
   Future<void> _restore() async {
     await _gateway.restore();
     await _loadEntitlements();
@@ -292,7 +302,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             dense: true,
             enabled: false,
           ),
-          ...IapProduct.values.map(
+          // Themed Packs (phase 6c) is a navigation row, not a purchase row —
+          // it opens the pack selector rather than IapGateway.purchase().
+          // Excluded from the generic products loop below.
+          ...IapProduct.values
+              .where((p) => p != IapProduct.themedPacks)
+              .map(
             (p) {
               final available = IapStub.isAvailable(p);
               // For the archive product, show unlocked state when entitled.
@@ -313,6 +328,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: available ? () => _purchase(p) : null,
               );
             },
+          ),
+          ListTile(
+            title: Text(IapStub.productNames[IapProduct.themedPacks] ?? 'Themed Packs'),
+            subtitle: const Text('Bollywood, Cricket, Food & more'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _openPacks,
           ),
 
           // Restore purchases (only visible when iap is wired up on native).

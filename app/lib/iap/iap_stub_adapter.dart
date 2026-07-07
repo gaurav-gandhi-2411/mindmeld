@@ -36,4 +36,8 @@ class IapStubAdapter implements IapGateway {
 
   @override
   Future<Entitlements> current() async => Entitlements.empty;
+
+  @override
+  Future<PurchaseOutcome> purchasePack(String packId) async =>
+      PurchaseOutcome.comingSoon;
 }

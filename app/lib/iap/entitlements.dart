@@ -51,6 +51,7 @@ class Entitlements {
     this.removeAds = false,
     this.archive = false,
     this.streakFreezes = 0,
+    this.packs = const {},
   });
 
   /// User has purchased the Remove Ads product.
@@ -62,12 +63,49 @@ class Entitlements {
   /// Number of unconsumed streak-freeze uses remaining.
   final int streakFreezes;
 
+  /// IDs of themed packs (phase 6c) the user has purchased.
+  final Set<String> packs;
+
   /// The null / nothing-unlocked state.
   static const Entitlements empty = Entitlements();
 
+  Entitlements copyWith({
+    bool? removeAds,
+    bool? archive,
+    int? streakFreezes,
+    Set<String>? packs,
+  }) {
+    return Entitlements(
+      removeAds: removeAds ?? this.removeAds,
+      archive: archive ?? this.archive,
+      streakFreezes: streakFreezes ?? this.streakFreezes,
+      packs: packs ?? this.packs,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Entitlements &&
+          runtimeType == other.runtimeType &&
+          removeAds == other.removeAds &&
+          archive == other.archive &&
+          streakFreezes == other.streakFreezes &&
+          packs.length == other.packs.length &&
+          packs.containsAll(other.packs));
+
+  @override
+  int get hashCode => Object.hash(
+        removeAds,
+        archive,
+        streakFreezes,
+        Object.hashAllUnordered(packs),
+      );
+
   @override
   String toString() =>
-      'Entitlements(removeAds: $removeAds, archive: $archive, streakFreezes: $streakFreezes)';
+      'Entitlements(removeAds: $removeAds, archive: $archive, '
+      'streakFreezes: $streakFreezes, packs: $packs)';
 }
 
 // ---------------------------------------------------------------------------
@@ -99,4 +137,10 @@ abstract class IapGateway {
   /// No-op when zero freezes remain. Implementations that do not track
   /// freezes may treat this as a no-op.
   Future<void> consumeStreakFreeze();
+
+  /// Attempt to purchase themed pack [packId] (phase 6c).
+  ///
+  /// Implementations MUST NOT throw — catch all SDK exceptions internally and
+  /// return [PurchaseOutcome.failed].
+  Future<PurchaseOutcome> purchasePack(String packId);
 }

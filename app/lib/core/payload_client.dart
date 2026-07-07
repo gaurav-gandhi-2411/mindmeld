@@ -86,4 +86,50 @@ class PayloadClient {
   /// Explicitly load from the bundled asset (public for testing).
   Future<PayloadResult> loadBundled(String lang, String date) =>
       _loadFromAsset(lang, date);
+
+  /// Fetch puzzle [idx] (1-based) of themed pack [packId] for [lang].
+  ///
+  /// Network fetch: GET {baseUrl}/packs/{packId}/{lang}/{NNN}.json.gz
+  /// Fallback:      assets/payloads/packs/{packId}/{lang}/{NNN}.json.gz
+  ///
+  /// [idx] is zero-padded to 3 digits (e.g. 1 -> "001") to match the
+  /// generator-side naming contract. Same timeout/fallback semantics as
+  /// [fetch].
+  Future<PayloadResult> fetchPack(String packId, int idx, String lang) async {
+    final idxStr = idx.toString().padLeft(3, '0');
+    try {
+      final url = Uri.parse('$_baseUrl/packs/$packId/$lang/$idxStr.json.gz');
+      final response = await _http.get(url).timeout(_timeout);
+      if (response.statusCode == 200) {
+        final payload = PayloadCodec.decode(
+          Uint8List.fromList(response.bodyBytes),
+        );
+        final result =
+            PayloadResult(payload: payload, source: PayloadSource.network);
+        lastSource = result.source;
+        return result;
+      }
+    } catch (_) {
+      // Fall through to bundled asset.
+    }
+
+    final result = await _loadPackFromAsset(packId, idx, lang);
+    lastSource = result.source;
+    return result;
+  }
+
+  /// Load a pack payload directly from bundled assets (used by tests).
+  Future<PayloadResult> _loadPackFromAsset(
+      String packId, int idx, String lang) async {
+    final idxStr = idx.toString().padLeft(3, '0');
+    final assetKey = 'assets/payloads/packs/$packId/$lang/$idxStr.json.gz';
+    final byteData = await _assets.load(assetKey);
+    final bytes = byteData.buffer.asUint8List();
+    final payload = PayloadCodec.decode(bytes);
+    return PayloadResult(payload: payload, source: PayloadSource.bundledAsset);
+  }
+
+  /// Explicitly load a pack payload from the bundled asset (public for testing).
+  Future<PayloadResult> loadBundledPack(String packId, int idx, String lang) =>
+      _loadPackFromAsset(packId, idx, lang);
 }

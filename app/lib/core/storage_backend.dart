@@ -56,6 +56,25 @@ abstract class StorageBackend {
   Future<void> saveStats(String lang, PlayerStats stats, DateTime? lastWinDate);
 
   // ---------------------------------------------------------------------------
+  // Themed-pack progress (phase 6c)
+  //
+  // Stored entirely separately from [day_state]/[stats] so pack play can never
+  // affect the daily streak — see [AppPersistence] class doc for the invariant.
+  // ---------------------------------------------------------------------------
+
+  /// Load the persisted state for pack puzzle (packId, idx, lang), or null.
+  Future<PackPuzzleState?> loadPackState(String packId, int idx, String lang);
+
+  /// Persist (upsert) [state] for its (packId, idx, lang) key.
+  Future<void> savePackState(PackPuzzleState state);
+
+  /// Load all persisted puzzle states for [packId] + [lang] (any idx).
+  ///
+  /// Used to render per-puzzle won/attempted/unplayed status in the pack
+  /// puzzle list and to compute won counts for the pack selector.
+  Future<List<PackPuzzleState>> loadPackStatesForPack(String packId, String lang);
+
+  // ---------------------------------------------------------------------------
   // Analytics ring buffer
   // ---------------------------------------------------------------------------
 

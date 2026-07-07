@@ -30,6 +30,10 @@ import 'share_stub.dart'
 /// - Par and rival lines are omitted when payload is v1 (parGuesses null).
 /// - [maxGuesses] shows the budget fraction on the par line (e.g. 6/15).
 /// - No secret word or guess words are ever included.
+///
+/// When [packName] is non-null (themed-pack puzzle, phase 6c), line 1 becomes:
+///   Mindmeld · $packName #N (English)  🟦🟦🟨🟧🟥⭐
+/// Daily output ([packName] null) is byte-identical to the original format.
 String buildShareCard({
   required List<Guess> guesses,
   required int puzzleNumber,
@@ -43,6 +47,8 @@ String buildShareCard({
   /// When null (the default), win is auto-detected from whether the last guess
   /// has [TemperatureBand.win] — preserving backward compatibility.
   bool? won,
+  /// Themed-pack display name (phase 6c); null for daily puzzles.
+  String? packName,
 }) {
   final langLabel = lang == 'hi-en' ? '(Hinglish)' : '(English)';
 
@@ -58,7 +64,9 @@ String buildShareCard({
     return e.value.band.emoji;
   }).join('');
 
-  final line1 = 'Mindmeld #$puzzleNumber $langLabel  $emojis';
+  final line1 = packName != null
+      ? 'Mindmeld · $packName #$puzzleNumber $langLabel  $emojis'
+      : 'Mindmeld #$puzzleNumber $langLabel  $emojis';
   final lines = <String>[line1];
 
   if (effectiveWon) {
@@ -119,6 +127,8 @@ class WinScreen extends StatefulWidget {
     this.exporter,
     this.onChallengeGroup,
     this.notificationService,
+    this.packName,
+    this.packPuzzleNumber,
   });
 
   final String secret;
@@ -156,6 +166,13 @@ class WinScreen extends StatefulWidget {
   /// [buildNotificationService] is used by [NotificationOptInCard].
   final NotificationService? notificationService;
 
+  /// Themed-pack display name (phase 6c); null for daily puzzles.
+  final String? packName;
+
+  /// 1-based puzzle number within [packName]'s pack (phase 6c); null for
+  /// daily puzzles, which derive their number from [date] instead.
+  final int? packPuzzleNumber;
+
   @override
   State<WinScreen> createState() => _WinScreenState();
 }
@@ -176,6 +193,7 @@ class _WinScreenState extends State<WinScreen> {
   }
 
   int get _puzzleNumber {
+    if (widget.packPuzzleNumber != null) return widget.packPuzzleNumber!;
     try {
       final start = DateTime(2026, 6, 12);
       final d = DateTime.parse(widget.date);
@@ -195,6 +213,7 @@ class _WinScreenState extends State<WinScreen> {
         rivalSolveAt: widget.rivalSolveAt,
         currentStreak: widget.currentStreak,
         won: true,
+        packName: widget.packName,
       );
 
   Future<void> _share(BuildContext context) async {
@@ -208,9 +227,11 @@ class _WinScreenState extends State<WinScreen> {
       'outcome': 'win',
     });
 
+    final shareTitle =
+        widget.packName != null ? 'Mindmeld · ${widget.packName}' : 'Mindmeld';
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
-        title: 'Mindmeld',
+        title: shareTitle,
         text: _shareText,
         url: 'https://playmindmeld.vercel.app/',
       );
@@ -329,6 +350,7 @@ class _WinScreenState extends State<WinScreen> {
             ),
             const SizedBox(height: 8),
             Text(
+              '${widget.packName != null ? '${widget.packName} ' : ''}'
               'Puzzle #$_puzzleNumber · ${widget.guesses.length} guess${widget.guesses.length == 1 ? '' : 'es'}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
@@ -449,6 +471,8 @@ class LossScreen extends StatefulWidget {
     this.exporter,
     this.onChallengeGroup,
     this.notificationService,
+    this.packName,
+    this.packPuzzleNumber,
   });
 
   final String secret;
@@ -486,6 +510,13 @@ class LossScreen extends StatefulWidget {
   /// [buildNotificationService] is used by [NotificationOptInCard].
   final NotificationService? notificationService;
 
+  /// Themed-pack display name (phase 6c); null for daily puzzles.
+  final String? packName;
+
+  /// 1-based puzzle number within [packName]'s pack (phase 6c); null for
+  /// daily puzzles, which derive their number from [date] instead.
+  final int? packPuzzleNumber;
+
   @override
   State<LossScreen> createState() => _LossScreenState();
 }
@@ -506,6 +537,7 @@ class _LossScreenState extends State<LossScreen> {
   }
 
   int get _puzzleNumber {
+    if (widget.packPuzzleNumber != null) return widget.packPuzzleNumber!;
     try {
       final start = DateTime(2026, 6, 12);
       final d = DateTime.parse(widget.date);
@@ -524,6 +556,7 @@ class _LossScreenState extends State<LossScreen> {
         hintsUsed: widget.hintsUsed,
         rivalSolveAt: widget.rivalSolveAt,
         won: false,
+        packName: widget.packName,
       );
 
   Future<void> _share(BuildContext context) async {
@@ -537,9 +570,11 @@ class _LossScreenState extends State<LossScreen> {
       'outcome': 'loss',
     });
 
+    final shareTitle =
+        widget.packName != null ? 'Mindmeld · ${widget.packName}' : 'Mindmeld';
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
-        title: 'Mindmeld',
+        title: shareTitle,
         text: _shareText,
         url: 'https://playmindmeld.vercel.app/',
       );
@@ -624,6 +659,7 @@ class _LossScreenState extends State<LossScreen> {
             ),
             const SizedBox(height: 8),
             Text(
+              '${widget.packName != null ? '${widget.packName} ' : ''}'
               'Puzzle #$_puzzleNumber · $langLabel · $reasonText',
               style: Theme.of(context).textTheme.titleMedium,
             ),

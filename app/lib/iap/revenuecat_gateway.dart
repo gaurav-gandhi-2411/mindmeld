@@ -21,6 +21,13 @@
 /// | archive         | archive_access         | archive_access     |
 /// | streakFreeze    | streak_freeze_3pack    | (consumable)       |
 /// | themedPacks     | —                      | —                  |
+///
+/// Themed packs (phase 6c) are purchased individually via [purchasePack],
+/// not the generic [purchase] product enum:
+///
+/// | Pack purchase        | RC product ID       | RC entitlement ID   |
+/// |-----------------------|----------------------|----------------------|
+/// | purchasePack(packId)  | mm_pack_{packId}    | pack_{packId}        |
 library;
 
 import 'dart:developer' as dev;
@@ -53,6 +60,11 @@ const String kRcEntitlementRemoveAds = 'remove_ads';
 
 /// RevenueCat entitlement identifier for Archive Access.
 const String kRcEntitlementArchiveAccess = 'archive_access';
+
+/// RevenueCat product identifier for a themed pack (phase 6c).
+///
+/// Entitlement id is `pack_{packId}` — see [_entitlementsFromIds].
+String rcProductIdForPack(String packId) => 'mm_pack_$packId';
 
 // ---------------------------------------------------------------------------
 // Thin-client value types
@@ -267,6 +279,38 @@ class RevenueCatGateway implements IapGateway {
   }
 
   @override
+  Future<PurchaseOutcome> purchasePack(String packId) async {
+    final productId = rcProductIdForPack(packId);
+    try {
+      await _ensureConfigured();
+      final result = await _rcClient.purchase(productId);
+
+      await _analytics.logEvent('purchase', {
+        'product': productId,
+        'entitlements': result.activeEntitlementIds.toList(),
+      });
+
+      return PurchaseOutcome.success;
+    } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        return PurchaseOutcome.cancelled;
+      }
+      dev.log(
+        'RevenueCatGateway.purchasePack failed: ${e.message}',
+        name: 'RevenueCatGateway',
+      );
+      return PurchaseOutcome.failed;
+    } catch (e) {
+      dev.log(
+        'RevenueCatGateway.purchasePack unexpected error: $e',
+        name: 'RevenueCatGateway',
+      );
+      return PurchaseOutcome.failed;
+    }
+  }
+
+  @override
   Future<Entitlements> current() async {
     try {
       await _ensureConfigured();
@@ -291,11 +335,22 @@ class RevenueCatGateway implements IapGateway {
       };
 
   /// Converts a set of active RC entitlement IDs to an [Entitlements] value.
-  Entitlements _entitlementsFromIds(Set<String> ids) => Entitlements(
-        removeAds: ids.contains(kRcEntitlementRemoveAds),
-        archive: ids.contains(kRcEntitlementArchiveAccess),
-        streakFreezes: _streakFreezes,
-      );
+  ///
+  /// Pack entitlements use the `pack_{packId}` convention (phase 6c); any
+  /// entitlement id with that prefix is parsed into [Entitlements.packs].
+  Entitlements _entitlementsFromIds(Set<String> ids) {
+    const packPrefix = 'pack_';
+    final packIds = ids
+        .where((id) => id.startsWith(packPrefix))
+        .map((id) => id.substring(packPrefix.length))
+        .toSet();
+    return Entitlements(
+      removeAds: ids.contains(kRcEntitlementRemoveAds),
+      archive: ids.contains(kRcEntitlementArchiveAccess),
+      streakFreezes: _streakFreezes,
+      packs: packIds,
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
