@@ -91,7 +91,9 @@ uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --
 # Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap.
 # This also copies the tracked app/web/vercel.json (rewrites + Cache-Control
 # headers) into the build dir — web-dist/ is gitignored deploy staging only,
-# never the source of truth for vercel.json.
+# never the source of truth for vercel.json. It also copies+templates the
+# tracked app/web/firebase-messaging-sw.js (FCM background messaging) with
+# the real Firebase web config values.
 uv run python scripts\make_web_sw.py --build-dir app\build\web
 Copy-Item app\build\web\* web-dist\ -Recurse -Force
 cd web-dist
