@@ -1,0 +1,44 @@
+name: Daily notification
+
+# Phase 6b scheduled sender (spec-phase6b.md "Scheduled sender (GitHub
+# Actions)"): broadcasts the daily "puzzle is live" push via FCM topics.
+# GitHub Actions cron instead of Cloud Functions is the whole point of the
+# $0/no-Blaze-plan architecture decision -- see scripts/send_daily_notification.py's
+# module docstring for the full rationale.
+
+run-name: >-
+  Daily notification${{ inputs.dry_run == true && ' (dry run)' || '' }}
+
+on:
+  schedule:
+    # 03:00 UTC = 08:30 IST (spec: India-first, ~8:30am IST single-time send).
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: query Firestore and build messages, but skip every mutating call"
+        type: boolean
+        default: false
+
+concurrency:
+  group: daily-notification
+  cancel-in-progress: true
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v8.3.1
+
+      - name: Send daily FCM topic broadcast
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            uv run scripts/send_daily_notification.py --dry-run
+          else
+            uv run scripts/send_daily_notification.py
+          fi
