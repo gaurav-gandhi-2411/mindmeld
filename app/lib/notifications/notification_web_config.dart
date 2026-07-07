@@ -25,4 +25,4 @@ library;
 
 /// Web Push VAPID public key — replace PLACEHOLDER before relying on real
 /// push delivery. See file doc comment for where to get the real value.
-const String notificationVapidKey = 'PLACEHOLDER';
+const String notificationVapidKey = 'BJgVsKF15CiDdvkxWuYe2BeOXIXUX0ejf5Oft6r8J2XOo_vyPrQWs48w5bQYX9WG4POyasj50hXjoxWhwOPI34c';
