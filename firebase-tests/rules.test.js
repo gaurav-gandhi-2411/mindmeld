@@ -81,6 +81,51 @@ async function main() {
     await assertFails(setDoc(doc(bob, 'users/alice'), { displayName: 'Not Alice' }, { merge: true }));
   });
 
+  // ---- users/{uid} — 6b notification fields ----
+  await check('a user can opt into notifications with NO displayName at all', async () => {
+    const dave = testEnv.authenticatedContext('dave').firestore();
+    await assertSucceeds(
+      setDoc(doc(dave, 'users/dave'), {
+        fcmToken: 'tok-dave-1', notifLang: 'en', timezone: 'Asia/Kolkata',
+        notifPendingAction: 'subscribe', notifUpdatedAt: serverTimestamp(),
+      }),
+    );
+  });
+  await check('a user can update just fcmToken without resending displayName', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice, 'users/alice'), {
+        fcmToken: 'tok-alice-1', notifPendingAction: 'subscribe', notifUpdatedAt: serverTimestamp(),
+      }, { merge: true }),
+    );
+  });
+  await check('unsubscribe: fcmToken/notifLang can be cleared to null', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice, 'users/alice'), {
+        fcmToken: null, notifLang: null, notifPendingAction: 'unsubscribe', notifUpdatedAt: serverTimestamp(),
+      }, { merge: true }),
+    );
+  });
+  await check('notifLang must be en or hi-en', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { notifLang: 'fr' }, { merge: true }),
+    );
+  });
+  await check('notifPendingAction must be subscribe/unsubscribe/null', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { notifPendingAction: 'do-it-now' }, { merge: true }),
+    );
+  });
+  await check('notifUpdatedAt cannot be backdated', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { notifUpdatedAt: new Date('2020-01-01') }, { merge: true }),
+    );
+  });
+  await check("a user still cannot write another user's notification fields", async () => {
+    await assertFails(
+      setDoc(doc(bob, 'users/alice'), { fcmToken: 'stolen' }, { merge: true }),
+    );
+  });
+
   // ---- groups/{groupId} create ----
   await check('unauthenticated cannot create a group', async () => {
     await assertFails(

@@ -1,9 +1,11 @@
 rules_version = '2';
 
-// Mindmeld 6a (Social) — Firestore security rules.
+// Mindmeld 6a (Social) + 6b (Notifications) — Firestore security rules.
 //
-// Data model (see spec.md #6a):
-//   users/{uid}                                  { displayName, createdAt, groupIds[] }
+// Data model (see spec.md #6a, spec-phase6b.md):
+//   users/{uid}                                  { displayName, createdAt, groupIds[],
+//                                                    fcmToken, notifLang, timezone,
+//                                                    notifPendingAction, notifUpdatedAt }
 //   groups/{groupId}                              { name, code, createdBy, memberUids[], createdAt }
 //   groups/{groupId}/days/{date}/results/{uid}    { uid, displayName, outcome, guessesUsed,
 //                                                    par, scoreVsPar, lang, finishedAt }
@@ -28,8 +30,38 @@ service cloud.firestore {
       return d is string && d.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
     }
 
+    // displayName is only required to be well-formed WHEN present — 6b lets a
+    // player opt into notifications without ever touching Social, so a
+    // users/{uid} doc can legitimately exist with no displayName at all
+    // (leaderboard code already falls back to "Anonymous" for that case).
+    function isValidDisplayName(data) {
+      return !('displayName' in data) || (
+        data.displayName is string &&
+        data.displayName.size() > 0 &&
+        data.displayName.size() <= 40
+      );
+    }
+
+    // 6b notification fields — all optional, each validated only when present
+    // so a write that touches just one of them (e.g. the Settings toggle
+    // clearing fcmToken on unsubscribe) never has to resend the others.
+    // notifUpdatedAt must be the server timestamp (no backdating), same
+    // pattern as results/{uid}.finishedAt below.
+    function isValidNotifFields(data) {
+      return (!('fcmToken' in data) || data.fcmToken == null ||
+                (data.fcmToken is string && data.fcmToken.size() <= 4096))
+        && (!('notifLang' in data) || data.notifLang == null ||
+              data.notifLang in ['en', 'hi-en'])
+        && (!('timezone' in data) || data.timezone == null ||
+              (data.timezone is string && data.timezone.size() <= 64))
+        && (!('notifPendingAction' in data) || data.notifPendingAction == null ||
+              data.notifPendingAction in ['subscribe', 'unsubscribe'])
+        && (!('notifUpdatedAt' in data) || data.notifUpdatedAt == request.time);
+    }
+
     // -------------------------------------------------------------------
-    // users/{uid} — profile (display name only; leaderboard identity)
+    // users/{uid} — profile (display name, leaderboard identity) +
+    // 6b notification subscription state.
     // -------------------------------------------------------------------
     match /users/{uid} {
       // Single-doc get only. Reading another member's display name for the
@@ -42,9 +74,8 @@ service cloud.firestore {
       // A user may only ever create/update their OWN profile doc.
       allow create, update: if isSignedIn()
         && request.auth.uid == uid
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() > 0
-        && request.resource.data.displayName.size() <= 40;
+        && isValidDisplayName(request.resource.data)
+        && isValidNotifFields(request.resource.data);
 
       allow delete: if false;
     }
