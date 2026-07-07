@@ -41,10 +41,22 @@ function parseActions(argv) {
     } else if (argv[i] === '--wait' && argv[i + 1]) {
       actions.push({ kind: 'wait', ms: Number(argv[i + 1]) });
       i++;
+    } else if (argv[i] === '--scroll' && argv[i + 1]) {
+      const [dx, dy] = argv[i + 1].split(',').map(Number);
+      actions.push({ kind: 'scroll', dx, dy });
+      i++;
     }
   }
   return actions;
 }
+
+// --grant-notifications: grants the 'notifications' permission via CDP
+// BEFORE navigation, so a real (non-interactive) headless run can complete
+// FirebaseMessaging.requestPermission() without a UI prompt Chrome headless
+// has no way to show. Real browsers show a real prompt; this only exists to
+// let this harness drive the REAL opt-in code path (getToken + Firestore
+// write) end-to-end for verification.
+const GRANT_NOTIFICATIONS = process.argv.includes('--grant-notifications');
 
 async function main() {
   const actions = parseActions(process.argv.slice(2));
@@ -54,6 +66,9 @@ async function main() {
     headless: 'new',
     args: ['--window-size=900,1000', '--no-sandbox'],
   });
+  if (GRANT_NOTIFICATIONS) {
+    await browser.defaultBrowserContext().overridePermissions(URL, ['notifications']);
+  }
   const page = await browser.newPage();
   await page.setViewport({ width: 900, height: 1000 });
 
@@ -99,6 +114,14 @@ async function main() {
       rec(`Waiting ${action.ms}ms...`);
       await new Promise((r) => setTimeout(r, action.ms));
       label = `wait_${action.ms}`;
+    } else if (action.kind === 'scroll') {
+      rec(`Scrolling by (${action.dx}, ${action.dy})...`);
+      // Wheel events apply at the CURRENT mouse position — move to the
+      // middle of the content area first, well clear of the bottom nav bar.
+      await page.mouse.move(450, 500);
+      await page.mouse.wheel({ deltaX: action.dx, deltaY: action.dy });
+      label = `scroll_${action.dx}_${action.dy}`;
+      await new Promise((r) => setTimeout(r, CLICK_SETTLE_MS));
     }
     const shotName = `${PREFIX}_${String(i + 1).padStart(2, '0')}_after_${label}.png`;
     await page.screenshot({ path: path.join(SCRATCH, shotName) });
