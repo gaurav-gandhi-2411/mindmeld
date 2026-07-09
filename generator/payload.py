@@ -232,7 +232,10 @@ def _build_payload_core(
             for alias_norm, alias_canonical in alias_map.items():
                 if alias_canonical == word:
                     candidate_set.add(alias_norm)
-            candidates = list(candidate_set)
+            # Sorted, not raw set order: set iteration order follows the per-process
+            # string-hash seed, which leaked into alt_map insertion order → JSON key
+            # order → non-reproducible payload bytes across builds (hi-en only).
+            candidates = sorted(candidate_set)
 
             for variant in candidates:
                 variant_hash = _word_hash(variant, salt)

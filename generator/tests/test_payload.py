@@ -374,6 +374,58 @@ class TestGzipReproducibility:
         second = compress_with_mtime0(data)
         assert first == second, "mtime=0 gzip compression must be deterministic"
 
+    def test_payload_bytes_stable_across_hash_seeds(self) -> None:
+        """
+        Regression: payload bytes must not depend on the per-process string-hash
+        seed. The alt-map builder once collected variants in a set and serialized
+        them in set-iteration order, so hi-en payloads differed byte-for-byte
+        between processes (PYTHONHASHSEED). Runs the build in subprocesses with
+        different seeds and asserts identical output bytes.
+        """
+        import os
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        generator_dir = Path(__file__).resolve().parent.parent
+        script = """
+import hashlib, io, json, sys
+from datetime import date
+import numpy as np
+import payload as payload_mod
+
+# Synthetic alias map with multiple aliases per canonical so each word's
+# candidate set has >1 element — the order-sensitive path.
+payload_mod.load_alias_map = lambda: {
+    "barrish": "baarish", "baarysh": "baarish", "bariish": "baarish",
+    "chandd": "chaand", "chaind": "chaand",
+    "gyann": "gyaan",
+}
+
+vocab = ["baarish", "chaand", "gyaan", "rain", "friend", "cloud"]
+rng = np.random.default_rng(7)
+raw = rng.standard_normal((len(vocab), 4)).astype(np.float32)
+matrix = (raw / np.linalg.norm(raw, axis=1, keepdims=True)).astype(np.float32)
+
+p = payload_mod.build_payload(vocab, matrix, "baarish", "hi-en", date(2026, 6, 13))
+blob = json.dumps(p, separators=(",", ":"), ensure_ascii=False).encode()
+print(hashlib.sha256(blob).hexdigest())
+"""
+        digests = []
+        for seed in ("1", "2", "3"):
+            env = dict(os.environ, PYTHONHASHSEED=seed)
+            result = subprocess.run(  # noqa: S603
+                [sys.executable, "-c", script],
+                cwd=str(generator_dir),
+                env=env,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            digests.append(result.stdout.strip())
+
+        assert len(set(digests)) == 1, f"payload bytes vary with PYTHONHASHSEED: {digests}"
+
 
 # ---------------------------------------------------------------------------
 # Alt-map tests (hi-en only)
