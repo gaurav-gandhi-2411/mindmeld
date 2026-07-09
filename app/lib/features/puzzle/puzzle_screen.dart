@@ -212,15 +212,28 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           _loading = false;
         });
 
-        // If the puzzle was already finished in a previous session (e.g. the app
-        // was restarted after winning or losing), route the shell to the
-        // appropriate result screen so the player sees their result instead of a
-        // locked-input puzzle screen.
-        if (existing != null && existing.won) {
+        // Already-finished-state redirect — pack mode only. Pack mode is a
+        // pushed route (Navigator.push per puzzle) with no remount loop, and
+        // its puzzle-list flow relies on this redirect to skip straight past
+        // an already-solved pack puzzle. Daily mode must NOT redirect here:
+        // the app shell (_AppShellState._deriveResultRouting) is the single
+        // owner of daily win/loss routing, derived from this same recorded
+        // day_state. If this fired in daily mode too, every remount of this
+        // widget (e.g. tapping Back on the win screen swaps this widget back
+        // into the index-0 IndexedStack slot) would re-fire onWin/onLoss and
+        // immediately bounce the player back to the result screen, making
+        // the bottom nav unreachable for the rest of the day. Gating this to
+        // pack mode keeps onWin/onLoss idempotent per completion in daily
+        // mode — they only fire from the active-transition paths below
+        // (_submitGuess / _useHint / _giveUp).
+        if (_isPackMode && existing != null && existing.won) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onWin();
           });
-        } else if (existing != null && existing.isFinished && !existing.won) {
+        } else if (_isPackMode &&
+            existing != null &&
+            existing.isFinished &&
+            !existing.won) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) widget.onLoss();
           });

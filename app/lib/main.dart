@@ -266,6 +266,29 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         _initialised = true;
       });
     }
+
+    // Restart routing: if today's puzzle was already finished in a previous
+    // session, land on the appropriate result shell (win/loss) instead of the
+    // live puzzle board. The tabbed nav stays mounted underneath (see build())
+    // so this never removes the bottom NavigationBar the way a full-surface
+    // swap used to.
+    await _deriveResultRouting(lang);
+  }
+
+  /// Loads today's persisted day state for [lang] and, if the puzzle is
+  /// already finished, transitions `_won`/`_lost` via [_handleWin]/
+  /// [_handleLoss]. No-op if the puzzle is still in progress or unstarted.
+  ///
+  /// Shared by [_init] (cold-start/restart routing) and [_onLangChanged]
+  /// (re-deriving routing for the newly selected language).
+  Future<void> _deriveResultRouting(String lang) async {
+    final state = await AppPersistence.instance.loadDayState(_today, lang);
+    if (!mounted || state == null) return;
+    if (state.won) {
+      await _handleWin();
+    } else if (state.isFinished) {
+      await _handleLoss();
+    }
   }
 
   /// Returns today's date as "yyyy-MM-dd", honouring [AppOverrides.fixedDate].
@@ -319,7 +342,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
     }
   }
 
-  void _onLangChanged(String lang) {
+  Future<void> _onLangChanged(String lang) async {
     setState(() {
       _lang = lang;
       _won = false;
@@ -329,6 +352,10 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       _lostSecret = null;
       _lostPayload = null;
     });
+    // Re-derive routing for the new lang: if its daily is already finished,
+    // land on that lang's result screen; otherwise the live puzzle board
+    // (already selected by the setState above) is correct as-is.
+    await _deriveResultRouting(lang);
   }
 
   @override
@@ -352,8 +379,14 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       );
     }
 
+    // The tabbed Scaffold is always the home surface — win/loss never replace
+    // it wholesale (that used to strip the NavigationBar, making it
+    // unreachable until the flag was cleared). Instead only the index-0
+    // IndexedStack child swaps between the result shells and the live puzzle
+    // board; NavigationBar stays mounted and reachable in every state.
+    final Widget puzzleTab;
     if (_won) {
-      return _WinShell(
+      puzzleTab = _WinShell(
         lang: _lang,
         date: _today,
         secret: _wonSecret ?? '',
@@ -365,10 +398,8 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
           _wonPayload = null;
         }),
       );
-    }
-
-    if (_lost) {
-      return _LossShell(
+    } else if (_lost) {
+      puzzleTab = _LossShell(
         lang: _lang,
         date: _today,
         secret: _lostSecret ?? '',
@@ -380,22 +411,24 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
           _lostPayload = null;
         }),
       );
+    } else {
+      puzzleTab = PuzzleScreen(
+        key: ValueKey('puzzle-$_lang'),
+        lang: _lang,
+        date: _today,
+        onWin: _handleWin,
+        onLoss: _handleLoss,
+        payloadClient: widget.overrides?.payloadClient,
+        hintGate: widget.overrides?.hintGate,
+        exporter: _exporter,
+      );
     }
 
     return Scaffold(
       body: IndexedStack(
         index: _navIndex,
         children: [
-          PuzzleScreen(
-            key: ValueKey('puzzle-$_lang'),
-            lang: _lang,
-            date: _today,
-            onWin: _handleWin,
-            onLoss: _handleLoss,
-            payloadClient: widget.overrides?.payloadClient,
-            hintGate: widget.overrides?.hintGate,
-            exporter: _exporter,
-          ),
+          puzzleTab,
           ArchiveScreen(lang: _lang),
           StatsScreen(lang: _lang),
           SettingsScreen(
