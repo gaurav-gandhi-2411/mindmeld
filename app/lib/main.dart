@@ -436,7 +436,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             onLangChanged: _onLangChanged,
             onReplayOnboarding: () => setState(() => _showOnboarding = true),
           ),
-          SocialHomeScreen(date: _today, lang: _lang),
+          SocialHomeScreen(date: _today, lang: _lang, active: _navIndex == 4),
         ],
       ),
       bottomNavigationBar: NavigationBar(

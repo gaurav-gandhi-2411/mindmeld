@@ -12,11 +12,31 @@ import 'package:mindmeld/social/social_service.dart';
 /// who has never used social features sees a gentle connect prompt here,
 /// never a blocker; solo play is entirely unaffected either way.
 class SocialHomeScreen extends StatefulWidget {
-  const SocialHomeScreen({super.key, required this.date, required this.lang, this.socialService});
+  const SocialHomeScreen({
+    super.key,
+    required this.date,
+    required this.lang,
+    this.socialService,
+    this.active = true,
+  });
 
   final String date;
   final String lang;
   final SocialService? socialService;
+
+  /// Whether this tab is the currently-selected destination in the app
+  /// shell's [IndexedStack].
+  ///
+  /// [SocialHomeScreen] is mounted eagerly at boot (all `IndexedStack`
+  /// children build regardless of which index is selected) and only ever
+  /// loaded once in [initState] — mirrors the same staleness pattern fixed
+  /// for [StatsScreen] (see its doc comment). Unlike stats, this screen
+  /// already has a manual pull-to-refresh, but nothing re-triggered it on
+  /// tab reactivation. [_SocialHomeScreenState.didUpdateWidget] reloads
+  /// whenever [active] transitions false→true. Defaults to `true` so direct
+  /// usages (tests, the win/loss "Challenge your group" push) reload on
+  /// every build as before.
+  final bool active;
 
   @override
   State<SocialHomeScreen> createState() => _SocialHomeScreenState();
@@ -31,6 +51,18 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
   void initState() {
     super.initState();
     _refresh();
+  }
+
+  @override
+  void didUpdateWidget(SocialHomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload on false→true activation (tab becomes visible again after
+    // groups may have changed elsewhere in this session — e.g. joining via
+    // a deep link, or a friend's win landing on this device). Unlike
+    // StatsScreen, the group list itself isn't lang-scoped, so no
+    // lang-change trigger is needed here.
+    final becameActive = widget.active && !oldWidget.active;
+    if (becameActive) _refresh();
   }
 
   Future<void> _refresh() async {
