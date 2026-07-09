@@ -49,7 +49,7 @@ Spec: `spec-phase6c.md` (source of truth). Scope: pack SYSTEM + Bollywood flagsh
 
 ## Known issues (found during 6c live verify, NOT 6c regressions)
 
-- **P1 — daily win screen "Back" is a dead end for the rest of the day** (pre-existing daily flow, packs unaffected): `main.dart` swaps the whole home between tabbed `IndexedStack` and `WinScreen` on a single `_won` flag; on Back, `PuzzleScreen.initState` sees `existing.won` and immediately re-fires `onWin()` → WinScreen remounts, bottom nav (Stats/Settings/Practice/Friends) unreachable until the next day. Reproduced 3×, console clean. Fix direction: gate the already-won redirect to once per session, or make the win screen a pushed route so pop semantics apply (packs already do this and are fine). Repro: win today's daily → tap Back.
+- [x] **P1 — daily win screen "Back" is a dead end for the rest of the day** — FIXED. `main.dart`'s tabbed Scaffold (NavigationBar + IndexedStack) is now always the home surface; only the index-0 child swaps between `_WinShell`/`_LossShell` and the live `PuzzleScreen`. Restart/lang-switch routing moved to `_AppShellState._deriveResultRouting`. `PuzzleScreen._load()`'s already-finished-state `onWin`/`onLoss` redirect is now scoped to pack mode only (daily mode's routing is owned exclusively by the app shell, keeping `onWin`/`onLoss` idempotent across remounts — that idempotency gap was the actual root cause of the bounce-back). Commits 5eb4869 (fix) + 1870a9c (tests: `app/test/daily_win_navigation_test.dart`, 6 cases). flutter test 382/382 (376 baseline + 6 new), analyze clean.
 
 ## Gotchas discovered
 
