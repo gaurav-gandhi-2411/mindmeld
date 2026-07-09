@@ -24,6 +24,7 @@ import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
+import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/main.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,6 +119,20 @@ Finder _navDestination(String label) => find.descendant(
       of: find.byType(NavigationBar),
       matching: find.text(label),
     );
+
+/// Asserts that StatsScreen's `label` stat box (e.g. "Played", "Streak")
+/// currently renders `expectedValue`.
+///
+/// Reads via the nearest ancestor [Column] of the label [Text] — that
+/// Column is `_StatBox`'s own layout (private widget, so not addressable by
+/// type from a test file) containing exactly [value, label] as its two
+/// children — rather than a brittle assumption about text-widget ordering.
+void _expectStatValue(String label, String expectedValue) {
+  final statBox =
+      find.ancestor(of: find.text(label), matching: find.byType(Column)).first;
+  expect(find.descendant(of: statBox, matching: find.text(expectedValue)), findsOneWidget,
+      reason: 'Stat "$label" must show "$expectedValue"');
+}
 
 void main() {
   late Directory tmpDir;
@@ -446,4 +461,82 @@ void main() {
           reason: 'the bottom nav must stay mounted for the loss shell too');
     },
   );
+
+  // ===========================================================================
+  // (e) Stats tab reflects a same-session win (follow-up to the P1 fix:
+  // StatsScreen is mounted eagerly at boot in the IndexedStack and only ever
+  // loaded once in initState, so it kept showing boot-time Played 0/Streak 0
+  // even after a win became reachable via the Stats tab post-fix).
+  // ===========================================================================
+
+  testWidgets(
+    'Stats tab reflects a same-session daily win immediately, not stale boot-time numbers',
+    (tester) async {
+      const date = '2099-01-01';
+      final payload = _buildOceanPayload();
+
+      await tester.pumpWidget(MindmeldApp(
+        overrides: AppOverrides(
+          fixedDate: date,
+          lang: 'en',
+          dbPath: dbPath,
+          skipOnboarding: true,
+          payloadClient: _FixedClient(payload),
+        ),
+      ));
+      await _settle(tester);
+      await _settle(tester);
+
+      // Play an ACTIVE win through the puzzle tab (not a pre-seeded state) —
+      // this is the exact live repro: win, then switch tabs within the
+      // session, with no app restart in between.
+      await tester.enterText(find.byType(TextField), 'ocean');
+      await _tapGuessAndAwaitWin(tester);
+
+      expect(_appBarTitle('You got it!'), findsOneWidget,
+          reason: 'sanity: the active win must route to the win screen');
+
+      await tester.tap(_navDestination('Stats'));
+      await _settle(tester);
+      await _settle(tester);
+
+      _expectStatValue('Played', '1');
+      _expectStatValue('Streak', '1');
+    },
+  );
+
+  group('StatsScreen activation reload', () {
+    testWidgets(
+      'reloads when active flips false→true after stats changed while inactive',
+      (tester) async {
+        await tester.pumpWidget(const MaterialApp(
+          home: StatsScreen(lang: 'en', active: false),
+        ));
+        await _settle(tester);
+
+        _expectStatValue('Played', '0');
+        _expectStatValue('Streak', '0');
+
+        // Persist a win directly — simulates stats changing elsewhere (e.g.
+        // the puzzle tab) while this StatsScreen instance stays mounted but
+        // inactive in the IndexedStack.
+        await tester.runAsync(() => AppPersistence.instance.recordWin(
+              lang: 'en',
+              guessCount: 3,
+              today: DateTime.now(),
+            ));
+
+        // Flip active: false → true — must reload and show the new numbers,
+        // not the stale ones captured at initState.
+        await tester.pumpWidget(const MaterialApp(
+          home: StatsScreen(lang: 'en', active: true),
+        ));
+        await _settle(tester);
+        await _settle(tester);
+
+        _expectStatValue('Played', '1');
+        _expectStatValue('Streak', '1');
+      },
+    );
+  });
 }

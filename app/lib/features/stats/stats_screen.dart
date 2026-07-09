@@ -12,12 +12,26 @@ class StatsScreen extends StatefulWidget {
     required this.lang,
     /// Optional gateway override for tests. When null [buildIapGateway] is used.
     this.iapGateway,
+    this.active = true,
   });
 
   final String lang;
 
   /// Optional IAP gateway; package-accessible for test injection.
   final IapGateway? iapGateway;
+
+  /// Whether this tab is the currently-selected destination in the app
+  /// shell's [IndexedStack].
+  ///
+  /// [StatsScreen] is mounted eagerly at boot (all `IndexedStack` children
+  /// build regardless of which index is selected) and only ever loads once
+  /// in [initState] — so within a single session, switching to this tab
+  /// after stats change elsewhere (e.g. winning the daily puzzle) rendered
+  /// boot-time numbers forever. [_StatsScreenState.didUpdateWidget] reloads
+  /// whenever [active] transitions false→true. Defaults to `true` so direct
+  /// usages (tests, any future non-tabbed embedding) reload on every build
+  /// as before.
+  final bool active;
 
   @override
   State<StatsScreen> createState() => _StatsScreenState();
@@ -35,6 +49,24 @@ class _StatsScreenState extends State<StatsScreen> {
     super.initState();
     _gateway = widget.iapGateway ?? buildIapGateway();
     _load();
+  }
+
+  @override
+  void didUpdateWidget(StatsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload on false→true activation (tab becomes visible again after
+    // stats may have changed elsewhere in this session — e.g. a daily win)
+    // and on a lang switch (stats are per-lang; the old lang's numbers are
+    // stale for the new lang). Not reloading on every build here is
+    // deliberate: this screen is always mounted (see [StatsScreen.active]
+    // doc), so an unconditional reload on every rebuild would re-fire the
+    // passive-streak-reset write and the IAP gateway call far more often
+    // than the data can actually change.
+    final becameActive = widget.active && !oldWidget.active;
+    final langChanged = widget.lang != oldWidget.lang;
+    if (becameActive || langChanged) {
+      _load();
+    }
   }
 
   Future<void> _load() async {

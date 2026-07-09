@@ -430,7 +430,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
         children: [
           puzzleTab,
           ArchiveScreen(lang: _lang),
-          StatsScreen(lang: _lang),
+          StatsScreen(lang: _lang, active: _navIndex == 2),
           SettingsScreen(
             currentLang: _lang,
             onLangChanged: _onLangChanged,
