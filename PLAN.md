@@ -41,9 +41,15 @@ Spec: `spec-phase6c.md` (source of truth). Scope: pack SYSTEM + Bollywood flagsh
   sitara, ladai, jawaani — eval fixtures P01–P11 pre-validated 11/11 PASS (thinnest: ladai .435>.398).
   Aliases to add: naatak, ansoo/aansu/ansu, kismet/qismat, waada (NOT wada/vada — food collision),
   kurbani, kahaani, sitaara, ladaai/larai, jawani, nach, pyar, ghussa, izat, ma.
-- [ ] **STOP POINT: GG review of secrets+clues** ← payloads must NOT be generated before approval
-- [ ] (post-approval) build + publish Bollywood payloads; deploy web; cold-profile live verify
-- [ ] Full suites green (generator pytest, app flutter test)
+- [x] **STOP POINT cleared 2026-07-09**: GG approved content WITH edits. Applied: 3 GG rewords (EN #5/#16/#23), item-song kept only on #4 (hi-en #23 reworded), whistle/seeti + front/first row + first show de-duplicated (#2/#9/#22/#24). Semantic-neighbor audit over all 50 clues reworded 5 more: lyrics→#5 hi-en, line→#9 both, giraftaar→#13 hi-en, Overacting→#7 EN, Picture→#16 hi-en; EN #19 moved off the seventies archetype (collision with new #23). 13/50 clues changed total.
+- [x] Payloads baked + published: 25×2 payloads + packs manifest, all under size targets (--strict-sizes), byte-reproducibility gate PASS after fixing hash-seed-dependent alt-map ordering in payload.py (5b7ddd6 — hi-en payloads were non-reproducible cross-process; regression test added). Pages commit fda0bba.
+- [x] Web app deployed to playmindmeld.vercel.app (registrant + auth-domain guards OK, SW mindmeld-precache-68baf9ba2a5d verified live).
+- [x] Cold-profile live verify on playmindmeld.vercel.app — ALL PASS (15 cold runs, screenshots reviewed): V1 selector gold→crimson Bollywood identity + 3 coming-soon tiles; V2 EN #1 start-to-win (wedding #889 Warm → movie #375 Hot → romance win); V3 hi-en win (shaadi → pyaar) with localized tagline; V4 share text `Mindmeld · Bollywood #1 (English) 🟨🟧⭐ / 3/15 · Par -6`; V5 pack win leaves Stats at Played 0/Streak 0 and daily unplayed, then daily win works normally. Zero pageerror/requestfailed across all runs. (Pages publish was delayed ~35 min by a GitHub Actions partial outage — queue only, no action needed.)
+- [x] Full suites green: generator 350 passed / 6 skipped, flutter 376/376, ruff clean.
+
+## Known issues (found during 6c live verify, NOT 6c regressions)
+
+- **P1 — daily win screen "Back" is a dead end for the rest of the day** (pre-existing daily flow, packs unaffected): `main.dart` swaps the whole home between tabbed `IndexedStack` and `WinScreen` on a single `_won` flag; on Back, `PuzzleScreen.initState` sees `existing.won` and immediately re-fires `onWin()` → WinScreen remounts, bottom nav (Stats/Settings/Practice/Friends) unreachable until the next day. Reproduced 3×, console clean. Fix direction: gate the already-won redirect to once per session, or make the win screen a pushed route so pop semantics apply (packs already do this and are fine). Repro: win today's daily → tap Back.
 
 ## Gotchas discovered
 
