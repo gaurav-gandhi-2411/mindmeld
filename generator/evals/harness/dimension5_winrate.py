@@ -4,13 +4,13 @@ from __future__ import annotations
 Dimension 5 — difficulty / win-rate modeling.
 
 Simulates a population of "competent player" guessers per puzzle and
-estimates win-rate under the REAL maxGuesses (par + 6, from rival.py's own
-par calculation — the same par a live payload ships with). Unlike
-rival.generate_rival_data (one smooth, deterministic path per tier, used to
-render the in-game rival), this simulates N independent NOISY trajectories
-per puzzle — modeling realistic human inconsistency (some guesses barely
-improve, occasional lucky jumps) rather than a single idealized curve — and
-reports the resulting win-rate distribution.
+estimates win-rate under the REAL maxGuesses (rival.max_guesses_for_par(par),
+from rival.py's own par calculation — the same par a live payload ships
+with). Unlike rival.generate_rival_data (one smooth, deterministic path per
+tier, used to render the in-game rival), this simulates N independent NOISY
+trajectories per puzzle — modeling realistic human inconsistency (some
+guesses barely improve, occasional lucky jumps) rather than a single
+idealized curve — and reports the resulting win-rate distribution.
 
 Purely algorithmic over rank-space (identical abstraction to rival.py: no
 embedding calls, no real words) — fast enough to run across every puzzle.
@@ -25,14 +25,22 @@ Base reduction factors (0.70/0.60/0.50 cold->hot) were calibrated by a
 parameter sweep against the spec's own target ("~75-85% for a competent
 player"): at maxGuesses=14 (a representative mid-range budget) they produce
 median win-rate ~0.82. Win-rate is HIGHLY sensitive to both these constants
-and to maxGuesses itself — at maxGuesses=10 the same player wins only ~12%
-of the time, at maxGuesses=20+ it's ~100%. This is itself a finding worth
-reporting, not just a calibration footnote: because maxGuesses = par + 6 is
-a FIXED offset above par, low-par puzzles (fast-converging embedding
-gradient, e.g. par=4-6) give the noisy simulated player a comparatively
-TIGHT absolute budget and show lower simulated win-rate than high-par
-puzzles (par=14-16) with the same +6 buffer — the fixed offset may be
-under-generous at the low end and over-generous at the high end. Treat
+and to maxGuesses itself.
+
+maxGuesses formula (rival.max_guesses_for_par): `max(12, round(par * 1.5))`
+— see rival.py's module-level comment for the full calibration story. This
+REPLACED an earlier fixed `par + 6` offset, which this very simulation
+exposed as miscalibrated: across the 220 puzzles in this eval's own content
+set (60 daily + 160 pack, both langs, par clustering in [6, 10]), `par + 6`
+produced median win-rate 93% with only 10.5% of puzzles in the target
+[0.75, 0.85] band — a FIXED offset above par handed low-par puzzles a
+disproportionately generous RELATIVE budget (par=6 -> 12 guesses is a 100%
+buffer) versus high-par puzzles with the same +6 buffer. Scaling
+multiplicatively with a floor (rather than adding a constant) fixes this:
+the floor keeps very-low-par puzzles from being punished with too tight a
+budget, while the multiplier keeps the buffer proportional to how hard the
+puzzle already is. Re-running this harness after the fix: median win-rate
+82.0%, 63.6% of puzzles in-band (see evals/reports for the full run). Treat
 per-puzzle win-rate numbers as MODELED estimates sensitive to these
 assumptions, not measured ground truth — useful for relative
 easy-vs-hard flagging across puzzles, not as an absolute probability.
@@ -44,7 +52,7 @@ import random
 import numpy as np
 
 from packs import load_pack_secrets, load_packs_meta
-from rival import generate_rival_data
+from rival import generate_rival_data, max_guesses_for_par
 from schedule import load_schedule
 from vocab import load_en_vocab, load_hien_vocab
 
@@ -65,9 +73,10 @@ def _vocab_size(lang: str) -> int:
 
 def _simulate_one(n: int, max_guesses: int, rng: random.Random) -> int | None:
     """Simulate one noisy player trajectory. Returns guesses-to-win, or None
-    if not solved within max_guesses (the actual per-puzzle budget, par + 6 —
-    NOT the unrelated _MAX_STEPS safety cap, which only guards against a
-    pathological infinite loop for unreasonably large max_guesses values)."""
+    if not solved within max_guesses (the actual per-puzzle budget, from
+    rival.max_guesses_for_par(par) — NOT the unrelated _MAX_STEPS safety cap,
+    which only guards against a pathological infinite loop for unreasonably
+    large max_guesses values)."""
     warm_threshold = int(n * 0.05)
     hot_threshold = max(500, int(n * 0.01))
 
@@ -103,7 +112,7 @@ def simulate_puzzle_winrate(
 ) -> dict:
     """Run n_sims noisy player simulations against one puzzle; return win-rate stats."""
     _, par = generate_rival_data(n, secret, key)
-    max_guesses = par + 6
+    max_guesses = max_guesses_for_par(par)
 
     seed = f"{secret}{key}winrate"
 

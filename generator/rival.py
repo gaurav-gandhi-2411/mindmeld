@@ -188,3 +188,37 @@ def generate_rival_data(n: int, secret: str, puzzle_date_iso: str) -> tuple[dict
 
     par_guesses: int = rival["even"]["solveAt"]
     return rival, par_guesses
+
+
+# maxGuesses scaling — shared by payload.py (production) and
+# evals/harness/dimension5_winrate.py (win-rate simulation), so the two
+# implementations can never drift apart.
+#
+# Calibrated via a grid search over k in [1.0, 1.7] and floor in [6, 14]
+# against dimension5's win-rate simulation (220 real puzzles: 60 daily +
+# 160 pack, both langs, par clustering in [6, 10] for this content set).
+# A fixed `par + 6` offset produced median win-rate 93% (only 10.5% of
+# puzzles in the target 75-85% band) — low-par puzzles got a
+# disproportionately generous relative budget (par=6 -> 12 guesses is a
+# 100% buffer). k=1.5 with floor=12 produces median 82.0% and 63.6% of
+# puzzles in-band (vs 10.5% before) — the best trade-off found: it is a
+# plateau (k=1.49-1.52 all produce the identical distribution, so this
+# is not a knife-edge value), the floor keeps very-low-par puzzles from
+# being punished (a par=4 puzzle gets the 12-guess floor rather than a
+# tight 6-guess budget), and it leaves only a single puzzle across the
+# whole 220-puzzle set below the 40% "unwinnable" outlier threshold (at
+# 39% — one point under the cutoff, within simulation noise at
+# n=100 sims/puzzle, sigma ~= 5pp). See PLAN.md for the full sweep.
+MAX_GUESSES_K = 1.5
+MAX_GUESSES_FLOOR = 12
+
+
+def max_guesses_for_par(par_guesses: int) -> int:
+    """Return the player-facing guess budget for a puzzle with `par_guesses`.
+
+    Scales with par (rather than a fixed offset) so low-par puzzles aren't
+    handed a disproportionately generous relative budget; floored so very-low
+    -par puzzles still get a workable minimum. See module-level comment above
+    for calibration details.
+    """
+    return max(MAX_GUESSES_FLOOR, round(par_guesses * MAX_GUESSES_K))

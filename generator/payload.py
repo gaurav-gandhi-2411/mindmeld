@@ -40,7 +40,7 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
-from rival import generate_rival_data
+from rival import generate_rival_data, max_guesses_for_par
 
 
 def levenshtein(a: str, b: str) -> int:
@@ -303,7 +303,7 @@ def _build_payload_core(
         "words": words_map,
         "hints": hints,
         "parGuesses": par_guesses,
-        "maxGuesses": par_guesses + 6,
+        "maxGuesses": max_guesses_for_par(par_guesses),
         "clue": clue,
         "rival": rival_data,
         "s": s_field,
