@@ -64,7 +64,7 @@ class PacksEntryBanner extends StatelessWidget {
                         ),
                       ] else
                         const Text(
-                          'Play Bollywood — more packs coming soon',
+                          'Bollywood & Cricket live — more packs coming soon',
                           style: TextStyle(color: Colors.white70, fontSize: 11),
                         ),
                     ],

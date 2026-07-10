@@ -68,8 +68,18 @@ void main() {
       expect(bollywood.titleFor('hi-en'), equals('Bollywood'));
     });
 
-    test('cricket/indian-food/nature-wild are paid and coming_soon', () {
-      for (final id in ['cricket', 'indian-food', 'nature-wild']) {
+    test('cricket is paid, live, count 25, icon sports_cricket', () {
+      final cricket = manifest.packs.firstWhere((p) => p.id == 'cricket');
+      expect(cricket.free, isFalse);
+      expect(cricket.isLive, isTrue);
+      expect(cricket.count, equals(25));
+      expect(cricket.iconData, equals(Icons.sports_cricket));
+      expect(cricket.titleFor('en'), equals('Cricket'));
+      expect(cricket.titleFor('hi-en'), equals('Cricket'));
+    });
+
+    test('indian-food/nature-wild are paid and coming_soon', () {
+      for (final id in ['indian-food', 'nature-wild']) {
         final pack = manifest.packs.firstWhere((p) => p.id == id);
         expect(pack.free, isFalse, reason: '$id must not be free');
         expect(pack.isLive, isFalse, reason: '$id must be coming_soon');

@@ -518,3 +518,14 @@ kahani	story
 sitara	star
 ladai	fight
 jawaani	youth
+# Phase 7 — Cricket pack additions (eval-gated, fixtures P12–P17): code-mixed
+# English cricket terms missing from the auto-included top-10k English words.
+# Native-Hindi alternatives (naara, shatak, chakka, haar, wapsi, bheed, vijeta,
+# mukabla, takkar, jeeta, josh) were embedding-tested and ALL failed — see
+# secrets_hi-en.txt header for the full log.
+wicket	wicket
+umpire	umpire
+bowler	bowler
+fielder	fielder
+finalist	finalist
+chant	chant

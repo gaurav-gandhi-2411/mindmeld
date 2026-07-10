@@ -101,9 +101,14 @@ class TestLoadPacksMeta:
         assert packs["bollywood"].status == "live"
         assert packs["bollywood"].free is True
 
-    def test_other_packs_are_coming_soon_and_paid(self) -> None:
+    def test_cricket_is_live_and_paid(self) -> None:
         packs = {p.id: p for p in load_packs_meta()}
-        for pack_id in ("cricket", "indian-food", "nature-wild"):
+        assert packs["cricket"].status == "live"
+        assert packs["cricket"].free is False
+
+    def test_remaining_packs_are_coming_soon_and_paid(self) -> None:
+        packs = {p.id: p for p in load_packs_meta()}
+        for pack_id in ("indian-food", "nature-wild"):
             assert packs[pack_id].status == "coming_soon"
             assert packs[pack_id].free is False
 

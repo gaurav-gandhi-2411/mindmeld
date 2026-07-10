@@ -99,11 +99,11 @@ void main() {
     expect(find.text('Indian Food'), findsOneWidget);
     expect(find.text('Nature & Wild'), findsOneWidget);
 
-    // Bollywood is live + free + unlocked → shows won/count progress.
-    expect(find.text('0/25'), findsOneWidget);
+    // Bollywood and Cricket are live + unlocked → each shows won/count progress.
+    expect(find.text('0/25'), findsNWidgets(2));
 
-    // The other three are coming_soon → dimmed "Coming soon" chip each.
-    expect(find.widgetWithText(Chip, 'Coming soon'), findsNWidgets(3));
+    // Indian Food / Nature & Wild are coming_soon → dimmed "Coming soon" chip each.
+    expect(find.widgetWithText(Chip, 'Coming soon'), findsNWidgets(2));
   });
 
   testWidgets('tapping a coming_soon tile does nothing (stays on selector)',
@@ -111,7 +111,7 @@ void main() {
     await tester.pumpWidget(buildScreen());
     await settle(tester);
 
-    await tester.tap(find.text('Cricket'));
+    await tester.tap(find.text('Indian Food'));
     await tester.pump();
 
     expect(find.text('Themed Packs'), findsOneWidget,
@@ -123,6 +123,18 @@ void main() {
     await settle(tester);
 
     await tester.tap(find.text('Bollywood'));
+    await tester.pump(); // begin the route push transition
+    await settle(tester); // let PackPuzzleListScreen's sqflite read complete
+    await tester.pump(const Duration(milliseconds: 400)); // finish transition
+
+    expect(find.text('Puzzle #1'), findsOneWidget);
+  });
+
+  testWidgets('tapping the Cricket tile opens the puzzle list', (tester) async {
+    await tester.pumpWidget(buildScreen());
+    await settle(tester);
+
+    await tester.tap(find.text('Cricket'));
     await tester.pump(); // begin the route push transition
     await settle(tester); // let PackPuzzleListScreen's sqflite read complete
     await tester.pump(const Duration(milliseconds: 400)); // finish transition

@@ -1,3 +1,29 @@
 # Cricket pack — Hinglish clues, one per line, keyed line-by-line to secrets_hi-en.txt
 # ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
-# Status: coming_soon, content pending authorship — do not add clues here (Phase 6c)
+# Written for an Indian player — culturally native, not translated
+# Pending GG review
+Ek ungli uthi, aur poora ground ya toh chilaya ya chup ho gaya
+Lakdiyan bikhri, aur pavilion ki taraf khamosh chaal shuru
+Daudta hua aata hai, baazu ghumaata hai, gendh udhti hai
+Tumhari baari crease pe, jab tak out ya declare na ho
+Sar ke upar utha ke, chuma, aur poore ground ka chakkar
+Zameen se chipki gendh, char run, ghaas chhode bina seedha paar
+Saath hazaar kursiyan, aur aaj ek bhi khaali nahi
+Dressing room mein sar jhuke hain aaj raat
+Naqshe pe padosi, teen ghante ke liye dushman
+Stands wahi aath shabd baar baar dohraate hain
+Hazaaron kandhe se kandha mila ke khade, koi baitha nahi
+Rope tak daudta hai, dive maarta hai, din bacha leta hai
+Sabse pehle ilzaam isi pe, sabse aakhri tak vishwas isi ka
+Dono haathon mein willow, guard maar ke, pehli gendh ka samna
+Do surakshit haath ek bade shot ko jaldi out mein badal dete hain
+Tea tak likh diya tha khatam, stumps tak jashan mana rahe
+Baaees gaz ki ghaas jo sab kuch tay karti hai
+Baaki sab ghar jaate hain, yeh team parade nikaalti hai
+Woh aankdha jo office ka har phone baar baar refresh karta hai
+Jeet se ek kadam door, ghar jaane se ek haar door
+Upar se lehrata hua aata hai, phir achanak kat ke nikal jaata hai
+Gyaarah aawazein, ek hi shabd, haath aasman ki taraf
+Jaali neeche, patti tight, tez raftaar ka saamna karne se pehle
+Pehla kadam maidan pe, naam sabke liye naya
+Rope ko chhue bina hi seedha uske paar

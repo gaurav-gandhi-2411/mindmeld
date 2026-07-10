@@ -24,12 +24,12 @@
         "hi-en": "Gully se stadium tak"
       },
       "free": false,
-      "status": "coming_soon",
+      "status": "live",
       "accent": "#2E7D32",
       "accentDark": "#1B4D20",
       "icon": "cricket",
       "langs": ["en", "hi-en"],
-      "count": 0
+      "count": 25
     },
     {
       "id": "indian-food",
