@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 from payload import build_payload
-from rival import _rival_seed, band_for_rank, generate_rival_data
+from rival import _rival_seed, band_for_rank, generate_rival_data, max_guesses_for_par
 
 # ---------------------------------------------------------------------------
 # Shared stub data (mirrors test_payload.py setup)
@@ -301,6 +301,34 @@ class TestPayloadSchemaV2:
 
     def test_par_equals_even_solve_at(self, payload: dict) -> None:
         assert payload["parGuesses"] == payload["rival"]["even"]["solveAt"]
+
+
+class TestMaxGuessesForPar:
+    """Tests for the shared max_guesses_for_par helper (payload.py's and
+    dimension5_winrate.py's maxGuesses formula, kept in one place so the two
+    can't drift apart)."""
+
+    def test_scales_with_par_above_floor(self) -> None:
+        # par=10 -> round(10*1.5)=15, above the floor -> the multiplier wins.
+        assert max_guesses_for_par(10) == 15
+
+    def test_floor_applies_for_low_par(self) -> None:
+        # par=4 -> round(4*1.5)=6, below the floor of 12 -> floor wins.
+        assert max_guesses_for_par(4) == 12
+
+    def test_always_exceeds_par(self) -> None:
+        # A budget must always give the player more than the "expert" par
+        # count, regardless of where par falls relative to the floor.
+        for par in range(1, 20):
+            assert max_guesses_for_par(par) > par
+
+    def test_monotonic_non_decreasing(self) -> None:
+        # A higher-par (harder) puzzle should never get a smaller budget
+        # than an easier, lower-par one.
+        values = [max_guesses_for_par(par) for par in range(1, 20)]
+        # strict=False: values[1:] is deliberately one element shorter (a
+        # sliding pairwise-comparison window), not a length mismatch bug.
+        assert all(b >= a for a, b in zip(values, values[1:], strict=False))
 
 
 class TestLargeVocabBehavior:

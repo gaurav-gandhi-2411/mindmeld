@@ -514,11 +514,16 @@ class TestDailyPathUnaffected:
         Byte-for-byte regression guard: a fixed stub vocab/date/secret must
         always compress to the same gzip bytes. This hash was captured against
         the current (post-refactor) code and must never change for this input.
+
+        Updated for the maxGuesses formula change (fixed `par + 6` offset ->
+        `max_guesses_for_par`, see rival.py) — the golden byte string
+        necessarily changes because maxGuesses is baked into the payload,
+        but the guard's INTENT (catch unintended byte drift) is unchanged.
         """
         p = build_payload(_STUB_VOCAB, _STUB_MATRIX, "ocean", "en", date(2026, 6, 12))
         out_path = write_payload(p, tmp_path, "en", date(2026, 6, 12))
         digest = hashlib.sha256(out_path.read_bytes()).hexdigest()
-        assert digest == "cc2379e304f519e80d0a82b880025b72ef98eacc4b0329a339b8c096dc1f449d"
+        assert digest == "ba1fdc65ffaef08dae8e151da6964a6e7e2b2df73be10777b903648e7919ee6d"
 
     def test_daily_payload_has_no_pack_fields(self) -> None:
         """Daily payloads must never carry the pack-only "pack"/"idx" fields."""
