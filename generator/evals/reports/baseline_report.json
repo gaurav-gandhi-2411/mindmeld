@@ -1,0 +1,5786 @@
+{
+  "generated_notes": [],
+  "legacy_fixtures": {
+    "passed": 77,
+    "total": 77
+  },
+  "dimension1_ranking": {
+    "en": {
+      "lang": "en",
+      "n_scenarios": 227,
+      "band_accuracy": {
+        "overall": 0.748898678414097,
+        "near": 0.96,
+        "mid": 0.07692307692307693,
+        "far": 0.944
+      },
+      "band_accuracy_hien_near_split": null,
+      "spearman_correlation": 0.8369394623806077,
+      "monotonicity": {
+        "total_pairs": 614,
+        "violations": 38,
+        "violation_rate": 0.06188925081433225,
+        "examples": [
+          {
+            "secret": "courage",
+            "closer": "boldness (near, rank 132)",
+            "farther": "strength (mid, rank 26)"
+          },
+          {
+            "secret": "dream",
+            "closer": "sleep (near, rank 51)",
+            "farther": "imagination (mid, rank 20)"
+          },
+          {
+            "secret": "dream",
+            "closer": "sleep (near, rank 51)",
+            "farther": "wish (mid, rank 19)"
+          },
+          {
+            "secret": "dream",
+            "closer": "vision (near, rank 71)",
+            "farther": "imagination (mid, rank 20)"
+          },
+          {
+            "secret": "dream",
+            "closer": "vision (near, rank 71)",
+            "farther": "wish (mid, rank 19)"
+          },
+          {
+            "secret": "family",
+            "closer": "kin (near, rank 279)",
+            "farther": "parents (mid, rank 4)"
+          },
+          {
+            "secret": "family",
+            "closer": "kin (near, rank 279)",
+            "farther": "home (mid, rank 72)"
+          },
+          {
+            "secret": "fire",
+            "closer": "blaze (near, rank 55)",
+            "farther": "smoke (mid, rank 33)"
+          },
+          {
+            "secret": "flower",
+            "closer": "petal (near, rank 1661)",
+            "farther": "garden (mid, rank 22)"
+          },
+          {
+            "secret": "flower",
+            "closer": "petal (near, rank 1661)",
+            "farther": "fragrance (mid, rank 133)"
+          },
+          {
+            "secret": "friend",
+            "closer": "companion (near, rank 10086)",
+            "farther": "friendship (mid, rank 7)"
+          },
+          {
+            "secret": "friend",
+            "closer": "companion (near, rank 10086)",
+            "farther": "trust (mid, rank 4107)"
+          },
+          {
+            "secret": "friend",
+            "closer": "companion (near, rank 10086)",
+            "farther": "thinking (far, rank 6401)"
+          },
+          {
+            "secret": "garden",
+            "closer": "yard (near, rank 29)",
+            "farther": "flower (mid, rank 27)"
+          },
+          {
+            "secret": "garden",
+            "closer": "yard (near, rank 29)",
+            "farther": "plant (mid, rank 20)"
+          },
+          {
+            "secret": "garden",
+            "closer": "yard (near, rank 29)",
+            "farther": "lawn (mid, rank 6)"
+          },
+          {
+            "secret": "garden",
+            "closer": "greenery (near, rank 70)",
+            "farther": "flower (mid, rank 27)"
+          },
+          {
+            "secret": "garden",
+            "closer": "greenery (near, rank 70)",
+            "farther": "plant (mid, rank 20)"
+          },
+          {
+            "secret": "garden",
+            "closer": "greenery (near, rank 70)",
+            "farther": "lawn (mid, rank 6)"
+          },
+          {
+            "secret": "letter",
+            "closer": "post (mid, rank 9979)",
+            "farther": "toasting (far, rank 7775)"
+          }
+        ]
+      },
+      "flagged_weak": [
+        {
+          "secret": "childhood",
+          "word": "nostalgia",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 82,
+          "note": null
+        },
+        {
+          "secret": "courage",
+          "word": "hero",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 238,
+          "note": null
+        },
+        {
+          "secret": "courage",
+          "word": "strength",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 26,
+          "note": null
+        },
+        {
+          "secret": "dream",
+          "word": "imagination",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 20,
+          "note": null
+        },
+        {
+          "secret": "dream",
+          "word": "wish",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 19,
+          "note": null
+        },
+        {
+          "secret": "family",
+          "word": "parents",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 4,
+          "note": null
+        },
+        {
+          "secret": "family",
+          "word": "home",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 72,
+          "note": null
+        },
+        {
+          "secret": "family",
+          "word": "troops",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 993,
+          "note": null
+        },
+        {
+          "secret": "fire",
+          "word": "smoke",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 33,
+          "note": null
+        },
+        {
+          "secret": "fire",
+          "word": "heat",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 57,
+          "note": null
+        },
+        {
+          "secret": "fire",
+          "word": "strike",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 1180,
+          "note": null
+        },
+        {
+          "secret": "flower",
+          "word": "petal",
+          "tier": "near",
+          "subtype": null,
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 3,
+          "actual_rank": 1661,
+          "note": null
+        },
+        {
+          "secret": "flower",
+          "word": "garden",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 22,
+          "note": null
+        },
+        {
+          "secret": "flower",
+          "word": "fragrance",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 133,
+          "note": null
+        },
+        {
+          "secret": "forest",
+          "word": "wildlife",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 107,
+          "note": null
+        },
+        {
+          "secret": "friend",
+          "word": "companion",
+          "tier": "near",
+          "subtype": null,
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 10086,
+          "note": null
+        },
+        {
+          "secret": "friend",
+          "word": "friendship",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 7,
+          "note": null
+        },
+        {
+          "secret": "friend",
+          "word": "trust",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 4107,
+          "note": null
+        },
+        {
+          "secret": "garden",
+          "word": "flower",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 27,
+          "note": null
+        },
+        {
+          "secret": "garden",
+          "word": "plant",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 20,
+          "note": null
+        },
+        {
+          "secret": "garden",
+          "word": "lawn",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 6,
+          "note": null
+        },
+        {
+          "secret": "hunger",
+          "word": "food",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 18,
+          "note": null
+        },
+        {
+          "secret": "hunger",
+          "word": "meal",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 8,
+          "note": null
+        },
+        {
+          "secret": "letter",
+          "word": "writing",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 28,
+          "note": null
+        },
+        {
+          "secret": "letter",
+          "word": "post",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 9979,
+          "note": null
+        },
+        {
+          "secret": "market",
+          "word": "vendor",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 136,
+          "note": null
+        },
+        {
+          "secret": "market",
+          "word": "price",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 84,
+          "note": null
+        },
+        {
+          "secret": "market",
+          "word": "confused",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 673,
+          "note": null
+        },
+        {
+          "secret": "memory",
+          "word": "nostalgia",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 187,
+          "note": null
+        },
+        {
+          "secret": "mirror",
+          "word": "bathroom",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 161,
+          "note": null
+        },
+        {
+          "secret": "mirror",
+          "word": "image",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 120,
+          "note": null
+        },
+        {
+          "secret": "mirror",
+          "word": "glass",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 27,
+          "note": null
+        },
+        {
+          "secret": "moon",
+          "word": "satellite",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 43,
+          "note": null
+        },
+        {
+          "secret": "moon",
+          "word": "eclipse",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 31,
+          "note": null
+        },
+        {
+          "secret": "mountain",
+          "word": "climb",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 14,
+          "note": null
+        },
+        {
+          "secret": "mountain",
+          "word": "snow",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 138,
+          "note": null
+        },
+        {
+          "secret": "music",
+          "word": "concert",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 72,
+          "note": null
+        },
+        {
+          "secret": "music",
+          "word": "instrument",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 56,
+          "note": null
+        },
+        {
+          "secret": "ocean",
+          "word": "beach",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 11,
+          "note": null
+        },
+        {
+          "secret": "ocean",
+          "word": "wave",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 256,
+          "note": null
+        },
+        {
+          "secret": "rain",
+          "word": "umbrella",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 39,
+          "note": null
+        },
+        {
+          "secret": "rain",
+          "word": "monsoon",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 32,
+          "note": null
+        },
+        {
+          "secret": "rain",
+          "word": "siren",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 667,
+          "note": null
+        },
+        {
+          "secret": "river",
+          "word": "bank",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 112,
+          "note": null
+        },
+        {
+          "secret": "river",
+          "word": "flow",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 87,
+          "note": null
+        },
+        {
+          "secret": "river",
+          "word": "marty",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 1558,
+          "note": null
+        },
+        {
+          "secret": "soldier",
+          "word": "battle",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 57,
+          "note": null
+        },
+        {
+          "secret": "soldier",
+          "word": "uniform",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 85,
+          "note": null
+        },
+        {
+          "secret": "temple",
+          "word": "god",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 14153,
+          "note": null
+        },
+        {
+          "secret": "treasure",
+          "word": "gem",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 396,
+          "note": null
+        },
+        {
+          "secret": "treasure",
+          "word": "wealth",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 19,
+          "note": null
+        },
+        {
+          "secret": "victory",
+          "word": "champion",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 40,
+          "note": null
+        },
+        {
+          "secret": "victory",
+          "word": "celebration",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 71,
+          "note": null
+        },
+        {
+          "secret": "victory",
+          "word": "knock",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 1088,
+          "note": null
+        },
+        {
+          "secret": "wisdom",
+          "word": "wise",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 2,
+          "note": null
+        },
+        {
+          "secret": "wisdom",
+          "word": "learning",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 2,
+          "actual_rank": 539,
+          "note": null
+        },
+        {
+          "secret": "wisdom",
+          "word": "cognition",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 3,
+          "actual_rank": 805,
+          "note": null
+        }
+      ],
+      "resolution_errors": []
+    },
+    "hi-en": {
+      "lang": "hi-en",
+      "n_scenarios": 227,
+      "band_accuracy": {
+        "overall": 0.5462555066079295,
+        "near": 0.08,
+        "mid": 0.0,
+        "far": 0.96
+      },
+      "band_accuracy_hien_near_split": {
+        "translation": {
+          "n": 20,
+          "band_accuracy": 0.0
+        },
+        "associate": {
+          "n": 30,
+          "band_accuracy": 0.13333333333333333
+        }
+      },
+      "spearman_correlation": -0.0034207306114626803,
+      "monotonicity": {
+        "total_pairs": 614,
+        "violations": 330,
+        "violation_rate": 0.5374592833876222,
+        "examples": [
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "smoke (mid, rank 7040)"
+          },
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "pieces (far, rank 4585)"
+          },
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "found (far, rank 4292)"
+          },
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "egyptian (far, rank 6994)"
+          },
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "knight (far, rank 6527)"
+          },
+          {
+            "secret": "aag",
+            "closer": "flame (near, rank 7802)",
+            "farther": "boots (far, rank 6129)"
+          },
+          {
+            "secret": "aag",
+            "closer": "fire (near, rank 7002)",
+            "farther": "pieces (far, rank 4585)"
+          },
+          {
+            "secret": "aag",
+            "closer": "fire (near, rank 7002)",
+            "farther": "found (far, rank 4292)"
+          },
+          {
+            "secret": "aag",
+            "closer": "fire (near, rank 7002)",
+            "farther": "egyptian (far, rank 6994)"
+          },
+          {
+            "secret": "aag",
+            "closer": "fire (near, rank 7002)",
+            "farther": "knight (far, rank 6527)"
+          },
+          {
+            "secret": "aag",
+            "closer": "fire (near, rank 7002)",
+            "farther": "boots (far, rank 6129)"
+          },
+          {
+            "secret": "aag",
+            "closer": "smoke (mid, rank 7040)",
+            "farther": "pieces (far, rank 4585)"
+          },
+          {
+            "secret": "aag",
+            "closer": "smoke (mid, rank 7040)",
+            "farther": "found (far, rank 4292)"
+          },
+          {
+            "secret": "aag",
+            "closer": "smoke (mid, rank 7040)",
+            "farther": "egyptian (far, rank 6994)"
+          },
+          {
+            "secret": "aag",
+            "closer": "smoke (mid, rank 7040)",
+            "farther": "knight (far, rank 6527)"
+          },
+          {
+            "secret": "aag",
+            "closer": "smoke (mid, rank 7040)",
+            "farther": "boots (far, rank 6129)"
+          },
+          {
+            "secret": "aag",
+            "closer": "heat (mid, rank 9098)",
+            "farther": "pieces (far, rank 4585)"
+          },
+          {
+            "secret": "aag",
+            "closer": "heat (mid, rank 9098)",
+            "farther": "found (far, rank 4292)"
+          },
+          {
+            "secret": "aag",
+            "closer": "heat (mid, rank 9098)",
+            "farther": "egyptian (far, rank 6994)"
+          },
+          {
+            "secret": "aag",
+            "closer": "heat (mid, rank 9098)",
+            "farther": "knight (far, rank 6527)"
+          }
+        ]
+      },
+      "flagged_weak": [
+        {
+          "secret": "aag",
+          "word": "flame",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7802,
+          "note": null
+        },
+        {
+          "secret": "aag",
+          "word": "fire",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7002,
+          "note": null
+        },
+        {
+          "secret": "aag",
+          "word": "smoke",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7040,
+          "note": null
+        },
+        {
+          "secret": "aag",
+          "word": "heat",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 9098,
+          "note": null
+        },
+        {
+          "secret": "aaina",
+          "word": "reflection",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9197,
+          "note": null
+        },
+        {
+          "secret": "aaina",
+          "word": "mirror",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 10291,
+          "note": null
+        },
+        {
+          "secret": "aaina",
+          "word": "bathroom",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 9161,
+          "note": null
+        },
+        {
+          "secret": "aaina",
+          "word": "image",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 1275,
+          "note": null
+        },
+        {
+          "secret": "aaina",
+          "word": "glass",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8400,
+          "note": null
+        },
+        {
+          "secret": "baarish",
+          "word": "shower",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9022,
+          "note": "polysemous: 'shower' can mean rain-shower (intended), bathing-shower, or baby-shower — kept per GG review, flag explicitly in the report rather than averaging away; see also KF-H19/H20 known-failure fixtures for baarish's other documented clustering issues."
+        },
+        {
+          "secret": "baarish",
+          "word": "rain",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7639,
+          "note": null
+        },
+        {
+          "secret": "baarish",
+          "word": "umbrella",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7276,
+          "note": null
+        },
+        {
+          "secret": "baarish",
+          "word": "cloud",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 10359,
+          "note": null
+        },
+        {
+          "secret": "bachpan",
+          "word": "youth",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 3687,
+          "note": null
+        },
+        {
+          "secret": "bachpan",
+          "word": "childhood",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4362,
+          "note": null
+        },
+        {
+          "secret": "bachpan",
+          "word": "innocence",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8353,
+          "note": null
+        },
+        {
+          "secret": "bachpan",
+          "word": "past",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 3057,
+          "note": null
+        },
+        {
+          "secret": "bagicha",
+          "word": "yard",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 8797,
+          "note": null
+        },
+        {
+          "secret": "bagicha",
+          "word": "garden",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7637,
+          "note": null
+        },
+        {
+          "secret": "bagicha",
+          "word": "phool",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 2479,
+          "note": null
+        },
+        {
+          "secret": "bagicha",
+          "word": "plant",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8461,
+          "note": null
+        },
+        {
+          "secret": "bagicha",
+          "word": "lawn",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 9995,
+          "note": null
+        },
+        {
+          "secret": "bazar",
+          "word": "vendor",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 9,
+          "note": null
+        },
+        {
+          "secret": "bazar",
+          "word": "price",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 974,
+          "note": null
+        },
+        {
+          "secret": "bhook",
+          "word": "starving",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 6770,
+          "note": null
+        },
+        {
+          "secret": "bhook",
+          "word": "appetite",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 5510,
+          "note": null
+        },
+        {
+          "secret": "bhook",
+          "word": "khana",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 950,
+          "note": null
+        },
+        {
+          "secret": "bhook",
+          "word": "meal",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7851,
+          "note": null
+        },
+        {
+          "secret": "chaand",
+          "word": "moon",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 10211,
+          "note": null
+        },
+        {
+          "secret": "chaand",
+          "word": "satellite",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 10241,
+          "note": null
+        },
+        {
+          "secret": "chaand",
+          "word": "eclipse",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 10222,
+          "note": null
+        },
+        {
+          "secret": "chaand",
+          "word": "sky",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8143,
+          "note": null
+        },
+        {
+          "secret": "chaand",
+          "word": "putin",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 298,
+          "note": null
+        },
+        {
+          "secret": "dost",
+          "word": "yaar",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 1189,
+          "note": null
+        },
+        {
+          "secret": "dost",
+          "word": "friend",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4247,
+          "note": null
+        },
+        {
+          "secret": "dost",
+          "word": "trust",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8122,
+          "note": null
+        },
+        {
+          "secret": "dost",
+          "word": "friendship",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7221,
+          "note": null
+        },
+        {
+          "secret": "gaana",
+          "word": "geet",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 670,
+          "note": null
+        },
+        {
+          "secret": "gaana",
+          "word": "song",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 2069,
+          "note": null
+        },
+        {
+          "secret": "gaana",
+          "word": "concert",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8177,
+          "note": null
+        },
+        {
+          "secret": "gaana",
+          "word": "instrument",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8931,
+          "note": null
+        },
+        {
+          "secret": "gyaan",
+          "word": "knowledge",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 2821,
+          "note": null
+        },
+        {
+          "secret": "gyaan",
+          "word": "wisdom",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 5013,
+          "note": null
+        },
+        {
+          "secret": "gyaan",
+          "word": "wise",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 2047,
+          "note": null
+        },
+        {
+          "secret": "gyaan",
+          "word": "learning",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 5900,
+          "note": null
+        },
+        {
+          "secret": "himmat",
+          "word": "courage",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4767,
+          "note": null
+        },
+        {
+          "secret": "himmat",
+          "word": "brave",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 2363,
+          "note": null
+        },
+        {
+          "secret": "himmat",
+          "word": "hero",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 1701,
+          "note": null
+        },
+        {
+          "secret": "himmat",
+          "word": "strength",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6770,
+          "note": null
+        },
+        {
+          "secret": "jeet",
+          "word": "win",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4603,
+          "note": null
+        },
+        {
+          "secret": "jeet",
+          "word": "victory",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4881,
+          "note": null
+        },
+        {
+          "secret": "jeet",
+          "word": "champion",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6406,
+          "note": null
+        },
+        {
+          "secret": "jeet",
+          "word": "celebration",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8916,
+          "note": null
+        },
+        {
+          "secret": "jungle",
+          "word": "van",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 530,
+          "note": null
+        },
+        {
+          "secret": "jungle",
+          "word": "wildlife",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 21,
+          "note": null
+        },
+        {
+          "secret": "jungle",
+          "word": "trees",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 1,
+          "actual_rank": 8,
+          "note": null
+        },
+        {
+          "secret": "khat",
+          "word": "letter",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 2598,
+          "note": null
+        },
+        {
+          "secret": "khat",
+          "word": "mail",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7141,
+          "note": null
+        },
+        {
+          "secret": "khat",
+          "word": "envelope",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7784,
+          "note": null
+        },
+        {
+          "secret": "khat",
+          "word": "writing",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6864,
+          "note": null
+        },
+        {
+          "secret": "khat",
+          "word": "ali",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 265,
+          "note": null
+        },
+        {
+          "secret": "khazana",
+          "word": "treasure",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 3263,
+          "note": null
+        },
+        {
+          "secret": "khazana",
+          "word": "gold",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9077,
+          "note": null
+        },
+        {
+          "secret": "khazana",
+          "word": "gem",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 3133,
+          "note": null
+        },
+        {
+          "secret": "khazana",
+          "word": "wealth",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6672,
+          "note": null
+        },
+        {
+          "secret": "mandir",
+          "word": "temple",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 935,
+          "note": null
+        },
+        {
+          "secret": "mandir",
+          "word": "worship",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 2787,
+          "note": null
+        },
+        {
+          "secret": "mandir",
+          "word": "prayer",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 5272,
+          "note": null
+        },
+        {
+          "secret": "mandir",
+          "word": "god",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 1402,
+          "note": null
+        },
+        {
+          "secret": "nadi",
+          "word": "stream",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9205,
+          "note": null
+        },
+        {
+          "secret": "nadi",
+          "word": "river",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9430,
+          "note": null
+        },
+        {
+          "secret": "nadi",
+          "word": "flow",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 9167,
+          "note": null
+        },
+        {
+          "secret": "nadi",
+          "word": "water",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 8420,
+          "note": null
+        },
+        {
+          "secret": "nadi",
+          "word": "des",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 369,
+          "note": null
+        },
+        {
+          "secret": "pahad",
+          "word": "peak",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7946,
+          "note": null
+        },
+        {
+          "secret": "pahad",
+          "word": "mountain",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 7342,
+          "note": null
+        },
+        {
+          "secret": "pahad",
+          "word": "climb",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7556,
+          "note": null
+        },
+        {
+          "secret": "pahad",
+          "word": "snow",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 7903,
+          "note": null
+        },
+        {
+          "secret": "parivar",
+          "word": "family",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 5705,
+          "note": null
+        },
+        {
+          "secret": "parivar",
+          "word": "relatives",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 4621,
+          "note": null
+        },
+        {
+          "secret": "parivar",
+          "word": "parents",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6467,
+          "note": null
+        },
+        {
+          "secret": "parivar",
+          "word": "ghar",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 4556,
+          "note": null
+        },
+        {
+          "secret": "parivar",
+          "word": "steve",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 95,
+          "note": null
+        },
+        {
+          "secret": "phool",
+          "word": "bloom",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 1233,
+          "note": null
+        },
+        {
+          "secret": "phool",
+          "word": "flower",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 1526,
+          "note": null
+        },
+        {
+          "secret": "phool",
+          "word": "bagicha",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 1008,
+          "note": null
+        },
+        {
+          "secret": "phool",
+          "word": "khushbu",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 974,
+          "note": null
+        },
+        {
+          "secret": "samunder",
+          "word": "sea",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 3417,
+          "note": null
+        },
+        {
+          "secret": "samunder",
+          "word": "beach",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 3537,
+          "note": null
+        },
+        {
+          "secret": "samunder",
+          "word": "wave",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 10301,
+          "note": null
+        },
+        {
+          "secret": "samunder",
+          "word": "kenya",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 464,
+          "note": null
+        },
+        {
+          "secret": "sapna",
+          "word": "neend",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 536,
+          "note": null
+        },
+        {
+          "secret": "sapna",
+          "word": "dream",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 3215,
+          "note": null
+        },
+        {
+          "secret": "sapna",
+          "word": "imagination",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 2352,
+          "note": null
+        },
+        {
+          "secret": "sapna",
+          "word": "wish",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 3362,
+          "note": null
+        },
+        {
+          "secret": "sipahi",
+          "word": "soldier",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 9998,
+          "note": null
+        },
+        {
+          "secret": "sipahi",
+          "word": "warrior",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 2599,
+          "note": null
+        },
+        {
+          "secret": "sipahi",
+          "word": "army",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 10054,
+          "note": null
+        },
+        {
+          "secret": "sipahi",
+          "word": "battle",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 5,
+          "actual_rank": 6050,
+          "note": null
+        },
+        {
+          "secret": "yaad",
+          "word": "memory",
+          "tier": "near",
+          "subtype": "translation",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 5,
+          "actual_rank": 5806,
+          "note": null
+        },
+        {
+          "secret": "yaad",
+          "word": "remember",
+          "tier": "near",
+          "subtype": "associate",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "actual_band": 4,
+          "actual_rank": 2057,
+          "note": null
+        },
+        {
+          "secret": "yaad",
+          "word": "past",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 2507,
+          "note": null
+        },
+        {
+          "secret": "yaad",
+          "word": "purana",
+          "tier": "mid",
+          "subtype": null,
+          "expected_bands": [
+            3
+          ],
+          "actual_band": 4,
+          "actual_rank": 1269,
+          "note": null
+        }
+      ],
+      "resolution_errors": []
+    }
+  },
+  "dimension2_crosslang": {
+    "n_pairs": 60,
+    "n_resolved": 59,
+    "n_resolution_errors": 1,
+    "pass_rate_scorching_or_hot": 0.05084745762711865,
+    "median_rank": 4881.0,
+    "mean_rank": 4980.762711864407,
+    "median_rank_percentile": 46.65,
+    "worst_diverging_pairs": [
+      {
+        "en_secret": "clock",
+        "hien_secret": "ghadi",
+        "rank": 10394,
+        "rank_percentile": 99.35,
+        "band": 5
+      },
+      {
+        "en_secret": "mirror",
+        "hien_secret": "aaina",
+        "rank": 10291,
+        "rank_percentile": 98.37,
+        "band": 5
+      },
+      {
+        "en_secret": "lightning",
+        "hien_secret": "bijli",
+        "rank": 10249,
+        "rank_percentile": 97.96,
+        "band": 5
+      },
+      {
+        "en_secret": "moon",
+        "hien_secret": "chaand",
+        "rank": 10211,
+        "rank_percentile": 97.6,
+        "band": 5
+      },
+      {
+        "en_secret": "soldier",
+        "hien_secret": "sipahi",
+        "rank": 9998,
+        "rank_percentile": 95.56,
+        "band": 5
+      },
+      {
+        "en_secret": "kitchen",
+        "hien_secret": "rasoi",
+        "rank": 9917,
+        "rank_percentile": 94.79,
+        "band": 5
+      },
+      {
+        "en_secret": "bridge",
+        "hien_secret": "pul",
+        "rank": 9743,
+        "rank_percentile": 93.13,
+        "band": 5
+      },
+      {
+        "en_secret": "butterfly",
+        "hien_secret": "titli",
+        "rank": 9579,
+        "rank_percentile": 91.56,
+        "band": 5
+      },
+      {
+        "en_secret": "river",
+        "hien_secret": "nadi",
+        "rank": 9430,
+        "rank_percentile": 90.14,
+        "band": 5
+      },
+      {
+        "en_secret": "window",
+        "hien_secret": "khidki",
+        "rank": 9172,
+        "rank_percentile": 87.67,
+        "band": 5
+      },
+      {
+        "en_secret": "lamp",
+        "hien_secret": "diya",
+        "rank": 9003,
+        "rank_percentile": 86.05,
+        "band": 5
+      },
+      {
+        "en_secret": "laughter",
+        "hien_secret": "hansi",
+        "rank": 8984,
+        "rank_percentile": 85.87,
+        "band": 5
+      },
+      {
+        "en_secret": "coffee",
+        "hien_secret": "chai",
+        "rank": 8765,
+        "rank_percentile": 83.78,
+        "band": 5
+      },
+      {
+        "en_secret": "blanket",
+        "hien_secret": "razaai",
+        "rank": 8662,
+        "rank_percentile": 82.79,
+        "band": 5
+      },
+      {
+        "en_secret": "sunrise",
+        "hien_secret": "subah",
+        "rank": 8443,
+        "rank_percentile": 80.7,
+        "band": 5
+      }
+    ],
+    "all_records": [
+      {
+        "en_secret": "ocean",
+        "hien_secret": "samunder",
+        "guess": "ocean",
+        "guess_is_valid_en_word": true,
+        "rank": 7852,
+        "vocab_size": 10462,
+        "rank_percentile": 75.05,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "music",
+        "hien_secret": "gaana",
+        "guess": "music",
+        "guess_is_valid_en_word": true,
+        "rank": 3830,
+        "vocab_size": 10462,
+        "rank_percentile": 36.61,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "doctor",
+        "hien_secret": "doctor",
+        "guess": "doctor",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "rain",
+        "hien_secret": "baarish",
+        "guess": "rain",
+        "guess_is_valid_en_word": true,
+        "rank": 7639,
+        "vocab_size": 10462,
+        "rank_percentile": 73.02,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "family",
+        "hien_secret": "parivar",
+        "guess": "family",
+        "guess_is_valid_en_word": true,
+        "rank": 5705,
+        "vocab_size": 10462,
+        "rank_percentile": 54.53,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "mountain",
+        "hien_secret": "pahad",
+        "guess": "mountain",
+        "guess_is_valid_en_word": true,
+        "rank": 7342,
+        "vocab_size": 10462,
+        "rank_percentile": 70.18,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "fire",
+        "hien_secret": "aag",
+        "guess": "fire",
+        "guess_is_valid_en_word": true,
+        "rank": 7002,
+        "vocab_size": 10462,
+        "rank_percentile": 66.93,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "dream",
+        "hien_secret": "sapna",
+        "guess": "dream",
+        "guess_is_valid_en_word": true,
+        "rank": 3215,
+        "vocab_size": 10462,
+        "rank_percentile": 30.73,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "money",
+        "hien_secret": "paisa",
+        "guess": "money",
+        "guess_is_valid_en_word": true,
+        "rank": 5921,
+        "vocab_size": 10462,
+        "rank_percentile": 56.6,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "school",
+        "hien_secret": "school",
+        "guess": "school",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "friend",
+        "hien_secret": "dost",
+        "guess": "friend",
+        "guess_is_valid_en_word": true,
+        "rank": 4247,
+        "vocab_size": 10462,
+        "rank_percentile": 40.59,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "kitchen",
+        "hien_secret": "rasoi",
+        "guess": "kitchen",
+        "guess_is_valid_en_word": true,
+        "rank": 9917,
+        "vocab_size": 10462,
+        "rank_percentile": 94.79,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "garden",
+        "hien_secret": "bagicha",
+        "guess": "garden",
+        "guess_is_valid_en_word": true,
+        "rank": 7637,
+        "vocab_size": 10462,
+        "rank_percentile": 73.0,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "bridge",
+        "hien_secret": "pul",
+        "guess": "bridge",
+        "guess_is_valid_en_word": true,
+        "rank": 9743,
+        "vocab_size": 10462,
+        "rank_percentile": 93.13,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "village",
+        "hien_secret": "gaon",
+        "guess": "village",
+        "guess_is_valid_en_word": true,
+        "rank": 2970,
+        "vocab_size": 10462,
+        "rank_percentile": 28.39,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "temple",
+        "hien_secret": "mandir",
+        "guess": "temple",
+        "guess_is_valid_en_word": true,
+        "rank": 935,
+        "vocab_size": 10462,
+        "rank_percentile": 8.94,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "journey",
+        "hien_secret": "safar",
+        "guess": "journey",
+        "guess_is_valid_en_word": true,
+        "rank": 4,
+        "vocab_size": 10462,
+        "rank_percentile": 0.04,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "shadow",
+        "hien_secret": "parchhain",
+        "guess": "shadow",
+        "guess_is_valid_en_word": true,
+        "rank": 4580,
+        "vocab_size": 10462,
+        "rank_percentile": 43.78,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "river",
+        "hien_secret": "nadi",
+        "guess": "river",
+        "guess_is_valid_en_word": true,
+        "rank": 9430,
+        "vocab_size": 10462,
+        "rank_percentile": 90.14,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "forest",
+        "hien_secret": "jungle",
+        "guess": "forest",
+        "guess_is_valid_en_word": true,
+        "rank": 2,
+        "vocab_size": 10462,
+        "rank_percentile": 0.02,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "sunrise",
+        "hien_secret": "subah",
+        "guess": "sunrise",
+        "guess_is_valid_en_word": true,
+        "rank": 8443,
+        "vocab_size": 10462,
+        "rank_percentile": 80.7,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "market",
+        "hien_secret": "bazar",
+        "guess": "market",
+        "guess_is_valid_en_word": true,
+        "rank": 13,
+        "vocab_size": 10462,
+        "rank_percentile": 0.12,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "memory",
+        "hien_secret": "yaad",
+        "guess": "memory",
+        "guess_is_valid_en_word": true,
+        "rank": 5806,
+        "vocab_size": 10462,
+        "rank_percentile": 55.5,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "festival",
+        "hien_secret": "tyohar",
+        "guess": "festival",
+        "guess_is_valid_en_word": true,
+        "rank": 4275,
+        "vocab_size": 10462,
+        "rank_percentile": 40.86,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "letter",
+        "hien_secret": "khat",
+        "guess": "letter",
+        "guess_is_valid_en_word": true,
+        "rank": 2598,
+        "vocab_size": 10462,
+        "rank_percentile": 24.83,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "mirror",
+        "hien_secret": "aaina",
+        "guess": "mirror",
+        "guess_is_valid_en_word": true,
+        "rank": 10291,
+        "vocab_size": 10462,
+        "rank_percentile": 98.37,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "blanket",
+        "hien_secret": "razaai",
+        "guess": "blanket",
+        "guess_is_valid_en_word": true,
+        "rank": 8662,
+        "vocab_size": 10462,
+        "rank_percentile": 82.79,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "victory",
+        "hien_secret": "jeet",
+        "guess": "victory",
+        "guess_is_valid_en_word": true,
+        "rank": 4881,
+        "vocab_size": 10462,
+        "rank_percentile": 46.65,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "butterfly",
+        "hien_secret": "titli",
+        "guess": "butterfly",
+        "guess_is_valid_en_word": true,
+        "rank": 9579,
+        "vocab_size": 10462,
+        "rank_percentile": 91.56,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "silence",
+        "hien_secret": "khamoshi",
+        "guess": "silence",
+        "guess_is_valid_en_word": true,
+        "rank": 4981,
+        "vocab_size": 10462,
+        "rank_percentile": 47.61,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "courage",
+        "hien_secret": "himmat",
+        "guess": "courage",
+        "guess_is_valid_en_word": true,
+        "rank": 4767,
+        "vocab_size": 10462,
+        "rank_percentile": 45.56,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "lamp",
+        "hien_secret": "diya",
+        "guess": "lamp",
+        "guess_is_valid_en_word": true,
+        "rank": 9003,
+        "vocab_size": 10462,
+        "rank_percentile": 86.05,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "treasure",
+        "hien_secret": "khazana",
+        "guess": "treasure",
+        "guess_is_valid_en_word": true,
+        "rank": 3263,
+        "vocab_size": 10462,
+        "rank_percentile": 31.19,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "library",
+        "hien_secret": "library",
+        "guess": "library",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "harvest",
+        "hien_secret": "fasal",
+        "guess": "harvest",
+        "guess_is_valid_en_word": true,
+        "rank": 602,
+        "vocab_size": 10462,
+        "rank_percentile": 5.75,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "lightning",
+        "hien_secret": "bijli",
+        "guess": "lightning",
+        "guess_is_valid_en_word": true,
+        "rank": 10249,
+        "vocab_size": 10462,
+        "rank_percentile": 97.96,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "wisdom",
+        "hien_secret": "gyaan",
+        "guess": "wisdom",
+        "guess_is_valid_en_word": true,
+        "rank": 5013,
+        "vocab_size": 10462,
+        "rank_percentile": 47.92,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "childhood",
+        "hien_secret": "bachpan",
+        "guess": "childhood",
+        "guess_is_valid_en_word": true,
+        "rank": 4362,
+        "vocab_size": 10462,
+        "rank_percentile": 41.69,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "wedding",
+        "hien_secret": "shaadi",
+        "guess": "wedding",
+        "guess_is_valid_en_word": true,
+        "rank": 5889,
+        "vocab_size": 10462,
+        "rank_percentile": 56.29,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "hospital",
+        "hien_secret": "hospital",
+        "guess": "hospital",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "window",
+        "hien_secret": "khidki",
+        "guess": "window",
+        "guess_is_valid_en_word": true,
+        "rank": 9172,
+        "vocab_size": 10462,
+        "rank_percentile": 87.67,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "soldier",
+        "hien_secret": "sipahi",
+        "guess": "soldier",
+        "guess_is_valid_en_word": true,
+        "rank": 9998,
+        "vocab_size": 10462,
+        "rank_percentile": 95.56,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "teacher",
+        "hien_secret": "teacher",
+        "guess": "teacher",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "perfume",
+        "hien_secret": "khushbu",
+        "guess": "perfume",
+        "guess_is_valid_en_word": true,
+        "rank": 4234,
+        "vocab_size": 10462,
+        "rank_percentile": 40.47,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "train",
+        "hien_secret": "train",
+        "guess": "train",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "candle",
+        "hien_secret": "mombatti",
+        "guess": "candle",
+        "guess_is_valid_en_word": true,
+        "rank": 6824,
+        "vocab_size": 10462,
+        "rank_percentile": 65.23,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "moon",
+        "hien_secret": "chaand",
+        "guess": "moon",
+        "guess_is_valid_en_word": true,
+        "rank": 10211,
+        "vocab_size": 10462,
+        "rank_percentile": 97.6,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "clock",
+        "hien_secret": "ghadi",
+        "guess": "clock",
+        "guess_is_valid_en_word": true,
+        "rank": 10394,
+        "vocab_size": 10462,
+        "rank_percentile": 99.35,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "island",
+        "hien_secret": "island",
+        "guess": "island",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "flower",
+        "hien_secret": "phool",
+        "guess": "flower",
+        "guess_is_valid_en_word": true,
+        "rank": 1526,
+        "vocab_size": 10462,
+        "rank_percentile": 14.59,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "diamond",
+        "hien_secret": "heera",
+        "guess": "diamond",
+        "guess_is_valid_en_word": true,
+        "rank": 7233,
+        "vocab_size": 10462,
+        "rank_percentile": 69.14,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "palace",
+        "hien_secret": "mahal",
+        "guess": "palace",
+        "guess_is_valid_en_word": true,
+        "rank": 3711,
+        "vocab_size": 10462,
+        "rank_percentile": 35.47,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "picture",
+        "hien_secret": "tasveer",
+        "guess": "picture",
+        "guess_is_valid_en_word": true,
+        "rank": 2496,
+        "vocab_size": 10462,
+        "rank_percentile": 23.86,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "hunger",
+        "hien_secret": "bhook",
+        "guess": "hunger",
+        "guess_is_valid_en_word": true,
+        "rank": 5782,
+        "vocab_size": 10462,
+        "rank_percentile": 55.27,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "laughter",
+        "hien_secret": "hansi",
+        "guess": "laughter",
+        "guess_is_valid_en_word": true,
+        "rank": 8984,
+        "vocab_size": 10462,
+        "rank_percentile": 85.87,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "coffee",
+        "hien_secret": "chai",
+        "guess": "coffee",
+        "guess_is_valid_en_word": true,
+        "rank": 8765,
+        "vocab_size": 10462,
+        "rank_percentile": 83.78,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "umbrella",
+        "hien_secret": "chhata",
+        "guess": "umbrella",
+        "guess_is_valid_en_word": true,
+        "rank": 3878,
+        "vocab_size": 10462,
+        "rank_percentile": 37.07,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "rainbow",
+        "hien_secret": "rainbow",
+        "guess": "rainbow",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      },
+      {
+        "en_secret": "kite",
+        "hien_secret": "patang",
+        "resolution_error": "EN translation 'kite' not in hi-en vocab"
+      },
+      {
+        "en_secret": "birthday",
+        "hien_secret": "birthday",
+        "guess": "birthday",
+        "guess_is_valid_en_word": true,
+        "rank": 1,
+        "vocab_size": 10462,
+        "rank_percentile": 0.01,
+        "band": 0,
+        "consistent": false,
+        "resolution_error": null
+      }
+    ]
+  },
+  "dimension3_judge": {
+    "available": true,
+    "calibration": {
+      "n_spoiler_cases": 32,
+      "spoiler_agreement": 0.96875,
+      "spoiler_disagreements": [
+        {
+          "axis": "spoiler_safety",
+          "lang": "en",
+          "secret": "lamp",
+          "clue": "Before switches existed, this kept the dark at bay (the answer is lamp)",
+          "ground_truth_spoiler_flag": true,
+          "case_id": "mutated:daily:lamp",
+          "judged_spoiler_flag": false,
+          "agree": false
+        }
+      ],
+      "n_solvability_cases": 32,
+      "solvability_agreement": 0.65625,
+      "solvability_disagreements": [
+        {
+          "axis": "solvability",
+          "lang": "en",
+          "secret": "audience",
+          "clue": "Whistles, claps, and throws coins at the screen",
+          "ground_truth_solvable": true,
+          "case_id": "matched:pack:bollywood:audience",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "en",
+          "secret": "village",
+          "clue": "Where everyone knows your grandmother's name",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:village",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "en",
+          "secret": "rain",
+          "clue": "The sky's only way of saying the earth is thirsty",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:rain",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "en",
+          "secret": "chant",
+          "clue": "The stands repeat the same eight words all afternoon",
+          "ground_truth_solvable": true,
+          "case_id": "matched:pack:cricket:chant",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "en",
+          "secret": "lightning",
+          "clue": "Brighter than daylight, gone before you can flinch",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:lightning",
+          "judged_solvability": 2,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "baarish",
+          "clue": "When the sky finally opens after a scorching May afternoon",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:baarish",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "rasoi",
+          "clue": "Where the whole house comes alive twice a day",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:rasoi",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "jeet",
+          "clue": "What India celebrates loudly and publicly, every time cricket happens",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:jeet",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "khamoshi",
+          "clue": "What fills the room after a difficult conversation",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:khamoshi",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "geet",
+          "clue": "Har mood ka Bollywood ilaaj — shabd bhool jao toh la-la-la",
+          "ground_truth_solvable": true,
+          "case_id": "matched:pack:bollywood:geet",
+          "judged_solvability": 1,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "badla",
+          "clue": "Bachpan ka zulm, ab bas ek hi mission",
+          "ground_truth_solvable": true,
+          "case_id": "matched:pack:bollywood:badla",
+          "judged_solvability": 1,
+          "agree": false
+        }
+      ]
+    },
+    "n_clues_judged": 220,
+    "n_judge_errors": 0,
+    "judge_errors": [],
+    "min_solvability": 1,
+    "mean_solvability": 2.15,
+    "pct_below_min_solvability": 0.7181818181818181,
+    "n_spoiler_flagged": 0,
+    "spoiler_flagged_clues": [],
+    "difficulty_distribution": {
+      "1": 0,
+      "2": 26,
+      "3": 183,
+      "4": 11,
+      "5": 0
+    },
+    "mean_cultural_fit_hien": 4.8,
+    "low_cultural_fit_clues": [],
+    "all_judged": [
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "ocean",
+        "clue": "The biggest blue thing on any map",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "music",
+        "clue": "It reaches places in your mind that words alone cannot",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "doctor",
+        "clue": "You hope you never need one, but glad they exist",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "rain",
+        "clue": "The sky's only way of saying the earth is thirsty",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "family",
+        "clue": "You didn't choose them, but life would be empty without",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "mountain",
+        "clue": "Nature's way of touching the clouds from below",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "fire",
+        "clue": "Useful in the hearth; terrifying in the wild",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "dream",
+        "clue": "The mind's own cinema, running while you sleep",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "money",
+        "clue": "Everyone wants it; nobody admits how much",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "school",
+        "clue": "Mandatory for twelve years; missed once it's over",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "friend",
+        "clue": "The family you choose, one laugh at a time",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "kitchen",
+        "clue": "Where hunger becomes something warm and delicious",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "garden",
+        "clue": "Patience measured in weeks, rewarded in bloom",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "bridge",
+        "clue": "Spans the gap between what water keeps apart",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "village",
+        "clue": "Where everyone knows your grandmother's name",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "temple",
+        "clue": "Built by hands; visited by the hopeful and grateful",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "journey",
+        "clue": "The distance between here and somewhere that matters",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "shadow",
+        "clue": "Follows you everywhere; never exists on cloudy days",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "river",
+        "clue": "Runs from high places to find something larger",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "forest",
+        "clue": "Where sunlight arrives in pieces, filtered by leaves",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "sunrise",
+        "clue": "The world's daily reset — free, punctual, unrepeatable",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "market",
+        "clue": "Noise and color where nothing has a fixed price",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "memory",
+        "clue": "The past you can revisit but never re-enter",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "festival",
+        "clue": "The calendar's bright spots, planned for months in advance",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "letter",
+        "clue": "Words that traveled by hand before the internet existed",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "mirror",
+        "clue": "The only portrait that updates in real time",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "blanket",
+        "clue": "Winter's best companion: soft, heavy, irresistible",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "victory",
+        "clue": "Hands raised at the finish line, scoreboard finally in your favor",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "butterfly",
+        "clue": "A caterpillar's midlife crisis ends beautifully",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "silence",
+        "clue": "The loudest thing in an empty room",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "courage",
+        "clue": "Not the absence of fear, but the decision to move",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "lamp",
+        "clue": "Before switches existed, this kept the dark at bay",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "treasure",
+        "clue": "What every child buries; what every adult hunts",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "library",
+        "clue": "Where any book is yours to borrow, briefly and for free",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "harvest",
+        "clue": "The payoff for months of soil, sun, and waiting",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "lightning",
+        "clue": "Brighter than daylight, gone before you can flinch",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "wisdom",
+        "clue": "Knowledge aged until it knows when to stay quiet",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "childhood",
+        "clue": "A time you only truly appreciate after it's gone",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "wedding",
+        "clue": "The ceremony that combines two families and one menu fight",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "hospital",
+        "clue": "The building that smells like worry and antiseptic",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "window",
+        "clue": "The view from inside looking out at the world",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "soldier",
+        "clue": "Trained to face what most people never want to imagine",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "teacher",
+        "clue": "The person whose words echo in your head decades later",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "perfume",
+        "clue": "Invisible, yet the fastest trigger for a distant memory",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "train",
+        "clue": "Steel and schedule, threading cities together across the land",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "candle",
+        "clue": "One small flame that changes the mood of any room",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "moon",
+        "clue": "Earth's loyal companion, visible even in daylight sometimes",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "clock",
+        "clue": "Time's only scorekeeper, indifferent to your feelings about it",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "island",
+        "clue": "Surrounded by water, disconnected from the mainland",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "flower",
+        "clue": "Born to bloom briefly; exists to say something without words",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "diamond",
+        "clue": "Billions of years of pressure, marketed as proof of love",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "palace",
+        "clue": "Where rulers slept, and tourists now take selfies",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "picture",
+        "clue": "On your phone, on the wall, frozen forever",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "hunger",
+        "clue": "The body's most persuasive argument for taking a break",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "laughter",
+        "clue": "Contagious, involuntary, and occasionally at the wrong moment",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "coffee",
+        "clue": "The ritual before the rest of the morning makes sense",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "umbrella",
+        "clue": "Optimism you carry; inconvenience you forget most days",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "rainbow",
+        "clue": "Seven colors that only appear when you need them most",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "kite",
+        "clue": "Wind-powered, string-tethered freedom, best viewed from below",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "en",
+        "secret": "birthday",
+        "clue": "The one annual occasion that's officially yours",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "samunder",
+        "clue": "India's coast stretches thousands of miles; this is what it touches",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "gaana",
+        "clue": "Bollywood runs on it; traffic jams survive because of it",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "doctor",
+        "clue": "The first person every Indian parent wants their child to become",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "baarish",
+        "clue": "When the sky finally opens after a scorching May afternoon",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "parivar",
+        "clue": "In India, rarely just parents and kids — always bigger, always louder",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "pahad",
+        "clue": "The place every Delhiite drives to escape the summer heat",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "aag",
+        "clue": "Without it, roti doesn't happen, havan doesn't happen",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "sapna",
+        "clue": "What you see with your eyes closed and chase with them open",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "paisa",
+        "clue": "Everyone wants more; nobody admits it",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "school",
+        "clue": "First tiffin box, first crush, first exam you stayed up for",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "dost",
+        "clue": "The one who knows your secrets and still picks up the call",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "rasoi",
+        "clue": "Where the whole house comes alive twice a day",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "bagicha",
+        "clue": "What every Delhi uncle tends to with surprising devotion",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "pul",
+        "clue": "Connects what the river divides",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "gaon",
+        "clue": "Where nani's stories come from, and where roti tastes different",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "mandir",
+        "clue": "Prasad, bells, incense — the crowd doubles on Tuesdays",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "safar",
+        "clue": "AC coach or sleeper — either way, it changes you",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "parchhain",
+        "clue": "Dhoop mein saath chalti, andhera aate hi gayab",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "nadi",
+        "clue": "Where the next city's drinking water began its trip",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "jungle",
+        "clue": "Where the tiger hides and the eco-resort charges a premium",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "subah",
+        "clue": "When the newspaper lands and the street is still quiet",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "bazar",
+        "clue": "Bargaining is not optional; it's part of the price",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "yaad",
+        "clue": "The thing that makes you smile or go quiet without warning",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "tyohar",
+        "clue": "When sweets appear, chutti is taken, and family actually gathers",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "khat",
+        "clue": "Before WhatsApp, this was how you waited two weeks for an answer",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "aaina",
+        "clue": "Checked before every family function, adjusted three more times on the way",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "razaai",
+        "clue": "December nights in north India would be unbearable without it",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "jeet",
+        "clue": "What India celebrates loudly and publicly, every time cricket happens",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "titli",
+        "clue": "The insect that earned its wings the hard way",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "khamoshi",
+        "clue": "What fills the room after a difficult conversation",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "himmat",
+        "clue": "What you need before the first day of anything important",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "diya",
+        "clue": "Clay, wick, oil — and somehow it changes the whole atmosphere",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "khazana",
+        "clue": "Grandparents' tin boxes that nobody opens until they're gone",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "library",
+        "clue": "Shh — required here; half the shelf is waiting just for you",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "fasal",
+        "clue": "What the farmers celebrate in January, after months of waiting",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "bijli",
+        "clue": "The flash before the booming wake-up call",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "gyaan",
+        "clue": "Dadaji gives it for free; you understand it ten years later",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "bachpan",
+        "clue": "Chhupa chhupai, kho kho, and summer holidays that felt like forever",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "shaadi",
+        "clue": "Three-day affair, two hundred guests minimum, one mehendi night",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "hospital",
+        "clue": "The building where the waiting room is always more crowded than expected",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "khidki",
+        "clue": "Where you watch the baarish without getting wet",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "sipahi",
+        "clue": "The one who serves so everyone else can argue freely",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "teacher",
+        "clue": "In India, touched at the feet first, then corrected on WhatsApp",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "khushbu",
+        "clue": "Jasmine in the hair at weddings, petrichor after first rains",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "train",
+        "clue": "Platform crowds, bedroll rentals, and the announcement at 2 AM",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "mombatti",
+        "clue": "What comes out the second bijli jaati hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "chaand",
+        "clue": "Eid mein dekha, Karva Chauth mein dekha — always doing double duty",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "ghadi",
+        "clue": "IST is the standard; individual arrival times vary widely",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "island",
+        "clue": "Andaman or Lakshadweep — most Indians dream of it, few go",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "phool",
+        "clue": "Garlands at arrival, petals at funerals — present at everything",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "heera",
+        "clue": "Sona is good; this is the real flex at a jewellery store",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "mahal",
+        "clue": "Where the Mughals lived and every tourist stands in line today",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "tasveer",
+        "clue": "On the phone, on the wall, in the dil",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "bhook",
+        "clue": "The most effective argument for stopping anywhere that smells good",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "hansi",
+        "clue": "What escapes when you're supposed to be quiet",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "chai",
+        "clue": "Two hundred million cups before 9 AM, and somehow still not enough",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "chhata",
+        "clue": "Bought at the first drop; lost by the end of the season",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "rainbow",
+        "clue": "Seven colors that appear after the clouds have finally cleared",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "patang",
+        "clue": "Makar Sankranti's star: the cutter wins, the watcher envies",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "daily",
+        "lang": "hi-en",
+        "secret": "birthday",
+        "clue": "The one annual occasion you're officially allowed to expect cake and phone calls",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "romance",
+        "clue": "The masala every blockbuster runs on",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "hero",
+        "clue": "Slow-motion entry, and the front row goes wild",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "villain",
+        "clue": "Mogambo, Gabbar, Kancha — the job title they share",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "dance",
+        "clue": "Two hundred backup performers appear at the wedding from nowhere",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "song",
+        "clue": "Emotions overflow, cut to Switzerland, and suddenly everyone knows the words",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "mother",
+        "clue": "Trump card of Hindi cinema's most famous argument",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "drama",
+        "clue": "Thunder, lightning, and three reaction shots for one slap",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "tears",
+        "clue": "Glycerine's most famous job in the industry",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "dialogue",
+        "clue": "'Don ko pakadna mushkil hi nahi' — the whole theater finishes it",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "destiny",
+        "clue": "Lovers keep missing trains; the scriptwriter insists they'll still meet",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "promise",
+        "clue": "Made under the moon, kept for seven lifetimes",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "revenge",
+        "clue": "Twenty years cold, served right after the childhood flashback",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "police",
+        "clue": "Arrives at the climax, exactly three minutes too late",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "honor",
+        "clue": "What the khandaan guards more fiercely than its gold",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "sacrifice",
+        "clue": "The elder brother's silent specialty: his happiness, your wedding",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "story",
+        "clue": "Three hours, six songs, and the aunty next to you already knows the ending",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "twist",
+        "clue": "Right before the interval: nothing is what it seemed",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "star",
+        "clue": "Every chaiwala in Film City dreams of becoming one",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "anger",
+        "clue": "Red eyes, clenched fists, and the dinner table goes flying",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "fight",
+        "clue": "One man, twenty goons, zero fair odds",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "gossip",
+        "clue": "What film magazines sold long before Instagram",
+        "solvability": 4,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "audience",
+        "clue": "Whistles, claps, and throws coins at the screen",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "youth",
+        "clue": "The seventies hero had it, and every villain wanted it back",
+        "solvability": 4,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "ticket",
+        "clue": "First day, first show — if you can get one",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "en",
+        "secret": "award",
+        "clue": "Filmfare night's black lady, clutched through teary speeches",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "pyaar",
+        "clue": "'Palat!' — woh palat gayi, toh samjho ho gaya",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "hero",
+        "clue": "Dhamakedaar entry, aakhri reel mein sau gundo pe akela bhaari",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "villain",
+        "clue": "Gabbar, Mogambo, Shakaal — sab ka ek hi dhandha",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "naach",
+        "clue": "Shaadi ho ya item number, yeh hona hi hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "geet",
+        "clue": "Har mood ka Bollywood ilaaj — shabd bhool jao toh la-la-la",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "maa",
+        "clue": "Nirupa Roy waala role — Deewar ki asli jeet",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "natak",
+        "clue": "Rona jhootha, awaaz uchi — ghar ho ya screen, full show",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "aansoo",
+        "clue": "Emotional scene ka proof — glycerine ho ya asli",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "dialogue",
+        "clue": "'Don ko pakadna mushkil hi nahi' — aage poora theater bolta hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "kismat",
+        "clue": "Jo likha hai, hoke rahega — filmo ka sabse bada bahana",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "vaada",
+        "clue": "Chaand gawah — saat janam tak nibhana padega",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "badla",
+        "clue": "Bachpan ka zulm, ab bas ek hi mission",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "police",
+        "clue": "Climax ke baad hi pahunchti hai — tab tak kaam ho chuka",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "izzat",
+        "clue": "Khandaan ki sabse keemti cheez — roz daav pe lagti hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "qurbani",
+        "clue": "Bade bhai ka signature move — apni khushi, bhai ke naam",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "kahani",
+        "clue": "Teen ghante, chhe gaane — par ending pehle se sab ko pata",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "twist",
+        "clue": "Interval se theek pehle — 'kya?! aisa socha bhi nahi tha!'",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "sitara",
+        "clue": "Aasman mein bhi chamakta hai, poster pe bhi",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "gussa",
+        "clue": "Aankhen laal, muthhi band — ab kuch tootne wala hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "ladai",
+        "clue": "Ek akela, bees gunde — dhishoom dhishoom",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "gossip",
+        "clue": "Building ki aunty se filmy magazine tak — sabka favourite time-pass",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "audience",
+        "clue": "Seeti bajaye, taali maare, first row se sikke phenke",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "jawaani",
+        "clue": "Sattar ke hero ke paas thi, aur har villain ko chahiye thi",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "ticket",
+        "clue": "First day first show ka jugaad — housefull ho toh black mein",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:bollywood",
+        "lang": "hi-en",
+        "secret": "award",
+        "clue": "Filmfare ki black lady — speech mein sab ko dhanyawaad",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "umpire",
+        "clue": "Raises one finger and either team erupts or groans",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "wicket",
+        "clue": "Splinters fly, and a long walk back to the pavilion begins",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "bowler",
+        "clue": "Runs in, arm windmills over, and the red leather flies",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "innings",
+        "clue": "Your turn at the crease, until you're out or declare",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "trophy",
+        "clue": "Lifted overhead, kissed, and paraded around the ground",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "boundary",
+        "clue": "Racing flat along the turf, four runs without ever leaving the grass",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "stadium",
+        "clue": "Sixty thousand voices, and every one of them roaring today",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "defeat",
+        "clue": "Heads hang low in the dressing room tonight",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "rivalry",
+        "clue": "Neighbors on the map, enemies for exactly three hours",
+        "solvability": 2,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "chant",
+        "clue": "The stands repeat the same eight words all afternoon",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "crowd",
+        "clue": "Thousands packed shoulder to shoulder, none of them sitting down",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "fielder",
+        "clue": "Sprints to the rope and dives to save the day",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "captain",
+        "clue": "First one blamed, last one to stop believing",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "bat",
+        "clue": "Carved from willow, gripped tightly, facing the opening delivery today",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "catch",
+        "clue": "Two safe hands turn a big shot into an early exit",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "comeback",
+        "clue": "Written off at tea, celebrating wildly by close of play",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "pitch",
+        "clue": "Twenty-two yards of grass that decides everything",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "champion",
+        "clue": "Everyone else goes home; this team gets the parade",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 2,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "score",
+        "clue": "The tally every phone in the office keeps refreshing",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "finalist",
+        "clue": "One win away from glory, one loss from going home",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "spin",
+        "clue": "Flighted invitingly, then bites and darts away late",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "appeal",
+        "clue": "Eleven voices, one word, hands raised to the sky",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "helmet",
+        "clue": "Snapped on before the fastest bowling, protecting more than pride",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "debut",
+        "clue": "Nervous first steps onto the field, name new to everyone",
+        "solvability": 5,
+        "matches": true,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "en",
+        "secret": "six",
+        "clue": "Clears the rope without even touching the ground",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": null
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "umpire",
+        "clue": "Ek ungli uthi, aur poora ground ya toh chilaya ya chup ho gaya",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "wicket",
+        "clue": "Lakdiyan bikhri, aur pavilion ki taraf khamosh chaal shuru",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "bowler",
+        "clue": "Daudta hua aata hai, baazu ghumaata hai, gendh udhti hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "innings",
+        "clue": "Tumhari baari crease pe, jab tak out ya declare na ho",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "trophy",
+        "clue": "Sar ke upar utha ke, chuma, aur poore ground ka chakkar",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "boundary",
+        "clue": "Zameen se chipki gendh, char run, ghaas chhode bina seedha paar",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "stadium",
+        "clue": "Saath hazaar kursiyan, aur aaj ek bhi khaali nahi",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "defeat",
+        "clue": "Dressing room mein sar jhuke hain aaj raat",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "rivalry",
+        "clue": "Naqshe pe padosi, teen ghante ke liye dushman",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "chant",
+        "clue": "Stands wahi aath shabd baar baar dohraate hain",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "crowd",
+        "clue": "Hazaaron kandhe se kandha mila ke khade, koi baitha nahi",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "fielder",
+        "clue": "Rope tak daudta hai, dive maarta hai, din bacha leta hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "captain",
+        "clue": "Sabse pehle ilzaam isi pe, sabse aakhri tak vishwas isi ka",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "bat",
+        "clue": "Dono haathon mein willow, guard maar ke, pehli gendh ka samna",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "catch",
+        "clue": "Do surakshit haath ek bade shot ko jaldi out mein badal dete hain",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "comeback",
+        "clue": "Tea tak likh diya tha khatam, stumps tak jashan mana rahe",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 4,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "pitch",
+        "clue": "Baaees gaz ki ghaas jo sab kuch tay karti hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "champion",
+        "clue": "Baaki sab ghar jaate hain, yeh team parade nikaalti hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "score",
+        "clue": "Woh aankdha jo office ka har phone baar baar refresh karta hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "finalist",
+        "clue": "Jeet se ek kadam door, ghar jaane se ek haar door",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "spin",
+        "clue": "Upar se lehrata hua aata hai, phir achanak kat ke nikal jaata hai",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "appeal",
+        "clue": "Gyaarah aawazein, ek hi shabd, haath aasman ki taraf",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 4
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "helmet",
+        "clue": "Jaali neeche, patti tight, tez raftaar ka saamna karne se pehle",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "debut",
+        "clue": "Pehla kadam maidan pe, naam sabke liye naya",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      },
+      {
+        "source": "pack:cricket",
+        "lang": "hi-en",
+        "secret": "six",
+        "clue": "Rope ko chhue bina hi seedha uske paar",
+        "solvability": 1,
+        "matches": false,
+        "spoiler_flag": false,
+        "difficulty": 3,
+        "cultural_fit": 5
+      }
+    ]
+  },
+  "dimension4_rival": {
+    "n_puzzles": 220,
+    "median_par": 8.0,
+    "mean_par": 8.227272727272727,
+    "par_within_target_range": 1.0,
+    "median_within_target": true,
+    "median_chill_spread": 5.0,
+    "chill_spread_within_target": 1.0,
+    "median_sharp_spread": 3.0,
+    "sharp_spread_within_target": 1.0,
+    "per_lang": {
+      "en": {
+        "n": 110,
+        "median_par": 9.0,
+        "mean_par": 8.945454545454545,
+        "n_flagged": 0
+      },
+      "hi-en": {
+        "n": 110,
+        "median_par": 8.0,
+        "mean_par": 7.509090909090909,
+        "n_flagged": 0
+      }
+    },
+    "n_flagged": 0,
+    "flagged_puzzles": []
+  },
+  "dimension5_winrate": {
+    "n_puzzles": 220,
+    "median_win_rate": 0.92,
+    "mean_win_rate": 0.9160454545454545,
+    "win_rate_in_target_band": 0.10909090909090909,
+    "per_lang": {
+      "en": {
+        "n": 110,
+        "median_win_rate": 0.9,
+        "mean_win_rate": 0.8881818181818181
+      },
+      "hi-en": {
+        "n": 110,
+        "median_win_rate": 0.955,
+        "mean_win_rate": 0.943909090909091
+      }
+    },
+    "n_outliers_too_easy": 21,
+    "n_outliers_too_hard": 0,
+    "outliers_too_easy": [
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "chhata",
+        "win_rate": 1.0
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "patang",
+        "win_rate": 1.0
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:cricket",
+        "secret": "trophy",
+        "win_rate": 1.0
+      },
+      {
+        "lang": "en",
+        "source": "daily",
+        "secret": "forest",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "aaina",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:bollywood",
+        "secret": "vaada",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:bollywood",
+        "secret": "ladai",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "en",
+        "source": "pack:cricket",
+        "secret": "defeat",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:cricket",
+        "secret": "defeat",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:cricket",
+        "secret": "catch",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "pack:cricket",
+        "secret": "debut",
+        "win_rate": 0.99
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "subah",
+        "win_rate": 0.98
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "hospital",
+        "win_rate": 0.98
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "khidki",
+        "win_rate": 0.98
+      },
+      {
+        "lang": "hi-en",
+        "source": "daily",
+        "secret": "island",
+        "win_rate": 0.98
+      }
+    ],
+    "outliers_too_hard": []
+  },
+  "elapsed_seconds": 2326.9
+}
