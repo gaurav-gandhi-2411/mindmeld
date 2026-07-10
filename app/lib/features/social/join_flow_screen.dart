@@ -134,7 +134,7 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
               const SizedBox(height: 16),
               const Text('This invite link is invalid or has expired.'),
               const SizedBox(height: 16),
-              FilledButton(onPressed: widget.onDone, child: const Text('Back to Mindmeld')),
+              FilledButton(onPressed: widget.onDone, child: const Text('Back to Warmer')),
             ],
           ),
         );

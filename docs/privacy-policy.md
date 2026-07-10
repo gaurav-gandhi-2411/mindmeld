@@ -1,8 +1,8 @@
-# Mindmeld Privacy Policy
+# Warmer Privacy Policy
 
 **Last Updated:** 2026-06-12
 
-This policy describes how Mindmeld ("the app", "we") handles your data. Mindmeld is a free word-guessing game. We do not require accounts or collect personal information beyond what is described below.
+This policy describes how Warmer ("the app", "we") handles your data. Warmer is a free word-guessing game. We do not require accounts or collect personal information beyond what is described below.
 
 ---
 
@@ -86,7 +86,7 @@ This policy describes how Mindmeld ("the app", "we") handles your data. Mindmeld
 
 ## What We Do NOT Collect
 
-- **No accounts.** Mindmeld has no login, registration, or account system.
+- **No accounts.** Warmer has no login, registration, or account system.
 - **No contacts or address book access.**
 - **No location data** beyond the coarse country/region Firebase infers from IP address (standard Firebase behaviour; we do not request location permission).
 - **Gameplay stays on device** — guess history, streaks, and stats are stored only in the local SQLite database on your device. They are not uploaded to any server (except as aggregate, anonymised analytics events described above).

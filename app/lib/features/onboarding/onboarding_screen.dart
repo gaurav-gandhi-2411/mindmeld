@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kOnboardingDone = 'onboarding_done';
@@ -18,7 +19,7 @@ Future<void> markOnboardingDone() async {
 /// 4-page onboarding flow shown on first launch.
 ///
 /// Pages:
-///   1. What is Mindmeld?
+///   1. What is Warmer?
 ///   2. How guessing works (semantic similarity)
 ///   3. Temperature bands explained
 ///   4. Hints and streaks
@@ -37,8 +38,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _pages = [
     _OnboardingPage(
-      icon: Icons.psychology,
-      title: 'Welcome to Mindmeld',
+      leading: HeatRingsMark(size: 88),
+      title: 'Welcome to Warmer',
       body: 'Every day there is a secret word. Your goal is to guess it using '
           'semantic similarity — the AI ranks how close each guess is.',
     ),
@@ -160,12 +161,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class _OnboardingPage extends StatelessWidget {
   const _OnboardingPage({
-    required this.icon,
+    this.icon,
+    this.leading,
     required this.title,
     required this.body,
-  });
+  }) : assert(
+          icon != null || leading != null,
+          'Provide either icon or leading.',
+        );
 
-  final IconData icon;
+  /// Material icon shown when [leading] is null.
+  final IconData? icon;
+
+  /// Custom leading widget (e.g. the brand mark) shown instead of [icon].
+  final Widget? leading;
   final String title;
   final String body;
 
@@ -176,7 +185,8 @@ class _OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 80, color: Theme.of(context).colorScheme.primary),
+          leading ??
+              Icon(icon, size: 80, color: Theme.of(context).colorScheme.primary),
           const SizedBox(height: 32),
           Text(
             title,

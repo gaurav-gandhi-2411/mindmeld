@@ -1,4 +1,4 @@
-# Play Console Data Safety — Mindmeld
+# Play Console Data Safety — Warmer
 
 > **Draft — verify against each SDK's official Play data-safety disclosure doc before
 > submitting; flags below mark the uncertain rows.**

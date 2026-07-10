@@ -117,7 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           OptInResult.permissionDenied =>
             'Notifications are blocked in your browser settings.',
           OptInResult.iosNotInstalled =>
-            'Add Mindmeld to your Home Screen first to enable reminders.',
+            'Add Warmer to your Home Screen first to enable reminders.',
           OptInResult.offlineOrError =>
             "Couldn't turn on reminders — check your connection and try again.",
         };
@@ -377,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('About'),
-            subtitle: Text('Mindmeld v1.0.0 — Semantic Daily Word Game'),
+            subtitle: Text('Warmer v1.0.0 — Semantic Daily Word Game'),
           ),
 
           const Divider(),

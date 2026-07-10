@@ -16,15 +16,15 @@ import 'share_stub.dart'
 /// Generate the spoiler-free heat-trail share card text.
 ///
 /// Format for wins (brand name first, URL last):
-///   Mindmeld #N (English)  🟦🟦🟨🟧🟥⭐
+///   Warmer #N (English)  🟦🟦🟨🟧🟥⭐
 ///   6/15 · Par −2 · Beat the bot 🤖✓
 ///   🔥 3 day streak
-///   playmindmeld.vercel.app
+///   playwarmer.vercel.app
 ///
 /// Format for losses:
-///   Mindmeld #N (English)  🟦🟦🟨🟧🟥💀
+///   Warmer #N (English)  🟦🟦🟨🟧🟥💀
 ///   Didn't get it — best: 🟥 · streak reset
-///   playmindmeld.vercel.app
+///   playwarmer.vercel.app
 ///
 /// - [won] controls the terminal emoji (⭐ for win, 💀 for loss).
 /// - Par and rival lines are omitted when payload is v1 (parGuesses null).
@@ -32,7 +32,7 @@ import 'share_stub.dart'
 /// - No secret word or guess words are ever included.
 ///
 /// When [packName] is non-null (themed-pack puzzle, phase 6c), line 1 becomes:
-///   Mindmeld · $packName #N (English)  🟦🟦🟨🟧🟥⭐
+///   Warmer · $packName #N (English)  🟦🟦🟨🟧🟥⭐
 /// Daily output ([packName] null) is byte-identical to the original format.
 String buildShareCard({
   required List<Guess> guesses,
@@ -65,8 +65,8 @@ String buildShareCard({
   }).join('');
 
   final line1 = packName != null
-      ? 'Mindmeld · $packName #$puzzleNumber $langLabel  $emojis'
-      : 'Mindmeld #$puzzleNumber $langLabel  $emojis';
+      ? 'Warmer · $packName #$puzzleNumber $langLabel  $emojis'
+      : 'Warmer #$puzzleNumber $langLabel  $emojis';
   final lines = <String>[line1];
 
   if (effectiveWon) {
@@ -106,7 +106,7 @@ String buildShareCard({
     lines.add("Didn't get it — best: $bestEmoji · streak reset");
   }
 
-  lines.add('playmindmeld.vercel.app');
+  lines.add('playwarmer.vercel.app');
   return lines.join('\n');
 }
 
@@ -228,12 +228,12 @@ class _WinScreenState extends State<WinScreen> {
     });
 
     final shareTitle =
-        widget.packName != null ? 'Mindmeld · ${widget.packName}' : 'Mindmeld';
+        widget.packName != null ? 'Warmer · ${widget.packName}' : 'Warmer';
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
         title: shareTitle,
         text: _shareText,
-        url: 'https://playmindmeld.vercel.app/',
+        url: 'https://playwarmer.vercel.app/',
       );
       if (shared) return;
     }
@@ -571,12 +571,12 @@ class _LossScreenState extends State<LossScreen> {
     });
 
     final shareTitle =
-        widget.packName != null ? 'Mindmeld · ${widget.packName}' : 'Mindmeld';
+        widget.packName != null ? 'Warmer · ${widget.packName}' : 'Warmer';
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
         title: shareTitle,
         text: _shareText,
-        url: 'https://playmindmeld.vercel.app/',
+        url: 'https://playwarmer.vercel.app/',
       );
       if (shared) return;
     }

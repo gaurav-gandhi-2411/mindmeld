@@ -17,7 +17,7 @@ const puppeteer = require('puppeteer-core');
 const path = require('path');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const URL = process.env.LIVE_URL || 'https://playmindmeld.vercel.app/';
+const URL = process.env.LIVE_URL || 'https://playwarmer.vercel.app/';
 const SCRATCH = process.env.SCRATCH_DIR || __dirname;
 const PREFIX = process.env.SHOT_PREFIX || 'run';
 const INITIAL_WAIT_MS = Number(process.env.INITIAL_WAIT_MS ?? 7000);

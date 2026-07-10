@@ -23,6 +23,7 @@ import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/main.dart';
@@ -182,7 +183,7 @@ void main() {
       // OS-thread I/O only resolves when explicitly drained through runAsync.
       await tester.runAsync(() => AppPersistence.instance.saveDayState(wonState));
 
-      await tester.pumpWidget(MindmeldApp(
+      await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: date,
           lang: 'en',
@@ -247,7 +248,7 @@ void main() {
       // OS-thread I/O only resolves when explicitly drained through runAsync.
       await tester.runAsync(() => AppPersistence.instance.saveDayState(wonState));
 
-      await tester.pumpWidget(MindmeldApp(
+      await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: date,
           lang: 'en',
@@ -277,8 +278,12 @@ void main() {
           reason: 'nav bar must remain mounted after Back');
       expect(find.text('Enter a word…'), findsNothing,
           reason: 'the daily puzzle is already won, so no active guess input is shown');
-      expect(_appBarTitle('Mindmeld'), findsOneWidget,
-          reason: 'the locked (finished) daily puzzle board renders under the Puzzle tab');
+      expect(
+        find.descendant(
+            of: find.byType(AppBar), matching: find.byType(WarmerWordmark)),
+        findsOneWidget,
+        reason: 'the locked (finished) daily puzzle board renders under the Puzzle tab',
+      );
 
       // The core regression: further settling must NOT bounce back to WinScreen.
       await _settle(tester);
@@ -443,7 +448,7 @@ void main() {
       // OS-thread I/O only resolves when explicitly drained through runAsync.
       await tester.runAsync(() => AppPersistence.instance.saveDayState(lostState));
 
-      await tester.pumpWidget(MindmeldApp(
+      await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: date,
           lang: 'en',
@@ -475,7 +480,7 @@ void main() {
       const date = '2099-01-01';
       final payload = _buildOceanPayload();
 
-      await tester.pumpWidget(MindmeldApp(
+      await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: date,
           lang: 'en',

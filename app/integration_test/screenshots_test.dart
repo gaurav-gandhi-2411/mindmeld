@@ -163,7 +163,7 @@ void main() {
     AppPersistence.resetForTest();
 
     await tester.pumpWidget(
-      MindmeldApp(
+      WarmerApp(
         overrides: AppOverrides(
           payloadClient: _BundleClient(),
           fixedDate: _kDate,
@@ -191,7 +191,7 @@ void main() {
     AppPersistence.resetForTest();
 
     await tester.pumpWidget(
-      MindmeldApp(
+      WarmerApp(
         overrides: AppOverrides(
           payloadClient: _BundleClient(),
           fixedDate: _kDate,
@@ -263,7 +263,7 @@ void main() {
     // so the main shell with the NavigationBar is the active widget.
     // Stats screen will show streak=1 from the seeded 2026-06-12 win.
     await tester.pumpWidget(
-      MindmeldApp(
+      WarmerApp(
         overrides: AppOverrides(
           payloadClient: _BundleClient(),
           fixedDate: '2026-06-13',
@@ -303,7 +303,7 @@ void main() {
     AppPersistence.resetForTest();
 
     await tester.pumpWidget(
-      MindmeldApp(
+      WarmerApp(
         overrides: AppOverrides(
           payloadClient: _BundleClient(),
           fixedDate: _kDate,

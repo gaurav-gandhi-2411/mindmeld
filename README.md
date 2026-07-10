@@ -1,8 +1,11 @@
-# Mindmeld — Semantic Daily Word Game
+# Warmer — Semantic Daily Word Game
 
 A daily word-guessing game: players guess a secret word and an embedding model scores how
 semantically close each guess is (rank + temperature feedback). English + Hinglish editions.
 All ML is offline — payloads are precomputed, so marginal cost per DAU is ~$0.
+
+The Firebase project ID (`mindmeld-c4bba`) and the payload CDN path (`mindmeld-payloads`) are
+unchanged internal infrastructure — only user-facing branding was renamed.
 
 Phase 1 build: playable Flutter app (Android-first) + Python payload generator. Ads and IAP
 are **stubs behind config flags** (`ads_enabled=false`, `iap_enabled=false`) — no SDK
@@ -72,7 +75,7 @@ flutter test integration_test/app_test.dart -d <device>   # full guess→win loo
 
 ## Web / PWA
 
-Play in the browser: **https://playmindmeld.vercel.app/**
+Play in the browser: **https://playwarmer.vercel.app/**
 (installable PWA; hosted on Vercel). The old `/play/` path on GitHub Pages now serves a
 redirect to the Vercel URL.
 
@@ -87,7 +90,7 @@ uv run python scripts\check_web_plugin_registrant.py --project-dir app
 # Guard: fails loudly if the deploy domain isn't in Firebase Auth's authorized
 # domains — see scripts/check_authorized_domains.py docstring and the
 # "Authorized domains" section in docs/firebase-setup.md.
-uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --domain playmindmeld.vercel.app
+uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --domain playwarmer.vercel.app
 # Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap.
 # This also copies the tracked app/web/vercel.json (rewrites + Cache-Control
 # headers) into the build dir — web-dist/ is gitignored deploy staging only,
@@ -108,7 +111,7 @@ uv run publish --days 30
 domains in the project's *Authorized domains* list (Authentication → Settings
 → Authorized domains in the Firebase console; `localhost` and the default
 `*.firebaseapp.com`/`*.web.app` domains are the only ones added automatically —
-a custom domain like `playmindmeld.vercel.app` is NOT added for you). Forgetting
+a custom domain like `playwarmer.vercel.app` is NOT added for you). Forgetting
 this step makes `signInAnonymously()` fail with a `[firebase_auth/channel-error]`
 that looks like a plugin-registration bug but isn't — see the 2026-07-07 incident
 note in `docs/firebase-setup.md`. `scripts/check_authorized_domains.py` (wired
@@ -154,7 +157,7 @@ payloads/    generated output (gitignored except samples/)
 
 ## Developer reset hook
 
-Browse to `https://playmindmeld.vercel.app/?reset=1` to wipe all local
+Browse to `https://playwarmer.vercel.app/?reset=1` to wipe all local
 state (today's puzzle for both languages, streaks, stats, hints,
 onboarding flag) and reload as a first-time user.
 

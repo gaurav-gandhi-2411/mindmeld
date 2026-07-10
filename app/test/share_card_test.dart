@@ -89,11 +89,11 @@ void main() {
       final guesses = makeGuesses([TemperatureBand.scorching]);
       final text = buildShareCard(
           guesses: guesses, puzzleNumber: 1, lang: 'en');
-      expect(text, contains('playmindmeld.vercel.app'));
+      expect(text, contains('playwarmer.vercel.app'));
     });
 
     test('URL does not contain secret word', () {
-      expect('playmindmeld.vercel.app', isNot(contains('ocean')));
+      expect('playwarmer.vercel.app', isNot(contains('ocean')));
     });
 
     test('emoji order matches guess chronological order', () {
@@ -239,7 +239,7 @@ void main() {
     // (packName omitted) must stay byte-identical to every test above.
     // -----------------------------------------------------------------------
 
-    test('pack game renders "Mindmeld · Bollywood #3 ..." on line 1', () {
+    test('pack game renders "Warmer · Bollywood #3 ..." on line 1', () {
       final guesses = makeGuesses([TemperatureBand.win]);
       final text = buildShareCard(
         guesses: guesses,
@@ -249,7 +249,7 @@ void main() {
         won: true,
       );
       final line1 = text.split('\n').first;
-      expect(line1, startsWith('Mindmeld · Bollywood #3 (English)'));
+      expect(line1, startsWith('Warmer · Bollywood #3 (English)'));
     });
 
     test('pack game with Hinglish lang shows the Hinglish label after the pack name', () {
@@ -262,7 +262,7 @@ void main() {
         won: false,
       );
       final line1 = text.split('\n').first;
-      expect(line1, startsWith('Mindmeld · Cricket #12 (Hinglish)'));
+      expect(line1, startsWith('Warmer · Cricket #12 (Hinglish)'));
     });
 
     test('daily game (packName omitted) is byte-identical to the pre-pack format', () {
@@ -280,7 +280,7 @@ void main() {
       );
       expect(withoutPackName, equals(explicitNullPackName));
       final line1 = withoutPackName.split('\n').first;
-      expect(line1, equals('Mindmeld #42 (English)  💀'));
+      expect(line1, equals('Warmer #42 (English)  💀'));
       expect(line1, isNot(contains('·')));
     });
   });

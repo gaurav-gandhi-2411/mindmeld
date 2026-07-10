@@ -10,6 +10,9 @@ import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/core/rival_state.dart';
+import 'package:mindmeld/features/branding/heat_rings_mark.dart';
+import 'package:mindmeld/features/packs/pack_selector_screen.dart';
+import 'package:mindmeld/features/packs/packs_entry_banner.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
@@ -701,7 +704,9 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       appBar: AppBar(
         title: Column(
           children: [
-            Text(_isPackMode ? (widget.packTitle ?? 'Mindmeld') : 'Mindmeld'),
+            _isPackMode
+                ? Text(widget.packTitle ?? 'Warmer')
+                : const WarmerWordmark(markSize: 20, fontSize: 18),
             Text(
               _isPackMode
                   ? 'Puzzle #${widget.packIdx}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}'
@@ -714,6 +719,20 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       ),
       body: Column(
         children: [
+          // Packs entry — pinned to the top of the primary daily play surface
+          // so a new pack (e.g. Bollywood) is impossible to miss. Hidden in
+          // practice/pack-play modes to avoid recursion into the same screen.
+          if (!_isPackMode && !widget.isPractice)
+            PacksEntryBanner(
+              compact: true,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => PackSelectorScreen(lang: widget.lang),
+                ),
+              ),
+            ),
+
           // Rival strip (shown during active play only, hidden after game over)
           if (_rivalState != null && !state.isFinished)
             _buildRivalStrip(_rivalState!, context),

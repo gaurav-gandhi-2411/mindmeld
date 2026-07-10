@@ -81,7 +81,7 @@ void main() {
         createdBy: 'alice',
         memberUids: ['alice'],
       );
-      expect(group.joinLink, 'https://playmindmeld.vercel.app/join/ABC123');
+      expect(group.joinLink, 'https://playwarmer.vercel.app/join/ABC123');
     });
   });
 }

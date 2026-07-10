@@ -43,7 +43,7 @@ Future<bool> shouldShowNotificationOptInCard({
   }
 }
 
-/// Dismissible card: "Want a reminder when tomorrow's Mindmeld is ready?"
+/// Dismissible card: "Want a reminder when tomorrow's Warmer is ready?"
 /// with "Yes, remind me" / "Not now" buttons.
 class NotificationOptInCard extends StatefulWidget {
   const NotificationOptInCard({
@@ -115,7 +115,7 @@ class _NotificationOptInCardState extends State<NotificationOptInCard> {
         case OptInResult.iosNotInstalled:
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Add Mindmeld to your Home Screen first to enable reminders.'),
+              content: Text('Add Warmer to your Home Screen first to enable reminders.'),
             ),
           );
         case OptInResult.offlineOrError:
@@ -144,7 +144,7 @@ class _NotificationOptInCardState extends State<NotificationOptInCard> {
                 Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 const Expanded(
-                  child: Text("Want a reminder when tomorrow's Mindmeld is ready?"),
+                  child: Text("Want a reminder when tomorrow's Warmer is ready?"),
                 ),
               ],
             ),

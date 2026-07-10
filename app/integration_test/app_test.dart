@@ -183,7 +183,7 @@ void main() {
 
       // Persistence is now initialised by _AppShellState._init() using the
       // per-test dbPath from AppOverrides; no separate init() call needed.
-      await tester.pumpWidget(MindmeldApp(overrides: overrides));
+      await tester.pumpWidget(WarmerApp(overrides: overrides));
 
       // Allow the async app init + payload network fetch to complete.
       // 10 s is generous; the live host returns in < 2 s on a healthy emulator.
@@ -249,9 +249,9 @@ void main() {
 
       // ── Step 5: Share card must not contain the secret ─────────────────────
       // The share card text widget is a SelectableText or Text whose content
-      // starts with "Mindmeld #".  Find any text that contains "#1" or "#"
+      // starts with "Warmer #".  Find any text that contains "#1" or "#"
       // and does NOT contain the raw secret word.
-      final shareCardFinder = find.textContaining('Mindmeld #');
+      final shareCardFinder = find.textContaining('Warmer #');
       expect(shareCardFinder, findsWidgets,
           reason: 'Share card text must be visible on the win screen');
 

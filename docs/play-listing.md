@@ -1,4 +1,4 @@
-# Play Store Listing — Mindmeld
+# Play Store Listing — Warmer
 
 <!-- =========================================================
      FIELD LIMITS (Play Console enforces these at submission)
@@ -13,7 +13,7 @@
 
 <!-- Character count: 27 / 30 -->
 ```
-Mindmeld: Daily Word Puzzle
+Warmer: Daily Word Puzzle
 ```
 
 ---
@@ -34,7 +34,7 @@ Guess the secret word by meaning. New puzzle every day — free.
 ```
 How close is your guess to the secret word?
 
-Mindmeld is a daily semantic word puzzle game — a new kind of semantic word
+Warmer is a daily semantic word puzzle game — a new kind of semantic word
 guessing challenge where you guess any word and the game tells you how
 semantically close it is to the hidden answer. Every guess gets a rank
 (1 = secret word) and a temperature: Scorching, Hot, Warm, Cold, or Freezing.
@@ -54,7 +54,7 @@ HOW TO PLAY
 
 HINGLISH MODE — INDIA KA APNA PUZZLE
 --------------------------------------
-Mindmeld includes a full Hinglish word game edition built from the ground up
+Warmer includes a full Hinglish word game edition built from the ground up
 for Indian players. The secret word and the entire vocabulary are in
 romanized Hinglish — words like dost, khushi, safar. The semantic model
 understands that dost is closer to friend than to paisa, so the
@@ -87,7 +87,7 @@ works at any connection speed.
 
 FREE WITH OPTIONAL UPGRADES
 ----------------------------
-Mindmeld is free to play. Optional one-time purchases:
+Warmer is free to play. Optional one-time purchases:
 - Remove Ads: hints without rewarded ads, forever.
 - Archive Access: play any past puzzle you missed.
 - Streak Freeze Pack: protect your streak for a missed day.
@@ -104,7 +104,7 @@ Five keyword-rich phrases woven naturally into the full description above:
 
 | Phrase | Location in description |
 |---|---|
-| **daily semantic word puzzle game** | Paragraph 1, sentence 1: "Mindmeld is a daily semantic word puzzle game" |
+| **daily semantic word puzzle game** | Paragraph 1, sentence 1: "Warmer is a daily semantic word puzzle game" |
 | **semantic word guessing** | Paragraph 1, sentence 2: "a new kind of semantic word guessing challenge" |
 | **Hinglish word game** | Hinglish section heading and opening sentence: "a full Hinglish word game edition" |
 | **word association game** | Paragraph 1, final sentence: "Pure word association game logic" |

@@ -232,7 +232,7 @@ void main() {
         ),
       ));
 
-      expect(find.textContaining("reminder when tomorrow's Mindmeld"), findsOneWidget);
+      expect(find.textContaining("reminder when tomorrow's Warmer"), findsOneWidget);
       expect(find.text('Not now'), findsOneWidget);
       expect(find.text('Yes, remind me'), findsOneWidget);
     });
@@ -323,7 +323,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(dismissed, isFalse); // stays visible — user may install and retry
-      expect(find.textContaining('Add Mindmeld to your Home Screen'), findsOneWidget);
+      expect(find.textContaining('Add Warmer to your Home Screen'), findsOneWidget);
     });
   });
 }

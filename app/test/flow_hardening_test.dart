@@ -81,10 +81,10 @@ void main() {
     // Scenario 1: No state ever → onboarding → fresh board
     // SharedPreferences is already cleared in setUp (no 'onboarding_done' key).
     // AppPersistence is initialised in setUp with a fresh DB.
-    // MindmeldApp._init() will find _backend != null (early return) and read
+    // WarmerApp._init() will find _backend != null (early return) and read
     // hasSeenOnboarding() → false → show onboarding.
     testWidgets('S1: no state → onboarding shown', (tester) async {
-      await tester.pumpWidget(MindmeldApp(
+      await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: '2026-06-12',
           lang: 'en',
@@ -98,7 +98,7 @@ void main() {
       await tester.pump();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Welcome to Mindmeld'), findsOneWidget,
+      expect(find.text('Welcome to Warmer'), findsOneWidget,
           reason: 'S1: brand-new user must see onboarding');
     });
 
@@ -114,7 +114,7 @@ void main() {
         ),
       ));
       await _pumpUntilLoaded(tester);
-      expect(find.text('Welcome to Mindmeld'), findsNothing,
+      expect(find.text('Welcome to Warmer'), findsNothing,
           reason: 'S2: no onboarding when going directly to PuzzleScreen');
       expect(find.text('Enter a word…'), findsOneWidget,
           reason: 'S2: fresh board — input is ready');

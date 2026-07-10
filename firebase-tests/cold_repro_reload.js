@@ -12,12 +12,19 @@
  *
  * Additional action:
  *   --reload        page.reload({ waitUntil: 'networkidle2' })
+ *
+ * --profile-dir <path>: launches Chrome with a persistent userDataDir
+ * instead of puppeteer's default fresh temp profile. Passing the SAME path
+ * across two separate invocations of this script simulates a genuinely
+ * "existing user" session (IndexedDB/localStorage/Cache Storage all persist
+ * between runs, like a real returning player days later), as opposed to
+ * `--reload`'s same-process reload which only proves same-session survival.
  */
 const puppeteer = require('puppeteer-core');
 const path = require('path');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const URL = process.env.LIVE_URL || 'https://playmindmeld.vercel.app/';
+const URL = process.env.LIVE_URL || 'https://playwarmer.vercel.app/';
 const SCRATCH = process.env.SCRATCH_DIR || __dirname;
 const PREFIX = process.env.SHOT_PREFIX || 'run';
 const INITIAL_WAIT_MS = Number(process.env.INITIAL_WAIT_MS ?? 7000);
@@ -55,13 +62,20 @@ function parseActions(argv) {
 
 const GRANT_NOTIFICATIONS = process.argv.includes('--grant-notifications');
 
+function parseProfileDir(argv) {
+  const i = argv.indexOf('--profile-dir');
+  return i !== -1 && argv[i + 1] ? argv[i + 1] : undefined;
+}
+
 async function main() {
   const actions = parseActions(process.argv.slice(2));
+  const profileDir = parseProfileDir(process.argv.slice(2));
   const t0 = Date.now();
   const browser = await puppeteer.launch({
     executablePath: CHROME_PATH,
     headless: 'new',
     args: ['--window-size=900,1000', '--no-sandbox'],
+    ...(profileDir ? { userDataDir: profileDir } : {}),
   });
   if (GRANT_NOTIFICATIONS) {
     await browser.defaultBrowserContext().overridePermissions(URL, ['notifications']);

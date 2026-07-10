@@ -63,12 +63,12 @@ class _GroupLeaderboardScreenState extends State<GroupLeaderboardScreen> {
   }
 
   Future<void> _shareInvite() async {
-    final text = 'Play Mindmeld with me — join "${widget.group.name}"!\n'
+    final text = 'Play Warmer with me — join "${widget.group.name}"!\n'
         '${widget.group.joinLink}\n'
         'Code: ${widget.group.code}';
     if (webShareAvailable()) {
       final shared = await shareViaWebApi(
-        title: 'Mindmeld',
+        title: 'Warmer',
         text: text,
         url: widget.group.joinLink,
       );

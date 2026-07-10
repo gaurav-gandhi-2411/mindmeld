@@ -1,4 +1,4 @@
-"""Generate a real caching Service Worker for the Mindmeld Flutter web build.
+"""Generate a real caching Service Worker for the Warmer Flutter web build.
 
 Why replace flutter_service_worker.js rather than add a second SW
 ---------------------------------------------------------------
@@ -60,7 +60,7 @@ Fetch strategy
 - Navigation requests (``mode == 'navigate'``) → network-first, fallback to
   cached ``/index.html`` so cold offline launch works.
 - Cross-origin GETs to the payload CDN → network-first; on success put a copy
-  in a separate ``mindmeld-payloads`` runtime cache (capped at ~8 entries).  On
+  in a separate ``warmer-payloads`` runtime cache (capped at ~8 entries).  On
   network failure serve from the runtime cache if present, otherwise let the
   request fail so the Flutter app falls back to bundled assets.
 
@@ -147,7 +147,7 @@ FIREBASE_CONFIG_FIELDS: tuple[str, ...] = (
 EXCLUDE_DIR_SEGMENTS: frozenset[str] = frozenset({".well-known"})
 
 # Runtime cache name for cross-origin payloads.
-PAYLOAD_CACHE_NAME: str = "mindmeld-payloads"
+PAYLOAD_CACHE_NAME: str = "warmer-payloads"
 
 # CDN origin that serves daily puzzle payloads.
 PAYLOAD_ORIGIN: str = "https://gaurav-gandhi-2411.github.io"
@@ -228,7 +228,7 @@ def _build_cache_name(build_dir: Path) -> str:
             rel = path.relative_to(build_dir).as_posix()
             hasher.update(rel.encode())
             hasher.update(path.read_bytes())
-    return f"mindmeld-precache-{hasher.hexdigest()[:12]}"
+    return f"warmer-precache-{hasher.hexdigest()[:12]}"
 
 
 def _render_sw(cache_name: str, urls: list[str]) -> str:

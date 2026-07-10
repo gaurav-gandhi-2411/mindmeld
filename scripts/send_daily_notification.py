@@ -74,18 +74,18 @@ VALID_LANGS: tuple[str, ...] = ("en", "hi-en")
 # code-switched, never a literal machine translation).
 DAILY_COPY: dict[str, tuple[str, str]] = {
     "en": (
-        "Today's Mindmeld is live!",
+        "Today's Warmer is live!",
         "A new secret word is waiting. Can you guess it?",
     ),
     "hi-en": (
-        "Aaj ka Mindmeld ready hai!",
+        "Aaj ka Warmer ready hai!",
         "Naya secret word wait kar raha hai. Guess kar sakte ho?",
     ),
 }
 
 # Deep link opened on notification tap. The `?notif=1` query param is load-
 # bearing: the client side listens for it to log a notification_opened event.
-DEEP_LINK = "https://playmindmeld.vercel.app/?notif=1"
+DEEP_LINK = "https://playwarmer.vercel.app/?notif=1"
 
 
 class MessagingClient(Protocol):

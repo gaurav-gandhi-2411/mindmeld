@@ -17,6 +17,7 @@ import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/features/archive/archive_screen.dart';
+import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:mindmeld/features/onboarding/onboarding_screen.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
@@ -36,7 +37,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
 ///
-/// Pass a non-null instance to [MindmeldApp] to:
+/// Pass a non-null instance to [WarmerApp] to:
 ///   - Skip network fetches by injecting a pre-built [PayloadClient]
 ///     (e.g. one backed by a [FileSystemAssetBundle] or mock HTTP).
 ///   - Pin the puzzle date so integration tests don't depend on wall-clock time.
@@ -127,11 +128,11 @@ void main() async {
     await ConsentManager.gatherConsent();
   }
 
-  runApp(MindmeldApp(exporter: exporter));
+  runApp(WarmerApp(exporter: exporter));
 }
 
-class MindmeldApp extends StatelessWidget {
-  const MindmeldApp({super.key, this.overrides, this.exporter});
+class WarmerApp extends StatelessWidget {
+  const WarmerApp({super.key, this.overrides, this.exporter});
 
   /// Test-only overrides; null in production.
   final AppOverrides? overrides;
@@ -139,21 +140,21 @@ class MindmeldApp extends StatelessWidget {
   /// Analytics exporter — passed down so [_AppShell] can call [onResume].
   ///
   /// When null a default [_NoOpExporter] is constructed (used in widget tests
-  /// that call [MindmeldApp] directly without going through [main]).
+  /// that call [WarmerApp] directly without going through [main]).
   final AnalyticsExporter? exporter;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mindmeld',
+      title: 'Warmer',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF6200EE),
+        colorSchemeSeed: WarmerColors.wordmarkAccent,
         useMaterial3: true,
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: const Color(0xFF6200EE),
+        colorSchemeSeed: WarmerColors.wordmarkAccent,
         useMaterial3: true,
         brightness: Brightness.dark,
       ),
@@ -361,7 +362,18 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     if (!_initialised) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              HeatRingsMark(size: 72),
+              SizedBox(height: 24),
+              CircularProgressIndicator(),
+            ],
+          ),
+        ),
+      );
     }
 
     if (_showOnboarding) {

@@ -24,7 +24,7 @@ secret to manage.
 Usage:
     uv run python scripts/check_authorized_domains.py \\
         --project-id mindmeld-c4bba \\
-        --domain playmindmeld.vercel.app
+        --domain playwarmer.vercel.app
 """
 
 from __future__ import annotations

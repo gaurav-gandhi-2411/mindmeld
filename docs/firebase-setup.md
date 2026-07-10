@@ -80,7 +80,7 @@ with:
 ```bash
 uv run python scripts/check_authorized_domains.py \
   --project-id mindmeld-c4bba \
-  --domain playmindmeld.vercel.app
+  --domain playwarmer.vercel.app
 ```
 
 When adding a new production domain, add it to both this command's `--domain`

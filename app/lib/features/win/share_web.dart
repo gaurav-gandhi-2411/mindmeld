@@ -48,7 +48,7 @@ Future<void> shareOrDownloadPng(Uint8List pngBytes) async {
     final anchor =
         web.window.document.createElement('a') as web.HTMLAnchorElement;
     anchor.href = dataUrl;
-    anchor.download = 'mindmeld.png';
+    anchor.download = 'warmer.png';
     web.window.document.body?.appendChild(anchor);
     anchor.click();
     web.window.document.body?.removeChild(anchor);

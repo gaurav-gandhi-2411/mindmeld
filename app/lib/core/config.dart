@@ -72,7 +72,7 @@ class AppConfig {
 
   /// Public play URL appended to the share card so recipients can immediately
   /// start playing. Included on all platforms (native + web).
-  static const String playUrl = 'https://playmindmeld.vercel.app/';
+  static const String playUrl = 'https://playwarmer.vercel.app/';
 
   // ---------------------------------------------------------------------------
   // AdMob IDs

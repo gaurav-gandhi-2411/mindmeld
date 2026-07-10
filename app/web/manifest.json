@@ -1,12 +1,12 @@
 {
-    "name": "Mindmeld",
-    "short_name": "Mindmeld",
+    "name": "Warmer",
+    "short_name": "Warmer",
     "description": "Daily semantic word game — guess the hidden word by similarity. Available in English and Hinglish.",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#F5F0FA",
-    "theme_color": "#1976D2",
+    "background_color": "#0F172A",
+    "theme_color": "#0F172A",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

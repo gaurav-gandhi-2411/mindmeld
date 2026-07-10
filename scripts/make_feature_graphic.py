@@ -1,12 +1,13 @@
-"""Generate the Play Store feature graphic (1024 × 500 px) for Mindmeld.
+"""Generate the Play Store feature graphic (1024 × 500 px) for Warmer.
 
 Design:
-  - Horizontal temperature-gradient background matching the app's band palette:
-      deep-blue (Freezing #1976D2) → teal (Cold #388E3C) →
-      amber (Warm #FBC02D) → orange (Hot #F57C00) → deep-red (Scorching #D32F2F)
-  - "Mindmeld" wordmark in white with a light shadow (segoeuib.ttf, fallback Arial/DejaVu).
+  - Horizontal gradient background using the locked heat-rings identity palette:
+      cold #2563EB → cool #06B6D4 → warm #F59E0B → hot #EF4444
+      (see spec-warmer-rename.md — same palette as the app icon/OG card, not
+      the separate 5-band gameplay guess-tile palette in guess_tile.dart).
+  - "Warmer" wordmark in white with a light shadow (segoeuib.ttf, fallback Arial/DejaVu).
   - Tagline below the wordmark.
-  - A row of emoji-style rounded squares matching the band colours, mimicking the share card.
+  - A row of emoji-style rounded squares in the heat-rings palette, echoing the mark.
 
 Usage (from repo root):
     uv run --with pillow python scripts/make_feature_graphic.py
@@ -29,37 +30,29 @@ WIDTH: int = 1024
 HEIGHT: int = 500
 
 # ---------------------------------------------------------------------------
-# Band colour palette — exact hex values from app/lib/features/puzzle/guess_tile.dart
-#
-# TemperatureBand colour mapping (bandColor function):
-#   win        → 0xFF6200EE  Purple  (not used in gradient)
-#   scorching  → 0xFFD32F2F  Deep red
-#   hot        → 0xFFF57C00  Orange
-#   warm       → 0xFFFBC02D  Yellow/amber
-#   cold       → 0xFF388E3C  Green (used as teal in gradient)
-#   freezing   → 0xFF1976D2  Blue
+# Locked heat-rings identity palette — see spec-warmer-rename.md /
+# scripts/make_app_icon.py. Distinct from the 5-band gameplay guess-tile
+# palette in app/lib/features/puzzle/guess_tile.dart.
 # ---------------------------------------------------------------------------
 
-COLOUR_FREEZING: tuple[int, int, int] = (0x19, 0x76, 0xD2)   # #1976D2 deep blue
-COLOUR_COLD: tuple[int, int, int] = (0x38, 0x8E, 0x3C)       # #388E3C green
-COLOUR_WARM: tuple[int, int, int] = (0xFB, 0xC0, 0x2D)       # #FBC02D amber
-COLOUR_HOT: tuple[int, int, int] = (0xF5, 0x7C, 0x00)        # #F57C00 orange
-COLOUR_SCORCHING: tuple[int, int, int] = (0xD3, 0x2F, 0x2F)  # #D32F2F deep red
+COLOUR_COLD: tuple[int, int, int] = (0x25, 0x63, 0xEB)  # #2563EB
+COLOUR_COOL: tuple[int, int, int] = (0x06, 0xB6, 0xD4)  # #06B6D4
+COLOUR_WARM: tuple[int, int, int] = (0xF5, 0x9E, 0x0B)  # #F59E0B
+COLOUR_HOT: tuple[int, int, int] = (0xEF, 0x44, 0x44)  # #EF4444
 
 # Gradient stops as (x_fraction, RGB) from left to right.
 GRADIENT_STOPS: list[tuple[float, tuple[int, int, int]]] = [
-    (0.00, COLOUR_FREEZING),
-    (0.30, COLOUR_COLD),
-    (0.55, COLOUR_WARM),
-    (0.75, COLOUR_HOT),
-    (1.00, COLOUR_SCORCHING),
+    (0.00, COLOUR_COLD),
+    (0.35, COLOUR_COOL),
+    (0.68, COLOUR_WARM),
+    (1.00, COLOUR_HOT),
 ]
 
 # ---------------------------------------------------------------------------
 # Text
 # ---------------------------------------------------------------------------
 
-WORDMARK: str = "Mindmeld"
+WORDMARK: str = "Warmer"
 TAGLINE: str = "Guess the word by meaning — new puzzle daily · English & Hinglish"
 
 # Safe horizontal margin (Play Store requires 15 % margin on each side = ~154 px;
@@ -72,11 +65,10 @@ MARGIN_Y: int = 48
 # ---------------------------------------------------------------------------
 
 BAND_COLOURS: list[tuple[int, int, int]] = [
-    COLOUR_FREEZING,
     COLOUR_COLD,
+    COLOUR_COOL,
     COLOUR_WARM,
     COLOUR_HOT,
-    COLOUR_SCORCHING,
 ]
 
 # ---------------------------------------------------------------------------

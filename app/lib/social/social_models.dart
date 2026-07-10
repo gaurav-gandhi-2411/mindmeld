@@ -32,7 +32,7 @@ class SocialGroup {
   final List<String> memberUids;
 
   /// Shareable join link for this group.
-  String get joinLink => 'https://playmindmeld.vercel.app/join/$code';
+  String get joinLink => 'https://playwarmer.vercel.app/join/$code';
 }
 
 /// One row in a per-group, per-day leaderboard.

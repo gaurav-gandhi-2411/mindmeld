@@ -1,5 +1,5 @@
 name: mindmeld
-description: "Mindmeld — Semantic Daily Word Game"
+description: "Warmer — Semantic Daily Word Game"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -64,11 +64,13 @@ flutter:
 flutter_launcher_icons:
   # Generate adaptive icons for Android (API 26+).
   android: "launcher_icon"
-  # Background: the darkest gradient colour (Freezing blue) — solid fill
-  # so the icon looks good on any adaptive-icon shape.
-  adaptive_icon_background: "#1976D2"
-  # Foreground: the branded icon (M glyph + flame accent) with built-in padding.
-  adaptive_icon_foreground: "assets/icon-1024.png"
-  # Also replace the legacy mipmap ic_launcher for API < 26 devices.
+  # Background: the heat-rings app-tile dark ground — solid fill so the icon
+  # looks good on any adaptive-icon shape.
+  adaptive_icon_background: "#0F172A"
+  # Foreground: transparent rings-only mark (safe-zone padding baked in by
+  # scripts/make_app_icon.py's ratios), composited over the background above.
+  adaptive_icon_foreground: "assets/icon-1024-fg.png"
+  # Also replace the legacy mipmap ic_launcher for API < 26 devices — uses the
+  # opaque tile (dark ground baked in) since legacy/iOS icons must be full-bleed.
   image_path: "assets/icon-1024.png"
   min_sdk_android: 21

@@ -44,7 +44,7 @@ const messaging = firebase.messaging();
 // `notificationclick` below can read it — the original payload is not
 // available in the notificationclick event.
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title || 'Mindmeld';
+  const title = payload.notification?.title || 'Warmer';
   const body = payload.notification?.body || "Today's puzzle is live.";
   const link = payload.fcmOptions?.link || payload.data?.link || '/';
 
