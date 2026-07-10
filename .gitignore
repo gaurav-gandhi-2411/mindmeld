@@ -24,6 +24,13 @@ app/android/local.properties
 app/ios/Pods/
 app/*.iml
 
+# Secrets (defense in depth — none committed as of the 2026-07 security audit)
+.env
+.env.*
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+*.pem
+
 # IDE / OS
 .idea/
 .vscode/
