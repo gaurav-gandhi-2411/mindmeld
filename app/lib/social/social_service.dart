@@ -27,10 +27,42 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mindmeld/analytics/app_check_init.dart';
 import 'package:mindmeld/analytics/firebase_web_options.dart';
+import 'package:mindmeld/social/moderation_blocklist.dart' show isBlockedName;
+import 'package:mindmeld/social/name_sanitizer.dart';
 import 'package:mindmeld/social/social_client.dart';
 import 'package:mindmeld/social/social_models.dart';
 
+export 'package:mindmeld/social/name_sanitizer.dart' show NameRejectionReason, NameSanitizeResult;
+
 const String _kDisplayNamePrefsKey = 'social_display_name';
+
+/// Max length for a display name — MUST match firestore.rules'
+/// `isValidDisplayName()` bound (1-40 chars).
+const int kDisplayNameMaxLength = 40;
+
+/// Max length for a group name — MUST match firestore.rules' group-create
+/// rule bound (1-60 chars).
+const int kGroupNameMaxLength = 60;
+
+/// Sanitize + moderate a raw display/group name: strips control/zero-width/
+/// bidi characters, enforces [maxLength], then checks the profanity/
+/// reserved-word blocklist (with homoglyph folding — see
+/// `name_sanitizer.dart` and `moderation_blocklist.dart`).
+///
+/// Public so UI callers (see `display_name_dialog.dart`) can pre-validate
+/// and re-prompt with immediate inline feedback. [setDisplayName] and
+/// [SocialService.createGroup] run this SAME check again at the actual
+/// write choke point — this function is a UX convenience, not a substitute
+/// for that enforcement (a caller could skip it entirely and the service
+/// would still reject an invalid name).
+NameSanitizeResult validateName(String raw, {required int maxLength}) {
+  final sanitized = sanitizeName(raw, maxLength: maxLength);
+  if (!sanitized.isOk) return sanitized;
+  if (isBlockedName(sanitized.cleaned!)) {
+    return const NameSanitizeResult.rejected(NameRejectionReason.blocked);
+  }
+  return sanitized;
+}
 
 /// Hard ceiling on every individual Firebase/Firestore call made from this
 /// service. Without this, a stuck platform-channel/JS-interop promise (a
@@ -48,6 +80,9 @@ enum JoinCodeStatus {
 
   /// Could not reach Firebase (offline / misconfigured) — degrade gently.
   offline,
+
+  /// The display name failed sanitization/moderation (see [validateName]).
+  rejectedName,
 }
 
 class JoinCodeResult {
@@ -55,6 +90,70 @@ class JoinCodeResult {
 
   final JoinCodeStatus status;
   final SocialGroup? group;
+}
+
+/// Outcome of a display-name write (see [SocialService.setDisplayName]).
+enum SetDisplayNameStatus {
+  /// Saved both locally and to the profile doc.
+  success,
+
+  /// Failed sanitization/moderation (see [validateName]) — never reached
+  /// the network.
+  rejectedName,
+
+  /// Could not reach Firebase (offline / misconfigured) — degrade gently.
+  offline,
+}
+
+class SetDisplayNameResult {
+  const SetDisplayNameResult(this.status);
+
+  final SetDisplayNameStatus status;
+
+  bool get isSuccess => status == SetDisplayNameStatus.success;
+}
+
+/// Outcome of a create-group attempt (see [SocialService.createGroup]).
+enum CreateGroupStatus {
+  /// Created successfully.
+  success,
+
+  /// The group name or display name failed sanitization/moderation (see
+  /// [validateName]).
+  rejectedName,
+
+  /// Could not reach Firebase (offline / misconfigured) — degrade gently.
+  offline,
+}
+
+class CreateGroupResult {
+  const CreateGroupResult({required this.status, this.group});
+
+  final CreateGroupStatus status;
+  final SocialGroup? group;
+}
+
+/// Outcome of a "delete my data" attempt (see [SocialService.deleteMyData]).
+enum DeleteMyDataStatus {
+  /// Deleted (see [SocialService.deleteMyData]'s doc comment for exactly
+  /// what "deleted" covers).
+  success,
+
+  /// There was no local identity to delete in the first place — a no-op.
+  notSignedIn,
+
+  /// Could not reach Firebase (offline / misconfigured) — degrade gently;
+  /// nothing was partially deleted in a way the UI needs to reconcile
+  /// (each step is itself idempotent/retry-safe).
+  offline,
+}
+
+class DeleteMyDataResult {
+  const DeleteMyDataResult(this.status);
+
+  final DeleteMyDataStatus status;
+
+  bool get isSuccess => status == DeleteMyDataStatus.success;
 }
 
 /// High-level social operations used by the UI layer.
@@ -224,21 +323,27 @@ class SocialService {
 
   /// Set/update the display name both locally and on the user's profile doc.
   ///
-  /// Must be called after [ensureSignedIn] has produced a uid. Returns false
-  /// (without caching locally) if the remote write fails, so the UI can
-  /// retry instead of masking a name that never actually saved.
-  Future<bool> setDisplayName(String uid, String displayName) async {
+  /// Must be called after [ensureSignedIn] has produced a uid. Sanitizes and
+  /// moderates [displayName] first (see [validateName]) — a name that fails
+  /// that check is rejected WITHOUT ever reaching the client/network, and
+  /// never cached locally either.
+  Future<SetDisplayNameResult> setDisplayName(String uid, String displayName) async {
+    final validated = validateName(displayName, maxLength: kDisplayNameMaxLength);
+    if (!validated.isOk) {
+      return const SetDisplayNameResult(SetDisplayNameStatus.rejectedName);
+    }
+    final cleaned = validated.cleaned!;
     try {
       debugPrint('SocialService: [3/4] users/$uid write starting…');
-      await _client.setDisplayName(uid: uid, displayName: displayName).timeout(_kSocialOpTimeout);
+      await _client.setDisplayName(uid: uid, displayName: cleaned).timeout(_kSocialOpTimeout);
       debugPrint('SocialService: [3/4] users/$uid write done.');
     } catch (e) {
       debugPrint('SocialService: [3/4] users/$uid write FAILED: $e');
-      return false;
+      return const SetDisplayNameResult(SetDisplayNameStatus.offline);
     }
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kDisplayNamePrefsKey, displayName);
-    return true;
+    await prefs.setString(_kDisplayNamePrefsKey, cleaned);
+    return const SetDisplayNameResult(SetDisplayNameStatus.success);
   }
 
   // ---------------------------------------------------------------------------
@@ -247,22 +352,38 @@ class SocialService {
 
   /// Create a group. Provisions anonymous auth + profile if needed.
   ///
-  /// Returns null on any failure (offline, etc.) — caller shows an error/retry.
-  Future<SocialGroup?> createGroup({
+  /// Sanitizes and moderates [groupName] first (see [validateName]) —
+  /// rejected WITHOUT ever reaching the network. [displayName] gets the same
+  /// treatment via [setDisplayName].
+  Future<CreateGroupResult> createGroup({
     required String groupName,
     required String displayName,
   }) async {
+    final validatedGroupName = validateName(groupName, maxLength: kGroupNameMaxLength);
+    if (!validatedGroupName.isOk) {
+      return const CreateGroupResult(status: CreateGroupStatus.rejectedName);
+    }
     final uid = await ensureSignedIn();
-    if (uid == null) return null;
-    if (!await setDisplayName(uid, displayName)) return null;
+    if (uid == null) return const CreateGroupResult(status: CreateGroupStatus.offline);
+    final nameResult = await setDisplayName(uid, displayName);
+    switch (nameResult.status) {
+      case SetDisplayNameStatus.rejectedName:
+        return const CreateGroupResult(status: CreateGroupStatus.rejectedName);
+      case SetDisplayNameStatus.offline:
+        return const CreateGroupResult(status: CreateGroupStatus.offline);
+      case SetDisplayNameStatus.success:
+        break;
+    }
     try {
       debugPrint('SocialService: [4/4] groups/{id} + codes/{code} write starting…');
-      final group = await _client.createGroup(uid: uid, name: groupName).timeout(_kSocialOpTimeout);
+      final group = await _client
+          .createGroup(uid: uid, name: validatedGroupName.cleaned!)
+          .timeout(_kSocialOpTimeout);
       debugPrint('SocialService: [4/4] group created (id=${group.id}, code=${group.code}).');
-      return group;
+      return CreateGroupResult(status: CreateGroupStatus.success, group: group);
     } catch (e) {
       debugPrint('SocialService: [4/4] createGroup FAILED: $e');
-      return null;
+      return const CreateGroupResult(status: CreateGroupStatus.offline);
     }
   }
 
@@ -312,8 +433,14 @@ class SocialService {
       if (groupId == null) {
         return const JoinCodeResult(status: JoinCodeStatus.codeNotFound);
       }
-      if (!await setDisplayName(uid, displayName)) {
-        return const JoinCodeResult(status: JoinCodeStatus.offline);
+      final nameResult = await setDisplayName(uid, displayName);
+      switch (nameResult.status) {
+        case SetDisplayNameStatus.rejectedName:
+          return const JoinCodeResult(status: JoinCodeStatus.rejectedName);
+        case SetDisplayNameStatus.offline:
+          return const JoinCodeResult(status: JoinCodeStatus.offline);
+        case SetDisplayNameStatus.success:
+          break;
       }
       await _client.joinGroup(groupId: groupId, uid: uid).timeout(_kSocialOpTimeout);
       final group = await _client.getGroup(groupId).timeout(_kSocialOpTimeout);
@@ -410,6 +537,60 @@ class SocialService {
       entries.add(LeaderboardEntry(uid: memberUid, displayName: name, played: false));
     }
     return rankLeaderboard(entries);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Data deletion (Play/GDPR)
+  // ---------------------------------------------------------------------------
+
+  /// "Delete my data": removes the player's server-side social identity.
+  ///
+  /// Concretely deletes/removes, in this order (order matters — see
+  /// [SocialClient.deleteOwnResultsBestEffort]'s doc comment):
+  ///   1. Every past result doc (score + displayName) this uid wrote, across
+  ///      every group/day, on a BEST-EFFORT basis (a collection-group query
+  ///      that may need a one-time production index — failures here are
+  ///      logged and non-fatal, never block steps 2-4).
+  ///   2. This uid's own entry in every group's `memberUids` (leave every
+  ///      group).
+  ///   3. The `users/{uid}` profile doc itself (displayName, notification
+  ///      subscription state, etc).
+  ///   4. The locally-cached display name (SharedPreferences).
+  ///
+  /// Returns [DeleteMyDataStatus.notSignedIn] as a no-op when there is no
+  /// local identity at all — nothing to delete. Returns
+  /// [DeleteMyDataStatus.offline] if the CORE deletion (steps 2-4) fails;
+  /// step 1 failing alone still counts as [DeleteMyDataStatus.success]
+  /// since it's explicitly best-effort (see docs/privacy-policy.md for what
+  /// this does and doesn't cover).
+  Future<DeleteMyDataResult> deleteMyData() async {
+    if (!hasLocalIdentity) {
+      return const DeleteMyDataResult(DeleteMyDataStatus.notSignedIn);
+    }
+    final uid = _client.currentUid!;
+
+    try {
+      await _client.deleteOwnResultsBestEffort(uid).timeout(_kSocialOpTimeout);
+    } catch (e) {
+      // Best-effort by design -- log and continue to the steps that matter
+      // most (profile + membership deletion below).
+      debugPrint('SocialService: deleteOwnResultsBestEffort failed (non-fatal): $e');
+    }
+
+    try {
+      final groups = await _client.myGroups(uid).timeout(_kSocialOpTimeout);
+      for (final group in groups) {
+        await _client.removeSelfFromGroup(groupId: group.id, uid: uid).timeout(_kSocialOpTimeout);
+      }
+      await _client.deleteOwnProfile(uid).timeout(_kSocialOpTimeout);
+    } catch (e) {
+      debugPrint('SocialService: deleteMyData FAILED: $e');
+      return const DeleteMyDataResult(DeleteMyDataStatus.offline);
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kDisplayNamePrefsKey);
+    return const DeleteMyDataResult(DeleteMyDataStatus.success);
   }
 }
 

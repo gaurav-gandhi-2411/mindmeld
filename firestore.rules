@@ -38,8 +38,27 @@ service cloud.firestore {
       return !('displayName' in data) || (
         data.displayName is string &&
         data.displayName.size() > 0 &&
-        data.displayName.size() <= 40
+        data.displayName.size() <= 40 &&
+        isValidNameCharset(data.displayName)
       );
+    }
+
+    // Defense-in-depth charset check, mirroring the client-side stripping in
+    // app/lib/social/name_sanitizer.dart (see its doc comment for the full
+    // codepoint rationale): rejects control characters (Cc: C0 controls,
+    // DEL, C1 controls), zero-width/invisible characters, and RTL/bidi
+    // embedding/override/isolate characters. The richer profanity/
+    // reserved-word moderation stays client-side only (per this app's
+    // launch-hardening spec) -- this is just what CAN be enforced here
+    // (length above, charset here) as a backstop against a client that
+    // bypasses the sanitizer (e.g. a modified build or direct API write).
+    //
+    // RE2 (Firestore rules' regex engine) has no lookaround/backreferences,
+    // so this is phrased as "every character is OUTSIDE the forbidden set"
+    // (anchored ^...$ over a negated character class) rather than a
+    // negative match anywhere in the string.
+    function isValidNameCharset(s) {
+      return s.matches('^[^\\x{0000}-\\x{001F}\\x{007F}-\\x{009F}\\x{200B}-\\x{200D}\\x{FEFF}\\x{2060}\\x{061C}\\x{202A}-\\x{202E}\\x{2066}-\\x{2069}]*$');
     }
 
     // 6b notification fields — all optional, each validated only when present
@@ -71,13 +90,29 @@ service cloud.firestore {
       allow get: if isSignedIn();
       allow list: if false;
 
-      // A user may only ever create/update their OWN profile doc.
+      // A user may only ever create/update their OWN profile doc. keys()
+      // .hasOnly(...) closes an extra-fields gap found in the 2026-07-11
+      // re-audit: isValidDisplayName()/isValidNotifFields() only constrain
+      // fields THEY know about when present -- neither denies a write that
+      // also smuggles in an extra, unlisted top-level key (Firestore rules
+      // don't implicitly forbid unknown fields). The allow-list below is
+      // exactly this file's documented users/{uid} data model (see the
+      // header comment) -- a legitimate client-app write never needs
+      // anything outside it.
       allow create, update: if isSignedIn()
         && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly([
+             'displayName', 'createdAt', 'groupIds',
+             'fcmToken', 'notifLang', 'timezone', 'notifPendingAction', 'notifUpdatedAt'
+           ])
         && isValidDisplayName(request.resource.data)
         && isValidNotifFields(request.resource.data);
 
-      allow delete: if false;
+      // Data-deletion (Play/GDPR): a user may delete ONLY their own profile
+      // doc. This does not touch group membership or past result docs --
+      // see groups/{groupId}'s self-removal update rule below, and
+      // docs/privacy-policy.md for what "delete my data" covers overall.
+      allow delete: if isSignedIn() && request.auth.uid == uid;
     }
 
     // -------------------------------------------------------------------
@@ -116,22 +151,43 @@ service cloud.firestore {
       allow get: if isSignedIn();
       allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
 
+      // keys().hasOnly(...) closes the same extra-fields gap noted on
+      // users/{uid} above -- the allow-list matches this file's documented
+      // groups/{groupId} data model (header comment).
       allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['name', 'code', 'createdBy', 'memberUids', 'createdAt'])
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.memberUids == [request.auth.uid]
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 60
+        && isValidNameCharset(request.resource.data.name)
         && request.resource.data.code is string;
 
       // Join flow: the ONLY allowed mutation is adding your own uid to
       // memberUids. Every other field must stay identical; no removing or
       // adding anyone else's uid; you cannot add yourself twice.
+      function isJoinUpdate() {
+        return request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
+          && request.resource.data.memberUids.hasAll(resource.data.memberUids)
+          && request.auth.uid in request.resource.data.memberUids
+          && !(request.auth.uid in resource.data.memberUids);
+      }
+
+      // Data-deletion (Play/GDPR) / "leave group" flow: the symmetric
+      // opposite of a join -- removing ONLY your own uid, no one else's.
+      // An empty memberUids list afterwards is a harmless orphaned doc, not
+      // a security concern (the group itself still cannot be deleted --
+      // see `allow delete: if false` below).
+      function isSelfRemovalUpdate() {
+        return request.resource.data.memberUids.size() == resource.data.memberUids.size() - 1
+          && resource.data.memberUids.hasAll(request.resource.data.memberUids)
+          && request.auth.uid in resource.data.memberUids
+          && !(request.auth.uid in request.resource.data.memberUids);
+      }
+
       allow update: if isSignedIn()
-        && request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
-        && request.resource.data.memberUids.hasAll(resource.data.memberUids)
-        && request.auth.uid in request.resource.data.memberUids
-        && !(request.auth.uid in resource.data.memberUids)
+        && (isJoinUpdate() || isSelfRemovalUpdate())
         && request.resource.data.name == resource.data.name
         && request.resource.data.code == resource.data.code
         && request.resource.data.createdBy == resource.data.createdBy;
@@ -161,6 +217,9 @@ service cloud.firestore {
           && uid == request.auth.uid
           && isValidDate(date)
           && isMember(get(/databases/$(database)/documents/groups/$(groupId)).data)
+          && request.resource.data.keys().hasOnly([
+               'uid', 'displayName', 'outcome', 'guessesUsed', 'par', 'scoreVsPar', 'lang', 'finishedAt'
+             ])
           && request.resource.data.uid == request.auth.uid
           && request.resource.data.displayName ==
                get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName
@@ -178,7 +237,17 @@ service cloud.firestore {
           && request.resource.data.finishedAt == request.time;
 
         allow update: if false;
-        allow delete: if false;
+
+        // Data-deletion (Play/GDPR): a user may delete ONLY their own past
+        // result doc (their own scores/displayName in a group they may have
+        // since left) -- deliberately not membership-gated like the
+        // get/list rule above, since "delete my data" runs alongside/after
+        // leaving a group's memberUids, at which point isMember() would
+        // already be false. Deleting your own row (rather than editing it)
+        // does not weaken the "no revising your score" anti-cheat posture
+        // above -- you can only erase your own history, never rewrite it to
+        // a better one, and this can never affect another member's data.
+        allow delete: if isSignedIn() && uid == request.auth.uid;
       }
     }
 

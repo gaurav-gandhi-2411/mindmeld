@@ -92,6 +92,27 @@ abstract class SocialClient {
     required String groupId,
     required String date,
   });
+
+  // ---------------------------------------------------------------------
+  // Data deletion (Play/GDPR) — see social_service.dart's deleteMyData().
+  // ---------------------------------------------------------------------
+
+  /// Delete the caller's own profile doc (`users/{uid}`).
+  Future<void> deleteOwnProfile(String uid);
+
+  /// Remove ONLY [uid] from one group's `memberUids` (leave-group /
+  /// delete-my-data flow). No-op if [uid] is already not a member.
+  Future<void> removeSelfFromGroup({required String groupId, required String uid});
+
+  /// Best-effort deletion of every past result doc across every group/day
+  /// that carries [uid] — see this method's `_LiveSocialClient`
+  /// implementation doc comment for why this is "best-effort" (a
+  /// production collection-group query may need a one-time index) rather
+  /// than a guaranteed operation. MUST be called BEFORE
+  /// [removeSelfFromGroup] for each group — `firestore.rules` still
+  /// membership-gates reading these docs, so once the caller has left a
+  /// group this can no longer find that group's results.
+  Future<void> deleteOwnResultsBestEffort(String uid);
 }
 
 /// Production [SocialClient] backed by real Firebase SDKs.
@@ -300,6 +321,51 @@ class _LiveSocialClient implements SocialClient {
       );
     }
     return out;
+  }
+
+  @override
+  Future<void> deleteOwnProfile(String uid) async {
+    await _db.collection('users').doc(uid).delete();
+  }
+
+  @override
+  Future<void> removeSelfFromGroup({required String groupId, required String uid}) async {
+    await _db.collection('groups').doc(groupId).update({
+      'memberUids': FieldValue.arrayRemove([uid]),
+    });
+  }
+
+  @override
+  Future<void> deleteOwnResultsBestEffort(String uid) async {
+    // Collection-group query across every groups/{id}/days/{date}/results
+    // subcollection, filtered to this uid's own docs (firestore.rules'
+    // get/list rule on that subcollection still requires group membership,
+    // which is why the caller MUST run this before removeSelfFromGroup —
+    // see this method's doc comment on the SocialClient interface).
+    //
+    // Best-effort, not guaranteed: a collection-group query needs a
+    // Firestore index scoped to COLLECTION_GROUP for the 'uid' field. A
+    // single-collection index (the default) does NOT cover collection-group
+    // queries — production may need a ONE-TIME manual step (Firebase
+    // console -> Firestore -> Indexes -> Collection group, or letting the
+    // first failed query's error surface a console link to auto-create it)
+    // before this succeeds live. Failure here must never block the more
+    // important profile+membership deletion in SocialService.deleteMyData(),
+    // so every failure is caught and logged, never rethrown.
+    try {
+      final query =
+          await _db.collectionGroup('results').where('uid', isEqualTo: uid).get();
+      for (final resultDoc in query.docs) {
+        try {
+          await resultDoc.reference.delete();
+        } catch (e) {
+          debugPrint(
+              'SocialClient: deleteOwnResultsBestEffort failed for ${resultDoc.reference.path}: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('SocialClient: deleteOwnResultsBestEffort query failed (non-fatal): $e');
+    }
   }
 
   SocialGroup? _groupFromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {

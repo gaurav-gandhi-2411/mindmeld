@@ -81,6 +81,15 @@ class _FakeSocialClient implements SocialClient {
     required String date,
   }) async =>
       {};
+
+  @override
+  Future<void> deleteOwnProfile(String uid) async {}
+
+  @override
+  Future<void> removeSelfFromGroup({required String groupId, required String uid}) async {}
+
+  @override
+  Future<void> deleteOwnResultsBestEffort(String uid) async {}
 }
 
 /// Configurable [NotificationClient] for widget tests.

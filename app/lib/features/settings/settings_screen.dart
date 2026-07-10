@@ -6,6 +6,7 @@ import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
 import 'package:mindmeld/notifications/notification_client.dart';
 import 'package:mindmeld/notifications/notification_service.dart';
+import 'package:mindmeld/social/social_service.dart';
 import 'package:mindmeld/stubs/iap_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +43,9 @@ class SettingsScreen extends StatefulWidget {
     /// Optional notification service override for tests. When null
     /// [buildNotificationService] is used.
     this.notificationService,
+    /// Optional social service override for tests (used by the "Delete my
+    /// data" action). When null [buildSocialService] is used.
+    this.socialService,
   });
 
   final String currentLang;
@@ -53,6 +57,9 @@ class SettingsScreen extends StatefulWidget {
 
   /// Optional notification service override; package-private for test injection.
   final NotificationService? notificationService;
+
+  /// Optional social service override; package-private for test injection.
+  final SocialService? socialService;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -79,12 +86,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notifSubscribedLocally = false;
   bool _notifBusy = false;
 
+  late final SocialService _socialService;
+  bool _deletingData = false;
+
   @override
   void initState() {
     super.initState();
     _lang = widget.currentLang;
     _gateway = widget.iapGateway ?? buildIapGateway();
     _notifService = widget.notificationService ?? buildNotificationService();
+    _socialService = widget.socialService ?? buildSocialService();
     _loadEntitlements();
     _checkPrivacyOptionsRequired();
     _loadRivalSettings();
@@ -266,6 +277,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// "Delete my data": confirms, then calls [SocialService.deleteMyData].
+  ///
+  /// See [SocialService.deleteMyData]'s doc comment for exactly what this
+  /// deletes vs. leaves as accepted residual (documented in
+  /// docs/privacy-policy.md). This action does NOT touch local-only
+  /// gameplay data (guess history, streaks, pack progress) — those have no
+  /// server-side copy and are unaffected either way.
+  Future<void> _deleteMyData() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete my data?'),
+        content: const Text(
+          'This removes your display name, group memberships, and past '
+          'leaderboard results from our servers. Your local gameplay '
+          'history (guesses, streaks) stays on this device and is not '
+          'affected. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    setState(() => _deletingData = true);
+    try {
+      final result = await _socialService.deleteMyData();
+      if (!mounted) return;
+      final message = switch (result.status) {
+        DeleteMyDataStatus.success => 'Your data has been deleted.',
+        DeleteMyDataStatus.notSignedIn =>
+          "You haven't used Play with Friends, so there's nothing to delete.",
+        DeleteMyDataStatus.offline =>
+          "Couldn't delete your data — check your connection and try again.",
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => _deletingData = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -366,6 +427,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: const Icon(Icons.policy_outlined),
             title: const Text('Privacy policy'),
             onTap: _showPrivacyPolicyDialog,
+          ),
+
+          // "Delete my data" — always visible; deleteMyData() itself
+          // degrades gracefully to a friendly "nothing to delete" message
+          // for a player who has never used Play with Friends.
+          ListTile(
+            leading: const Icon(Icons.delete_outline),
+            title: const Text('Delete my data'),
+            subtitle: const Text('Removes your social data from our servers'),
+            enabled: !_deletingData,
+            onTap: _deleteMyData,
           ),
 
           // Onboarding + About

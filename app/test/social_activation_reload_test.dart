@@ -149,6 +149,25 @@ class _FakeSocialClient implements SocialClient {
         ));
   }
 
+  @override
+  Future<void> deleteOwnProfile(String uid) async {
+    users.remove(uid);
+  }
+
+  @override
+  Future<void> removeSelfFromGroup({required String groupId, required String uid}) async {
+    (groups[groupId]?['memberUids'] as List<String>?)?.remove(uid);
+  }
+
+  @override
+  Future<void> deleteOwnResultsBestEffort(String uid) async {
+    for (final byDate in results.values) {
+      for (final byUid in byDate.values) {
+        byUid.remove(uid);
+      }
+    }
+  }
+
   SocialGroup _groupFrom(String id) {
     final g = groups[id]!;
     return SocialGroup(
@@ -258,7 +277,7 @@ void main() {
         final aliceService =
             SocialService(client: aliceClient, firebaseInitializer: () async => true);
         final group =
-            await aliceService.createGroup(groupName: 'Friends', displayName: 'Alice');
+            (await aliceService.createGroup(groupName: 'Friends', displayName: 'Alice')).group;
 
         final bobClient = _FakeSocialClient(
             users: users, groups: groups, codes: codes, results: results, uidToAssign: 'bob');

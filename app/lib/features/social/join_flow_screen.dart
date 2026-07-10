@@ -65,6 +65,11 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
             _state = _JoinFlowState.notFound;
           case JoinCodeStatus.offline:
             _state = _JoinFlowState.offline;
+          case JoinCodeStatus.rejectedName:
+            // previewGroupForCode never sets a display name, so this status
+            // never actually occurs here — included only for switch
+            // exhaustiveness over the shared JoinCodeStatus enum.
+            _state = _JoinFlowState.offline;
         }
       });
     } catch (e) {
@@ -77,7 +82,8 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
 
   Future<void> _confirmJoin() async {
     final cachedName = await _service.cachedDisplayName();
-    final displayName = cachedName ?? (mounted ? await promptDisplayName(context) : null);
+    final displayName = cachedName ??
+        (mounted ? await promptValidatedName(context, maxLength: kDisplayNameMaxLength) : null);
     if (displayName == null) return;
     if (!mounted) return;
 
@@ -86,6 +92,16 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
     try {
       final result = await _service.joinByCode(code: widget.code, displayName: displayName);
       if (!mounted) return;
+
+      if (result.status == JoinCodeStatus.rejectedName) {
+        // Defense-in-depth fallback: promptValidatedName already screens
+        // the name client-side, so this should be unreachable in practice.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(kNameRejectedMessage)),
+        );
+        setState(() => _state = _JoinFlowState.confirm);
+        return;
+      }
 
       if (result.status == JoinCodeStatus.success && result.group != null) {
         // Return to the main app shell rather than pushReplacement-ing to

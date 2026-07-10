@@ -171,6 +171,32 @@ class _FakeSocialClient implements SocialClient {
       memberUids: List<String>.from(g['memberUids'] as List),
     );
   }
+
+  int deleteOwnProfileCalls = 0;
+  int removeSelfFromGroupCalls = 0;
+  int deleteOwnResultsBestEffortCalls = 0;
+
+  @override
+  Future<void> deleteOwnProfile(String uid) async {
+    deleteOwnProfileCalls++;
+    users.remove(uid);
+  }
+
+  @override
+  Future<void> removeSelfFromGroup({required String groupId, required String uid}) async {
+    removeSelfFromGroupCalls++;
+    (groups[groupId]?['memberUids'] as List<String>?)?.remove(uid);
+  }
+
+  @override
+  Future<void> deleteOwnResultsBestEffort(String uid) async {
+    deleteOwnResultsBestEffortCalls++;
+    for (final byDate in results.values) {
+      for (final byUid in byDate.values) {
+        byUid.remove(uid);
+      }
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -208,13 +234,14 @@ void main() {
       expect(fake.writeResultCalls, 0); // never reached the client
     });
 
-    test('createGroup() returns null without touching the client when offline', () async {
+    test('createGroup() returns offline status without touching the client', () async {
       final fake = _FakeSocialClient();
       final service = SocialService(client: fake, firebaseInitializer: () async => false);
 
-      final group = await service.createGroup(groupName: 'Friends', displayName: 'Alice');
+      final result = await service.createGroup(groupName: 'Friends', displayName: 'Alice');
 
-      expect(group, isNull);
+      expect(result.status, CreateGroupStatus.offline);
+      expect(result.group, isNull);
       expect(fake.groups, isEmpty);
     });
 
@@ -232,8 +259,10 @@ void main() {
       final fake = _FakeSocialClient();
       final service = SocialService(client: fake, firebaseInitializer: () async => true);
 
-      final group = await service.createGroup(groupName: 'Office Crew', displayName: 'Alice');
+      final result = await service.createGroup(groupName: 'Office Crew', displayName: 'Alice');
 
+      expect(result.status, CreateGroupStatus.success);
+      final group = result.group;
       expect(group, isNotNull);
       expect(group!.name, 'Office Crew');
       expect(group.memberUids, [fake.currentUid]);
@@ -249,7 +278,7 @@ void main() {
 
       final aliceClient = _FakeSocialClient(users: users, groups: groups, codes: codes, uidToAssign: 'alice');
       final alice = SocialService(client: aliceClient, firebaseInitializer: () async => true);
-      final group = await alice.createGroup(groupName: 'Friends', displayName: 'Alice');
+      final group = (await alice.createGroup(groupName: 'Friends', displayName: 'Alice')).group;
 
       final bobClient = _FakeSocialClient(users: users, groups: groups, codes: codes, uidToAssign: 'bob');
       final bob = SocialService(client: bobClient, firebaseInitializer: () async => true);
@@ -329,7 +358,7 @@ void main() {
       final aliceClient = _FakeSocialClient(
           users: users, groups: groups, codes: codes, results: results, uidToAssign: 'alice');
       final alice = SocialService(client: aliceClient, firebaseInitializer: () async => true);
-      final group = await alice.createGroup(groupName: 'Friends', displayName: 'Alice');
+      final group = (await alice.createGroup(groupName: 'Friends', displayName: 'Alice')).group;
 
       final bobClient = _FakeSocialClient(
           users: users, groups: groups, codes: codes, results: results, uidToAssign: 'bob');
@@ -364,6 +393,70 @@ void main() {
       final service = SocialService(client: _FakeSocialClient(), firebaseInitializer: () async => true);
       final board = await service.leaderboardFor(groupId: 'nope', date: '2026-07-06');
       expect(board, isEmpty);
+    });
+  });
+
+  group('deleteMyData (Play/GDPR)', () {
+    test('with no local identity, returns notSignedIn without touching the client', () async {
+      final fake = _FakeSocialClient();
+      final service = SocialService(client: fake, firebaseInitializer: () async => false);
+
+      final result = await service.deleteMyData();
+
+      expect(result.status, DeleteMyDataStatus.notSignedIn);
+      expect(fake.deleteOwnProfileCalls, 0);
+      expect(fake.removeSelfFromGroupCalls, 0);
+    });
+
+    test('removes the user from every group, deletes the profile, clears cached name', () async {
+      final fake = _FakeSocialClient(uidToAssign: 'alice');
+      final service = SocialService(client: fake, firebaseInitializer: () async => true);
+      final groupOne = (await service.createGroup(groupName: 'Group One', displayName: 'Alice')).group!;
+      final groupTwo = (await service.createGroup(groupName: 'Group Two', displayName: 'Alice')).group!;
+
+      final result = await service.deleteMyData();
+
+      expect(result.status, DeleteMyDataStatus.success);
+      expect(fake.deleteOwnProfileCalls, 1);
+      expect(fake.removeSelfFromGroupCalls, 2);
+      expect(fake.users.containsKey('alice'), isFalse);
+      expect((fake.groups[groupOne.id]!['memberUids'] as List<String>).contains('alice'), isFalse);
+      expect((fake.groups[groupTwo.id]!['memberUids'] as List<String>).contains('alice'), isFalse);
+      expect(await service.cachedDisplayName(), isNull);
+    });
+
+    test("does not remove OTHER members from a shared group's memberUids", () async {
+      final users = <String, String>{};
+      final groups = <String, Map<String, dynamic>>{};
+      final codes = <String, String>{};
+
+      final aliceClient = _FakeSocialClient(users: users, groups: groups, codes: codes, uidToAssign: 'alice');
+      final alice = SocialService(client: aliceClient, firebaseInitializer: () async => true);
+      final group = (await alice.createGroup(groupName: 'Friends', displayName: 'Alice')).group!;
+
+      final bobClient = _FakeSocialClient(users: users, groups: groups, codes: codes, uidToAssign: 'bob');
+      final bob = SocialService(client: bobClient, firebaseInitializer: () async => true);
+      await bob.joinByCode(code: group.code, displayName: 'Bob');
+
+      await alice.deleteMyData();
+
+      final remaining = groups[group.id]!['memberUids'] as List<String>;
+      expect(remaining, ['bob']);
+      expect(users.containsKey('bob'), isTrue); // bob's own profile untouched
+    });
+
+    test('best-effort result deletion removes only the deleting user\'s own rows', () async {
+      final fake = _FakeSocialClient(uidToAssign: 'alice');
+      final service = SocialService(client: fake, firebaseInitializer: () async => true);
+      final group = (await service.createGroup(groupName: 'Friends', displayName: 'Alice')).group!;
+      await service.writeResultToAllGroups(
+        date: '2026-07-06', outcome: 'win', guessesUsed: 4, par: 6, scoreVsPar: -2, lang: 'en',
+      );
+
+      await service.deleteMyData();
+
+      expect(fake.deleteOwnResultsBestEffortCalls, 1);
+      expect(fake.results[group.id]!['2026-07-06']!.containsKey('alice'), isFalse);
     });
   });
 }

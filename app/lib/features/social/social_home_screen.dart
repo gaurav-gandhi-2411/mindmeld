@@ -78,13 +78,14 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
     final cached = await _service.cachedDisplayName();
     if (cached != null) return cached;
     if (!mounted) return null;
-    return promptDisplayName(context);
+    return promptValidatedName(context, maxLength: kDisplayNameMaxLength);
   }
 
   Future<void> _createGroup() async {
-    final name = await promptDisplayName(
+    final name = await promptValidatedName(
       context,
       title: 'Name your group',
+      maxLength: kGroupNameMaxLength,
     );
     if (name == null) return;
     final displayName = await _resolveDisplayName();
@@ -93,17 +94,32 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
 
     setState(() => _busy = true);
     try {
-      final group = await _service.createGroup(groupName: name, displayName: displayName);
+      final result = await _service.createGroup(groupName: name, displayName: displayName);
       if (!mounted) return;
 
-      if (group == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Couldn't create the group — check your connection and try again."),
-          ),
-        );
-        return;
+      switch (result.status) {
+        case CreateGroupStatus.success:
+          break;
+        case CreateGroupStatus.rejectedName:
+          // Defense-in-depth fallback: promptValidatedName already screens
+          // both names client-side, so this should be unreachable in
+          // practice — but the service enforces the same check
+          // independently, and this keeps that path honest instead of
+          // showing a misleading "connection" error.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(kNameRejectedMessage)),
+          );
+          return;
+        case CreateGroupStatus.offline:
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Couldn't create the group — check your connection and try again."),
+            ),
+          );
+          return;
       }
+      final group = result.group;
+      if (group == null) return; // unreachable given success above, but keeps this null-safe.
       await _refresh();
       if (!mounted) return;
       _showInviteSheet(group);
@@ -162,6 +178,14 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
         case JoinCodeStatus.codeNotFound:
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('That code doesn\'t match any group.')),
+          );
+          break;
+        case JoinCodeStatus.rejectedName:
+          // Defense-in-depth fallback: promptValidatedName (via
+          // _resolveDisplayName) already screens the name client-side, so
+          // this should be unreachable in practice.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(kNameRejectedMessage)),
           );
           break;
         case JoinCodeStatus.offline:

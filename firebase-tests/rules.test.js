@@ -21,6 +21,7 @@ const {
   doc,
   setDoc,
   updateDoc,
+  deleteDoc,
   getDoc,
   getDocs,
   collection,
@@ -79,6 +80,40 @@ async function main() {
   });
   await check("a user cannot write another user's profile", async () => {
     await assertFails(setDoc(doc(bob, 'users/alice'), { displayName: 'Not Alice' }, { merge: true }));
+  });
+
+  // ---- users/{uid} — charset (2026-07-11 re-audit) ----
+  await check('a displayName containing a control character is rejected', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'Alice' }, { merge: true }),
+    );
+  });
+  await check('a displayName containing a zero-width character is rejected', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'Al​ice' }, { merge: true }),
+    );
+  });
+  await check('a displayName containing a bidi-override character is rejected', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'Al‮ice' }, { merge: true }),
+    );
+  });
+  await check('a legitimate Devanagari displayName is still accepted', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'गौरव' }, { merge: true }),
+    );
+  });
+  await check('a legitimate accented-Latin displayName is still accepted', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'André' }, { merge: true }),
+    );
+  });
+
+  // ---- users/{uid} — extra-fields gap (2026-07-11 re-audit) ----
+  await check('a write with an unlisted extra top-level field is rejected', async () => {
+    await assertFails(
+      setDoc(doc(alice, 'users/alice'), { displayName: 'Alice', evilField: 'payload' }, { merge: true }),
+    );
   });
 
   // ---- users/{uid} — 6b notification fields ----
@@ -155,6 +190,35 @@ async function main() {
       }),
     );
   });
+  await check('a group name containing a control character is rejected', async () => {
+    await assertFails(
+      setDoc(doc(bob, 'groups/gBadName1'), {
+        name: 'Fun​ Group', code: 'BAD001', createdBy: 'bob', memberUids: ['bob'], createdAt: serverTimestamp(),
+      }),
+    );
+  });
+  await check('a group name containing a bidi-override character is rejected', async () => {
+    await assertFails(
+      setDoc(doc(bob, 'groups/gBadName2'), {
+        name: 'Fun‮ Group', code: 'BAD002', createdBy: 'bob', memberUids: ['bob'], createdAt: serverTimestamp(),
+      }),
+    );
+  });
+  await check('a legitimate Devanagari group name is still accepted', async () => {
+    await assertSucceeds(
+      setDoc(doc(bob, 'groups/gGoodName1'), {
+        name: 'दोस्त गैंग', code: 'GOOD001', createdBy: 'bob', memberUids: ['bob'], createdAt: serverTimestamp(),
+      }),
+    );
+  });
+  await check('a group create with an unlisted extra top-level field is rejected', async () => {
+    await assertFails(
+      setDoc(doc(bob, 'groups/gExtra1'), {
+        name: 'G', code: 'EXTRA01', createdBy: 'bob', memberUids: ['bob'], createdAt: serverTimestamp(),
+        evilField: 'payload',
+      }),
+    );
+  });
 
   // ---- codes/{code} ----
   await check('creator can create the matching join code atomically', async () => {
@@ -197,6 +261,34 @@ async function main() {
       });
     });
     await assertFails(updateDoc(doc(bob, 'groups/g5'), { memberUids: ['bob'] }));
+  });
+
+  // ---- self-removal / leave-group flow (2026-07-11 data-deletion re-audit) ----
+  await check('a member CAN remove ONLY their own uid from memberUids (leave group)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'groups/g6'), {
+        name: 'G6', code: 'LLL333', createdBy: 'alice', memberUids: ['alice', 'bob'], createdAt: new Date(),
+      });
+    });
+    await assertSucceeds(updateDoc(doc(bob, 'groups/g6'), { memberUids: ['alice'] }));
+  });
+  await check('a member cannot remove someone ELSE while "leaving" (self-removal must be self-only)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'groups/g7'), {
+        name: 'G7', code: 'MMM444', createdBy: 'alice', memberUids: ['alice', 'bob'], createdAt: new Date(),
+      });
+    });
+    await assertFails(updateDoc(doc(bob, 'groups/g7'), { memberUids: ['bob'] }));
+  });
+  await check('self-removal cannot also change the group name/code/createdBy', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'groups/g8'), {
+        name: 'G8', code: 'NNN555', createdBy: 'alice', memberUids: ['alice', 'bob'], createdAt: new Date(),
+      });
+    });
+    await assertFails(
+      updateDoc(doc(bob, 'groups/g8'), { memberUids: ['alice'], name: 'Hijacked' }),
+    );
   });
 
   // ---- results/{uid} ----
@@ -275,6 +367,38 @@ async function main() {
   await check('a non-member cannot read the day\'s results (spoiler safety at the rules layer)', async () => {
     const carol = testEnv.authenticatedContext('carol').firestore();
     await assertFails(getDocs(collection(carol, `groups/g1/days/${today}/results`)));
+  });
+  await check('a result create with an unlisted extra top-level field is rejected', async () => {
+    await assertFails(
+      setDoc(doc(alice, `groups/g1/days/${today}/results/aliceExtra`), {
+        uid: 'aliceExtra', displayName: 'Alice', outcome: 'win', guessesUsed: 5, par: 6,
+        scoreVsPar: -1, lang: 'en', finishedAt: serverTimestamp(), evilField: 'payload',
+      }),
+    );
+  });
+
+  // ---- data deletion (Play/GDPR) — 2026-07-11 ----
+  await check('a user CAN delete their own users/{uid} doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/erin'), { displayName: 'Erin', createdAt: new Date(), groupIds: [] });
+    });
+    const erin = testEnv.authenticatedContext('erin').firestore();
+    await assertSucceeds(deleteDoc(doc(erin, 'users/erin')));
+  });
+  await check("a user CANNOT delete another uid's users/{uid} doc", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'users/frank'), { displayName: 'Frank', createdAt: new Date(), groupIds: [] });
+    });
+    await assertFails(deleteDoc(doc(bob, 'users/frank')));
+  });
+  await check('a user CAN delete their own past result doc', async () => {
+    await assertSucceeds(deleteDoc(doc(bob, `groups/g1/days/${today}/results/bob`)));
+  });
+  await check("a user CANNOT delete another member's result doc", async () => {
+    await assertFails(deleteDoc(doc(bob, `groups/g1/days/${today}/results/alice`)));
+  });
+  await check('the group itself still cannot be deleted (only self-removal from memberUids is allowed)', async () => {
+    await assertFails(deleteDoc(doc(alice, 'groups/g1')));
   });
 
   // ---- default deny ----

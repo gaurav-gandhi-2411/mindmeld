@@ -1,8 +1,8 @@
 # Warmer Privacy Policy
 
-**Last Updated:** 2026-06-12
+**Last Updated:** 2026-07-11
 
-This policy describes how Warmer ("the app", "we") handles your data. Warmer is a free word-guessing game. We do not require accounts or collect personal information beyond what is described below.
+This policy describes how Warmer ("the app", "we") handles your data. Warmer is a free word-guessing game. We do not require accounts to play solo, and Play with Friends uses only anonymous identifiers — no personal information beyond what is described below.
 
 ---
 
@@ -84,12 +84,35 @@ This policy describes how Warmer ("the app", "we") handles your data. Warmer is 
 
 ---
 
+### Play with Friends (Social) and Notifications
+
+**Purpose:** Compare daily results with friends on a private leaderboard, and (optionally) get a daily puzzle reminder.
+
+This feature is entirely opt-in — it only activates the first time you tap "Create a group," "Join a group," or turn on the notification reminder toggle. If you never use these features, none of the following applies to you.
+
+**Data collected:**
+- An anonymous Firebase Authentication user ID (not linked to your name, email, or any real-world identity) — created the first time you use Social or Notifications.
+- The display name you choose, shown to other members of any group you join.
+- Group membership: which private friend-groups you belong to, and the group's own chosen name.
+- Per-day results you finish while in a group: outcome (win/loss), guess count, par, score vs. par, and language — visible only to members of that specific group, never publicly.
+- If you opt into notifications: an FCM (Firebase Cloud Messaging) push token, your selected notification language, and your device's timezone, used solely to deliver a daily puzzle reminder at a locally-appropriate time.
+
+**Moderation:** Display names and group names are checked against an automated filter (impersonation/reserved-word and profanity checks) before being saved, so a rejected name is never stored or shown to other players.
+
+**What we do NOT collect via Social/Notifications:**
+- Your real name, email address, or phone number.
+- The secret word, your guesses' text, or any spoiler content in a leaderboard entry.
+
+**Source of truth:** `firestore.rules` (this repository) defines exactly what can be written and by whom — a player can only ever write their own profile and their own results.
+
+---
+
 ## What We Do NOT Collect
 
-- **No accounts.** Warmer has no login, registration, or account system.
+- **No traditional accounts.** Warmer has no email/password login or registration form. Play with Friends uses anonymous Firebase Authentication (see above) — no email, phone number, or password is ever requested.
 - **No contacts or address book access.**
 - **No location data** beyond the coarse country/region Firebase infers from IP address (standard Firebase behaviour; we do not request location permission).
-- **Gameplay stays on device** — guess history, streaks, and stats are stored only in the local SQLite database on your device. They are not uploaded to any server (except as aggregate, anonymised analytics events described above).
+- **Solo gameplay stays on device** — guess history, streaks, and stats from solo play are stored only in the local SQLite database on your device and are not uploaded to any server (except as aggregate, anonymised analytics events described above). This does NOT apply to Play with Friends data (display name, group membership, per-day results), which is stored server-side as described above — that's the nature of a shared leaderboard.
 
 ---
 
@@ -98,8 +121,20 @@ This policy describes how Warmer ("the app", "we") handles your data. Warmer is 
 - **Local data** (guess history, streaks, analytics ring buffer): stored on your device. You can clear it at any time by uninstalling the app.
 - **Firebase Analytics and Crashlytics data** is retained for up to 14 months per Google's default settings.
 - **RevenueCat purchase records** are retained for the period required to support purchase restoration and disputes.
+- **Play with Friends / Notifications data**: retained until you delete it (see "Delete my data" below) or request deletion.
 
-To request deletion of any data associated with your device, contact us at:
+### In-app deletion: "Delete my data"
+
+If you've used Play with Friends or Notifications, **Settings → "Delete my data"** removes, immediately and without contacting us:
+- Your profile document (display name, notification subscription state, FCM token).
+- Your membership in every group you belong to (you're removed from each group's member list; the groups themselves and their other members are unaffected).
+- Every past leaderboard result you wrote, on a best-effort basis (this is a background cleanup step that, in rare cases — e.g. a delayed server-side index — may not complete instantly; if any of your past results are not cleaned up immediately, contact us using the address below and we will remove them manually).
+
+This action does NOT delete: your local, on-device gameplay history (guesses, streaks, pack progress) — that data has no server-side copy in the first place and uninstalling the app removes it, same as always.
+
+### Manual request path
+
+For anything not covered by the in-app "Delete my data" action — including Firebase Analytics/Crashlytics data (which Google does not expose a self-serve per-user deletion API for; see below) or RevenueCat purchase records — contact us at:
 
 **PLACEHOLDER_EMAIL**
 
