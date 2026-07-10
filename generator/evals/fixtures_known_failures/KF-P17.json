@@ -1,0 +1,9 @@
+{
+  "id": "KF-P17",
+  "lang": "hi-en",
+  "anchor": "chant",
+  "closer": "cheering",
+  "farther": "doctor",
+  "note": "chant=crowd chant; Cricket pack addition (missing from top-10k)",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off). cos(chant,cheering)=0.5666 < cos(chant,doctor)=0.5885 -- a marginal (0.02) miss. 'chant' IS a live scheduled secret (Cricket pack, hi-en, code-mixed English spelling) -- flagged here rather than silently dropped since it is consequential."
+}

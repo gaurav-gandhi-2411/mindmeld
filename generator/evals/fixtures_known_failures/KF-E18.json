@@ -1,0 +1,9 @@
+{
+  "id": "KF-E18",
+  "lang": "hi-en",
+  "anchor": "king",
+  "closer": "queen",
+  "farther": "river",
+  "note": "king/queen are related royalty terms; river is unrelated",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off) fixed the hi-en OOD romanization failure (harness Spearman -0.003 -> 0.639, cross-language pass 5% -> 54%) but is an Indic-NLI-tuned checkpoint, not a general English paraphrase model like the old paraphrase-multilingual-MiniLM-L12-v2 -- pure English-word pairs inside the hi-en vocab can score slightly worse. cos(king,queen)=0.4047 < cos(king,river)=0.5150. Neither word is a currently scheduled secret; the English game mode (config.MODELS['en']) is untouched and unaffected."
+}

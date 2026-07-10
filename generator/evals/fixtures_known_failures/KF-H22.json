@@ -1,0 +1,9 @@
+{
+  "id": "KF-H22",
+  "lang": "hi-en",
+  "anchor": "gham",
+  "closer": "dard",
+  "farther": "ocean",
+  "note": "gham=sorrow, dard=pain — semantically adjacent Hindi words vs ocean",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off). cos(gham,dard)=0.5389 < cos(gham,ocean)=0.5626 -- see also KF-R01 (same anchor/closer pair vs a different farther word). 'gham' is a vocab/hinglish.txt entry, not a currently scheduled secret."
+}

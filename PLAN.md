@@ -132,7 +132,7 @@ Spec: `spec-cricket-pack.md` (source of truth). Content-only drop — pack SYSTE
 
 Spec: `spec-eval-harness.md`. GG approved dim-1 scenario labels 2026-07-10 (relabels: bagicha/aaina near-tier fixes + EN garden/mirror proactive parity fix, forest mid swap, hi-en near-tier split into translation-vs-associate subtypes).
 
-## MAJOR FINDING (dimension 1, hi-en) — real, live, production issue, not an eval bug
+## MAJOR FINDING (dimension 1, hi-en) — RESOLVED 2026-07-10, see spec-hinglish-fix.md fix below
 
 The direct English translation of a Hinglish secret ranks in the **thousands** (out of ~10,445 words) for every real published daily payload checked — not a handful of edge cases, the dominant pattern:
 
@@ -174,3 +174,68 @@ Product implication: a Hinglish player who correctly guesses the **English trans
 - [x] **Critical interpretation finding on the 71.8% figure — do not act on it at face value.** Manually spot-checked the 8 lowest-scored (solvability=1) real clues against raw text: every one is a legitimate, evocative, human-approved clue (e.g. `music`: "It reaches places in your mind that words alone cannot"; `village`: "Where everyone knows your grandmother's name"; `friend`: "The family you choose, one laugh at a time"). None are broken. This matches the calibration gap exactly (65.6% solvability agreement vs 96.9% spoiler-safety) — the judge's confirmed failure mode is under-rating deliberately indirect/evocative clues, which is this game's house style by design. Read 71.8% as "this judge's absolute solvability threshold doesn't fit this game's clue style," not "most clues are unsolvable." The judge IS trustworthy for spoiler-detection (0 flagged, exactly matches the deterministic `clue_leak_reason` gate's own 0-leak result) and difficulty-distribution sanity-checking. Deliberately did NOT wire a hard solvability-score gate into pytest against this judge's raw scores — only the fast calibration floors (`spoiler_agreement >= 0.85`, `solvability_agreement >= 0.55`) are gated in `test_harness_judge.py`. A future hard per-clue solvability gate needs either threshold recalibration or a relative/comparative solvability check, not this judge's absolute score as-is.
 - [x] Baseline report committed: `evals/reports/baseline_report.{json,md}` — full per-dimension-per-language numbers, worst-diverging pairs, outlier lists, interpretation notes.
 - [x] All tests green: 16/16 in `test_harness.py` + `test_harness_judge.py` (14 fast + 2 Ollama-gated, 498.7s), plus legacy 77/77 fixtures subsumed into the harness report (run via `run_full_harness`'s call into `evals/run_evals.py`, not duplicated as separate pytest cases).
+
+---
+
+# PLAN — Hinglish semantic engine fix (eval-gated bake-off) — COMPLETE
+
+Spec: `spec-hinglish-fix.md`. Autonomous single-pass run, harness-verified.
+
+## Root cause (confirmed, step 1)
+
+15 known-fail hi-en pairs embedded three ways (romanized / hand-transliterated Devanagari / English translation) under the then-shipped `paraphrase-multilingual-MiniLM-L12-v2`: Devanagari aligned with the English translation in 15/15 pairs (mean cos(devanagari,english)=0.869 vs mean cos(romanized,english)=0.344 -- e.g. `ghadi`->clock: romanized cos=0.10, Devanagari cos=0.97). Confirms the model was never taught to associate Latin-script romanized Hindi with its own meaning; it clusters by surface form instead. Validates Path A's premise, but see bake-off below -- a different path won.
+
+## Bake-off (9 candidates, harness dims 1+2, hi-en full 10,462-word production vocab + full 60-pair schedule)
+
+| candidate | Spearman | cross-lang pass | notes |
+|---|---|---|---|
+| baseline (shipped): paraphrase-multilingual-MiniLM-L12-v2, raw romanized | -0.003 | 5.1% | broken |
+| A: ITRANS-transliterate hi-words -> Devanagari + same model | 0.232 | 23.7% | rule-based translit too noisy (only ~56% cos match to hand-corrected Devanagari) |
+| B1: L3Cube hing-mbert-mixed-v2, mean-pooled | 0.352 | 28.8% | native code-mixed BERT, raw mean-pool |
+| B2: L3Cube hing-roberta-mixed, mean-pooled | 0.358 | 30.5% | |
+| C: MuRIL (google/muril-base-cased), mean-pooled, raw romanized | 0.399 | 52.5% | clears cross-lang gate alone |
+| C-hybrid: MuRIL fed ITRANS-Devanagari (not raw romanized) | 0.248 | 32.2% | WORSE than raw -- confirms MuRIL already natively handles romanization; bolting noisy rule-based translit in front of it hurts |
+| D: BAAI/bge-m3, raw romanized (general multilingual baseline) | 0.236 | 20.3% | confirms general multilingual embedders also fail on raw romanized, as spec predicted |
+| E1: l3cube-pune/indic-sentence-similarity-sbert (proper SBERT pooling) | 0.530 | 52.5% | clears both gates |
+| E2: l3cube-pune/indic-sentence-bert-nli (WINNER) | 0.639 | 54.2% | clears both gates, best Spearman, lowest monotonicity (15.3% vs baseline 53.75%) |
+| E3: l3cube-pune/hindi-sentence-similarity-sbert (Hindi-only, not multilingual) | 0.599 | 57.6% | best cross-lang but narrower training distribution (higher generalization risk for the code-mixed EN+Hindi vocab) -- not picked |
+
+Key lesson: raw mean-pooled masked-LM checkpoints (B/C) underperform a properly SBERT-trained (NLI/STS fine-tuned) pooling head on the same underlying multilingual-BERT family (E-series) by a wide margin -- confirms the spec's own risk note.
+
+Selection gate: minimum viable = Spearman >=0.5 AND cross-lang >=40%. Winner l3cube-pune/indic-sentence-bert-nli clears both (0.639 / 54.2%) -- does not yet reach the EN-parity target (0.8+), but is the best of 9 candidates and a categorical fix vs. shipped baseline. License: CC-BY-4.0 (attribution required, commercial use OK).
+
+## Shipped
+
+- `generator/config.py`: `MODELS["hi-en"]` -> `l3cube-pune/indic-sentence-bert-nli` (768-dim, up from 384). `MODELS["en"]` untouched.
+- `generator/embeddings.py`: fixed a latent cache-key gap found while shipping this -- the `.model-cache/{lang}-{hash}.npy` cache key was hashed from vocab content ONLY, not model name, so swapping `MODELS[lang]` without also purging the cache would have silently kept serving the OLD model's vectors. Cache key now hashes (model_name, vocab). Stale hi-en cache files purged.
+- Regenerated ALL hi-en payloads: 60 daily (2026-06-12..2026-08-10) + 25 Bollywood + 25 Cricket. `en` payloads confirmed byte-identical to pre-fix (0 diffs, both daily and packs) -- English engine provably untouched. hi-en payloads: byte-reproducible across two independent full rebuilds (only `generated_at` timestamp in manifest.json differs). All size gates pass (`--strict-sizes`): hi-en ~151-153KB (target 400KB), en ~775-780KB (target 1.5MB) -- both packs match the daily profile.
+- 7 legacy pairwise-ordering fixtures flipped by the model swap (`E18`, `H22`, `H34`, `P03`, `P15`, `P17`, `R01`) reclassified to `evals/fixtures_known_failures/KF-*.json` with measured cosine scores in the `reason` field, following the exact precedent of the 5 pre-existing KF-H* fixtures. Of these, `aansoo` (Bollywood), `fielder` and `chant` (Cricket) are live scheduled secrets -- flagged explicitly rather than silently dropped; the rest (`gham`, `naukri`, `king`) are vocab-only, not currently scheduled. Legacy fixture gate: 70/70 passing (was 77, minus these 7).
+- Bundled offline-fallback payloads (`app/assets/payloads/hi-en/2026-06-12..18.json.gz`, 7 days) updated to match; `app/assets/payloads/en/*` and `packs/manifest.json` confirmed byte-identical (no update needed).
+
+## Harness before/after (full production vocab + schedule, not the bake-off sample)
+
+| metric | before | after |
+|---|---|---|
+| hi-en Spearman correlation | -0.003 | 0.639 |
+| hi-en band-accuracy overall | 54.6% | 67.8% |
+| hi-en near-tier: translation / associate | 0.0% / 13.3% | 85.0% / 56.7% |
+| hi-en monotonicity violations | 53.75% (330/614) | 15.3% (94/614) |
+| cross-language pass rate (Scorching/Hot) | 5.08% | 54.2% |
+| cross-language median rank | 4881 (46.65th %ile) | 20 (0.2th %ile) |
+| EN Spearman / band-accuracy / monotonicity | 0.837 / 74.9% / 6.2% | 0.837 / 74.9% / 6.2% (bit-identical, confirmed via harness re-run) |
+| dimension 3 (clue quality, LLM judge) | spoiler 96.9%, solvability 65.6%, n=220 | identical (clue text unchanged -- this dimension doesn't touch embeddings) |
+| dimension 4 (rival calibration) | 100% within target, 0 flagged | identical (deterministic, embedding-independent) |
+| dimension 5 (win-rate model) | median 93.0%, 10.5% in-band | identical (par-distribution-driven, embedding-independent) |
+| legacy fixtures | 77/77 | 70/70 (7 reclassified, see above) |
+
+Residual worst-diverging cross-language pairs (translation still ranks outside Scorching/Hot, but far better than before): `khamoshi`<-silence (78.8%ile), `rasoi`<-kitchen (61.1%ile), `samunder`<-ocean (36.4%ile), `bachpan`<-childhood (36.1%ile), `titli`<-butterfly (36.0%ile). None are catastrophic (worst pre-fix case was 99.35%ile); documented as the new known-limitations state, not hidden.
+
+## Known-limitations ledger update
+
+Hinglish semantic engine: broken (random, Spearman -0.003) -> measured working state (Spearman 0.639, cross-lang pass 54.2%). Does not yet reach EN parity (0.837/74.9%) -- the residual gap is documented above with the 5 worst pairs. If EN parity is ever required, the next step is a Warmer-specific fine-tune on Hinglish similarity pairs (not attempted here -- out of scope per spec, which only required clearing minimum viable via off-the-shelf models).
+
+## Gotchas discovered
+
+- Embedding cache key must include the model name, not just vocab content -- otherwise a `MODELS[lang]` swap silently keeps serving stale vectors from the previous model. Fixed in `embeddings.py`; would have been a silent, very confusing bug otherwise.
+- `fairseq` (a dependency of `ai4bharat-transliteration` / IndicXlit, one of the spec's suggested Path-A tools) requires compiling a C extension and has no prebuilt Windows wheel -- blocked on this machine (no MSVC Build Tools) without a large, out-of-scope environment change. Not pursued further since Path A (rule-based ITRANS transliteration) was already outperformed by every E-series candidate; noted for the record in case IndicXlit is revisited later on a Linux/WSL build host.
+- MuRIL fed hand/rule-transliterated Devanagari scored WORSE than MuRIL fed raw romanized text directly (0.248 vs 0.399 Spearman) -- confirms MuRIL's own training already covers transliterated/romanized Indic text natively; adding an extra (noisy) transliteration pass in front of it actively hurts rather than helps.

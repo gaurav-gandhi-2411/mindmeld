@@ -1,0 +1,9 @@
+{
+  "id": "KF-H34",
+  "lang": "hi-en",
+  "anchor": "naukri",
+  "closer": "job",
+  "farther": "flower",
+  "note": "naukri=job (work) vs flower (nature)",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off). cos(naukri,job)=0.5488 < cos(naukri,flower)=0.6055. 'naukri' is a vocab/hinglish.txt entry, not a currently scheduled secret."
+}

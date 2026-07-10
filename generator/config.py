@@ -30,9 +30,16 @@ EVALS_KNOWN_FAILURES_DIR = EVALS_DIR / "fixtures_known_failures"
 # 384-dim embeddings, ~22 MB on disk.
 MODELS: dict[str, str] = {
     "en": "sentence-transformers/all-MiniLM-L6-v2",
-    # paraphrase-multilingual covers 50+ languages including Hindi romanization;
-    # this allows khushi ≈ happiness cross-lingually.
-    "hi-en": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    # paraphrase-multilingual-MiniLM-L12-v2 was tried first but scored ~random
+    # on hi-en (Spearman -0.003, cross-language pass 5%): it was trained on
+    # Hindi in Devanagari script, not Latin-script romanized Hindi, so it embeds
+    # romanized tokens by surface form rather than meaning (see
+    # spec-hinglish-fix.md / evals/reports/baseline_report.md for the bake-off).
+    # l3cube-pune/indic-sentence-bert-nli is an SBERT model fine-tuned on
+    # cross-lingual NLI/STS pairs across Hindi + English + other Indic
+    # languages incl. romanized text (L3Cube-IndicSBERT, CC-BY-4.0), and won a
+    # 9-candidate bake-off: Spearman 0.639, cross-language pass 54.2%.
+    "hi-en": "l3cube-pune/indic-sentence-bert-nli",
 }
 
 # ---------------------------------------------------------------------------

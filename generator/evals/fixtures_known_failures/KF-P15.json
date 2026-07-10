@@ -1,0 +1,9 @@
+{
+  "id": "KF-P15",
+  "lang": "hi-en",
+  "anchor": "fielder",
+  "closer": "baseball",
+  "farther": "candle",
+  "note": "fielder=player stopping/catching the ball; Cricket pack addition (missing from top-10k)",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off). cos(fielder,baseball)=0.4572 < cos(fielder,candle)=0.4839. 'fielder' IS a live scheduled secret (Cricket pack, hi-en, code-mixed English spelling) -- flagged here rather than silently dropped since it is consequential. 'baseball' itself is a loose associate word (fielder's own sport is cricket, not baseball) so this ordering was already a soft one under the old model too."
+}

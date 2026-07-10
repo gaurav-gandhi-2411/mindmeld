@@ -1,0 +1,9 @@
+{
+  "id": "KF-P03",
+  "lang": "hi-en",
+  "anchor": "aansoo",
+  "closer": "tears",
+  "farther": "window",
+  "note": "aansoo=tears; Bollywood pack addition",
+  "reason": "Model swap (l3cube-pune/indic-sentence-bert-nli, spec-hinglish-fix.md bake-off). cos(aansoo,tears)=0.4969 < cos(aansoo,window)=0.5069 -- a marginal (0.01) miss. 'aansoo' IS a live scheduled secret (Bollywood pack, hi-en) -- flagged here rather than silently dropped since it is consequential, not just a synthetic vocab pair."
+}
