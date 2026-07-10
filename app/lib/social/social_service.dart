@@ -25,6 +25,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:mindmeld/analytics/app_check_init.dart';
 import 'package:mindmeld/analytics/firebase_web_options.dart';
 import 'package:mindmeld/social/social_client.dart';
 import 'package:mindmeld/social/social_models.dart';
@@ -154,6 +155,7 @@ class SocialService {
   static Future<bool> _defaultFirebaseInitializer() async {
     if (Firebase.apps.isNotEmpty) {
       _applyFirestoreWebSettings();
+      await ensureAppCheckActivated();
       return true;
     }
     final webConfigReady = !kIsWeb || firebaseWebOptions.apiKey != 'PLACEHOLDER';
@@ -164,6 +166,7 @@ class SocialService {
           .timeout(_kSocialOpTimeout);
       debugPrint('SocialService: [1/4] Firebase.initializeApp() done.');
       _applyFirestoreWebSettings();
+      await ensureAppCheckActivated();
       return true;
     } catch (e) {
       debugPrint('SocialService: [1/4] Firebase.initializeApp() FAILED: $e');

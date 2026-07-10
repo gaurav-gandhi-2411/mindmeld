@@ -9,6 +9,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/ads/rewarded_ad_service.dart';
+import 'package:mindmeld/analytics/app_check_init.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/analytics/firebase_web_options.dart';
 import 'package:mindmeld/core/config.dart';
@@ -105,6 +106,7 @@ void main() async {
     await Firebase.initializeApp(
       options: kIsWeb ? firebaseWebOptions : null,
     );
+    await ensureAppCheckActivated();
 
     // Wire Flutter framework errors to Crashlytics.
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
