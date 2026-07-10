@@ -27,7 +27,8 @@ void main() {
       expect(payload.words.length, equals(55000));
       // Phase 5 fields
       expect(payload.clue, equals('The biggest blue thing on any map'));
-      expect(payload.maxGuesses, equals(16)); // par=10, maxGuesses=par+6=16
+      // par=10, maxGuesses=max(12, round(10*1.5))=15 (post maxGuesses-tuning formula change).
+      expect(payload.maxGuesses, equals(15));
     });
 
     test('exactly one rank-1 entry exists', () {
@@ -102,9 +103,10 @@ void main() {
       expect(payload.lang, equals('hi-en'));
     });
 
-    test('n is 10445', () {
-      // Refreshed 2026-06-12 hi-en payload (with alt map) has n=10445.
-      expect(payload.n, equals(10445));
+    test('n is 10462', () {
+      // Refreshed 2026-06-12 hi-en payload (with alt map) has n=10462
+      // (hi-en vocab grew after the Cricket-pack hinglish.txt additions).
+      expect(payload.n, equals(10462));
     });
 
     test('exactly one rank-1 entry exists', () {

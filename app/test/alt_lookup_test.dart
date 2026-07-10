@@ -270,7 +270,7 @@ void main() {
 
     test('alt map is non-empty for hi-en/2026-06-13', () {
       expect(payload.alt.isNotEmpty, isTrue);
-      expect(payload.alt.length, equals(452));
+      expect(payload.alt.length, equals(462));
     });
 
     test('secret is gaana (rank 1)', () {
