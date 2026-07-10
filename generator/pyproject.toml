@@ -53,3 +53,9 @@ dev = [
     "pytest>=9.0.3",
     "ruff>=0.15.17",
 ]
+
+[tool.uv]
+# msgpack is a transitive dep of wordfreq. Constrained to >=1.2.1 to pick up the
+# fix for GHSA-6v7p-g79w-8964 (HIGH, CVE-2026-57585): Unpacker reuse after a
+# caught error can SEGV / DoS on untrusted input (CWE-416, use-after-free).
+constraint-dependencies = ["msgpack>=1.2.1"]
