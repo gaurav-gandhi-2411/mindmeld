@@ -301,10 +301,21 @@ orchestrator review), live-verified 2026-07-11.
   regression-tested bump).
 - [x] **Data deletion**: `SocialService.deleteMyData()` (results -> group self-removal -> profile,
   in that order so the results collection-group query still sees membership) wired into Settings ->
-  "Delete my data", with `firestore.rules` relaxed for self-only deletes. Live-verified end-to-end:
-  created a group with a persistent profile, deleted, Friends tab reverted to the empty
-  "Connect to play with friends" state. `docs/privacy-policy.md` updated to drop the stale
-  "nothing uploaded to any server" claim and describe Social/Notifications data + the deletion mechanism.
+  "Delete my data", with `firestore.rules` relaxed for self-only deletes. `docs/privacy-policy.md`
+  updated to drop the stale "nothing uploaded to any server" claim and describe Social/Notifications
+  data + the deletion mechanism.
+  **Correction (2026-07-11, post-report)**: the first live-verify pass ("Friends tab reverted to the
+  empty state") was a FALSE POSITIVE -- `deleteMyData()` gated on `hasLocalIdentity`, which is false
+  on every fresh page load until Firebase is explicitly (re-)initialised that session (by design).
+  A returning user opening Settings and tapping Delete without another social action first got
+  "nothing to delete" while their profile/group data stayed live server-side; the empty Friends
+  screen was that same false-negative, not a successful deletion. Caught by directly querying
+  production Firestore after the "successful" run and finding the group membership + profile doc
+  still present. Fixed (`94fc5d4`): gate on `cachedDisplayName()` (SharedPreferences, survives
+  across page loads) instead, call `ensureSignedIn()` before the core deletion (verified live to
+  recover the SAME persisted uid, not mint a duplicate). Added a regression test
+  (`settings_delete_data_test.dart`) for exactly this scenario. Re-verified live via direct Firestore
+  reads (not just UI state) -- profile doc actually deleted, group memberUids actually emptied.
 - [x] **Accepted-risk ledger**: `docs/accepted-risks.md` -- 9 entries (self-reported scores, soft
   payload anti-cheat, the deferred dependency findings above, homoglyph-coverage scope, a one-time
   Firestore collection-group index GG needs to create on first live `deleteMyData()` use, and the
