@@ -249,4 +249,38 @@ void main() {
     expect(fake.deleteOwnProfileCalls, 1);
     expect(fake.removeSelfFromGroupCalls, 1);
   });
+
+  testWidgets(
+      'regression 2026-07-11: a cached display name from a PRIOR session still deletes '
+      'even though hasLocalIdentity is false this session (fresh page load, no other '
+      'social action taken yet before tapping Delete)', (tester) async {
+    final fake = _FakeSocialClient();
+    // Simulate server-side state from a session that ended before this one
+    // started -- this SocialService instance never calls ensureSignedIn (so
+    // hasLocalIdentity starts false), but the SAME uid signInAnonymously()
+    // resolves to (`uid0`, the fake's fixed first-call value) already owns
+    // a group, mirroring a returning user whose persisted Firebase Auth
+    // session hasn't been re-established THIS page load yet.
+    fake.groups['group0'] = {
+      'name': 'Friends',
+      'code': 'CODE0',
+      'createdBy': 'uid0',
+      'memberUids': <String>['uid0'],
+    };
+    SharedPreferences.setMockInitialValues({'social_display_name': 'Alice'});
+    final service = SocialService(client: fake, firebaseInitializer: () async => true);
+
+    await tester.pumpWidget(_buildSettings(service));
+    await tester.pump();
+
+    await _scrollToDeleteMyData(tester);
+    await tester.tap(find.text('Delete my data'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your data has been deleted.'), findsOneWidget);
+    expect(fake.deleteOwnProfileCalls, 1);
+    expect(fake.removeSelfFromGroupCalls, 1);
+  });
 }

@@ -563,11 +563,31 @@ class SocialService {
   /// step 1 failing alone still counts as [DeleteMyDataStatus.success]
   /// since it's explicitly best-effort (see docs/privacy-policy.md for what
   /// this does and doesn't cover).
+  ///
+  /// Root-caused live 2026-07-11: this used to gate on [hasLocalIdentity]
+  /// alone, which is false on every fresh page load until Firebase is
+  /// explicitly initialised THIS session (by design — see this class's own
+  /// "degradation guarantee" doc comment). A RETURNING social user who opens
+  /// Settings and taps "Delete my data" without first taking another social
+  /// action in the same session hit that false negative and got told there
+  /// was "nothing to delete," when in fact their profile/group data was
+  /// still live server-side. [cachedDisplayName] is a local, zero-network
+  /// SharedPreferences read that survives across page loads (unlike
+  /// [hasLocalIdentity]), so it correctly distinguishes "never used Social,
+  /// ever" from "used it before, just haven't re-initialised Firebase this
+  /// load yet." [ensureSignedIn] is safe to call here even when already
+  /// signed in — [SocialClient.signInAnonymously] returns the EXISTING
+  /// persisted uid rather than minting a new one (verified live: the same
+  /// uid was recovered after a full fresh browser-process reload of a
+  /// persisted profile) — so this can never orphan the original identity.
   Future<DeleteMyDataResult> deleteMyData() async {
-    if (!hasLocalIdentity) {
+    if (!hasLocalIdentity && await cachedDisplayName() == null) {
       return const DeleteMyDataResult(DeleteMyDataStatus.notSignedIn);
     }
-    final uid = _client.currentUid!;
+    final uid = await ensureSignedIn();
+    if (uid == null) {
+      return const DeleteMyDataResult(DeleteMyDataStatus.offline);
+    }
 
     try {
       await _client.deleteOwnResultsBestEffort(uid).timeout(_kSocialOpTimeout);
