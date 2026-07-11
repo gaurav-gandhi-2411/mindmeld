@@ -239,3 +239,96 @@ Hinglish semantic engine: broken (random, Spearman -0.003) -> measured working s
 - Embedding cache key must include the model name, not just vocab content -- otherwise a `MODELS[lang]` swap silently keeps serving stale vectors from the previous model. Fixed in `embeddings.py`; would have been a silent, very confusing bug otherwise.
 - `fairseq` (a dependency of `ai4bharat-transliteration` / IndicXlit, one of the spec's suggested Path-A tools) requires compiling a C extension and has no prebuilt Windows wheel -- blocked on this machine (no MSVC Build Tools) without a large, out-of-scope environment change. Not pursued further since Path A (rule-based ITRANS transliteration) was already outperformed by every E-series candidate; noted for the record in case IndicXlit is revisited later on a Linux/WSL build host.
 - MuRIL fed hand/rule-transliterated Devanagari scored WORSE than MuRIL fed raw romanized text directly (0.248 vs 0.399 Spearman) -- confirms MuRIL's own training already covers transliterated/romanized Indic text natively; adding an extra (noisy) transliteration pass in front of it actively hurts rather than helps.
+
+---
+
+# PLAN -- maxGuesses tuning + security/hardening pass (complete)
+
+Spec: `spec-security-hardening.md`. Autonomous single-pass run (5 parallel executor subagents +
+orchestrator review), live-verified 2026-07-11.
+
+## Part 1 -- maxGuesses tuning
+
+- [x] Replaced fixed `par + 6` with `max_guesses_for_par(par) = max(12, round(par * 1.5))`, a
+  shared helper in `generator/rival.py` imported by both `payload.py` and
+  `evals/harness/dimension5_winrate.py` (previously duplicated arithmetic, now can't drift).
+  Iterated 6 candidate formulas against the Dimension 5 win-rate simulation before landing here:
+  baseline (par+6) median 93.0%/10.5% in-band -> final candidate median 82.0%/63.6% in-band (only
+  1 marginal outlier at 39% -- noise at n=100 sims/puzzle). Per-lang: en median 80.0%, hi-en 84.0%.
+- [x] All payloads regenerated (daily 30 days + Bollywood 25 + Cricket 25, both langs), byte-reproducible
+  (scratch-dir rebuild diff -rq identical except manifest timestamp). Generator suite 372 passed/4 skipped.
+- [x] Live spot-check: today's puzzle (2026-07-11 EN) shows "0/15 - 15 left" -- a sane, non-absurd budget.
+
+## Part 2 -- security + hardening
+
+- [x] **2.1 Moderation**: new `app/lib/social/name_sanitizer.dart` (strips control/zero-width/
+  bidi-override chars, unicode-normalization scope-limited and documented) + `moderation_blocklist.dart`
+  (EN + Hinglish profanity, reserved-word impersonation block with homoglyph folding for the
+  Cyrillic/Greek lookalike vector), wired into `SocialService.setDisplayName`/`createGroup` as the
+  single write choke point. Fixed a pre-existing bug found during this pass: group naming reused the
+  display-name dialog's hardcoded 40-char limit against a 60-char rule -- now parameterized correctly.
+  Live-verified: "admin" rejected with a friendly generic message; "TestSquadLive" accepted normally.
+- [x] **2.2 Injection-sink audit**: every sink confirmed safe -- FCM notification title/body is static
+  copy keyed only by lang (`scripts/send_daily_notification.py`, never interpolates user content);
+  `url_launcher` is not even a dependency (zero call sites); deep links (`social_models.dart`'s
+  `joinLink`) embed only the server-generated join code, never a name; no `dart:html` innerHTML-style
+  sink exists anywhere; analytics event params never carry display/group names (verified against the
+  full `AnalyticsEvent` catalog).
+- [x] **Firestore rules re-audit**: added a charset constraint (RE2 `\x{HHHH}` ranges, verified against
+  the emulator) mirroring the client-side strip; closed an extra-fields gap with `keys().hasOnly(...)`
+  on `users/{uid}`, `groups/{groupId}`, and `results/{uid}` writes (previously nothing stopped a
+  bypassing client smuggling unlisted top-level fields); confirmed packs added no new Firestore
+  collections; `firebase-tests/rules.test.js` expanded 34->53 cases, all green against the real emulator
+  (JAVA_HOME=`C:\Users\gaura\sdks\jdk21`). `create_group_flow.test.js` (5) + `join_and_results_flow.test.js`
+  (11) also green -- 69 emulator tests total.
+- [x] **App Check**: `firebase_app_check ^0.3.2+10` wired into both independent Firebase init call
+  sites (`main.dart`'s eager path, `social_service.dart`'s lazy path), web-only (`ReCaptchaV3Provider`),
+  site key via `--dart-define=APP_CHECK_RECAPTCHA_SITE_KEY` (empty-string default -> clean no-op,
+  live-confirmed via console log `"AppCheck: skipped — APP_CHECK_RECAPTCHA_SITE_KEY not set."`).
+  **STOP POINT for GG (manual, not yet done)**: create a reCAPTCHA v3 site key at
+  https://www.google.com/recaptcha/admin for `playwarmer.vercel.app` + `playmindmeld.vercel.app` +
+  `localhost`; register the site key AND its paired secret key in Firebase console -> Project Settings
+  -> App Check -> Apps tab (web app); pass the site key at build time via the dart-define above; leave
+  every product (Firestore etc.) on default "Unenforced / Metrics only" -- do NOT click Enforce.
+- [x] **Secret audit**: full git-history scan (96 commits) found zero committed credentials.
+  `FIREBASE_SERVICE_ACCOUNT` confirmed GH-secret-only, never echoed. Firebase web config + VAPID
+  public key confirmed intentionally public. `.gitignore` hardened (`.env`, service-account JSON,
+  `.pem` patterns) as defense-in-depth.
+- [x] **Dependency audits**: pip-audit found 1 HIGH (msgpack DoS, fixed via version constraint,
+  368->372 tests still green) + 1 LOW/no-fix (torch, deferred -- unreachable code path); npm audit
+  found 5 moderate transitive (deferred -- fix would downgrade firebase-tools); Flutter's 6 Firebase
+  packages are one major version behind as a set (recommendation only, not applied -- needs its own
+  regression-tested bump).
+- [x] **Data deletion**: `SocialService.deleteMyData()` (results -> group self-removal -> profile,
+  in that order so the results collection-group query still sees membership) wired into Settings ->
+  "Delete my data", with `firestore.rules` relaxed for self-only deletes. Live-verified end-to-end:
+  created a group with a persistent profile, deleted, Friends tab reverted to the empty
+  "Connect to play with friends" state. `docs/privacy-policy.md` updated to drop the stale
+  "nothing uploaded to any server" claim and describe Social/Notifications data + the deletion mechanism.
+- [x] **Accepted-risk ledger**: `docs/accepted-risks.md` -- 9 entries (self-reported scores, soft
+  payload anti-cheat, the deferred dependency findings above, homoglyph-coverage scope, a one-time
+  Firestore collection-group index GG needs to create on first live `deleteMyData()` use, and the
+  still-placeholder privacy-policy contact email).
+- [x] Full suites green: generator 372/4-skip, flutter 434/434, emulator 69/69, `flutter analyze` clean.
+- [x] Deployed: Firestore rules released to `mindmeld-c4bba`; web build deployed to
+  `playwarmer.vercel.app` via the canonical `web-dist/` staging flow (both guard scripts passed).
+  Commits: `2446f3d`/`8a25fe5`/`a9e3446` (maxGuesses), `7a55051` (msgpack), `79dc578` (App Check),
+  `d8833ac` (stale test literals), `71015ff` (moderation/rules/deletion), `cf90cb8` (docs/ledger).
+
+## Gotchas discovered
+
+- `vercel deploy --prod --yes` run from `app/` (instead of the documented `web-dist/` staging dir)
+  first hit a broken/missing `.vercel/project.json` link and silently created a brand-new stray
+  Vercel project named "app" rather than erroring -- always re-check `.vercel/project.json`'s
+  `projectId` against `vercel projects ls` before a non-interactive deploy. The canonical flow
+  (README's "Web / PWA" section) requires `make_web_sw.py` + copying into `web-dist/` first --
+  deploying raw `app/build/web/` directly (missing the copied `vercel.json`/service worker) produced
+  a generic Vercel build error with no useful message.
+- Firestore rules emulator tests need TWO different invocations depending on the test file: pure
+  rules-unit-testing files (`rules.test.js`) only need `--only firestore`; files that also call real
+  `signInAnonymously()` (`create_group_flow.test.js`, `join_and_results_flow.test.js`) need
+  `--only firestore,auth` or every auth call fails with `auth/network-request-failed`.
+- Executor subagents each independently decided to commit their own scoped work rather than leaving
+  everything staged for a final orchestrator commit -- fine in this case (each commit was itself
+  tested and atomic) but worth being explicit about commit ownership when running several parallel
+  executors against the same repo.
