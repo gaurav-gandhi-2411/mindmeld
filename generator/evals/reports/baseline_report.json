@@ -2699,7 +2699,7 @@
         }
       ],
       "n_solvability_cases": 32,
-      "solvability_agreement": 0.65625,
+      "solvability_agreement": 0.625,
       "solvability_disagreements": [
         {
           "axis": "solvability",
@@ -2749,6 +2749,16 @@
           "ground_truth_solvable": true,
           "case_id": "matched:daily:lightning",
           "judged_solvability": 2,
+          "agree": false
+        },
+        {
+          "axis": "solvability",
+          "lang": "hi-en",
+          "secret": "parivar",
+          "clue": "In India, rarely just parents and kids — always bigger, always louder",
+          "ground_truth_solvable": true,
+          "case_id": "matched:daily:parivar",
+          "judged_solvability": 1,
           "agree": false
         },
         {
@@ -2817,8 +2827,8 @@
     "n_judge_errors": 0,
     "judge_errors": [],
     "min_solvability": 1,
-    "mean_solvability": 2.15,
-    "pct_below_min_solvability": 0.7181818181818181,
+    "mean_solvability": 2.1363636363636362,
+    "pct_below_min_solvability": 0.7227272727272728,
     "n_spoiler_flagged": 0,
     "spoiler_flagged_clues": [],
     "difficulty_distribution": {
@@ -2935,8 +2945,8 @@
         "lang": "en",
         "secret": "school",
         "clue": "Mandatory for twelve years; missed once it's over",
-        "solvability": 5,
-        "matches": true,
+        "solvability": 2,
+        "matches": false,
         "spoiler_flag": false,
         "difficulty": 2,
         "cultural_fit": null
@@ -5282,116 +5292,32 @@
   },
   "dimension5_winrate": {
     "n_puzzles": 220,
-    "median_win_rate": 0.93,
-    "mean_win_rate": 0.9145454545454548,
-    "win_rate_in_target_band": 0.10454545454545454,
+    "median_win_rate": 0.82,
+    "mean_win_rate": 0.8025454545454546,
+    "win_rate_in_target_band": 0.6363636363636364,
     "per_lang": {
       "en": {
         "n": 110,
-        "median_win_rate": 0.89,
-        "mean_win_rate": 0.8847272727272728
+        "median_win_rate": 0.8,
+        "mean_win_rate": 0.7675454545454546
       },
       "hi-en": {
         "n": 110,
-        "median_win_rate": 0.96,
-        "mean_win_rate": 0.9443636363636366
+        "median_win_rate": 0.84,
+        "mean_win_rate": 0.8375454545454545
       }
     },
-    "n_outliers_too_easy": 18,
-    "n_outliers_too_hard": 0,
-    "outliers_too_easy": [
+    "n_outliers_too_easy": 0,
+    "n_outliers_too_hard": 1,
+    "outliers_too_easy": [],
+    "outliers_too_hard": [
       {
         "lang": "en",
         "source": "pack:bollywood",
-        "secret": "award",
-        "win_rate": 1.0
-      },
-      {
-        "lang": "hi-en",
-        "source": "daily",
-        "secret": "himmat",
-        "win_rate": 0.99
-      },
-      {
-        "lang": "hi-en",
-        "source": "daily",
-        "secret": "diya",
-        "win_rate": 0.99
-      },
-      {
-        "lang": "hi-en",
-        "source": "daily",
-        "secret": "khidki",
-        "win_rate": 0.99
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:bollywood",
-        "secret": "badla",
-        "win_rate": 0.99
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:cricket",
-        "secret": "catch",
-        "win_rate": 0.99
-      },
-      {
-        "lang": "hi-en",
-        "source": "daily",
-        "secret": "parivar",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "daily",
-        "secret": "bachpan",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:bollywood",
-        "secret": "natak",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:bollywood",
-        "secret": "dialogue",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:bollywood",
-        "secret": "police",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:bollywood",
-        "secret": "kahani",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:cricket",
-        "secret": "umpire",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:cricket",
-        "secret": "wicket",
-        "win_rate": 0.98
-      },
-      {
-        "lang": "hi-en",
-        "source": "pack:cricket",
-        "secret": "trophy",
-        "win_rate": 0.98
+        "secret": "song",
+        "win_rate": 0.39
       }
-    ],
-    "outliers_too_hard": []
+    ]
   },
-  "elapsed_seconds": 2336.3
+  "elapsed_seconds": 2388.8
 }

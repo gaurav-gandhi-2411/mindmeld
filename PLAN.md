@@ -1,3 +1,64 @@
+# PLAN — Known-limitations ledger: fix what's worth fixing, document the rest (complete)
+
+Autonomous single-pass run, 2026-07-12. Full inventory of every known gap across
+PLAN.md, `docs/accepted-risks.md`, the eval baseline report, and a repo-wide
+TODO/FIXME grep — fixed the player-visible + cheaply-fixable items, documented the
+rest in `docs/known-limitations.md` (supersedes `docs/accepted-risks.md`).
+
+## Fixed
+
+- [x] **Spoiler-gate over-firing on short secrets** — `_is_morphological_variant`
+  (generator/payload.py) used a flat Levenshtein distance-2 threshold and an
+  unconditional substring check; both scaled to the shorter string's length (see
+  the fix commit for the exact false positives this closes: bat/ball-wait-both,
+  money/more, mandir/and). 8 new unit tests. Audited all 220 shipped clues
+  old-vs-new: 0 regressions, 0 restorable clues — the historical false-positive
+  rewords (cricket "bat", bollywood mother/her/the) were fixed pre-commit, so no
+  draft text survives to restore.
+- [x] **Packs unreachable from win/loss result screens** — `WinScreen`/`LossScreen`
+  now show the same `PacksEntryBanner` as `PuzzleScreen`, gated off in pack mode.
+- [x] **No way back to the result/share screen after Back** — the finished puzzle
+  board (daily mode) now has a "View result" button that re-enters via the
+  existing `onWin`/`onLoss` callbacks.
+- [x] **`scripts/` never lint-gated** — new root `pyproject.toml` with the same
+  ruff rule set as `generator/pyproject.toml`; fixed the 3 findings it surfaces
+  (3 unused imports, 2 long lines, 1 for-loop-to-any() simplification).
+- [x] Nothing else in the inventory qualified as both player-visible and
+  fixable without a new backend/paid dependency (reviewed: self-reported scores
+  need Cloud Functions, Firebase SDK bump needs its own regression pass, npm/pip
+  audit findings are dev-only/unreachable, homoglyph coverage is already
+  right-sized, Firestore index / privacy email / reCAPTCHA key are GG-only manual
+  actions — all moved into `docs/known-limitations.md` instead).
+
+## Documented (`docs/known-limitations.md`, supersedes `docs/accepted-risks.md`)
+
+16 entries: Hinglish semantic-quality gap (0.639 vs EN 0.837 Spearman, residual
+worst pairs titli/khamoshi/rasoi/samunder/bachpan), LLM-judge solvability vs
+spoiler-safety calibration split, packs online-only, iOS web-push PWA constraint,
+self-reported scores, soft anti-cheat, npm/pip audit deferrals, Firebase SDK
+version lag, homoglyph coverage, App Check monitor-mode + pending reCAPTCHA
+STOP POINT, Firestore collection-group index, privacy-policy placeholder email,
+Flutter-web cold-boot latency (Lighthouse baseline + rule-15e budgets ratified,
+see `reports/performance-baseline-2026-07-12.md`), Android release-signing
+scaffold defaults, and the eval baseline report's dimension-5 staleness
+(regenerated as part of this pass).
+
+## Verification
+
+- [x] Regenerated `generator/evals/reports/baseline_report.{json,md}` end-to-end
+  (Ollama `qwen3:8b` running locally) — see the file for current numbers; the
+  previously-stale dimension 5 win-rate figures (93.0%/10.5%) now correctly show
+  the post-maxGuesses-fix numbers (82.0%/63.6%) already reported in the
+  security-hardening PLAN section below.
+- [x] generator suite green (377 passed/4 skipped — 2 previously Ollama-gated
+  skips now run for real since Ollama was up for the harness regen), flutter
+  suite green (472/472).
+- [ ] Live-verify on playwarmer.vercel.app: packs reachable directly from a
+  daily win/loss screen (no extra Back tap), "View result" button returns from
+  the finished board to the share screen. (in progress — see next update)
+
+---
+
 # PLAN — Follow-ups from the aesthetic pass: uptime monitoring + maxGuesses reconciliation (complete)
 
 Two items flagged by the aesthetic-pass report below, closed out 2026-07-12.
@@ -136,7 +197,7 @@ Spec: `spec-warmer-rename.md` (source of truth). Autonomous single-pass run, liv
 
 ---
 
-# PLAN — Cricket pack (content drop) — STOP POINT, awaiting GG review
+# PLAN — Cricket pack (content drop) — complete (shipped 2026-07-10, see Status below)
 
 Spec: `spec-cricket-pack.md` (source of truth). Content-only drop — pack SYSTEM unchanged.
 

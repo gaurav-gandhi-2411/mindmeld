@@ -1,6 +1,6 @@
 # Warmer — Applied-AI Eval Harness: Baseline Report
 
-Generated in 2336.3s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
+Generated in 2388.8s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
 
 ## Legacy pairwise-ordering fixtures (subsumed, not replaced)
 
@@ -48,12 +48,12 @@ Generated in 2336.3s. See the sibling `.json` file for full per-record detail (e
 ### Calibration (judge <-> known-ground-truth agreement)
 
 - spoiler-safety agreement: 96.9% (32 golden cases)
-- solvability agreement: 65.6% (32 golden cases)
+- solvability agreement: 62.5% (32 golden cases)
 
 ### Full clue-set judging
 
 - n_clues_judged: 220 (errors: 0)
-- solvability: min 1, mean 2.15, % below gate (3): 71.8%
+- solvability: min 1, mean 2.14, % below gate (3): 72.3%
 - spoiler-flagged clues: 0
 - difficulty distribution: {'1': 0, '2': 25, '3': 184, '4': 11, '5': 0}
 - mean cultural_fit (hi-en, uncalibrated): 4.80
@@ -69,7 +69,7 @@ Generated in 2336.3s. See the sibling `.json` file for full per-record detail (e
 ## Dimension 5 — Difficulty / win-rate modeling
 
 - n_puzzles: 220
-- median win-rate: 93.0%
-- in target band [75%,85%]: 10.5%
-- outliers too easy (>97%): 18
-- outliers too hard (<40%): 0
+- median win-rate: 82.0%
+- in target band [75%,85%]: 63.6%
+- outliers too easy (>97%): 0
+- outliers too hard (<40%): 1
