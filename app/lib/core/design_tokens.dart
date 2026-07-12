@@ -26,6 +26,60 @@ class HeatSpec {
   }
 }
 
+/// Spacing scale for paddings/gaps, in logical pixels.
+///
+/// Values are the ones already in repeated use across `app/lib` (confirmed
+/// by grepping `EdgeInsets`/`SizedBox` call sites) — not invented. Kept as
+/// plain `static const double`s rather than [WarmerTokens] fields because
+/// spacing doesn't vary by brightness and so needs no [ThemeExtension.lerp]
+/// support; a private constructor keeps this a namespace, not a value type.
+class WarmerSpacing {
+  const WarmerSpacing._();
+
+  /// 4 — tightest gap (icon-to-label, hairline padding).
+  static const double xs = 4;
+
+  /// 8 — default gap between related inline elements.
+  static const double sm = 8;
+
+  /// 12 — default gap between stacked elements within a card.
+  static const double md = 12;
+
+  /// 16 — default screen-edge/card padding.
+  static const double lg = 16;
+
+  /// 24 — section-level padding/gap.
+  static const double xl = 24;
+
+  /// 32 — large vertical rhythm between major sections.
+  static const double xxl = 32;
+}
+
+/// Border-radius scale, in logical pixels.
+///
+/// Values are the ones already in repeated use across `app/lib` (confirmed
+/// by grepping `BorderRadius.circular(`) — not invented. Kept as plain
+/// `static const double`s rather than [WarmerTokens] fields for the same
+/// reason as [WarmerSpacing]: radii don't need brightness-based lerping.
+class WarmerRadius {
+  const WarmerRadius._();
+
+  /// 6 — small chips/badges.
+  static const double xs = 6;
+
+  /// 8 — inputs, small buttons, snack bars.
+  static const double sm = 8;
+
+  /// 12 — default card/button radius.
+  static const double md = 12;
+
+  /// 16 — larger cards.
+  static const double lg = 16;
+
+  /// 20 — full-surface sheets (dialogs, bottom sheets).
+  static const double xl = 20;
+}
+
 /// Single source of truth for the "calm-minimal" design palette.
 ///
 /// Accessed via `Theme.of(context).extension<WarmerTokens>()`. See

@@ -78,6 +78,69 @@ void main() {
     });
   });
 
+  group('WarmerSpacing — matches grepped real-world usage', () {
+    // Regression-proofs the claim that these constants reflect values
+    // actually in use in app/lib (see design_tokens.dart doc comments for
+    // the grep evidence), not invented numbers.
+    test('scale matches the values found via grep', () {
+      expect(WarmerSpacing.xs, 4);
+      expect(WarmerSpacing.sm, 8);
+      expect(WarmerSpacing.md, 12);
+      expect(WarmerSpacing.lg, 16);
+      expect(WarmerSpacing.xl, 24);
+      expect(WarmerSpacing.xxl, 32);
+    });
+
+    test('scale is strictly ascending', () {
+      const scale = [
+        WarmerSpacing.xs,
+        WarmerSpacing.sm,
+        WarmerSpacing.md,
+        WarmerSpacing.lg,
+        WarmerSpacing.xl,
+        WarmerSpacing.xxl,
+      ];
+      for (var i = 1; i < scale.length; i++) {
+        expect(scale[i], greaterThan(scale[i - 1]));
+      }
+    });
+  });
+
+  group('WarmerRadius — matches grepped real-world usage', () {
+    // Regression-proofs the claim that these constants reflect values
+    // actually in use in app/lib (see design_tokens.dart doc comments for
+    // the grep evidence), not invented numbers.
+    test('scale matches the values found via grep', () {
+      expect(WarmerRadius.xs, 6);
+      expect(WarmerRadius.sm, 8);
+      expect(WarmerRadius.md, 12);
+      expect(WarmerRadius.lg, 16);
+      expect(WarmerRadius.xl, 20);
+    });
+
+    test('scale is strictly ascending', () {
+      const scale = [
+        WarmerRadius.xs,
+        WarmerRadius.sm,
+        WarmerRadius.md,
+        WarmerRadius.lg,
+        WarmerRadius.xl,
+      ];
+      for (var i = 1; i < scale.length; i++) {
+        expect(scale[i], greaterThan(scale[i - 1]));
+      }
+    });
+
+    test('matches the radii already hardcoded in buildWarmerTheme', () {
+      // buildWarmerTheme() still hardcodes BorderRadius.circular(16/12/20)
+      // inline (rule 15b finding) — this app is not yet consuming the new
+      // tokens, but the token values must match what's already shipping.
+      expect(WarmerRadius.md, 12);
+      expect(WarmerRadius.lg, 16);
+      expect(WarmerRadius.xl, 20);
+    });
+  });
+
   group('buildPackTheme', () {
     test('light accent gets dark ink', () {
       final base = buildWarmerTheme(Brightness.light);

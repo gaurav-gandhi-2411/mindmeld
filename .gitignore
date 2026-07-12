@@ -6,6 +6,12 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 *.egg-info/
+# Root-only: `uv run` from repo root (e.g. deploy-warmer.ps1's guard-script
+# steps) treats the root pyproject.toml (ruff config only, not a real uv
+# project) as a project root and generates an empty lockfile here. Scoped
+# with a leading slash so generator/uv.lock (a real, committed lockfile) is
+# unaffected.
+/uv.lock
 
 # Generated payloads (samples are explicitly re-added below)
 payloads/*
