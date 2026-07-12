@@ -82,7 +82,13 @@ redirect to the Vercel URL.
 ```powershell
 # Build and deploy to Vercel (canonical production flow):
 cd app
-flutter build web --release --no-web-resources-cdn
+# --wasm: adopted 2026-07-12 (launch-1 wave) after measuring a real Lighthouse
+# improvement (TBT 221ms->13.5ms, LCP 2864ms->2635ms, -417KB) — see
+# reports/renderer-decision-2026-07-12.md for the full before/after evidence.
+# --dart-define=ANALYTICS_ENABLED=true: without this, Firebase Analytics never
+# initializes and the PM header's D1-retention/completion-rate success metrics
+# have zero data — see docs/known-limitations.md.
+flutter build web --release --no-web-resources-cdn --wasm --dart-define=ANALYTICS_ENABLED=true
 # Guard: fails loudly if a Firebase web plugin (auth/firestore/analytics/core)
 # didn't register — see scripts/check_web_plugin_registrant.py docstring for why.
 cd ..
