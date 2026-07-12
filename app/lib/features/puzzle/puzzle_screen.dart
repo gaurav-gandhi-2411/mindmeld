@@ -638,7 +638,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(color: tokens.hairline, width: 0.5),

@@ -943,7 +943,7 @@ class _SharePreviewCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(WarmerSpacing.lg),
       decoration: BoxDecoration(
         color: tokens.canvas,
         borderRadius: BorderRadius.circular(WarmerRadius.lg),
