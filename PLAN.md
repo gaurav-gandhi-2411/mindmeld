@@ -53,9 +53,16 @@ scaffold defaults, and the eval baseline report's dimension-5 staleness
 - [x] generator suite green (377 passed/4 skipped — 2 previously Ollama-gated
   skips now run for real since Ollama was up for the harness regen), flutter
   suite green (472/472).
-- [ ] Live-verify on playwarmer.vercel.app: packs reachable directly from a
-  daily win/loss screen (no extra Back tap), "View result" button returns from
-  the finished board to the share screen. (in progress — see next update)
+- [x] Deployed to playwarmer.vercel.app (`vercel deploy --prod`, aliased,
+  post-deploy smoke check passed: 200, Flutter engine booted, 0
+  pageerror/requestfailed) and live-verified with a real cold-profile puppeteer
+  run (`firebase-tests/cold_repro_reload.js`, `--profile-dir`, fresh profile):
+  guessed today's actual secret (`courage`, puzzle #31) on the first try, which
+  landed directly on `WinScreen` — the Themed Packs banner was visible
+  immediately, no extra Back tap needed (fix 2b confirmed). Tapped Back to
+  reach the finished board — the new "View result" button was present right
+  below the packs banner (fix 2c confirmed); tapping it re-showed the win
+  screen exactly as before. Zero pageerror/requestfailed across every step.
 
 ---
 
