@@ -174,9 +174,13 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
                     final lost = state != null && state.gaveUp && !won;
                     final inProgress =
                         state != null && !state.isFinished && !won && !lost;
+                    // Pinned to the light-mode accentInk token (not the
+                    // current `tokens`) — this ink sits on a pack's own
+                    // accent colour, which is theme-independent, so the ink
+                    // must stay fixed across light/dark app theme too.
                     final wonIconInk = pack.accent.computeLuminance() < 0.25
                         ? Colors.white
-                        : const Color(0xFF26231F);
+                        : WarmerTokens.light.accentInk;
 
                     return ListTile(
                       leading: CircleAvatar(

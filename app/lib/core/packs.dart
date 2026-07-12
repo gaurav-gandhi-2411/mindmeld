@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 
 /// Describes where a pack manifest was ultimately loaded from.
@@ -89,9 +90,9 @@ class Pack {
 }
 
 /// Fallback accent used when a manifest entry has a missing/malformed color —
-/// the app's brand terracotta, so a bad manifest entry degrades gracefully
-/// instead of crashing the pack selector.
-const Color kPackFallbackAccent = Color(0xFFDD6B4D);
+/// the app's brand terracotta ([WarmerTokens.light.accent]), so a bad
+/// manifest entry degrades gracefully instead of crashing the pack selector.
+final Color kPackFallbackAccent = WarmerTokens.light.accent;
 
 /// Parses "#RRGGBB" into a [Color]; tolerant of null/malformed input.
 Color colorFromHex(String? hex) {
