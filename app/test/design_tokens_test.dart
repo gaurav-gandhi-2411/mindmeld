@@ -59,6 +59,33 @@ void main() {
         final ratio = contrastRatio(tokens.text1, tokens.surface);
         expect(ratio, greaterThanOrEqualTo(wcagAA));
       });
+
+      // text2/text3 had NO contrast test before the launch-1 wave — that gap
+      // is exactly how both shipped failing WCAG AA (measured 2.08-3.67:1)
+      // undetected by a real design-reviewer pass. Locking in the fix.
+      test('$name: text2 on canvas >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text2, tokens.canvas);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text2/canvas was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text2 on surface >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text2, tokens.surface);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text2/surface was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text3 on canvas >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text3, tokens.canvas);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text3/canvas was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text3 on surface >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text3, tokens.surface);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text3/surface was ${ratio.toStringAsFixed(2)}');
+      });
     }
   });
 

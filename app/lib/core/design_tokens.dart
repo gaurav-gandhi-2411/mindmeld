@@ -231,8 +231,15 @@ class WarmerTokens extends ThemeExtension<WarmerTokens> {
     surface: Color(0xFFFFFFFF),
     hairline: Color(0xFFECE8E1),
     text1: Color(0xFF26231F),
-    text2: Color(0xFF8A857C),
-    text3: Color(0xFFB4AEA4),
+    // text2/text3 darkened from the original 8A857C/B4AEA4 — launch-1 wave's
+    // design-reviewer pass measured those at 3.46-3.67:1 / 2.08-2.20:1 against
+    // canvas/surface, both failing WCAG AA (text3 failing even the large-text
+    // 3.0:1 floor). These clear 4.5:1 against both canvas and surface with a
+    // small margin (text2 5.37/5.70, text3 4.71/4.99) — see
+    // design_tokens_test.dart's contrast tests. Same warm-neutral hue, just
+    // darker; hierarchy (text1 > text2 > text3 lightness) preserved.
+    text2: Color(0xFF6B665D),
+    text3: Color(0xFF756F62),
     accent: Color(0xFFDD6B4D),
     accentText: Color(0xFFB04429),
     accentInk: Color(0xFF26231F),
@@ -276,7 +283,11 @@ class WarmerTokens extends ThemeExtension<WarmerTokens> {
     hairline: Color(0xFF302D29),
     text1: Color(0xFFF2EFE9),
     text2: Color(0xFF9C968C),
-    text3: Color(0xFF6E6960),
+    // Lightened from 6E6960 — same launch-1 WCAG pass found dark-mode text3
+    // failing too (3.05-3.32:1 against canvas/surface). 8C8579 clears 4.5:1
+    // against both (4.95/4.55) with a small margin. text2 already passed
+    // (6.16/5.67), unchanged.
+    text3: Color(0xFF8C8579),
     accent: Color(0xFFE87A5C),
     accentText: Color(0xFFE87A5C),
     accentInk: Color(0xFF171614),
