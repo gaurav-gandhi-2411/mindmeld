@@ -240,35 +240,75 @@ contact address.
 
 ## Performance
 
-### 14. Flutter-web cold-boot latency (CanvasKit)
+### 14. Flutter-web cold-boot latency, and analytics' real perf cost (updated launch-1 wave)
 
-Lighthouse baseline against the live production site
-(`reports/performance-baseline-2026-07-12.md`, raw artifacts
-`reports/lighthouse-playwarmer-baseline.report.{html,json}`, this commit):
-**LCP 2864ms, FCP 934ms, TBT 221ms, CLS 0, Speed Index 2797ms, total page weight
-2,838 KB (of which `canvaskit.wasm` alone is 1,613 KB), Lighthouse performance
-score 0.69/1.0**. Caveat already noted in that report: Lighthouse's Lantern
-network simulation throws `LanternError: NO_LCP` against this canvas-rendered
-(not DOM-rendered) app — there's no traditional "largest contentful DOM element"
-to key off, so treat the LCP number as directionally useful, not precise. The
-dominant payload cost is Flutter web's CanvasKit renderer — a fixed cost of the
-Flutter-web rendering strategy, not something this app's own code drives down
-further without a renderer change.
+Original baseline (`reports/performance-baseline-2026-07-12.md`, pre-wave):
+LCP 2864ms, TBT 221ms, total weight 2,838 KB, score 0.69. Launch-1 wave adopted
+`--wasm` (see `reports/renderer-decision-2026-07-12.md`) and enabled Firebase
+Analytics in production for the first time (see entry above on D1-retention
+instrumentation) — both landed together, so the full before/after story has
+three data points, all Lighthouse 13.4.0/desktop-preset, same caveat as before
+(`LanternError: NO_LCP` against this canvas-rendered app — treat LCP as
+directional, not precise):
 
-**Why accepted:** CanvasKit gives pixel-perfect cross-browser rendering parity
-(matches the identical native look on Android/iOS), which matters for a
-visually-branded word game. The alternative (`html` renderer) trades that fidelity
-for a smaller bundle and was not evaluated as part of this pass.
+| state | LCP | TBT | total weight | score | artifact |
+|---|---|---|---|---|---|
+| baseline (JS, no analytics) | 2864ms | 221ms | 2838 KB | 0.69 | `lighthouse-playwarmer-baseline.report.{html,json}` |
+| `--wasm` only, sandbox (no analytics) | 2635ms | 13.5ms | 2421 KB | 0.79 | `lighthouse-wasm-experiment.report.{html,json}` |
+| `--wasm` + analytics enabled, real production | 3173ms | 90.5ms | 2990 KB | 0.73 | `lighthouse-playwarmer-launch1-final.report.{html,json}` |
 
-**Budgets (rule 15e, ratified this pass)** — previously proposed-but-unratified in
-`reports/performance-baseline-2026-07-12.md`): initial own-domain JS bundle
-(`main.dart.js` + `flutter_bootstrap.js`) ≤ 1000 KB (current ~932 KB combined;
-third-party CanvasKit/RevenueCat CDN assets tracked separately, not counted
-against this budget); LCP ≤ 2500ms (current 2864ms — a near-term target, subject
-to the Lantern caveat above); TBT ≤ 200ms (current 221ms); CLS ≤ 0.1 (current 0).
+**Root cause of the production regression vs. the sandbox measurement (measured,
+not guessed):** enabling `ANALYTICS_ENABLED=true` doesn't load *just* Analytics
+— `Firebase.initializeApp()` is a single shared call, and Flutter web's plugin
+registrant eagerly loads the JS SDK for every registered Firebase plugin
+(`firebase-app.js`, `firebase-firestore.js`, `firebase-auth.js`,
+`firebase-analytics.js`, `firebase-messaging.js`, `firebase-app-check.js` — confirmed
+via the Lighthouse network-requests audit, ~211KB combined), not just the one
+product actually needed for the retention metric. Tried the obvious cheap fix
+— deferred `main()`'s `await Firebase.initializeApp()` (and AdMob/UMP init) to
+run *after* `runApp()` instead of blocking the first frame on it (see the
+`perf: defer Firebase/AdMob init` commit) — real but small win (LCP
+3240ms->3173ms, ~67ms). Confirmed via the same network-requests audit *why*
+it's small: the browser fetches all these `<script>` resources in parallel at
+HTML-parse time regardless of when the Dart code inside main.dart.wasm awaits
+Firebase's init promise — reordering Dart-level awaits changes execution/
+blocking order, not the underlying resource-fetch timing. A real fix would
+need to stop loading Firestore/Auth/Messaging/AppCheck's JS eagerly when only
+Analytics/Crashlytics are needed for the metric — that's a bigger, riskier
+change (splitting one shared `Firebase.initializeApp()` call and its plugin
+registration) than fits this wave's "paint and gates only" scope.
 
-**Revisit if:** a future Lighthouse re-run regresses past these budgets, or the
-`html` renderer's visual fidelity gap closes enough to reconsider.
+**Net honest result:** LCP is currently 3173ms, over the 3000ms tracked
+ceiling (see budget below), directly because analytics instrumentation (an
+explicit requirement of this wave — "measurement must exist before launch, or
+the success metric is fiction") has a real, measured cost that the cheap
+lever only partially offsets. This is a genuine tension between two of this
+wave's own requirements, not an oversight — flagged here rather than silently
+picking one side.
+
+**Why CanvasKit is still accepted:** gives pixel-perfect cross-browser
+rendering parity (matches the identical native look on Android/iOS), which
+matters for a visually-branded word game. HTML renderer is not available on
+this toolchain at all (Flutter 3.44.2; removed in 3.29) — see the renderer
+decision doc.
+
+**Budgets (rule 15e, ratified this pass):** initial own-domain JS bundle
+(`main.dart.wasm` + `.mjs` + `flutter_bootstrap.js`) ≤ 1000 KB (current ~972 KB
+combined; third-party CanvasKit/Firebase/RevenueCat CDN assets tracked
+separately, not counted against this budget — still passing); LCP ≤ 2500ms
+target / ≤ 3000ms tracked ceiling (current 3173ms — **failing the tracked
+ceiling**, see above); TBT ≤ 200ms (current 90.5ms — passing); CLS ≤ 0.1
+(current 0).
+
+**Revisit if:** a future pass has budget for splitting Firebase's eager
+plugin-JS loading (load Analytics/Crashlytics eagerly, defer
+Firestore/Auth/Messaging/AppCheck until first actual social-feature use,
+mirroring `social_service.dart`'s existing lazy-init pattern) — the concrete,
+scoped next lever, not attempted here. Also revisit the RevenueCat script
+(187KB, pre-existing before this wave) loading unconditionally on web despite
+IAP being force-disabled there (`iapEnabledEffective` always false on web) —
+a second, independent bundle-size finding from this pass's network audit, not
+yet investigated further.
 
 ## Native app release readiness (web-only launch; not currently player-visible)
 
