@@ -64,6 +64,31 @@ deletes hidden directories too (verified empirically), silently undoing the link
 single deploy. `deploy-warmer.ps1`'s staging step explicitly excludes `.vercel/` from the
 wipe.
 
+### 1a. `vercel deploy --prod` can silently stop updating the short alias too
+
+**Real incident, launch-1 wave.** Distinct from gotcha 1 above (which is about deploying to
+the WRONG project entirely) — this is `vercel deploy --prod` succeeding against the CORRECT
+(`playwarmer`) project, but its automatic aliasing updating only the longer auto-generated
+`playwarmer-gaurav-gandhi-2411s-projects.vercel.app` form, not the short
+`playwarmer.vercel.app` domain real users hit. No error, no warning. Every downstream check
+(smoke check, Lighthouse, screenshots) kept "passing" because they only prove *some* build
+boots at that URL, not that it's the one just deployed. Discovered only because a shipped UI
+change visibly wasn't appearing in a screenshot — caught by eyeballing actual output, not by
+any automated gate. Root cause of why the automatic aliasing stopped working partway through
+a session not fully determined.
+
+**Fixed mechanically**: `deploy-warmer.ps1` no longer trusts `vercel deploy`'s own aliasing.
+After every deploy it (1) parses the deployment URL from the deploy command's own JSON output
+and explicitly runs `npx vercel alias set <that-url> playwarmer.vercel.app`, then (2) fetches
+the live `main.dart.wasm` and byte-compares its size against the just-built local file, purging
+the CDN cache (`npx vercel cache purge`) and re-checking once before failing loudly on any
+mismatch. Both steps are mandatory (not `-SkipSmokeCheck`-able) and verified working end-to-end.
+
+**Lesson for any future manual deploy** (bypassing the script): never trust "the deploy
+command exited 0" or "the site returns 200" as proof that YOUR change is live. Diff a
+content-derived signal (a file byte size, a string grep, a version marker) between the local
+build and the live response before trusting any measurement or screenshot taken against it.
+
 **Always sanity-check** `npx vercel ls playwarmer` after any deploy you didn't run through
 `deploy-warmer.ps1` — confirm the deployment you expect actually shows up under the
 `playwarmer` project, not a stray one.

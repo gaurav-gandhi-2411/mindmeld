@@ -255,7 +255,30 @@ directional, not precise):
 |---|---|---|---|---|---|
 | baseline (JS, no analytics) | 2864ms | 221ms | 2838 KB | 0.69 | `lighthouse-playwarmer-baseline.report.{html,json}` |
 | `--wasm` only, sandbox (no analytics) | 2635ms | 13.5ms | 2421 KB | 0.79 | `lighthouse-wasm-experiment.report.{html,json}` |
-| `--wasm` + analytics enabled, real production | 3173ms | 90.5ms | 2990 KB | 0.73 | `lighthouse-playwarmer-launch1-final.report.{html,json}` |
+| `--wasm` + analytics, production (uncertain provenance — see below) | 3173ms | 90.5ms | 2990 KB | 0.73 | `lighthouse-playwarmer-launch1-final.report.{html,json}` |
+| **`--wasm` + analytics + deferred-init, production (verified, authoritative)** | **3082ms** | **26ms** | **2990 KB** | **0.76** | `lighthouse-playwarmer-launch1-verified.report.{html,json}` |
+
+**Deployment incident discovered mid-wave, affecting the third row above:**
+while capturing screenshots for the design-reviewer gate, a shipped UI fix
+wasn't appearing on production despite a successful deploy. Root-caused to two
+compounding issues: (1) `vercel.json` had a `Cache-Control` rule for
+`main.dart.js` but none for `main.dart.wasm`/`.mjs` (new files this wave never
+added), and (2) more seriously, `vercel deploy --prod` had silently stopped
+updating the `playwarmer.vercel.app` alias partway through the wave — it kept
+aliasing to a longer auto-generated `*-gaurav-gandhi-2411s-projects.vercel.app`
+form instead, with zero errors, so every prior smoke check/Lighthouse run/
+screenshot kept "passing" while possibly checking stale content (they only
+proved *some* build boots, not *this* one). Root cause of the alias drift
+itself not fully determined. Fixed: `vercel.json` now has explicit cache rules
+for the wasm/mjs files, and `deploy-warmer.ps1` now (a) explicitly runs
+`vercel alias set` after every deploy instead of trusting automatic aliasing,
+and (b) fetches the live `main.dart.wasm` and byte-compares it against the
+local build, purging the CDN cache and re-checking once before failing loudly
+on any mismatch — both steps verified working end-to-end. The third table row
+above (measured before this was caught) has uncertain provenance as a result;
+the fourth row was re-measured immediately after the fix, with the deploy
+script's own new guard confirming byte-for-byte that production matched the
+local build at measurement time — that row is the authoritative one.
 
 **Root cause of the production regression vs. the sandbox measurement (measured,
 not guessed):** enabling `ANALYTICS_ENABLED=true` doesn't load *just* Analytics
@@ -278,13 +301,13 @@ Analytics/Crashlytics are needed for the metric — that's a bigger, riskier
 change (splitting one shared `Firebase.initializeApp()` call and its plugin
 registration) than fits this wave's "paint and gates only" scope.
 
-**Net honest result:** LCP is currently 3173ms, over the 3000ms tracked
-ceiling (see budget below), directly because analytics instrumentation (an
-explicit requirement of this wave — "measurement must exist before launch, or
-the success metric is fiction") has a real, measured cost that the cheap
-lever only partially offsets. This is a genuine tension between two of this
-wave's own requirements, not an oversight — flagged here rather than silently
-picking one side.
+**Net honest result:** LCP is currently 3082ms (verified row above), over the
+3000ms tracked ceiling by 82ms, directly because analytics instrumentation
+(an explicit requirement of this wave — "measurement must exist before
+launch, or the success metric is fiction") has a real, measured cost that the
+cheap lever only partially offsets. This is a genuine tension between two of
+this wave's own requirements, not an oversight — flagged here rather than
+silently picking one side.
 
 **Why CanvasKit is still accepted:** gives pixel-perfect cross-browser
 rendering parity (matches the identical native look on Android/iOS), which
@@ -296,9 +319,9 @@ decision doc.
 (`main.dart.wasm` + `.mjs` + `flutter_bootstrap.js`) ≤ 1000 KB (current ~972 KB
 combined; third-party CanvasKit/Firebase/RevenueCat CDN assets tracked
 separately, not counted against this budget — still passing); LCP ≤ 2500ms
-target / ≤ 3000ms tracked ceiling (current 3173ms — **failing the tracked
-ceiling**, see above); TBT ≤ 200ms (current 90.5ms — passing); CLS ≤ 0.1
-(current 0).
+target / ≤ 3000ms tracked ceiling (current 3082ms, verified — **failing the
+tracked ceiling** by 82ms, see above); TBT ≤ 200ms (current 26ms — passing);
+CLS ≤ 0.1 (current 0).
 
 **Revisit if:** a future pass has budget for splitting Firebase's eager
 plugin-JS loading (load Analytics/Crashlytics eagerly, defer
