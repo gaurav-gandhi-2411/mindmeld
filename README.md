@@ -101,11 +101,31 @@ uv run python scripts\make_web_sw.py --build-dir app\build\web
 Copy-Item app\build\web\* web-dist\ -Recurse -Force
 cd web-dist
 npx vercel deploy --prod --yes
+cd ..
+
+# Post-deploy smoke check (required — see the 2026-07-12 incident below):
+# fails loudly (non-zero exit) unless the live URL returns 200 AND the
+# Flutter engine actually booted. A deploy is NOT done until this passes —
+# if it fails, check `vercel inspect`/build logs and re-deploy or roll back
+# before doing anything else.
+node firebase-tests\smoke_check.js https://playwarmer.vercel.app/
 
 # Publish payloads (unchanged — Pages repo, /play/ is now redirect-only):
-cd ..\generator
+cd generator
 uv run publish --days 30
 ```
+
+**Uptime monitoring.** `.github/workflows/uptime-check.yml` polls the live app,
+the CDN manifest, and one real CDN payload every 15 minutes
+(`scripts/check_uptime.py`) and opens a GitHub issue — which GitHub emails to
+you by default — the moment any of them breaks; it auto-closes the issue on
+recovery. This exists because on 2026-07-12 the `playwarmer` Vercel project
+was deleted from the account and both production domains 404'd for an
+unknown window before anyone noticed — nothing alerted, it was found by
+accident during an unrelated deploy. **You will only receive the alert if
+GitHub email notifications for "Issues" are enabled on your account**
+(github.com → Settings → Notifications) — verify this once; a check that
+alerts nobody is a check that "logs," not one that "alerts."
 
 **Deploying to a new/changed domain?** Firebase Auth only allows sign-in from
 domains in the project's *Authorized domains* list (Authentication → Settings

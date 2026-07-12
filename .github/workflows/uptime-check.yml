@@ -1,0 +1,86 @@
+name: Uptime check
+
+# 2026-07-12 incident: the playwarmer Vercel project was deleted from the
+# account and both production domains 404'd for an unknown window before
+# anyone noticed -- nothing alerted, it was found by accident during an
+# unrelated deploy. This workflow is the fix: poll the live app + the CDN
+# manifest + one real CDN payload on a schedule, and open a GitHub issue
+# (which GitHub emails to the repo owner by default) the moment any of them
+# breaks. See scripts/check_uptime.py for what each check actually verifies.
+#
+# GitHub's own docs note that scheduled workflows can be delayed beyond
+# their nominal interval during periods of high platform load, especially on
+# the free tier -- treat "every 15 minutes" as "at least every 15 minutes,
+# usually," not a hard SLA.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: uptime-check
+  cancel-in-progress: true
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run uptime check
+        id: check
+        run: |
+          set +e
+          python scripts/check_uptime.py > check_output.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat check_output.txt
+
+      - name: Open or update alert issue on failure
+        if: steps.check.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Idempotent: `gh issue create --label` fails outright if the label
+          # doesn't exist, and a repo starts with no custom labels.
+          gh label create uptime-alert --repo "$GITHUB_REPOSITORY" --color B60205 \
+            --description "Automated: live uptime check is failing" --force
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime-alert --state open --json number --jq '.[0].number')
+          body="Uptime check failed at $(date -u +%Y-%m-%dT%H:%M:%SZ).
+
+          \`\`\`
+          $(cat check_output.txt)
+          \`\`\`
+
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ -z "$existing" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "🔴 Warmer is down — uptime check failed" \
+              --label uptime-alert \
+              --body "$body"
+          else
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "Still failing as of $(date -u +%Y-%m-%dT%H:%M:%SZ):
+
+          \`\`\`
+          $(cat check_output.txt)
+          \`\`\`"
+          fi
+
+      - name: Close alert issue on recovery
+        if: steps.check.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime-alert --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "Recovered — all checks passed at $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY"
+          fi
