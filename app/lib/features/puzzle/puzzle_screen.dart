@@ -271,6 +271,18 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     }
   }
 
+  /// Re-attempts [_load] after a failed load — the "Retry" button's action.
+  /// Resets [_loadError]/[_loading] first so the build method falls back to
+  /// the loading spinner while the retry is in flight, mirroring the state
+  /// [initState] starts in.
+  Future<void> _retry() async {
+    setState(() {
+      _loadError = null;
+      _loading = true;
+    });
+    await _load();
+  }
+
   Future<void> _loadRivalSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -393,6 +405,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           'max_guesses': payload.maxGuesses ?? 0,
           'par': payload.parGuesses ?? 0,
         });
+        await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
+          'lang': widget.lang,
+          'day': widget.date,
+          'outcome': 'win',
+        });
         await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
       }
 
@@ -404,6 +421,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           'guesses_used': newGuesses.length + state.hintsUsed,
           'max_guesses': payload.maxGuesses ?? 0,
           'par': payload.parGuesses ?? 0,
+        });
+        await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
+          'lang': widget.lang,
+          'day': widget.date,
+          'outcome': 'loss_budget',
         });
         await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: false);
       }
@@ -495,6 +517,22 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       if (effective >= maxG) {
         if (!_skipStatsWrites) {
           await AppPersistence.instance.recordLoss(lang: widget.lang);
+          // Pre-existing gap (found during the launch-1 analytics audit): this
+          // budget-exhausted-via-hint path recorded the loss to local stats
+          // but never reported it to analytics — only the guess-exhaustion
+          // and explicit-give-up paths did. Fixed here.
+          await _analytics.logEvent(AnalyticsEvent.loss, {
+            'lang': widget.lang,
+            'day': widget.date,
+            'guesses_used': effective,
+            'max_guesses': maxG,
+            'par': payload.parGuesses ?? 0,
+          });
+          await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
+            'lang': widget.lang,
+            'day': widget.date,
+            'outcome': 'loss_hint_exhausted',
+          });
         }
         final lostState = newState.copyWith(gaveUp: true);
         await _saveState(lostState);
@@ -540,6 +578,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         'max_guesses': payload.maxGuesses ?? 0,
         'par': payload.parGuesses ?? 0,
         'gave_up': 1,
+      });
+      await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
+        'lang': widget.lang,
+        'day': widget.date,
+        'outcome': 'loss_gave_up',
       });
       await _logRivalOutcome(payload, state.guesses, state.hintsUsed, won: false);
     }
@@ -595,7 +638,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(color: tokens.hairline, width: 0.5),
@@ -663,7 +706,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
     final labelStyle = Theme.of(context).textTheme.labelSmall;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg, vertical: 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -676,9 +719,35 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               borderRadius: BorderRadius.circular(3),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: WarmerSpacing.xs),
           Text('#${bestGuess.rank} · Top $pctStr%$parStr', style: labelStyle),
         ],
+      ),
+    );
+  }
+
+  /// Empty-state nudge shown in place of the guess/hint list on a totally
+  /// fresh puzzle (zero guesses, zero hints revealed, not yet finished) —
+  /// otherwise that list renders as blank space with no guidance. Kept calm
+  /// and restrained (muted icon/text colours, no accent) to match the rest
+  /// of this screen's tone.
+  Widget _buildEmptyGuessState(BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.explore_outlined, size: 40, color: tokens.text3),
+            const SizedBox(height: WarmerSpacing.sm),
+            Text(
+              'Make your first guess above',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: tokens.text2),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -712,16 +781,21 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             final tokens =
                 Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
             return Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(WarmerSpacing.xl),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.cloud_off_outlined, size: 48, color: tokens.text3),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: WarmerSpacing.md),
                   Text(
                     'Failed to load puzzle: $_loadError',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: tokens.text2),
+                  ),
+                  const SizedBox(height: WarmerSpacing.lg),
+                  FilledButton(
+                    onPressed: _retry,
+                    child: const Text('Retry'),
                   ),
                 ],
               ),
@@ -794,7 +868,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           // _load() above), so this would be redundant there.
           if (!_isPackMode && state.isFinished)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: const EdgeInsets.fromLTRB(
+                  WarmerSpacing.lg, WarmerSpacing.sm, WarmerSpacing.lg, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton.icon(
@@ -816,11 +891,12 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                   Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
               return Container(
                 width: double.infinity,
-                margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.fromLTRB(
+                    WarmerSpacing.lg, WarmerSpacing.sm, WarmerSpacing.lg, 0),
+                padding: const EdgeInsets.all(WarmerSpacing.lg),
                 decoration: BoxDecoration(
                   color: Theme.of(ctx).colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(WarmerRadius.lg),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -842,7 +918,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           // Guess input
           if (!state.isFinished)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: const EdgeInsets.fromLTRB(
+                  WarmerSpacing.lg, WarmerSpacing.md, WarmerSpacing.lg, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -850,6 +927,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       controller: _controller,
                       focusNode: _focusNode,
                       decoration: InputDecoration(
+                        labelText: 'Your guess',
                         hintText: 'Enter a word…',
                         errorText: _inputError,
                         border: const OutlineInputBorder(),
@@ -859,7 +937,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       onSubmitted: (_) => _submitGuess(),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: WarmerSpacing.sm),
                   FilledButton(
                     onPressed: _submitGuess,
                     child: const Text('Guess'),
@@ -871,7 +949,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           // Hint + give-up row
           if (!state.isFinished)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
               child: Row(
                 children: [
                   OutlinedButton.icon(
@@ -887,7 +966,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                               : 'No hints left',
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: WarmerSpacing.sm),
                   if (canGiveUp)
                     TextButton(
                       onPressed: _giveUp,
@@ -903,7 +982,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
           // Guess count + progress row
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg),
             child: Row(
               children: [
                 Builder(builder: (ctx) {
@@ -943,52 +1022,59 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           const Divider(),
 
           // Combined scrollable: pinned hint tiles first, then guess history.
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              // Header items: hint section label + one HintTile per revealed hint
-              // + separator divider; guess tiles follow immediately after.
-              itemCount: (pinnedHints.isEmpty ? 0 : pinnedHints.length + 2) +
-                  sorted.length,
-              itemBuilder: (ctx, i) {
-                // ── Pinned-hints header ─────────────────────────────────────
-                if (pinnedHints.isNotEmpty) {
-                  // Index 0: section label
-                  if (i == 0) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 2),
-                      child: Text(
-                        'Hints revealed',
-                        style: Theme.of(ctx).textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    );
+          // A truly fresh puzzle (no guesses, no hints revealed, not yet
+          // finished) renders an empty-state nudge instead of blank space —
+          // the already-finished zero-guess give-up case is excluded so its
+          // existing (distinct) rendering is untouched.
+          if (state.guesses.isEmpty && state.revealedHints.isEmpty && !state.isFinished)
+            Expanded(child: _buildEmptyGuessState(context))
+          else
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.lg),
+                // Header items: hint section label + one HintTile per revealed hint
+                // + separator divider; guess tiles follow immediately after.
+                itemCount: (pinnedHints.isEmpty ? 0 : pinnedHints.length + 2) +
+                    sorted.length,
+                itemBuilder: (ctx, i) {
+                  // ── Pinned-hints header ─────────────────────────────────────
+                  if (pinnedHints.isNotEmpty) {
+                    // Index 0: section label
+                    if (i == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: WarmerSpacing.xs, bottom: 2),
+                        child: Text(
+                          'Hints revealed',
+                          style: Theme.of(ctx).textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      );
+                    }
+                    // Indices 1 … pinnedHints.length: one HintTile each.
+                    if (i <= pinnedHints.length) {
+                      return HintTile(
+                        hint: pinnedHints[i - 1],
+                        vocabSize: payload.n,
+                      );
+                    }
+                    // Index pinnedHints.length + 1: separator divider.
+                    if (i == pinnedHints.length + 1) {
+                      return const Divider(height: 12);
+                    }
                   }
-                  // Indices 1 … pinnedHints.length: one HintTile each.
-                  if (i <= pinnedHints.length) {
-                    return HintTile(
-                      hint: pinnedHints[i - 1],
-                      vocabSize: payload.n,
-                    );
-                  }
-                  // Index pinnedHints.length + 1: separator divider.
-                  if (i == pinnedHints.length + 1) {
-                    return const Divider(height: 12);
-                  }
-                }
-                // ── Guess tiles ──────────────────────────────────────────────
-                final guessOffset = pinnedHints.isEmpty ? 0 : pinnedHints.length + 2;
-                final g = sorted[i - guessOffset];
-                final isLatest = latestGuess != null && g.word == latestGuess.word;
-                return GuessTile(
-                  guess: g,
-                  vocabSize: payload.n,
-                  isHighlighted: isLatest,
-                );
-              },
+                  // ── Guess tiles ──────────────────────────────────────────────
+                  final guessOffset = pinnedHints.isEmpty ? 0 : pinnedHints.length + 2;
+                  final g = sorted[i - guessOffset];
+                  final isLatest = latestGuess != null && g.word == latestGuess.word;
+                  return GuessTile(
+                    guess: g,
+                    vocabSize: payload.n,
+                    isHighlighted: isLatest,
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

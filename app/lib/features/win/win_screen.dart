@@ -255,17 +255,17 @@ class _WinScreenState extends State<WinScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(WarmerSpacing.md),
               decoration: BoxDecoration(
                 color: Theme.of(ctx).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(WarmerRadius.sm),
               ),
               child: SelectableText(
                 _shareText,
                 style: const TextStyle(fontFamily: 'monospace'),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: WarmerSpacing.md),
             const Text('Copied to clipboard!'),
           ],
         ),
@@ -317,10 +317,11 @@ class _WinScreenState extends State<WinScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(WarmerRadius.sm),
       ),
       child: Text(
         '$parStr$rivalStr',
@@ -340,7 +341,7 @@ class _WinScreenState extends State<WinScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('You got it!')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -361,7 +362,7 @@ class _WinScreenState extends State<WinScreen> {
                 ),
               ),
             const HeatRingsMark(size: 72),
-            const SizedBox(height: 16),
+            const SizedBox(height: WarmerSpacing.lg),
             Text(
               widget.secret.toUpperCase(),
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -369,7 +370,7 @@ class _WinScreenState extends State<WinScreen> {
                     letterSpacing: 4,
                   ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: WarmerSpacing.sm),
             Text(
               '${widget.packName != null ? '${widget.packName} ' : ''}'
               'Puzzle #$_puzzleNumber · ${widget.guesses.length} guess${widget.guesses.length == 1 ? '' : 'es'}',
@@ -377,11 +378,11 @@ class _WinScreenState extends State<WinScreen> {
             ),
 
             if (widget.parGuesses != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: WarmerSpacing.md),
               _buildParRivalBadge(context),
             ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: WarmerSpacing.xl),
 
             // Share card preview (wrapped in RepaintBoundary for PNG capture)
             RepaintBoundary(
@@ -400,7 +401,7 @@ class _WinScreenState extends State<WinScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: WarmerSpacing.lg),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -410,7 +411,7 @@ class _WinScreenState extends State<WinScreen> {
                   icon: const Icon(Icons.share),
                   label: const Text('Copy & Share'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: WarmerSpacing.md),
                 OutlinedButton.icon(
                   onPressed: () => _sharePng(context),
                   icon: const Icon(Icons.image_outlined),
@@ -420,7 +421,7 @@ class _WinScreenState extends State<WinScreen> {
             ),
 
             if (widget.onChallengeGroup != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: WarmerSpacing.md),
               TextButton.icon(
                 onPressed: widget.onChallengeGroup,
                 icon: const Icon(Icons.groups),
@@ -429,7 +430,7 @@ class _WinScreenState extends State<WinScreen> {
             ],
 
             if (_showNotifCard) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               NotificationOptInCard(
                 lang: widget.lang,
                 notificationService: widget.notificationService,
@@ -438,7 +439,7 @@ class _WinScreenState extends State<WinScreen> {
               ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: WarmerSpacing.xxl),
 
             Builder(builder: (ctx) {
               final tokens =
@@ -448,7 +449,7 @@ class _WinScreenState extends State<WinScreen> {
                 style: microLabel(tokens),
               );
             }),
-            const SizedBox(height: 8),
+            const SizedBox(height: WarmerSpacing.sm),
             ...sorted.take(5).map(
                   (g) => Builder(builder: (ctx) {
                     final heat = heatForBand(ctx, g.band);
@@ -474,7 +475,7 @@ class _WinScreenState extends State<WinScreen> {
                               color: heat.text,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: WarmerSpacing.md),
                           Text(g.word, style: TextStyle(color: tokens.text1)),
                           const Spacer(),
                           Text(
@@ -490,7 +491,7 @@ class _WinScreenState extends State<WinScreen> {
                   }),
                 ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: WarmerSpacing.xxl),
             TextButton(
               onPressed: widget.onPlayAgain,
               child: const Text('Back'),
@@ -640,17 +641,17 @@ class _LossScreenState extends State<LossScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(WarmerSpacing.md),
               decoration: BoxDecoration(
                 color: Theme.of(ctx).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(WarmerRadius.sm),
               ),
               child: SelectableText(
                 _shareText,
                 style: const TextStyle(fontFamily: 'monospace'),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: WarmerSpacing.md),
             const Text('Copied to clipboard!'),
           ],
         ),
@@ -692,7 +693,7 @@ class _LossScreenState extends State<LossScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Better luck next time 🌙')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -717,7 +718,7 @@ class _LossScreenState extends State<LossScreen> {
                   Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
               return Icon(Icons.sentiment_dissatisfied, size: 64, color: tokens.text3);
             }),
-            const SizedBox(height: 16),
+            const SizedBox(height: WarmerSpacing.lg),
             Text(
               widget.secret.toUpperCase(),
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -725,19 +726,20 @@ class _LossScreenState extends State<LossScreen> {
                     letterSpacing: 4,
                   ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: WarmerSpacing.sm),
             Text(
               '${widget.packName != null ? '${widget.packName} ' : ''}'
               'Puzzle #$_puzzleNumber · $langLabel · $reasonText',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             if (bestGuess != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: WarmerSpacing.md),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(WarmerRadius.sm),
                 ),
                 child: Text(
                   'Your best: ${bestGuess.band.label} #${bestGuess.rank} — so close!',
@@ -748,7 +750,7 @@ class _LossScreenState extends State<LossScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: WarmerSpacing.xl),
             RepaintBoundary(
               key: _shareCardKey,
               child: _SharePreviewCard(
@@ -763,7 +765,7 @@ class _LossScreenState extends State<LossScreen> {
                 rivalSolveAt: widget.rivalSolveAt,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: WarmerSpacing.lg),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -772,7 +774,7 @@ class _LossScreenState extends State<LossScreen> {
                   icon: const Icon(Icons.share),
                   label: const Text('Copy & Share'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: WarmerSpacing.md),
                 OutlinedButton.icon(
                   onPressed: () => _sharePng(context),
                   icon: const Icon(Icons.image_outlined),
@@ -781,7 +783,7 @@ class _LossScreenState extends State<LossScreen> {
               ],
             ),
             if (widget.onChallengeGroup != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: WarmerSpacing.md),
               TextButton.icon(
                 onPressed: widget.onChallengeGroup,
                 icon: const Icon(Icons.groups),
@@ -789,7 +791,7 @@ class _LossScreenState extends State<LossScreen> {
               ),
             ],
             if (_showNotifCard) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               NotificationOptInCard(
                 lang: widget.lang,
                 notificationService: widget.notificationService,
@@ -797,7 +799,7 @@ class _LossScreenState extends State<LossScreen> {
                 onDismissed: () => setState(() => _showNotifCard = false),
               ),
             ],
-            const SizedBox(height: 32),
+            const SizedBox(height: WarmerSpacing.xxl),
             if (widget.guesses.isNotEmpty) ...[
               Builder(builder: (ctx) {
                 final tokens =
@@ -807,7 +809,7 @@ class _LossScreenState extends State<LossScreen> {
                   style: microLabel(tokens),
                 );
               }),
-              const SizedBox(height: 8),
+              const SizedBox(height: WarmerSpacing.sm),
               ...sorted.take(5).map(
                     (g) => Builder(builder: (ctx) {
                       final heat = heatForBand(ctx, g.band);
@@ -833,7 +835,7 @@ class _LossScreenState extends State<LossScreen> {
                                 color: heat.text,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: WarmerSpacing.md),
                             Text(g.word, style: TextStyle(color: tokens.text1)),
                             const Spacer(),
                             Text(
@@ -849,7 +851,7 @@ class _LossScreenState extends State<LossScreen> {
                     }),
                   ),
             ],
-            const SizedBox(height: 32),
+            const SizedBox(height: WarmerSpacing.xxl),
             TextButton(
               onPressed: widget.onClose,
               child: const Text('Back'),
@@ -941,17 +943,17 @@ class _SharePreviewCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(WarmerSpacing.lg),
       decoration: BoxDecoration(
         color: tokens.canvas,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(WarmerRadius.lg),
         border: Border.all(color: tokens.hairline, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const WarmerWordmark(markSize: 18, fontSize: 15),
-          const SizedBox(height: 12),
+          const SizedBox(height: WarmerSpacing.md),
           Text(
             _headline,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -966,7 +968,7 @@ class _SharePreviewCard extends StatelessWidget {
                 Container(
                   width: 16,
                   height: 16,
-                  margin: const EdgeInsets.only(right: 4),
+                  margin: const EdgeInsets.only(right: WarmerSpacing.xs),
                   decoration: BoxDecoration(
                     color: i == guesses.length - 1
                         ? (won ? tokens.accent : tokens.text3)
@@ -1000,7 +1002,7 @@ class _SharePreviewCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: tokens.text2),
             ),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: WarmerSpacing.md),
           Text(
             'playwarmer.vercel.app',
             style: Theme.of(context)

@@ -122,7 +122,7 @@ class _GroupLeaderboardScreenState extends State<GroupLeaderboardScreen> {
     final dateLabel = DateFormat('EEE, MMM d').format(DateTime.parse(widget.date));
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(WarmerSpacing.lg),
       children: [
         if (AppConfig.supportedLangs.length > 1)
           Center(
@@ -138,7 +138,7 @@ class _GroupLeaderboardScreenState extends State<GroupLeaderboardScreen> {
               },
             ),
           ),
-        const SizedBox(height: 12),
+        const SizedBox(height: WarmerSpacing.md),
         Text(
           'Today · $dateLabel',
           textAlign: TextAlign.center,
@@ -158,7 +158,7 @@ class _GroupLeaderboardScreenState extends State<GroupLeaderboardScreen> {
                   isSelf: e.value.uid == _service.selfUidOrNull,
                 ),
               ),
-        const SizedBox(height: 24),
+        const SizedBox(height: WarmerSpacing.xl),
         Center(
           child: OutlinedButton.icon(
             onPressed: _shareInvite,
@@ -201,7 +201,7 @@ class _LeaderboardRow extends StatelessWidget {
     final notPlayed = !entry.played;
     return Card(
       color: isSelf ? theme.colorScheme.primaryContainer : null,
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: WarmerSpacing.xs),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.surfaceContainerHighest,

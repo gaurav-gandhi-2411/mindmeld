@@ -128,14 +128,14 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
           : _error != null
               ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(WarmerSpacing.xl),
                     child: Text('Failed to load packs: $_error'),
                   ),
                 )
               : _packs.isEmpty
                   ? const Center(child: Text('No packs available yet.'))
                   : GridView.extent(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(WarmerSpacing.lg),
                       // Responsive columns: ~2 on phones, more on wide
                       // viewports — keeps the quiet cards compact instead of
                       // stretching two tall columns across desktop widths.
@@ -190,7 +190,7 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
                         color: tokens.text1,
                       ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: WarmerSpacing.xs),
                 Text(
                   pack.taglineFor(widget.lang),
                   maxLines: 2,
@@ -200,7 +200,7 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
                       .bodySmall
                       ?.copyWith(color: tokens.text2),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: WarmerSpacing.sm),
                 if (comingSoon)
                   const Chip(
                     label: Text('Coming soon'),
@@ -240,21 +240,21 @@ class _PackUnlockSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Unlock ${pack.titleFor(lang)}',
                 style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
+            const SizedBox(height: WarmerSpacing.sm),
             Text('Get all ${pack.count} puzzles in this pack.'),
             const SizedBox(height: 20),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text('Unlock pack'),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: WarmerSpacing.xs),
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('Not now'),

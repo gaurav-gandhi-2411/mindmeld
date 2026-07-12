@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,7 +114,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _pages.length,
                 (i) => AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: WarmerSpacing.xs, vertical: WarmerSpacing.md),
                   width: i == _page ? 20 : 8,
                   height: 8,
                   decoration: BoxDecoration(
@@ -126,7 +128,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              padding: const EdgeInsets.fromLTRB(
+                  WarmerSpacing.xl, 0, WarmerSpacing.xl, WarmerSpacing.xl),
               child: Row(
                 children: [
                   if (_page > 0)
@@ -142,7 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onPressed: _finish,
                     child: const Text('Skip'),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: WarmerSpacing.sm),
                   FilledButton(
                     onPressed: _next,
                     child: Text(
@@ -181,13 +184,13 @@ class _OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(WarmerSpacing.xxl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           leading ??
               Icon(icon, size: 80, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 32),
+          const SizedBox(height: WarmerSpacing.xxl),
           Text(
             title,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -195,7 +198,7 @@ class _OnboardingPage extends StatelessWidget {
                 ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: WarmerSpacing.lg),
           Text(
             body,
             style: Theme.of(context).textTheme.bodyLarge,

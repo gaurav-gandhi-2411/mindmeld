@@ -92,10 +92,26 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppPersistence.instance.init(); // production: uses platform default path
 
-  // Firebase init + Crashlytics error hooks — only when analyticsEnabled.
-  // When analyticsEnabled=false (the default) zero Firebase calls are made,
-  // keeping cold-start fast for non-monetised builds.
-  //
+  // Build the exporter synchronously (FirebaseExporter or _NoOpExporter
+  // depending on the flag) so it's available as a WarmerApp constructor arg —
+  // its async .init() (ring-buffer flush) is deferred below, same as Firebase.
+  final exporter = buildAnalyticsExporter();
+
+  // Render the first frame BEFORE awaiting Firebase/AppCheck/Crashlytics/ads.
+  // Launch-1 wave finding: awaiting Firebase.initializeApp() here (it loads
+  // several gstatic.com JS SDK modules on web — firestore/auth/analytics/
+  // messaging/app-check, ~211KB combined) previously blocked runApp() itself,
+  // directly costing real LCP once ANALYTICS_ENABLED=true started actually
+  // exercising this path in production (measured: LCP 2635ms with --wasm
+  // alone -> 3240ms once analytics was also enabled and eagerly awaited here
+  // — see reports/renderer-decision-2026-07-12.md and
+  // docs/known-limitations.md). None of what follows is needed for the first
+  // frame — analytics events already queue in the local SQLite ring buffer
+  // regardless (see firebase_exporter.dart's own flush-semantics doc), so
+  // deferring this costs nothing functionally, only delays when the FIRST
+  // flush/AdMob-load/Crashlytics-wiring happens by a few hundred ms.
+  runApp(WarmerApp(exporter: exporter));
+
   // On web, FirebaseOptions must be supplied explicitly (no google-services.json).
   // The placeholder values in firebase_web_options.dart must be replaced before
   // deploying a monetised web build. See docs/firebase-setup.md for instructions.
@@ -103,6 +119,13 @@ void main() async {
   final webConfigReady =
       !kIsWeb || firebaseWebOptions.apiKey != 'PLACEHOLDER';
 
+  // Firebase init + Crashlytics error hooks — only when analyticsEnabled.
+  // When analyticsEnabled=false (the default) zero Firebase calls are made,
+  // keeping cold-start fast for non-monetised builds. Trade-off accepted:
+  // a Flutter framework error thrown in the brief window between runApp()
+  // and this block completing won't reach Crashlytics (it still surfaces in
+  // the browser/device console) — an acceptable gap for a real LCP win on
+  // every load, versus the previous zero-gap-but-blocking behaviour.
   if (AppConfig.analyticsEnabled && webConfigReady) {
     await Firebase.initializeApp(
       options: kIsWeb ? firebaseWebOptions : null,
@@ -119,8 +142,6 @@ void main() async {
     };
   }
 
-  // Build the exporter (FirebaseExporter or _NoOpExporter depending on flag).
-  final exporter = buildAnalyticsExporter();
   await exporter.init(); // flush any queued events from previous sessions.
 
   // AdMob initialisation and UMP consent — only executed in monetised native builds.
@@ -130,8 +151,6 @@ void main() async {
     await MobileAds.instance.initialize();
     await ConsentManager.gatherConsent();
   }
-
-  runApp(WarmerApp(exporter: exporter));
 }
 
 class WarmerApp extends StatelessWidget {
@@ -363,7 +382,7 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             mainAxisSize: MainAxisSize.min,
             children: [
               HeatRingsMark(size: 72),
-              SizedBox(height: 24),
+              SizedBox(height: WarmerSpacing.xl),
               CircularProgressIndicator(),
             ],
           ),

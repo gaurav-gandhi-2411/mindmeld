@@ -26,6 +26,60 @@ class HeatSpec {
   }
 }
 
+/// Spacing scale for paddings/gaps, in logical pixels.
+///
+/// Values are the ones already in repeated use across `app/lib` (confirmed
+/// by grepping `EdgeInsets`/`SizedBox` call sites) — not invented. Kept as
+/// plain `static const double`s rather than [WarmerTokens] fields because
+/// spacing doesn't vary by brightness and so needs no [ThemeExtension.lerp]
+/// support; a private constructor keeps this a namespace, not a value type.
+class WarmerSpacing {
+  const WarmerSpacing._();
+
+  /// 4 — tightest gap (icon-to-label, hairline padding).
+  static const double xs = 4;
+
+  /// 8 — default gap between related inline elements.
+  static const double sm = 8;
+
+  /// 12 — default gap between stacked elements within a card.
+  static const double md = 12;
+
+  /// 16 — default screen-edge/card padding.
+  static const double lg = 16;
+
+  /// 24 — section-level padding/gap.
+  static const double xl = 24;
+
+  /// 32 — large vertical rhythm between major sections.
+  static const double xxl = 32;
+}
+
+/// Border-radius scale, in logical pixels.
+///
+/// Values are the ones already in repeated use across `app/lib` (confirmed
+/// by grepping `BorderRadius.circular(`) — not invented. Kept as plain
+/// `static const double`s rather than [WarmerTokens] fields for the same
+/// reason as [WarmerSpacing]: radii don't need brightness-based lerping.
+class WarmerRadius {
+  const WarmerRadius._();
+
+  /// 6 — small chips/badges.
+  static const double xs = 6;
+
+  /// 8 — inputs, small buttons, snack bars.
+  static const double sm = 8;
+
+  /// 12 — default card/button radius.
+  static const double md = 12;
+
+  /// 16 — larger cards.
+  static const double lg = 16;
+
+  /// 20 — full-surface sheets (dialogs, bottom sheets).
+  static const double xl = 20;
+}
+
 /// Single source of truth for the "calm-minimal" design palette.
 ///
 /// Accessed via `Theme.of(context).extension<WarmerTokens>()`. See
@@ -177,8 +231,15 @@ class WarmerTokens extends ThemeExtension<WarmerTokens> {
     surface: Color(0xFFFFFFFF),
     hairline: Color(0xFFECE8E1),
     text1: Color(0xFF26231F),
-    text2: Color(0xFF8A857C),
-    text3: Color(0xFFB4AEA4),
+    // text2/text3 darkened from the original 8A857C/B4AEA4 — launch-1 wave's
+    // design-reviewer pass measured those at 3.46-3.67:1 / 2.08-2.20:1 against
+    // canvas/surface, both failing WCAG AA (text3 failing even the large-text
+    // 3.0:1 floor). These clear 4.5:1 against both canvas and surface with a
+    // small margin (text2 5.37/5.70, text3 4.71/4.99) — see
+    // design_tokens_test.dart's contrast tests. Same warm-neutral hue, just
+    // darker; hierarchy (text1 > text2 > text3 lightness) preserved.
+    text2: Color(0xFF6B665D),
+    text3: Color(0xFF756F62),
     accent: Color(0xFFDD6B4D),
     accentText: Color(0xFFB04429),
     accentInk: Color(0xFF26231F),
@@ -222,7 +283,11 @@ class WarmerTokens extends ThemeExtension<WarmerTokens> {
     hairline: Color(0xFF302D29),
     text1: Color(0xFFF2EFE9),
     text2: Color(0xFF9C968C),
-    text3: Color(0xFF6E6960),
+    // Lightened from 6E6960 — same launch-1 WCAG pass found dark-mode text3
+    // failing too (3.05-3.32:1 against canvas/surface). 8C8579 clears 4.5:1
+    // against both (4.95/4.55) with a small margin. text2 already passed
+    // (6.16/5.67), unchanged.
+    text3: Color(0xFF8C8579),
     accent: Color(0xFFE87A5C),
     accentText: Color(0xFFE87A5C),
     accentInk: Color(0xFF171614),
@@ -328,7 +393,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(WarmerRadius.lg),
         side: BorderSide(color: tokens.hairline, width: 1),
       ),
     ),
@@ -341,23 +406,23 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       filled: true,
       fillColor: tokens.surface,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.hairline, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.hairline, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.accent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: colorScheme.error, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: colorScheme.error, width: 1.5),
       ),
       hintStyle: TextStyle(color: tokens.text3),
@@ -373,7 +438,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
           return tokens.accentInk;
         }),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w600),
@@ -385,7 +450,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
         foregroundColor: WidgetStatePropertyAll(tokens.accentText),
         side: WidgetStatePropertyAll(BorderSide(color: tokens.hairline)),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
       ),
     ),
@@ -420,25 +485,25 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       backgroundColor: tokens.text1,
       contentTextStyle: TextStyle(color: tokens.canvas, fontSize: 14),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
     ),
     dialogTheme: DialogThemeData(
       backgroundColor: tokens.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.xl)),
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: tokens.surface,
       surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(WarmerRadius.xl)),
       ),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: tokens.canvas,
       side: BorderSide(color: tokens.hairline),
       labelStyle: TextStyle(color: tokens.text2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.sm)),
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(color: tokens.accent),
     segmentedButtonTheme: SegmentedButtonThemeData(
@@ -498,7 +563,7 @@ ThemeData buildPackTheme(ThemeData base, Color accent, Color accentDark) {
         backgroundColor: WidgetStatePropertyAll(accent),
         foregroundColor: WidgetStatePropertyAll(ink),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w600),

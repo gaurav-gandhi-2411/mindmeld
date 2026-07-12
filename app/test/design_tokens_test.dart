@@ -59,6 +59,33 @@ void main() {
         final ratio = contrastRatio(tokens.text1, tokens.surface);
         expect(ratio, greaterThanOrEqualTo(wcagAA));
       });
+
+      // text2/text3 had NO contrast test before the launch-1 wave — that gap
+      // is exactly how both shipped failing WCAG AA (measured 2.08-3.67:1)
+      // undetected by a real design-reviewer pass. Locking in the fix.
+      test('$name: text2 on canvas >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text2, tokens.canvas);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text2/canvas was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text2 on surface >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text2, tokens.surface);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text2/surface was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text3 on canvas >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text3, tokens.canvas);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text3/canvas was ${ratio.toStringAsFixed(2)}');
+      });
+
+      test('$name: text3 on surface >= $wcagAA', () {
+        final ratio = contrastRatio(tokens.text3, tokens.surface);
+        expect(ratio, greaterThanOrEqualTo(wcagAA),
+            reason: '$name text3/surface was ${ratio.toStringAsFixed(2)}');
+      });
     }
   });
 
@@ -75,6 +102,69 @@ void main() {
       expect(theme.scaffoldBackgroundColor, WarmerTokens.dark.canvas);
       expect(theme.extension<WarmerTokens>(), isNotNull);
       expect(theme.colorScheme.primary, WarmerTokens.dark.accent);
+    });
+  });
+
+  group('WarmerSpacing — matches grepped real-world usage', () {
+    // Regression-proofs the claim that these constants reflect values
+    // actually in use in app/lib (see design_tokens.dart doc comments for
+    // the grep evidence), not invented numbers.
+    test('scale matches the values found via grep', () {
+      expect(WarmerSpacing.xs, 4);
+      expect(WarmerSpacing.sm, 8);
+      expect(WarmerSpacing.md, 12);
+      expect(WarmerSpacing.lg, 16);
+      expect(WarmerSpacing.xl, 24);
+      expect(WarmerSpacing.xxl, 32);
+    });
+
+    test('scale is strictly ascending', () {
+      const scale = [
+        WarmerSpacing.xs,
+        WarmerSpacing.sm,
+        WarmerSpacing.md,
+        WarmerSpacing.lg,
+        WarmerSpacing.xl,
+        WarmerSpacing.xxl,
+      ];
+      for (var i = 1; i < scale.length; i++) {
+        expect(scale[i], greaterThan(scale[i - 1]));
+      }
+    });
+  });
+
+  group('WarmerRadius — matches grepped real-world usage', () {
+    // Regression-proofs the claim that these constants reflect values
+    // actually in use in app/lib (see design_tokens.dart doc comments for
+    // the grep evidence), not invented numbers.
+    test('scale matches the values found via grep', () {
+      expect(WarmerRadius.xs, 6);
+      expect(WarmerRadius.sm, 8);
+      expect(WarmerRadius.md, 12);
+      expect(WarmerRadius.lg, 16);
+      expect(WarmerRadius.xl, 20);
+    });
+
+    test('scale is strictly ascending', () {
+      const scale = [
+        WarmerRadius.xs,
+        WarmerRadius.sm,
+        WarmerRadius.md,
+        WarmerRadius.lg,
+        WarmerRadius.xl,
+      ];
+      for (var i = 1; i < scale.length; i++) {
+        expect(scale[i], greaterThan(scale[i - 1]));
+      }
+    });
+
+    test('matches the radii already hardcoded in buildWarmerTheme', () {
+      // buildWarmerTheme() still hardcodes BorderRadius.circular(16/12/20)
+      // inline (rule 15b finding) — this app is not yet consuming the new
+      // tokens, but the token values must match what's already shipping.
+      expect(WarmerRadius.md, 12);
+      expect(WarmerRadius.lg, 16);
+      expect(WarmerRadius.xl, 20);
     });
   });
 

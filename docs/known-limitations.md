@@ -199,6 +199,23 @@ mode is the standard safe rollout path.
 real traffic long enough to confirm no false-positive blocks, flip Firestore (and
 any other App Check-guarded product) to Enforced.
 
+### 11a. Unbounded group/code document creation by a scripted client
+
+Found during the launch-1 wave's STRIDE pass (`docs/stride-launch-1.md`): a scripted
+anonymous-auth client can mint unlimited `groups/{groupId}` + `codes/{code}` documents
+(one fresh `signInAnonymously()` per iteration) — `firestore.rules` has no per-uid cap on
+group/code creation.
+
+**Why accepted:** impact is Firestore storage/cost growth and junk-group clutter, not a
+confidentiality or integrity breach — group documents carry no sensitive/puzzle content,
+and cross-group data leakage is already prevented (see entry 11's default-deny + the
+membership-gated `list` rules). No evidence of active abuse.
+
+**Revisit if:** App Check enforcement (entry 11, pending the reCAPTCHA site-key
+registration) doesn't sufficiently curb this once flipped from monitor to enforced, or
+real abuse/cost-spike evidence surfaces — a Cloud Function-based per-uid creation
+throttle would be the fix, real infra work not scoped here.
+
 ### 12. Data-deletion result-doc cleanup needs a one-time Firestore index
 
 `SocialService.deleteMyData()`'s collection-group query over `results.uid` requires
@@ -223,35 +240,98 @@ contact address.
 
 ## Performance
 
-### 14. Flutter-web cold-boot latency (CanvasKit)
+### 14. Flutter-web cold-boot latency, and analytics' real perf cost (updated launch-1 wave)
 
-Lighthouse baseline against the live production site
-(`reports/performance-baseline-2026-07-12.md`, raw artifacts
-`reports/lighthouse-playwarmer-baseline.report.{html,json}`, this commit):
-**LCP 2864ms, FCP 934ms, TBT 221ms, CLS 0, Speed Index 2797ms, total page weight
-2,838 KB (of which `canvaskit.wasm` alone is 1,613 KB), Lighthouse performance
-score 0.69/1.0**. Caveat already noted in that report: Lighthouse's Lantern
-network simulation throws `LanternError: NO_LCP` against this canvas-rendered
-(not DOM-rendered) app — there's no traditional "largest contentful DOM element"
-to key off, so treat the LCP number as directionally useful, not precise. The
-dominant payload cost is Flutter web's CanvasKit renderer — a fixed cost of the
-Flutter-web rendering strategy, not something this app's own code drives down
-further without a renderer change.
+Original baseline (`reports/performance-baseline-2026-07-12.md`, pre-wave):
+LCP 2864ms, TBT 221ms, total weight 2,838 KB, score 0.69. Launch-1 wave adopted
+`--wasm` (see `reports/renderer-decision-2026-07-12.md`) and enabled Firebase
+Analytics in production for the first time (see entry above on D1-retention
+instrumentation) — both landed together, so the full before/after story has
+three data points, all Lighthouse 13.4.0/desktop-preset, same caveat as before
+(`LanternError: NO_LCP` against this canvas-rendered app — treat LCP as
+directional, not precise):
 
-**Why accepted:** CanvasKit gives pixel-perfect cross-browser rendering parity
-(matches the identical native look on Android/iOS), which matters for a
-visually-branded word game. The alternative (`html` renderer) trades that fidelity
-for a smaller bundle and was not evaluated as part of this pass.
+| state | LCP | TBT | total weight | score | artifact |
+|---|---|---|---|---|---|
+| baseline (JS, no analytics) | 2864ms | 221ms | 2838 KB | 0.69 | `lighthouse-playwarmer-baseline.report.{html,json}` |
+| `--wasm` only, sandbox (no analytics) | 2635ms | 13.5ms | 2421 KB | 0.79 | `lighthouse-wasm-experiment.report.{html,json}` |
+| `--wasm` + analytics, production (uncertain provenance — see below) | 3173ms | 90.5ms | 2990 KB | 0.73 | `lighthouse-playwarmer-launch1-final.report.{html,json}` |
+| **`--wasm` + analytics + deferred-init, production (verified, authoritative)** | **3082ms** | **26ms** | **2990 KB** | **0.76** | `lighthouse-playwarmer-launch1-verified.report.{html,json}` |
 
-**Budgets (rule 15e, ratified this pass)** — previously proposed-but-unratified in
-`reports/performance-baseline-2026-07-12.md`): initial own-domain JS bundle
-(`main.dart.js` + `flutter_bootstrap.js`) ≤ 1000 KB (current ~932 KB combined;
-third-party CanvasKit/RevenueCat CDN assets tracked separately, not counted
-against this budget); LCP ≤ 2500ms (current 2864ms — a near-term target, subject
-to the Lantern caveat above); TBT ≤ 200ms (current 221ms); CLS ≤ 0.1 (current 0).
+**Deployment incident discovered mid-wave, affecting the third row above:**
+while capturing screenshots for the design-reviewer gate, a shipped UI fix
+wasn't appearing on production despite a successful deploy. Root-caused to two
+compounding issues: (1) `vercel.json` had a `Cache-Control` rule for
+`main.dart.js` but none for `main.dart.wasm`/`.mjs` (new files this wave never
+added), and (2) more seriously, `vercel deploy --prod` had silently stopped
+updating the `playwarmer.vercel.app` alias partway through the wave — it kept
+aliasing to a longer auto-generated `*-gaurav-gandhi-2411s-projects.vercel.app`
+form instead, with zero errors, so every prior smoke check/Lighthouse run/
+screenshot kept "passing" while possibly checking stale content (they only
+proved *some* build boots, not *this* one). Root cause of the alias drift
+itself not fully determined. Fixed: `vercel.json` now has explicit cache rules
+for the wasm/mjs files, and `deploy-warmer.ps1` now (a) explicitly runs
+`vercel alias set` after every deploy instead of trusting automatic aliasing,
+and (b) fetches the live `main.dart.wasm` and byte-compares it against the
+local build, purging the CDN cache and re-checking once before failing loudly
+on any mismatch — both steps verified working end-to-end. The third table row
+above (measured before this was caught) has uncertain provenance as a result;
+the fourth row was re-measured immediately after the fix, with the deploy
+script's own new guard confirming byte-for-byte that production matched the
+local build at measurement time — that row is the authoritative one.
 
-**Revisit if:** a future Lighthouse re-run regresses past these budgets, or the
-`html` renderer's visual fidelity gap closes enough to reconsider.
+**Root cause of the production regression vs. the sandbox measurement (measured,
+not guessed):** enabling `ANALYTICS_ENABLED=true` doesn't load *just* Analytics
+— `Firebase.initializeApp()` is a single shared call, and Flutter web's plugin
+registrant eagerly loads the JS SDK for every registered Firebase plugin
+(`firebase-app.js`, `firebase-firestore.js`, `firebase-auth.js`,
+`firebase-analytics.js`, `firebase-messaging.js`, `firebase-app-check.js` — confirmed
+via the Lighthouse network-requests audit, ~211KB combined), not just the one
+product actually needed for the retention metric. Tried the obvious cheap fix
+— deferred `main()`'s `await Firebase.initializeApp()` (and AdMob/UMP init) to
+run *after* `runApp()` instead of blocking the first frame on it (see the
+`perf: defer Firebase/AdMob init` commit) — real but small win (LCP
+3240ms->3173ms, ~67ms). Confirmed via the same network-requests audit *why*
+it's small: the browser fetches all these `<script>` resources in parallel at
+HTML-parse time regardless of when the Dart code inside main.dart.wasm awaits
+Firebase's init promise — reordering Dart-level awaits changes execution/
+blocking order, not the underlying resource-fetch timing. A real fix would
+need to stop loading Firestore/Auth/Messaging/AppCheck's JS eagerly when only
+Analytics/Crashlytics are needed for the metric — that's a bigger, riskier
+change (splitting one shared `Firebase.initializeApp()` call and its plugin
+registration) than fits this wave's "paint and gates only" scope.
+
+**Net honest result:** LCP is currently 3082ms (verified row above), over the
+3000ms tracked ceiling by 82ms, directly because analytics instrumentation
+(an explicit requirement of this wave — "measurement must exist before
+launch, or the success metric is fiction") has a real, measured cost that the
+cheap lever only partially offsets. This is a genuine tension between two of
+this wave's own requirements, not an oversight — flagged here rather than
+silently picking one side.
+
+**Why CanvasKit is still accepted:** gives pixel-perfect cross-browser
+rendering parity (matches the identical native look on Android/iOS), which
+matters for a visually-branded word game. HTML renderer is not available on
+this toolchain at all (Flutter 3.44.2; removed in 3.29) — see the renderer
+decision doc.
+
+**Budgets (rule 15e, ratified this pass):** initial own-domain JS bundle
+(`main.dart.wasm` + `.mjs` + `flutter_bootstrap.js`) ≤ 1000 KB (current ~972 KB
+combined; third-party CanvasKit/Firebase/RevenueCat CDN assets tracked
+separately, not counted against this budget — still passing); LCP ≤ 2500ms
+target / ≤ 3000ms tracked ceiling (current 3082ms, verified — **failing the
+tracked ceiling** by 82ms, see above); TBT ≤ 200ms (current 26ms — passing);
+CLS ≤ 0.1 (current 0).
+
+**Revisit if:** a future pass has budget for splitting Firebase's eager
+plugin-JS loading (load Analytics/Crashlytics eagerly, defer
+Firestore/Auth/Messaging/AppCheck until first actual social-feature use,
+mirroring `social_service.dart`'s existing lazy-init pattern) — the concrete,
+scoped next lever, not attempted here. Also revisit the RevenueCat script
+(187KB, pre-existing before this wave) loading unconditionally on web despite
+IAP being force-disabled there (`iapEnabledEffective` always false on web) —
+a second, independent bundle-size finding from this pass's network audit, not
+yet investigated further.
 
 ## Native app release readiness (web-only launch; not currently player-visible)
 
@@ -267,6 +347,38 @@ Android build has ever been distributed, so this affects zero real players today
 
 **Revisit if:** a native Android release (Play Store) is ever pursued — needs a
 real applicationId decision and a release keystore before any distributable build.
+
+## From the launch-1 design-reviewer sign-off (approved with suggestions, not blocking)
+
+### 17. Win screen CTA density; unverified mobile/keyboard dimensions
+
+Design-reviewer sign-off for the launch-1 aesthetic pass (`reports/screenshots/
+wave-launch-1-readiness/`) was **approved with suggestions** — all 5 prior blocking
+findings independently re-verified fixed (contrast recomputed from raw hex values,
+not taken on faith). Non-blocking items logged here rather than fixed inline:
+
+- **Win-screen CTA density**: the win screen stacks 5 distinct interactive asks
+  (Copy & Share, Image, Challenge your group, notification opt-in Yes/Not-now,
+  Back) in one view right after the celebratory moment. Not wrong on its own
+  (Wordle/NYT-style result screens do this too), but approaching CTA fatigue.
+  **Revisit if:** analytics (now actually collecting data — see entry above) show
+  meaningful drop-off on this screen; a lighter-weight, collapsed-by-default
+  treatment for the notification opt-in card would be the first thing to try.
+- **Mobile breakpoint unverified**: all review screenshots were captured at a
+  single ~900px desktop-ish viewport; no ~360px mobile-width capture exists to
+  confirm no overflow/overlap there. **Revisit before/at next visual pass**:
+  capture a narrow-viewport screenshot set and re-check.
+- **Keyboard/focus-ring pass unverified**: `design_tokens.dart`'s
+  `inputDecorationTheme.focusedBorder` does define a visible focus indicator
+  (`tokens.accent`, 1.5px), a good sign, but actual tab-order and focus-ring
+  rendering in the running app was not verified live. **Revisit**: a manual
+  keyboard-only pass through the puzzle/settings/onboarding flows.
+- **Possible tooltip artifact**: a floating "Friends" pill appeared above the nav
+  bar in one captured screenshot, likely a `NavigationDestination` hover-tooltip
+  render artifact from the automated capture tool rather than a real layout bug
+  (unconfirmed either way — no live interaction was available in that review
+  pass). **Revisit if**: this reproduces during a live manual pass — would need a
+  real fix if so, not just a note.
 
 ## Documentation hygiene (not a product limitation, noted for completeness)
 

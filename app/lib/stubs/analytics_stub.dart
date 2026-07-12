@@ -13,6 +13,14 @@ class AnalyticsEvent {
   static const String adWatched = 'ad_watched';
   static const String puzzleStarted = 'puzzle_started';
   static const String loss = 'loss';
+
+  /// Fired on EVERY daily-puzzle terminal state (win, budget exhausted via a
+  /// guess or a hint, or explicit give-up) — never fired for practice/pack
+  /// mode. Added launch-1 wave so "% of DAU completing the daily puzzle"
+  /// (PM header success metric) is a single GA4 event rather than a manual
+  /// win-OR-loss union. Props: `{outcome: String}` where outcome is one of
+  /// 'win' | 'loss_budget' | 'loss_hint_exhausted' | 'loss_gave_up'.
+  static const String puzzleCompleted = 'puzzle_completed';
   static const String rivalOutcome = 'rival_outcome';
   static const String returningPlayer = 'returning_player';
 

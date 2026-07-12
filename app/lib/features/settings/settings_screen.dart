@@ -470,7 +470,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           if (_rivalEnabled) ...[
             const Padding(
-              padding: EdgeInsets.only(left: 16, top: 4, bottom: 2),
+              padding: EdgeInsets.only(left: WarmerSpacing.lg, top: WarmerSpacing.xs, bottom: 2),
               child: Text('Difficulty',
                   style: TextStyle(fontWeight: FontWeight.w500)),
             ),
