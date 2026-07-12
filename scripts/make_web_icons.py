@@ -47,12 +47,13 @@ WEB_ROOT: Path = REPO_ROOT / "app" / "web"
 # Locked heat-rings palette — must match scripts/make_app_icon.py exactly.
 # ---------------------------------------------------------------------------
 
-COLD: tuple[int, int, int] = (0x25, 0x63, 0xEB)
-WARM: tuple[int, int, int] = (0xF5, 0x9E, 0x0B)
-HOT: tuple[int, int, int] = (0xEF, 0x44, 0x44)
+COLD: tuple[int, int, int] = (0x6B, 0x89, 0xA8)
+COOL: tuple[int, int, int] = (0x7E, 0x9B, 0xB5)
+WARM: tuple[int, int, int] = (0xD9, 0xAE, 0x6B)
+HOT: tuple[int, int, int] = (0xD6, 0x5F, 0x49)
 
 # App-tile ground (dark) — background for maskable icons.
-BRAND_BG: tuple[int, int, int, int] = (0x0F, 0x17, 0x2A, 0xFF)
+BRAND_BG: tuple[int, int, int, int] = (0x17, 0x16, 0x14, 0xFF)
 
 # ---------------------------------------------------------------------------
 # Icon specs
@@ -104,7 +105,7 @@ def _draw_favicon_32(size: int = FAVICON_32) -> Image.Image:
     cx = cy = size / 2
     stroke_w = max(1, round(size * 0.125))
 
-    for frac, colour in ((0.44, COLD), (0.30, (0x06, 0xB6, 0xD4)), (0.16, WARM)):
+    for frac, colour in ((0.44, COLD), (0.30, COOL), (0.16, WARM)):
         r = size * frac
         draw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=colour, width=stroke_w)
 

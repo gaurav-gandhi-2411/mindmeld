@@ -1,10 +1,10 @@
 """Generate branded app icons for Warmer — the heat-rings mark.
 
-Design (locked palette, see spec-warmer-rename.md):
+Design (locked palette, see spec-aesthetic-pass.md):
   Concentric rings closing to a hot center — cold blue outer, cyan, amber,
   red-hot center dot. It IS the mechanic (closing in, getting warmer).
-    cold/outer #2563EB, cool #06B6D4, warm #F59E0B, hot/center #EF4444
-    app-tile dark ground #0F172A
+    cold/outer #6B89A8, cool #7E9BB5, warm #D9AE6B, hot/center #D65F49
+    app-tile dark ground #171614
 
 Produces TWO master images per size, because Android adaptive icons need a
 transparent foreground composited over a separate solid background layer,
@@ -31,14 +31,14 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 # ---------------------------------------------------------------------------
-# Locked heat-rings palette — see spec-warmer-rename.md
+# Locked heat-rings palette — see spec-aesthetic-pass.md
 # ---------------------------------------------------------------------------
 
-COLD: tuple[int, int, int] = (0x25, 0x63, 0xEB)
-COOL: tuple[int, int, int] = (0x06, 0xB6, 0xD4)
-WARM: tuple[int, int, int] = (0xF5, 0x9E, 0x0B)
-HOT: tuple[int, int, int] = (0xEF, 0x44, 0x44)
-GROUND: tuple[int, int, int] = (0x0F, 0x17, 0x2A)
+COLD: tuple[int, int, int] = (0x6B, 0x89, 0xA8)
+COOL: tuple[int, int, int] = (0x7E, 0x9B, 0xB5)
+WARM: tuple[int, int, int] = (0xD9, 0xAE, 0x6B)
+HOT: tuple[int, int, int] = (0xD6, 0x5F, 0x49)
+GROUND: tuple[int, int, int] = (0x17, 0x16, 0x14)
 
 # ---------------------------------------------------------------------------
 # Ring geometry — fractions of icon size S. Same ratios reused at every

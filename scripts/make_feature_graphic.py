@@ -2,8 +2,8 @@
 
 Design:
   - Horizontal gradient background using the locked heat-rings identity palette:
-      cold #2563EB → cool #06B6D4 → warm #F59E0B → hot #EF4444
-      (see spec-warmer-rename.md — same palette as the app icon/OG card, not
+      cold #6B89A8 → cool #7E9BB5 → warm #D9AE6B → hot #D65F49
+      (see spec-aesthetic-pass.md — same palette as the app icon/OG card, not
       the separate 5-band gameplay guess-tile palette in guess_tile.dart).
   - "Warmer" wordmark in white with a light shadow (segoeuib.ttf, fallback Arial/DejaVu).
   - Tagline below the wordmark.
@@ -30,15 +30,15 @@ WIDTH: int = 1024
 HEIGHT: int = 500
 
 # ---------------------------------------------------------------------------
-# Locked heat-rings identity palette — see spec-warmer-rename.md /
+# Locked heat-rings identity palette — see spec-aesthetic-pass.md /
 # scripts/make_app_icon.py. Distinct from the 5-band gameplay guess-tile
 # palette in app/lib/features/puzzle/guess_tile.dart.
 # ---------------------------------------------------------------------------
 
-COLOUR_COLD: tuple[int, int, int] = (0x25, 0x63, 0xEB)  # #2563EB
-COLOUR_COOL: tuple[int, int, int] = (0x06, 0xB6, 0xD4)  # #06B6D4
-COLOUR_WARM: tuple[int, int, int] = (0xF5, 0x9E, 0x0B)  # #F59E0B
-COLOUR_HOT: tuple[int, int, int] = (0xEF, 0x44, 0x44)  # #EF4444
+COLOUR_COLD: tuple[int, int, int] = (0x6B, 0x89, 0xA8)  # #6B89A8
+COLOUR_COOL: tuple[int, int, int] = (0x7E, 0x9B, 0xB5)  # #7E9BB5
+COLOUR_WARM: tuple[int, int, int] = (0xD9, 0xAE, 0x6B)  # #D9AE6B
+COLOUR_HOT: tuple[int, int, int] = (0xD6, 0x5F, 0x49)  # #D65F49
 
 # Gradient stops as (x_fraction, RGB) from left to right.
 GRADIENT_STOPS: list[tuple[float, tuple[int, int, int]]] = [

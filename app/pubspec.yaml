@@ -67,7 +67,7 @@ flutter_launcher_icons:
   android: "launcher_icon"
   # Background: the heat-rings app-tile dark ground — solid fill so the icon
   # looks good on any adaptive-icon shape.
-  adaptive_icon_background: "#0F172A"
+  adaptive_icon_background: "#171614"
   # Foreground: transparent rings-only mark (safe-zone padding baked in by
   # scripts/make_app_icon.py's ratios), composited over the background above.
   adaptive_icon_foreground: "assets/icon-1024-fg.png"

@@ -18,13 +18,14 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH: int = 1200
 HEIGHT: int = 630
 
-COLD: tuple[int, int, int] = (0x25, 0x63, 0xEB)
-COOL: tuple[int, int, int] = (0x06, 0xB6, 0xD4)
-WARM: tuple[int, int, int] = (0xF5, 0x9E, 0x0B)
-HOT: tuple[int, int, int] = (0xEF, 0x44, 0x44)
-WORDMARK_ACCENT: tuple[int, int, int] = (0xF9, 0x73, 0x16)
-GROUND: tuple[int, int, int] = (0x0F, 0x17, 0x2A)
-TAGLINE_GREY: tuple[int, int, int] = (0x94, 0xA3, 0xB8)
+COLD: tuple[int, int, int] = (0x6B, 0x89, 0xA8)
+COOL: tuple[int, int, int] = (0x7E, 0x9B, 0xB5)
+WARM: tuple[int, int, int] = (0xD9, 0xAE, 0x6B)
+HOT: tuple[int, int, int] = (0xD6, 0x5F, 0x49)
+WORDMARK_ACCENT: tuple[int, int, int] = (0xE8, 0x7A, 0x5C)
+GROUND: tuple[int, int, int] = (0x17, 0x16, 0x14)
+TAGLINE_GREY: tuple[int, int, int] = (0x9C, 0x96, 0x8C)
+WARM_TEXT: tuple[int, int, int] = (0xF2, 0xEF, 0xE9)
 
 TAGLINE = "The daily word game where closer means warmer."
 
@@ -76,7 +77,7 @@ def render() -> Image.Image:
 
     word_x = 520
     word_y = HEIGHT // 2 - 130
-    draw.text((word_x, word_y), warm_text, font=word_font, fill=(0xF8, 0xFA, 0xFC))
+    draw.text((word_x, word_y), warm_text, font=word_font, fill=WARM_TEXT)
     draw.text((word_x + warm_w, word_y), er_text, font=word_font, fill=WORDMARK_ACCENT)
 
     # Tagline below the wordmark — shrink to fit the available width so it
