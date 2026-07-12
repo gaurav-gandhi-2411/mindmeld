@@ -79,6 +79,10 @@ Play in the browser: **https://playwarmer.vercel.app/**
 (installable PWA; hosted on Vercel). The old `/play/` path on GitHub Pages now serves a
 redirect to the Vercel URL.
 
+Scripted as `./deploy-warmer.ps1` (repo root) — mirrors the commands below exactly;
+keep both in sync if either changes. Also used by `docs/runbook.md`'s deploy/
+rollback procedure.
+
 ```powershell
 # Build and deploy to Vercel (canonical production flow):
 cd app
