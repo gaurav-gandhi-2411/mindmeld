@@ -41,7 +41,7 @@ jobs:
         id: check
         run: |
           set +e
-          python scripts/check_uptime.py --app-url https://playwarmer.vercel.app/TEMP-CI-VERIFY-FAILURE-PATH > check_output.txt 2>&1
+          python scripts/check_uptime.py > check_output.txt 2>&1
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
           cat check_output.txt
 
