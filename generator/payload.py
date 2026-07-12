@@ -71,17 +71,25 @@ def _is_morphological_variant(candidate: str, secret: str) -> bool:
     Excludes candidates that:
     - Are a prefix of the secret (e.g. "ocean" is prefix of "oceanic")
     - Have the secret as a prefix (e.g. "oceans" starts with "ocean")
-    - Contain the secret as a substring (e.g. "gunfire" contains "fire" — leaks the secret
-      when the hint appears in plaintext JSON)
-    - Have the secret contain the candidate as a substring (symmetry)
-    - Are within Levenshtein distance 2 of the secret (catches plurals, -ed, -ing variants)
+    - Contain the secret as a substring, or have the secret contain them, PROVIDED
+      the shorter of the two strings is at least 4 characters (e.g. "gunfire"
+      contains "fire" — leaks the secret when the hint appears in plaintext JSON).
+      Below that length the check is disabled: a 3-letter string like "and" is a
+      coincidental substring of countless unrelated words (e.g. "mandir") and
+      flagging it would needlessly reject safe candidates.
+    - Are within a length-scaled Levenshtein distance of the secret (catches
+      plurals, -ed, -ing variants). A flat distance-2 threshold is too loose for
+      short words — for a 3-letter secret like "bat", distance 2 admits "ball",
+      "wait", "both" (unrelated words, ~2/3 of the letters differ) — so the
+      threshold is 1 when the shorter string has <=4 characters, 2 otherwise.
     """
+    shorter_len = min(len(candidate), len(secret))
+    max_distance = 1 if shorter_len <= 4 else 2
     return (
         candidate.startswith(secret)
         or secret.startswith(candidate)
-        or secret in candidate
-        or candidate in secret
-        or levenshtein(candidate, secret) <= 2
+        or (shorter_len >= 4 and (secret in candidate or candidate in secret))
+        or levenshtein(candidate, secret) <= max_distance
     )
 
 

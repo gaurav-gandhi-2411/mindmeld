@@ -188,10 +188,7 @@ def _should_exclude(rel: Path) -> bool:
     """Return True if *rel* must be omitted from PRECACHE."""
     if rel.name in EXCLUDE_NAMES:
         return True
-    for part in rel.parts:
-        if part in EXCLUDE_DIR_SEGMENTS:
-            return True
-    return False
+    return any(part in EXCLUDE_DIR_SEGMENTS for part in rel.parts)
 
 
 def _collect_files(build_dir: Path) -> list[str]:

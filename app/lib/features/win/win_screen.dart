@@ -8,6 +8,8 @@ import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:mindmeld/features/notifications/notification_opt_in_card.dart';
+import 'package:mindmeld/features/packs/pack_selector_screen.dart';
+import 'package:mindmeld/features/packs/packs_entry_banner.dart';
 import 'package:mindmeld/features/puzzle/guess_tile.dart' show heatForBand;
 import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
@@ -342,6 +344,22 @@ class _WinScreenState extends State<WinScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Packs entry — daily-mode only. Hidden for pack-mode wins
+            // (widget.packName != null) to avoid recursion into the pack
+            // system from within a pack puzzle's own result screen. This is
+            // the fix for packs being unreachable from a result screen
+            // reached directly (no puzzle-tab "Back" tap needed) — see
+            // packs_entry_banner.dart for the shared widget.
+            if (widget.packName == null)
+              PacksEntryBanner(
+                compact: true,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => PackSelectorScreen(lang: widget.lang),
+                  ),
+                ),
+              ),
             const HeatRingsMark(size: 72),
             const SizedBox(height: 16),
             Text(
@@ -678,6 +696,22 @@ class _LossScreenState extends State<LossScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Packs entry — daily-mode only. Hidden for pack-mode losses
+            // (widget.packName != null) to avoid recursion into the pack
+            // system from within a pack puzzle's own result screen. This is
+            // the fix for packs being unreachable from a result screen
+            // reached directly (no puzzle-tab "Back" tap needed) — see
+            // packs_entry_banner.dart for the shared widget.
+            if (widget.packName == null)
+              PacksEntryBanner(
+                compact: true,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => PackSelectorScreen(lang: widget.lang),
+                  ),
+                ),
+              ),
             Builder(builder: (ctx) {
               final tokens =
                   Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;

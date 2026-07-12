@@ -15,9 +15,6 @@ Usage (from repo root):
 
 from __future__ import annotations
 
-import math
-import os
-import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont

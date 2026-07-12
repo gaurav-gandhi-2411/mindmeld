@@ -92,7 +92,9 @@ def _fetch_authorized_domains(project_id: str, token: str) -> list[str]:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--project-id", required=True, help="Firebase project ID, e.g. mindmeld-c4bba")
+    parser.add_argument(
+        "--project-id", required=True, help="Firebase project ID, e.g. mindmeld-c4bba"
+    )
     parser.add_argument(
         "--domain",
         action="append",
@@ -107,7 +109,9 @@ def main(argv: list[str] | None = None) -> None:
     missing = [d for d in args.domains if d not in authorized]
 
     if not missing:
-        print(f"OK: all of {args.domains} are in {args.project_id}'s authorizedDomains {authorized}")
+        print(
+            f"OK: all of {args.domains} are in {args.project_id}'s authorizedDomains {authorized}"
+        )
         return
 
     remediation = json.dumps({"authorizedDomains": sorted(set(authorized) | set(missing))})
