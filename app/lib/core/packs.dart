@@ -89,9 +89,9 @@ class Pack {
 }
 
 /// Fallback accent used when a manifest entry has a missing/malformed color —
-/// the app's core purple, so a bad manifest entry degrades gracefully instead
-/// of crashing the pack selector.
-const Color kPackFallbackAccent = Color(0xFF6200EE);
+/// the app's brand terracotta, so a bad manifest entry degrades gracefully
+/// instead of crashing the pack selector.
+const Color kPackFallbackAccent = Color(0xFFDD6B4D);
 
 /// Parses "#RRGGBB" into a [Color]; tolerant of null/malformed input.
 Color colorFromHex(String? hex) {

@@ -13,6 +13,7 @@ import 'package:mindmeld/analytics/app_check_init.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/analytics/firebase_web_options.dart';
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
@@ -150,16 +151,8 @@ class WarmerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Warmer',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: WarmerColors.wordmarkAccent,
-        useMaterial3: true,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: WarmerColors.wordmarkAccent,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
+      theme: buildWarmerTheme(Brightness.light),
+      darkTheme: buildWarmerTheme(Brightness.dark),
       home: _AppShell(overrides: overrides, exporter: exporter),
     );
   }

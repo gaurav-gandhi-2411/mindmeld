@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/packs.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/features/packs/pack_puzzle_list_screen.dart';
@@ -133,10 +134,13 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
                 )
               : _packs.isEmpty
                   ? const Center(child: Text('No packs available yet.'))
-                  : GridView.count(
+                  : GridView.extent(
                       padding: const EdgeInsets.all(16),
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.82,
+                      // Responsive columns: ~2 on phones, more on wide
+                      // viewports — keeps the quiet cards compact instead of
+                      // stretching two tall columns across desktop widths.
+                      maxCrossAxisExtent: 260,
+                      childAspectRatio: 0.88,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                       children: _packs.map(_buildTile).toList(),
@@ -148,6 +152,7 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
     final comingSoon = !pack.isLive;
     final unlocked = packUnlocked(pack, _entitlements);
     final won = _progress[pack.id] ?? 0;
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
 
     return Opacity(
       opacity: comingSoon ? 0.55 : 1.0,
@@ -158,73 +163,63 @@ class _PackSelectorScreenState extends State<PackSelectorScreen> {
           onTap: comingSoon
               ? null
               : (unlocked ? () => _openPack(pack) : () => _showUnlockSheet(pack)),
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [pack.accent, pack.accentDark],
-              ),
-            ),
-            child: Stack(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               children: [
-                // Faint oversized icon "flourish" (e.g. spotlight/film for
-                // Bollywood) — vector only, no new binary assets.
-                Positioned(
-                  right: -12,
-                  bottom: -12,
-                  child: Icon(
-                    pack.iconData,
-                    size: 96,
-                    color: Colors.white.withValues(alpha: 0.14),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [pack.accent, pack.accentDark],
+                    ),
                   ),
+                  child: Icon(pack.iconData, color: Colors.white, size: 24),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Icon(pack.iconData, color: Colors.white, size: 28),
-                      const Spacer(),
-                      Text(
-                        pack.titleFor(widget.lang),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                const Spacer(),
+                Text(
+                  pack.titleFor(widget.lang),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: tokens.text1,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        pack.taglineFor(widget.lang),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
-                      ),
-                      const SizedBox(height: 8),
-                      if (comingSoon)
-                        const Chip(
-                          label: Text('Coming soon'),
-                          visualDensity: VisualDensity.compact,
-                        )
-                      else if (!unlocked)
-                        const Chip(
-                          avatar: Icon(Icons.lock, size: 14),
-                          label: Text('Unlock'),
-                          visualDensity: VisualDensity.compact,
-                        )
-                      else
-                        Text(
-                          '$won/${pack.count}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                    ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  pack.taglineFor(widget.lang),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: tokens.text2),
+                ),
+                const SizedBox(height: 8),
+                if (comingSoon)
+                  const Chip(
+                    label: Text('Coming soon'),
+                    visualDensity: VisualDensity.compact,
+                  )
+                else if (!unlocked)
+                  const Chip(
+                    avatar: Icon(Icons.lock, size: 14),
+                    label: Text('Unlock'),
+                    visualDensity: VisualDensity.compact,
+                  )
+                else
+                  Text(
+                    '$won/${pack.count}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall
+                        ?.copyWith(color: tokens.text2),
                   ),
-                ),
               ],
             ),
           ),

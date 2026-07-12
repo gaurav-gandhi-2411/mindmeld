@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mindmeld/ads/rewarded_ad_service.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
 import 'package:mindmeld/core/payload_codec.dart';
@@ -572,6 +573,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     final solveAt = rivalState.solveAt;
 
     String rivalLabel;
+    TemperatureBand? rivalBand;
     if (rivalState.rivalSolved) {
       rivalLabel = 'Rival finished in $solveAt ${solveAt == 1 ? 'guess' : 'guesses'}';
     } else if (guessCount == 0) {
@@ -579,8 +581,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     } else {
       final step = rivalState.rivalCurrentStep;
       final label = step?.temperatureBand.label ?? '';
-      final emoji = step?.temperatureBand.emoji ?? '';
-      rivalLabel = 'Rival: $emoji $label (best #${rivalState.rivalBestRank})';
+      rivalBand = step?.temperatureBand;
+      rivalLabel = 'Rival: $label (best #${rivalState.rivalBestRank})';
     }
 
     final outcomeEmoji = switch (rivalState.outcome) {
@@ -590,20 +592,44 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       RivalOutcome.racing => '',
     };
 
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: tokens.hairline, width: 0.5),
+          bottom: BorderSide(color: tokens.hairline, width: 0.5),
+        ),
+      ),
       child: Row(
         children: [
           const Text('🤖', style: TextStyle(fontSize: 14)),
           const SizedBox(width: 6),
+          if (rivalBand != null) ...[
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: heatForBand(context, rivalBand).base,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
           Expanded(
             child: Text(rivalLabel,
-                style: Theme.of(context).textTheme.bodySmall),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: tokens.text2)),
           ),
           Text(
             'You $guessCount · Bot ${rivalState.rivalSolved ? solveAt : '?'}$outcomeEmoji',
-            style: Theme.of(context).textTheme.labelSmall,
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: tokens.text2),
           ),
         ],
       ),
@@ -635,11 +661,24 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       }
     }
 
+    final labelStyle = Theme.of(context).textTheme.labelSmall;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Text(
-        'Best: ${bestGuess.band.emoji} #${bestGuess.rank} · Top $pctStr%$parStr',
-        style: Theme.of(context).textTheme.labelSmall,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Best: ', style: labelStyle),
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: heatForBand(context, bestGuess.band).base,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text('#${bestGuess.rank} · Top $pctStr%$parStr', style: labelStyle),
+        ],
       ),
     );
   }
@@ -669,10 +708,25 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     if (_loadError != null) {
       return Scaffold(
         body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text('Failed to load puzzle: $_loadError'),
-          ),
+          child: Builder(builder: (ctx) {
+            final tokens =
+                Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.cloud_off_outlined, size: 48, color: tokens.text3),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Failed to load puzzle: $_loadError',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: tokens.text2),
+                  ),
+                ],
+              ),
+            );
+          }),
         ),
       );
     }
@@ -739,22 +793,33 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
           // Clue display (Phase 5 — shown from puzzle start until game over)
           if (payload.clue != null && payload.clue!.isNotEmpty && !state.isFinished)
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '💡 ${payload.clue}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      fontStyle: FontStyle.italic,
+            Builder(builder: (ctx) {
+              final tokens =
+                  Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(ctx).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _isPackMode ? 'CLUE' : "TODAY'S CLUE",
+                      style: microLabel(tokens),
                     ),
-              ),
-            ),
+                    const SizedBox(height: 6),
+                    Text(
+                      payload.clue!,
+                      style: Theme.of(ctx).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              );
+            }),
 
           // Guess input
           if (!state.isFinished)
@@ -824,6 +889,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             child: Row(
               children: [
                 Builder(builder: (ctx) {
+                  final tokens =
+                      Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
                   final maxG = payload.maxGuesses;
                   if (maxG != null) {
                     final remaining = maxG - state.guesses.length - state.hintsUsed;
@@ -832,13 +899,16 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       style: Theme.of(ctx).textTheme.labelMedium?.copyWith(
                             color: remaining <= 3
                                 ? Theme.of(ctx).colorScheme.error
-                                : null,
+                                : tokens.text2,
                           ),
                     );
                   }
                   return Text(
                     '${state.guesses.length} guess${state.guesses.length == 1 ? '' : 'es'}',
-                    style: Theme.of(ctx).textTheme.labelMedium,
+                    style: Theme.of(ctx)
+                        .textTheme
+                        .labelMedium
+                        ?.copyWith(color: tokens.text2),
                   );
                 }),
                 const Spacer(),

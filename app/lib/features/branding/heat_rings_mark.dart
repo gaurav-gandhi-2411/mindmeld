@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 
 /// Locked heat-rings identity palette — must match scripts/make_app_icon.py
-/// and warmer_heat_rings_identity.svg exactly. See spec-warmer-rename.md.
+/// and warmer_heat_rings_identity.svg exactly. See spec-aesthetic-pass.md.
 class WarmerColors {
   const WarmerColors._();
 
-  static const Color cold = Color(0xFF2563EB);
-  static const Color cool = Color(0xFF06B6D4);
-  static const Color warm = Color(0xFFF59E0B);
-  static const Color hot = Color(0xFFEF4444);
-  static const Color wordmarkAccent = Color(0xFFF97316);
-  static const Color ground = Color(0xFF0F172A);
+  static const Color cold = Color(0xFF6B89A8);
+  static const Color cool = Color(0xFF7E9BB5);
+  static const Color warm = Color(0xFFD9AE6B);
+  static const Color hot = Color(0xFFD65F49);
+  static const Color wordmarkAccent = Color(0xFFDD6B4D);
+  static const Color ground = Color(0xFF171614);
 }
 
 /// The heat-rings mark: concentric rings (cold blue outer -> cyan -> amber)
@@ -97,11 +98,14 @@ class WarmerWordmark extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: baseColor,
             ),
-            children: const [
-              TextSpan(text: 'warm'),
+            children: [
+              const TextSpan(text: 'warm'),
               TextSpan(
                 text: 'er',
-                style: TextStyle(color: WarmerColors.wordmarkAccent),
+                style: TextStyle(
+                  color: Theme.of(context).extension<WarmerTokens>()?.accent ??
+                      WarmerColors.wordmarkAccent,
+                ),
               ),
             ],
           ),

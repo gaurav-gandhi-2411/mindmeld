@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/features/packs/pack_selector_screen.dart';
 import 'package:mindmeld/features/packs/packs_entry_banner.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
@@ -57,6 +58,8 @@ class ArchiveScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dates = _availableDates();
+    final colorScheme = Theme.of(context).colorScheme;
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     return Scaffold(
       appBar: AppBar(title: const Text('Practice')),
       body: Column(
@@ -79,8 +82,10 @@ class ArchiveScreen extends StatelessWidget {
                           dt.difference(DateTime.parse(_startDate)).inDays + 1;
                       return ListTile(
                         leading: CircleAvatar(
+                          backgroundColor: colorScheme.surfaceContainerHighest,
                           child: Text('#$puzzleNum',
-                              style: const TextStyle(fontSize: 12)),
+                              style:
+                                  TextStyle(fontSize: 12, color: tokens.text2)),
                         ),
                         title: Text('Puzzle #$puzzleNum'),
                         subtitle: Text(formatted),

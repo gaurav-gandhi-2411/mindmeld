@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/iap/entitlements.dart';
@@ -146,7 +147,12 @@ class _StatsScreenState extends State<StatsScreen> {
             const SizedBox(height: 12),
 
             if (stats.guessDistribution.isEmpty)
-              const Text('No wins yet — play a puzzle!')
+              Text(
+                'No wins yet — play a puzzle!',
+                style: TextStyle(
+                  color: (Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light).text2,
+                ),
+              )
             else
               ..._buildDistribution(context, stats),
 
@@ -165,6 +171,7 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   List<Widget> _buildDistribution(BuildContext context, PlayerStats stats) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     final maxCount = stats.guessDistribution.values.fold(0, (a, b) => a > b ? a : b);
     final sortedKeys = stats.guessDistribution.keys.toList()
       ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
@@ -179,7 +186,7 @@ class _StatsScreenState extends State<StatsScreen> {
           children: [
             SizedBox(
               width: 36,
-              child: Text(key, textAlign: TextAlign.right),
+              child: Text(key, textAlign: TextAlign.right, style: TextStyle(color: tokens.text2)),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -192,12 +199,12 @@ class _StatsScreenState extends State<StatsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     '$count',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: tokens.accentInk,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -220,16 +227,27 @@ class _StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
-      ],
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: tokens.hairline),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: tokens.text1,
+                ),
+          ),
+          Text(label, style: microLabel(tokens)),
+        ],
+      ),
     );
   }
 }

@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:mindmeld/features/notifications/notification_opt_in_card.dart';
+import 'package:mindmeld/features/puzzle/guess_tile.dart' show heatForBand;
 import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 
@@ -339,7 +342,7 @@ class _WinScreenState extends State<WinScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(Icons.emoji_events, size: 80, color: Color(0xFFFBC02D)),
+            const HeatRingsMark(size: 72),
             const SizedBox(height: 16),
             Text(
               widget.secret.toUpperCase(),
@@ -365,17 +368,17 @@ class _WinScreenState extends State<WinScreen> {
             // Share card preview (wrapped in RepaintBoundary for PNG capture)
             RepaintBoundary(
               key: _shareCardKey,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _shareText,
-                  style: const TextStyle(fontSize: 16),
-                ),
+              child: _SharePreviewCard(
+                guesses: widget.guesses,
+                won: true,
+                puzzleNumber: _puzzleNumber,
+                lang: widget.lang,
+                packName: widget.packName,
+                parGuesses: widget.parGuesses,
+                maxGuesses: widget.maxGuesses,
+                hintsUsed: widget.hintsUsed,
+                rivalSolveAt: widget.rivalSolveAt,
+                currentStreak: widget.currentStreak,
               ),
             ),
 
@@ -419,27 +422,54 @@ class _WinScreenState extends State<WinScreen> {
 
             const SizedBox(height: 32),
 
-            Text(
-              'Your closest guesses:',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            Builder(builder: (ctx) {
+              final tokens =
+                  Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+              return Text(
+                'Your closest guesses:',
+                style: microLabel(tokens),
+              );
+            }),
             const SizedBox(height: 8),
             ...sorted.take(5).map(
-                  (g) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Text(
-                          '#${g.rank}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(g.word),
-                        const Spacer(),
-                        Text(g.band.label),
-                      ],
-                    ),
-                  ),
+                  (g) => Builder(builder: (ctx) {
+                    final heat = heatForBand(ctx, g.band);
+                    final tokens =
+                        Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: heat.base,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            '#${g.rank}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: heat.text,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(g.word, style: TextStyle(color: tokens.text1)),
+                          const Spacer(),
+                          Text(
+                            g.band.label,
+                            style: Theme.of(ctx)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: heat.text),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
 
             const SizedBox(height: 32),
@@ -648,7 +678,11 @@ class _LossScreenState extends State<LossScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(Icons.sentiment_dissatisfied, size: 80, color: Color(0xFF9E9E9E)),
+            Builder(builder: (ctx) {
+              final tokens =
+                  Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+              return Icon(Icons.sentiment_dissatisfied, size: 64, color: tokens.text3);
+            }),
             const SizedBox(height: 16),
             Text(
               widget.secret.toUpperCase(),
@@ -672,7 +706,7 @@ class _LossScreenState extends State<LossScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Your best: ${bestGuess.band.emoji} #${bestGuess.rank} — so close!',
+                  'Your best: ${bestGuess.band.label} #${bestGuess.rank} — so close!',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
@@ -683,17 +717,16 @@ class _LossScreenState extends State<LossScreen> {
             const SizedBox(height: 24),
             RepaintBoundary(
               key: _shareCardKey,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _shareText,
-                  style: const TextStyle(fontSize: 16),
-                ),
+              child: _SharePreviewCard(
+                guesses: widget.guesses,
+                won: false,
+                puzzleNumber: _puzzleNumber,
+                lang: widget.lang,
+                packName: widget.packName,
+                parGuesses: widget.parGuesses,
+                maxGuesses: widget.maxGuesses,
+                hintsUsed: widget.hintsUsed,
+                rivalSolveAt: widget.rivalSolveAt,
               ),
             ),
             const SizedBox(height: 16),
@@ -732,27 +765,54 @@ class _LossScreenState extends State<LossScreen> {
             ],
             const SizedBox(height: 32),
             if (widget.guesses.isNotEmpty) ...[
-              Text(
-                'Your guesses this round:',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
+              Builder(builder: (ctx) {
+                final tokens =
+                    Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+                return Text(
+                  'Your guesses this round:',
+                  style: microLabel(tokens),
+                );
+              }),
               const SizedBox(height: 8),
               ...sorted.take(5).map(
-                    (g) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        children: [
-                          Text(
-                            '#${g.rank}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(g.word),
-                          const Spacer(),
-                          Text(g.band.label),
-                        ],
-                      ),
-                    ),
+                    (g) => Builder(builder: (ctx) {
+                      final heat = heatForBand(ctx, g.band);
+                      final tokens = Theme.of(ctx).extension<WarmerTokens>() ??
+                          WarmerTokens.light;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: heat.base,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              '#${g.rank}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: heat.text,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(g.word, style: TextStyle(color: tokens.text1)),
+                            const Spacer(),
+                            Text(
+                              g.band.label,
+                              style: Theme.of(ctx)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(color: heat.text),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ),
             ],
             const SizedBox(height: 32),
@@ -762,6 +822,159 @@ class _LossScreenState extends State<LossScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The visual share-card preview shown inside the `RepaintBoundary` on both
+/// [WinScreen] and [LossScreen] — this becomes the shared PNG, the
+/// most-seen brand surface.
+///
+/// IMPORTANT: this widget is display-only. It computes its own headline/
+/// result strings from the same fields [buildShareCard] uses, but is
+/// entirely independent of [buildShareCard] and the clipboard/Web-Share
+/// text — changing this widget must never change [buildShareCard]'s output.
+class _SharePreviewCard extends StatelessWidget {
+  const _SharePreviewCard({
+    required this.guesses,
+    required this.won,
+    required this.puzzleNumber,
+    required this.lang,
+    this.packName,
+    this.parGuesses,
+    this.maxGuesses,
+    this.hintsUsed = 0,
+    this.rivalSolveAt,
+    this.currentStreak = 0,
+  });
+
+  /// Guesses in chronological order (the order they were made).
+  final List<Guess> guesses;
+  final bool won;
+  final int puzzleNumber;
+  final String lang;
+  final String? packName;
+  final int? parGuesses;
+  final int? maxGuesses;
+  final int hintsUsed;
+  final int? rivalSolveAt;
+  final int currentStreak;
+
+  String get _headline {
+    final langLabel = lang == 'hi-en' ? 'Hinglish' : 'English';
+    return packName != null
+        ? 'Warmer · $packName #$puzzleNumber ($langLabel)'
+        : 'Warmer #$puzzleNumber ($langLabel)';
+  }
+
+  String get _resultLine {
+    final n = guesses.length;
+    if (!won) {
+      final bestGuess = guesses.isEmpty
+          ? null
+          : guesses.reduce((a, b) => a.rank < b.rank ? a : b);
+      final bestLabel = bestGuess?.band.label ?? 'No guesses';
+      return "Didn't get it — best: $bestLabel";
+    }
+
+    String base;
+    if (parGuesses != null) {
+      final budgetStr = maxGuesses != null ? '$n/$maxGuesses guesses' : '$n guesses';
+      final delta = (n + hintsUsed) - parGuesses!;
+      final parStr = delta == 0 ? 'Par' : (delta > 0 ? 'Par +$delta' : 'Par $delta');
+      base = '$budgetStr · $parStr';
+    } else {
+      base = '$n guess${n == 1 ? '' : 'es'}';
+    }
+
+    final rivalAt = rivalSolveAt;
+    if (rivalAt != null) {
+      if (n < rivalAt) {
+        base += ' · Beat the bot';
+      } else if (n == rivalAt) {
+        base += ' · Tied the bot';
+      } else {
+        base += ' · Bot won';
+      }
+    }
+    return base;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: tokens.canvas,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: tokens.hairline, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const WarmerWordmark(markSize: 18, fontSize: 15),
+          const SizedBox(height: 12),
+          Text(
+            _headline,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: tokens.text1,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              for (var i = 0; i < guesses.length; i++)
+                Container(
+                  width: 16,
+                  height: 16,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: i == guesses.length - 1
+                        ? (won ? tokens.accent : tokens.text3)
+                        : heatForBand(context, guesses[i].band).base,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: i == guesses.length - 1 && won
+                      ? Center(
+                          child: Container(
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: tokens.accentInk,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            _resultLine,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: tokens.text2),
+          ),
+          if (won && currentStreak > 1) ...[
+            const SizedBox(height: 2),
+            Text(
+              '🔥 $currentStreak day streak',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: tokens.text2),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Text(
+            'playwarmer.vercel.app',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: tokens.accentText),
+          ),
+        ],
       ),
     );
   }

@@ -281,7 +281,7 @@ void main() {
 
       // The tile should display the word and the rank.
       expect(find.text('wave'), findsOneWidget);
-      expect(find.text('rank #8'), findsOneWidget);
+      expect(find.text('#8'), findsOneWidget);
 
       // No snackbar should be present for hints.
       expect(find.byType(SnackBar), findsNothing);
@@ -307,7 +307,7 @@ void main() {
 
       // Pinned tile for hint 1 ("wave", rank 8).
       expect(find.byKey(const HintTileKey('wave')), findsOneWidget);
-      expect(find.text('rank #8'), findsOneWidget);
+      expect(find.text('#8'), findsOneWidget);
 
       // ── Second hint ──
       await _triggerHint(tester, 'Hint (1 left)');
@@ -317,8 +317,8 @@ void main() {
       expect(find.byKey(const HintTileKey('shore')), findsOneWidget);
 
       // Rank labels for both hints.
-      expect(find.text('rank #8'), findsOneWidget);
-      expect(find.text('rank #4'), findsOneWidget);
+      expect(find.text('#8'), findsOneWidget);
+      expect(find.text('#4'), findsOneWidget);
 
       // "shore" (rank 4) is closer — its tile is rendered above "wave" (rank 8)
       // because pinnedHints are sorted ascending by rank in the UI.

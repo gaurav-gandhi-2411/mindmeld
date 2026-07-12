@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindmeld/ads/consent_manager.dart';
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/features/packs/pack_selector_screen.dart';
 import 'package:mindmeld/iap/entitlements.dart';
 import 'package:mindmeld/iap/revenuecat_gateway.dart';
@@ -329,6 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -380,9 +382,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: Text(subtitle),
                 trailing: available
                     ? (_entitlements.removeAds && p == IapProduct.removeAds
-                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        ? Icon(Icons.check_circle, color: tokens.accentText)
                         : _entitlements.archive && p == IapProduct.archive
-                            ? const Icon(Icons.check_circle, color: Colors.green)
+                            ? Icon(Icons.check_circle, color: tokens.accentText)
                             : const Icon(Icons.chevron_right))
                     : const Chip(label: Text('Soon')),
                 enabled: available,

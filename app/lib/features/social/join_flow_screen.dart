@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/features/social/display_name_dialog.dart';
 import 'package:mindmeld/social/social_models.dart';
 import 'package:mindmeld/social/social_service.dart';
@@ -137,6 +138,7 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     switch (_state) {
       case _JoinFlowState.loading:
         return const CircularProgressIndicator();
@@ -146,7 +148,7 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.link_off, size: 64),
+              Icon(Icons.link_off, size: 64, color: tokens.text3),
               const SizedBox(height: 16),
               const Text('This invite link is invalid or has expired.'),
               const SizedBox(height: 16),
@@ -160,7 +162,7 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off, size: 64),
+              Icon(Icons.wifi_off, size: 64, color: tokens.text3),
               const SizedBox(height: 16),
               const Text("Couldn't join — check your connection and try again."),
               const SizedBox(height: 16),
@@ -178,7 +180,7 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.groups, size: 64),
+              Icon(Icons.groups, size: 64, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 16),
               Text(
                 'Join "${group.name}"?',

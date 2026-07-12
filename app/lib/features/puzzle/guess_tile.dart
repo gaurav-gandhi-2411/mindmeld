@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 
 // ---------------------------------------------------------------------------
@@ -11,6 +12,14 @@ import 'package:mindmeld/core/models.dart';
 /// Usage: `find.byKey(HintTileKey('wave'))` in widget tests.
 class HintTileKey extends ValueKey<String> {
   const HintTileKey(super.value);
+}
+
+/// Resolves the [HeatSpec] for [band] from the current theme's
+/// [WarmerTokens] extension, falling back to [WarmerTokens.light] for bare
+/// test harnesses that don't build a themed [MaterialApp].
+HeatSpec heatForBand(BuildContext context, TemperatureBand band) {
+  final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+  return tokens.heatFor(band);
 }
 
 /// A pinned tile displayed above the guess list for a revealed hint.
@@ -32,85 +41,70 @@ class HintTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final band = bandForRank(hint.rank, vocabSize);
-    final color = bandColor(band);
+    final heat = heatForBand(context, band);
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
 
     return Container(
       key: HintTileKey(hint.word),
       margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color, width: 1.5),
-        borderRadius: BorderRadius.circular(8),
+        color: heat.tintBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: heat.base.withValues(alpha: 0.25), width: 0.5),
       ),
-      child: ListTile(
-        dense: true,
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.20),
-          radius: 16,
-          child: Icon(Icons.lightbulb, color: color, size: 18),
-        ),
-        title: Text(
-          hint.word,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'rank #${hint.rank}',
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall
-              ?.copyWith(color: color),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // "Hint" chip badge distinguishes pinned hints from guesses.
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Hint',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
+      child: Row(
+        children: [
+          Icon(Icons.lightbulb_outline, size: 18, color: heat.text),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              hint.word,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: tokens.surface,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: tokens.hairline, width: 1),
+            ),
+            child: Text(
+              'Hint',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+                color: tokens.text2,
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              band.label,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
-        ),
+          ),
+          const Spacer(),
+          Text(
+            '#${hint.rank}',
+            style: TextStyle(fontWeight: FontWeight.w600, color: heat.text),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            band.label,
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: heat.text),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Color mapping for temperature bands.
-Color bandColor(TemperatureBand band) {
-  switch (band) {
-    case TemperatureBand.win:
-      return const Color(0xFF6200EE); // Purple
-    case TemperatureBand.scorching:
-      return const Color(0xFFD32F2F); // Deep red
-    case TemperatureBand.hot:
-      return const Color(0xFFF57C00); // Orange
-    case TemperatureBand.warm:
-      return const Color(0xFFFBC02D); // Yellow
-    case TemperatureBand.cold:
-      return const Color(0xFF388E3C); // Green
-    case TemperatureBand.freezing:
-      return const Color(0xFF1976D2); // Blue
-  }
-}
-
 /// A single row in the guess history list.
+///
+/// Visual identity: word on the left; rank + temperature pill on the right;
+/// row tinted by the guess's temperature band (soft tint background + the
+/// band's deepest text shade — never black-on-color, never a full-saturation
+/// fill).
 class GuessTile extends StatelessWidget {
   const GuessTile({
     super.key,
@@ -125,67 +119,65 @@ class GuessTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = bandColor(guess.band);
+    final heat = heatForBand(context, guess.band);
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    final isWin = guess.band == TemperatureBand.win;
     final simPct = ((guess.similarity + 1) / 2 * 100).toStringAsFixed(1);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isHighlighted
-            ? color.withValues(alpha: 0.18)
-            : Theme.of(context).colorScheme.surfaceContainerHighest,
-        border: Border.all(
-          color: isHighlighted ? color : Colors.transparent,
-          width: isHighlighted ? 2 : 0,
-        ),
-        borderRadius: BorderRadius.circular(8),
+        color: heat.tintBg,
+        borderRadius: BorderRadius.circular(12),
+        border: isHighlighted
+            ? Border.all(color: heat.base, width: 1.5)
+            : Border.all(color: heat.base.withValues(alpha: 0.25), width: 0.5),
       ),
-      child: ListTile(
-        dense: true,
-        leading: CircleAvatar(
-          backgroundColor: color,
-          radius: 16,
-          child: Text(
+      child: Row(
+        children: [
+          Text(
+            guess.word,
+            style: TextStyle(
+              fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w500,
+              color: tokens.text1,
+            ),
+          ),
+          const Spacer(),
+          Text(
             '#${guess.rank}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: heat.text,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-        ),
-        title: Text(
-          guess.word,
-          style: TextStyle(
-            fontWeight:
-                isHighlighted ? FontWeight.bold : FontWeight.normal,
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isWin ? tokens.accent : heat.base.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              guess.band.label,
+              style: TextStyle(
+                color: isWin ? tokens.accentInk : heat.text,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+            ),
           ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                guess.band.label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '$simPct%',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
-        ),
+          const SizedBox(width: 8),
+          Text(
+            '$simPct%',
+            style: Theme.of(context)
+                .textTheme
+                .labelSmall
+                ?.copyWith(color: tokens.text3),
+          ),
+        ],
       ),
     );
   }

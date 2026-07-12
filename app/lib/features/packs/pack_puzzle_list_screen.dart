@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/packs.dart';
 import 'package:mindmeld/core/payload_client.dart';
@@ -67,9 +68,8 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
       context,
       MaterialPageRoute<void>(
         builder: (routeContext) => Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.fromSeed(seedColor: widget.pack.accent),
-          ),
+          data: buildPackTheme(
+              Theme.of(context), widget.pack.accent, widget.pack.accentDark),
           child: PuzzleScreen(
             lang: widget.lang,
             date: packDateKey(widget.pack.id, idx),
@@ -136,11 +136,30 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
   @override
   Widget build(BuildContext context) {
     final pack = widget.pack;
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: pack.accent,
-        foregroundColor: Colors.white,
-        title: Text(pack.titleFor(widget.lang)),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [pack.accent, pack.accentDark],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(pack.titleFor(widget.lang)),
+          ],
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -155,21 +174,28 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
                     final lost = state != null && state.gaveUp && !won;
                     final inProgress =
                         state != null && !state.isFinished && !won && !lost;
+                    final wonIconInk = pack.accent.computeLuminance() < 0.25
+                        ? Colors.white
+                        : const Color(0xFF26231F);
 
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: won
-                            ? Colors.green
+                            ? pack.accent
                             : lost
-                                ? Colors.grey
-                                : pack.accent.withValues(alpha: 0.2),
+                                ? colorScheme.surfaceContainerHighest
+                                : pack.accent.withValues(alpha: 0.14),
                         child: Icon(
                           won
                               ? Icons.check
                               : lost
                                   ? Icons.close
                                   : Icons.play_arrow,
-                          color: won || lost ? Colors.white : pack.accent,
+                          color: won
+                              ? wonIconInk
+                              : lost
+                                  ? tokens.text3
+                                  : pack.accentDark,
                         ),
                       ),
                       title: Text('Puzzle #$idx'),

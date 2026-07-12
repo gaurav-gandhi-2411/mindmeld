@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/social/social_models.dart';
 import 'package:mindmeld/social/social_service.dart';
 
@@ -196,12 +197,19 @@ class _LeaderboardRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = theme.extension<WarmerTokens>() ?? WarmerTokens.light;
     final notPlayed = !entry.played;
     return Card(
       color: isSelf ? theme.colorScheme.primaryContainer : null,
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
-        leading: CircleAvatar(child: Text('$rank')),
+        leading: CircleAvatar(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          child: Text(
+            '$rank',
+            style: TextStyle(color: tokens.text2, fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+        ),
         title: Text(
           entry.displayName + (isSelf ? ' (you)' : ''),
           style: TextStyle(fontWeight: isSelf ? FontWeight.bold : FontWeight.normal),
@@ -210,7 +218,7 @@ class _LeaderboardRow extends StatelessWidget {
           _resultLabel,
           style: TextStyle(
             fontStyle: notPlayed ? FontStyle.italic : FontStyle.normal,
-            color: notPlayed ? theme.disabledColor : null,
+            color: notPlayed ? tokens.text3 : null,
           ),
         ),
       ),

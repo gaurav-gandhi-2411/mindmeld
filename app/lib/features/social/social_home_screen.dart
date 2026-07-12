@@ -263,7 +263,7 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
           if (_busy)
             Positioned.fill(
               child: ColoredBox(
-                color: Colors.black.withValues(alpha: 0.35),
+                color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.35),
                 child: const Center(
                   child: Card(
                     child: Padding(
@@ -300,7 +300,7 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
         padding: const EdgeInsets.all(24),
         children: [
           const SizedBox(height: 40),
-          Icon(Icons.groups_outlined, size: 72, color: Theme.of(context).colorScheme.primary),
+          Icon(Icons.groups_outlined, size: 64, color: Theme.of(context).colorScheme.primary),
           const SizedBox(height: 16),
           Text(
             'Connect to play with friends',

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 
-/// Entry banner into [PackSelectorScreen] — deliberately styled with the
-/// packs motif (gold/crimson gradient, film-strip icon) rather than the
-/// app's own heat-rings identity, so it reads as a distinct destination
-/// (a themed content pack, e.g. Bollywood) rather than another app-chrome
-/// element.
+/// Entry banner into [PackSelectorScreen] — a themed card whose "identity
+/// coin" carries the packs motif (gold/plum gradient, sparkle icon) so it
+/// reads as a distinct destination (a themed content pack, e.g. Bollywood)
+/// while the card itself stays on the app's calm-minimal surface treatment.
 ///
 /// Two placements:
 ///   - [compact] = true: a slim strip pinned to the top of the primary daily
@@ -20,8 +20,17 @@ class PacksEntryBanner extends StatelessWidget {
   final VoidCallback onTap;
   final bool compact;
 
+  /// Bollywood-pack motif gradient for the banner's identity coin — kept
+  /// distinct from any single pack's live accent so the banner reads as the
+  /// "packs" destination itself, not one specific pack.
+  static const _coinGradient = [Color(0xFFC0913F), Color(0xFF7E3B46)];
+
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    final coinSize = compact ? 32.0 : 40.0;
+    final coinRadius = compact ? 10.0 : 12.0;
+
     return Padding(
       padding: compact
           ? const EdgeInsets.fromLTRB(16, 8, 16, 0)
@@ -31,18 +40,24 @@ class PacksEntryBanner extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap: onTap,
-          child: Ink(
+          child: Padding(
             padding: EdgeInsets.all(compact ? 12 : 16),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFFE8B23A), Color(0xFF8E1A2B)],
-              ),
-            ),
             child: Row(
               children: [
-                Icon(Icons.auto_awesome, color: Colors.white, size: compact ? 24 : 32),
+                Container(
+                  width: coinSize,
+                  height: coinSize,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(coinRadius),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: _coinGradient,
+                    ),
+                  ),
+                  child: Icon(Icons.auto_awesome,
+                      color: Colors.white, size: compact ? 16 : 20),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -51,26 +66,26 @@ class PacksEntryBanner extends StatelessWidget {
                       Text(
                         'Themed Packs',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          color: tokens.text1,
+                          fontWeight: FontWeight.w600,
                           fontSize: compact ? 14 : 16,
                         ),
                       ),
-                      if (!compact) ...const [
-                        SizedBox(height: 2),
+                      if (!compact) ...[
+                        const SizedBox(height: 2),
                         Text(
                           'Bollywood, Cricket, Food & more',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                          style: TextStyle(color: tokens.text2, fontSize: 12),
                         ),
                       ] else
-                        const Text(
+                        Text(
                           'Bollywood & Cricket live — more packs coming soon',
-                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          style: TextStyle(color: tokens.text2, fontSize: 11),
                         ),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.white),
+                Icon(Icons.chevron_right, color: tokens.text3),
               ],
             ),
           ),
