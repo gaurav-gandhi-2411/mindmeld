@@ -148,6 +148,26 @@ render; ads/IAP are force-disabled on web (`*EnabledEffective` getters); share u
 Share API with clipboard fallback. Rewarded web ads via Google's Ad Placement API are a
 Phase 4 item (`docs/web-monetization.md`).
 
+### Performance budgets (playwarmer.vercel.app)
+
+Per-product numeric performance budgets (rule 15e) — measured baseline and artifact in
+`reports/performance-baseline-2026-07-12.md` (Lighthouse 13.4.0, desktop preset, 2026-07-12).
+
+| Budget | Value | Measured baseline |
+|---|---|---|
+| Initial JS bundle (own-domain: `main.dart.js` + `flutter_bootstrap.js`) | ≤ 1000 KB | ~932 KB |
+| LCP — tracked | ≤ 3000 ms | 2864 ms |
+| LCP — target, post-aesthetic-pass | ≤ 2500 ms | — |
+| TBT | ≤ 200 ms | 221 ms |
+| CLS | ≤ 0.1 | 0 |
+
+The tracked-vs-target LCP split is deliberate: 2864 ms was measured via Lighthouse's Lantern
+simulator, which threw `NO_LCP` on this run — a known weak spot against CanvasKit (canvas-rendered,
+not DOM) apps. Gating below the current baseline on a directional metric would be instant noise;
+the 3000 ms number is the real near-term gate, 2500 ms is the aspirational post-aesthetic-pass
+target. CanvasKit/RevenueCat CDN assets (~1.6 MB, gstatic/jsdelivr, likely cross-site cached) are
+tracked separately, not counted against the own-domain bundle budget.
+
 ## Results (honest numbers)
 
 - **Payload sizes (gzipped):** en 776–778 KB/day (target < 1.5 MB); hi-en 146 KB/day
