@@ -1,3 +1,30 @@
+# PLAN — Aesthetic pass: calm-minimal design system (complete)
+
+Spec: `spec-aesthetic-pass.md` (source of truth). Visual-only; zero gameplay changes. Live-verified on playwarmer.vercel.app 2026-07-12.
+
+## Status — DONE
+
+- [x] **Design tokens**: `app/lib/core/design_tokens.dart` — `WarmerTokens` ThemeExtension (single source of truth), locked light palette + purpose-derived dark scale (lifted luminance, warm near-black `#171614` canvas — NOT inverted). `buildWarmerTheme()` builds all Material component themes from tokens; `buildPackTheme()` re-accents pack play with a luminance-based ink rule (replaces `ColorScheme.fromSeed`). `design_tokens_test.dart` bakes WCAG AA ≥4.5:1 for every band text/tint pair in BOTH modes into CI (24 tests).
+- [x] **Applied everywhere**: puzzle (clue card w/ TODAY'S CLUE micro-label, guess/hint tiles, rival strip, budget, progress row), win/loss (heat-rings mark, redesigned share PREVIEW card with painted heat-trail squares — `buildShareCard()` TEXT stays byte-identical, tests prove it), pack selector (responsive `GridView.extent` quiet cards + gradient identity coins), pack list/play, banner, onboarding, loading, stats, settings, social ×3, archive, nav bar, dialogs, snackbars, empty/error states. In-app band EMOJIS (rival strip, loss badge, progress row) replaced with painted swatches/labels — bright unicode squares remain only in share TEXT (WhatsApp), by design.
+- [x] **Identity retune** (same mark): rings `#6B89A8/#7E9BB5/#D9AE6B/#D65F49`, ground `#171614`, wordmark accent `#DD6B4D` (light) / `#E87A5C` (dark) — synced across heat_rings_mark.dart, 4 scripts (app icon, web icons, OG, feature graphic), identity SVG, PWA meta/manifest, adaptive-icon bg, all regenerated PNGs + Android mipmaps.
+- [x] **Pack accents muted** (distinct from each other + brand): bollywood `#C0913F/#7E3B46`, cricket `#4F7A57/#2F4C36`, indian-food `#9C5E20/#6B3F14` (darkened so white ink passes AA when it goes live), nature `#3D7068/#24443F`. Fallback accent `#6200EE` purple → `#DD6B4D`. CDN manifest republished (payloads repo `ff11651`, **manifest-only**).
+- [x] **Suites**: flutter 459/459 (was 393; +24 token/WCAG +misc from wave), generator 370 passed/6 skipped, analyze 7 pre-existing issues only. Grep-clean: zero old bright hexes / Material purple / colorSchemeSeed / fromSeed in app/lib + scripts + web meta.
+- [x] **Live-verified prod** (cold_repro_reload.js, new `--dark`/`--light` flags): Gate A fresh profile light (onboarding→4-guess win `courage` #31→share card/dialog) + full dark pass; Gate B existing-user new-process restore (win screen + Stats 1/100%/1/1); packs muted from CDN manifest both modes. Zero pageerror/requestfailed. Commits `2defd21`,`1b59630`,`295d86a`,`14f0d71`.
+
+## Incidents & flags discovered
+
+- **P0 found mid-deploy: production was already DOWN** — the `playwarmer` Vercel project had been DELETED from the account (cause unknown, sometime after 2026-07-10 verification; another product's session touched Vercel ~9h before). Both domains 404'd BEFORE this session's deploy. Recovered: recreated project `playwarmer` (new id `prj_xTlhdx6TkHnobjF5JuCQ2ZQRbSp0`), linked web-dist, deployed, re-registered `playwarmer.vercel.app` + `playmindmeld.vercel.app` via `vercel domains add`, both 200. A stray auto-created `web-dist` project (from deploying before discovering the missing link) was deleted. **Watch: whatever deleted the project may still be unexplained.**
+- **maxGuesses payload drift (NOT shipped)**: a fresh `build-packs` bake from generator HEAD produces maxGuesses one LOWER than the published pack payloads (en 15→14, hi-en 13→12). Republishing payloads would be a silent gameplay change, so the aesthetic pass published ONLY `packs/manifest.json`. Needs a deliberate decision: either the tuning intent (a927c94 era) was never republished to packs, or HEAD drifted — resolve in a gameplay context.
+- Pre-existing, untouched (out of visual scope): ruff I001×2 + F841×1 in `generator/build.py`/`tests/test_rival.py`; `firebase-tests/node_modules` template noise in repo-root `flutter analyze`.
+
+## Gotchas discovered
+
+- The app reads pack accents from the **CDN manifest live** — bundled fallback only covers offline. Local builds show old colors until the Pages manifest is republished.
+- Headless Chrome inherited the OS dark preference — light-mode verification runs MUST pass `--light` explicitly (flag added).
+- Emoji render as tofu in headless screenshots (no emoji font) — cosmetic, text content is correct.
+
+---
+
 # PLAN — Phase 6c: Themed Packs (living tracker)
 
 Spec: `spec-phase6c.md` (source of truth). Scope: pack SYSTEM + Bollywood flagship only; Cricket / Indian Food / Nature & Wild as content-drop stubs.
