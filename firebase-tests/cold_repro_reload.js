@@ -19,6 +19,11 @@
  * "existing user" session (IndexedDB/localStorage/Cache Storage all persist
  * between runs, like a real returning player days later), as opposed to
  * `--reload`'s same-process reload which only proves same-session survival.
+ *
+ * --dark / --light: emulates `prefers-color-scheme` on the page (aesthetic-
+ * pass verification — the app's theme follows the system preference on web).
+ * Headless Chrome can inherit the OS preference, so pass one explicitly for
+ * deterministic runs.
  */
 const puppeteer = require('puppeteer-core');
 const path = require('path');
@@ -82,6 +87,17 @@ async function main() {
   }
   const page = await browser.newPage();
   await page.setViewport({ width: 900, height: 1000 });
+  if (process.argv.includes('--dark')) {
+    await page.emulateMediaFeatures([
+      { name: 'prefers-color-scheme', value: 'dark' },
+    ]);
+  } else if (process.argv.includes('--light')) {
+    // Headless Chrome may inherit the OS dark preference — force light
+    // explicitly so light-mode verification runs are deterministic.
+    await page.emulateMediaFeatures([
+      { name: 'prefers-color-scheme', value: 'light' },
+    ]);
+  }
 
   const logs = [];
   const rec = (line) => {
