@@ -1,0 +1,61 @@
+# Pre-commit hooks for a mixed Python (generator/) + Flutter/Dart (app/) repo.
+#
+# - Python hooks are scoped to generator/ via `files:` so they never touch the Dart tree.
+# - There's no maintained pre-commit-hooks-repo equivalent for `dart format`/`flutter
+#   analyze`, so the app/ side uses local `repo: local` hooks instead (see below).
+# - Generic hooks (whitespace, EOF, YAML, merge conflicts, large files) run repo-wide.
+#
+# Install: `pre-commit install` (run once per clone).
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.21
+    hooks:
+      - id: ruff
+        name: ruff (generator/)
+        args: [--fix]
+        files: ^generator/
+      - id: ruff-format
+        name: ruff-format (generator/)
+        files: ^generator/
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        # 2048 KB threshold: the largest legitimately committed blobs today are
+        # payload/report json.gz files and docs/store-assets screenshots, topping
+        # out around ~1.3-1.4 MB (verified via `git log`/`git cat-file --batch-check`
+        # over full history). 2 MB gives headroom above those without being loose
+        # enough to silently accept a stray venv/model-weight/build-artifact commit.
+        args: [--maxkb=2048]
+      - id: debug-statements
+        # Python-only check (pdb/breakpoint/etc.); no-op on Dart, but scope it to
+        # generator/ anyway so it never even walks the app/ tree.
+        files: ^generator/
+
+  # Flutter/Dart: no equivalent hosted hook repo, so these run the local toolchain
+  # directly. `dart format` is fast and deterministic — always-on here.
+  # `flutter analyze` is also included (not deferred to CI) because this repo has
+  # no push/PR-triggered CI today (only scheduled workflows) — if analyze isn't
+  # run in pre-commit, static-analysis errors in app/ have no automated gate at
+  # all. This is a real commit-time cost tradeoff (analyze can take several
+  # seconds to tens of seconds depending on cache warmth); revisit if it proves
+  # too slow in practice and move it to CI once push/PR CI exists for app/.
+  - repo: local
+    hooks:
+      - id: dart-format
+        name: dart format (app/)
+        entry: dart format --set-exit-if-changed app/lib app/test
+        language: system
+        files: ^app/(lib|test)/.*\.dart$
+        pass_filenames: false
+      - id: flutter-analyze
+        name: flutter analyze (app/)
+        entry: bash -c 'cd app && flutter analyze'
+        language: system
+        files: ^app/(lib|test)/.*\.dart$
+        pass_filenames: false
