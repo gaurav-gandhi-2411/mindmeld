@@ -1,0 +1,86 @@
+name: E2E web (integration_test)
+
+# This repo's GitHub plan tier has NO branch protection configured, so this
+# workflow CANNOT be made a "required" check -- it runs and reports on every
+# push/PR, but nothing currently blocks a merge on its failure. That is a
+# known, documented gap, not an oversight.
+#
+# Wires integration_test/app_test.dart (full guess -> win loop for en/hi-en,
+# a garbage-word rejection check, and a spoiler-safety assertion on the share
+# card) into CI. It previously existed on disk but was never run anywhere
+# (found by a /launch-check audit).
+#
+# Why web, not the Android emulator the test file's own header comment
+# mentions: mindmeld/Warmer is a WEB-ONLY product (production is
+# playwarmer.vercel.app; there is no distributed native build). Spinning up
+# Android emulator infra in CI for a platform with zero real users would be
+# disproportionate effort for zero coverage of what's actually shipped.
+# integration_test supports running on Flutter web via `flutter drive`
+# against the `web-server` device driven by chromedriver over WebDriver --
+# that is the path proven to work locally (see PR description / session
+# notes for the exact command and passing output) and is what this workflow
+# runs. `-d chrome` (direct DWDS debug connection) was tried first and does
+# NOT work reliably here: DWDS's tab-matching step
+# (dev_handler.dart _startLocalDebugService) throws AppConnectionException
+# when Chrome is launched via chromedriver instead of directly by
+# flutter_tools, regardless of compile warmth. `-d web-server
+# --browser-name=chrome` sidesteps that entirely and is the officially
+# documented way to drive integration_test on web.
+#
+# Known flakiness risk: app_test.dart makes a REAL network fetch against the
+# live GitHub Pages payload host (gaurav-gandhi-2411.github.io/mindmeld-payloads)
+# by design (see the test file's own docstring) -- this is intentional, not
+# something to mock, but it does mean this job's result depends on that
+# host's availability, same as uptime-check.yml.
+#
+# Expected runtime: ~3-5 minutes per run (cold DDC compile of a Firebase-heavy
+# app is the dominant cost, not the test body itself).
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch: {}
+
+concurrency:
+  group: e2e-web-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.44.2'
+
+      - name: flutter pub get
+        working-directory: app
+        run: flutter pub get
+
+      # ubuntu-latest ships Chrome but not a version-matched chromedriver;
+      # this action detects the installed Chrome version and installs the
+      # matching driver on PATH.
+      - uses: nanasess/setup-chromedriver@v3
+
+      - name: Start chromedriver
+        run: |
+          chromedriver --port=4444 &
+          sleep 2
+          curl -sf http://localhost:4444/status
+
+      - name: Run integration_test on Flutter web (Chrome via WebDriver)
+        working-directory: app
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/app_test.dart \
+            -d web-server \
+            --browser-name=chrome \
+            --web-port=7357
