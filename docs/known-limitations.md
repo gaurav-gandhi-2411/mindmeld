@@ -199,6 +199,23 @@ mode is the standard safe rollout path.
 real traffic long enough to confirm no false-positive blocks, flip Firestore (and
 any other App Check-guarded product) to Enforced.
 
+### 11a. Unbounded group/code document creation by a scripted client
+
+Found during the launch-1 wave's STRIDE pass (`docs/stride-launch-1.md`): a scripted
+anonymous-auth client can mint unlimited `groups/{groupId}` + `codes/{code}` documents
+(one fresh `signInAnonymously()` per iteration) — `firestore.rules` has no per-uid cap on
+group/code creation.
+
+**Why accepted:** impact is Firestore storage/cost growth and junk-group clutter, not a
+confidentiality or integrity breach — group documents carry no sensitive/puzzle content,
+and cross-group data leakage is already prevented (see entry 11's default-deny + the
+membership-gated `list` rules). No evidence of active abuse.
+
+**Revisit if:** App Check enforcement (entry 11, pending the reCAPTCHA site-key
+registration) doesn't sufficiently curb this once flipped from monitor to enforced, or
+real abuse/cost-spike evidence surfaces — a Cloud Function-based per-uid creation
+throttle would be the fix, real infra work not scoped here.
+
 ### 12. Data-deletion result-doc cleanup needs a one-time Firestore index
 
 `SocialService.deleteMyData()`'s collection-group query over `results.uid` requires
