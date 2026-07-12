@@ -282,6 +282,44 @@ class TestMorphologicalVariantFilter:
         # "campfire" contains "fire"
         assert _is_morphological_variant("campfire", "fire") is True
 
+    # -----------------------------------------------------------------------
+    # Length-scaled threshold — a flat distance-2 (or unconditional substring)
+    # check over-fires on short secrets. See the module-level regression tests
+    # below (test_short_secret_...) for the exact previously-reported false
+    # positives this fixes: 3-letter "bat" flagging ball/wait/both, 5-letter
+    # "money" flagging "more", and 6-letter "mandir" flagging "and" (the last
+    # via the plain-substring check, not Levenshtein — "and" is a coincidental
+    # substring of "mandir", not a morphological relative of it).
+    # -----------------------------------------------------------------------
+
+    def test_short_secret_no_longer_flags_unrelated_distance_two_words(self) -> None:
+        # "bat" (3 letters): distance 2 from all three, previously flagged.
+        assert _is_morphological_variant("ball", "bat") is False
+        assert _is_morphological_variant("wait", "bat") is False
+        assert _is_morphological_variant("both", "bat") is False
+
+    def test_medium_short_secret_no_longer_flags_unrelated_distance_two_word(self) -> None:
+        # "money" (5 letters) vs "more": distance 2, shorter string ("more") is
+        # only 4 characters, so the length-scaled threshold is 1, not 2.
+        assert _is_morphological_variant("more", "money") is False
+
+    def test_short_candidate_substring_of_secret_not_flagged(self) -> None:
+        # "and" (3 letters) is a coincidental substring of "mandir" — not a
+        # real spoiler risk, and not caught by Levenshtein either (distance 3).
+        assert _is_morphological_variant("and", "mandir") is False
+
+    def test_short_distance_one_variant_still_flagged(self) -> None:
+        # Distance 1 remains a real risk even for very short secrets: "fix"
+        # and "mix" are genuine near-typo lookalikes of "six".
+        assert _is_morphological_variant("fix", "six") is True
+        assert _is_morphological_variant("mix", "six") is True
+
+    def test_four_letter_compound_boundary_still_flagged(self) -> None:
+        # Boundary check: the substring rule's >=4 minimum-length guard must
+        # not regress the existing "fire"/"gunfire" case above (secret "fire"
+        # is exactly 4 characters, the guard's own threshold).
+        assert _is_morphological_variant("bonfire", "fire") is True
+
 
 class TestHintMorphologicalExclusion:
     """
