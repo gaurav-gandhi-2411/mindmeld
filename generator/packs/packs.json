@@ -8,8 +8,8 @@
     },
     "free": true,
     "status": "live",
-    "accent": "#E8B23A",
-    "accentDark": "#8E1A2B",
+    "accent": "#C0913F",
+    "accentDark": "#7E3B46",
     "icon": "film",
     "langs": ["en", "hi-en"]
   },
@@ -22,8 +22,8 @@
     },
     "free": false,
     "status": "live",
-    "accent": "#2E7D32",
-    "accentDark": "#1B4D20",
+    "accent": "#4F7A57",
+    "accentDark": "#2F4C36",
     "icon": "cricket",
     "langs": ["en", "hi-en"]
   },
@@ -36,8 +36,8 @@
     },
     "free": false,
     "status": "coming_soon",
-    "accent": "#E65100",
-    "accentDark": "#8F3300",
+    "accent": "#9C5E20",
+    "accentDark": "#6B3F14",
     "icon": "food",
     "langs": ["en", "hi-en"]
   },
@@ -50,8 +50,8 @@
     },
     "free": false,
     "status": "coming_soon",
-    "accent": "#00695C",
-    "accentDark": "#003D33",
+    "accent": "#3D7068",
+    "accentDark": "#24443F",
     "icon": "nature",
     "langs": ["en", "hi-en"]
   }
