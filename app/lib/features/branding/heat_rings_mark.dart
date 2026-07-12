@@ -3,15 +3,21 @@ import 'package:mindmeld/core/design_tokens.dart';
 
 /// Locked heat-rings identity palette — must match scripts/make_app_icon.py
 /// and warmer_heat_rings_identity.svg exactly. See spec-aesthetic-pass.md.
+///
+/// Sourced from [WarmerTokens.light]/[WarmerTokens.dark] rather than
+/// re-declared literals so the identity palette can never drift from the
+/// design tokens it happens to coincide with. Deliberately pinned to fixed
+/// light/dark tokens (not the theme's current brightness) — the mark must
+/// read identically regardless of app theme.
 class WarmerColors {
   const WarmerColors._();
 
-  static const Color cold = Color(0xFF6B89A8);
-  static const Color cool = Color(0xFF7E9BB5);
-  static const Color warm = Color(0xFFD9AE6B);
-  static const Color hot = Color(0xFFD65F49);
-  static const Color wordmarkAccent = Color(0xFFDD6B4D);
-  static const Color ground = Color(0xFF171614);
+  static final Color cold = WarmerTokens.light.freezing.base;
+  static final Color cool = WarmerTokens.light.cold.base;
+  static final Color warm = WarmerTokens.light.warm.base;
+  static final Color hot = WarmerTokens.light.scorching.base;
+  static final Color wordmarkAccent = WarmerTokens.light.accent;
+  static final Color ground = WarmerTokens.dark.canvas;
 }
 
 /// The heat-rings mark: concentric rings (cold blue outer -> cyan -> amber)
