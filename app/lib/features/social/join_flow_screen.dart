@@ -144,28 +144,28 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
         return const CircularProgressIndicator();
       case _JoinFlowState.notFound:
         return Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(WarmerSpacing.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.link_off, size: 64, color: tokens.text3),
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               const Text('This invite link is invalid or has expired.'),
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               FilledButton(onPressed: widget.onDone, child: const Text('Back to Warmer')),
             ],
           ),
         );
       case _JoinFlowState.offline:
         return Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(WarmerSpacing.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.wifi_off, size: 64, color: tokens.text3),
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               const Text("Couldn't join — check your connection and try again."),
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               FilledButton(onPressed: _retryAction, child: const Text('Retry')),
               TextButton(onPressed: widget.onDone, child: const Text('Cancel')),
             ],
@@ -176,22 +176,22 @@ class _JoinFlowScreenState extends State<JoinFlowScreen> {
       case _JoinFlowState.confirm:
         final group = _preview!;
         return Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(WarmerSpacing.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.groups, size: 64, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(height: 16),
+              const SizedBox(height: WarmerSpacing.lg),
               Text(
                 'Join "${group.name}"?',
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: WarmerSpacing.sm),
               Text('${group.memberUids.length} member${group.memberUids.length == 1 ? '' : 's'}'),
-              const SizedBox(height: 24),
+              const SizedBox(height: WarmerSpacing.xl),
               FilledButton(onPressed: _confirmJoin, child: const Text('Join group')),
-              const SizedBox(height: 8),
+              const SizedBox(height: WarmerSpacing.sm),
               TextButton(onPressed: widget.onDone, child: const Text('Not now')),
             ],
           ),

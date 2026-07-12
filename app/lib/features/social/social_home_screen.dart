@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/features/social/display_name_dialog.dart';
 import 'package:mindmeld/features/social/group_leaderboard_screen.dart';
 import 'package:mindmeld/social/social_models.dart';
@@ -210,17 +211,17 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('"${group.name}" is ready!', style: Theme.of(ctx).textTheme.titleLarge),
-            const SizedBox(height: 12),
+            const SizedBox(height: WarmerSpacing.md),
             Text('Code: ${group.code}', style: Theme.of(ctx).textTheme.titleMedium),
-            const SizedBox(height: 4),
+            const SizedBox(height: WarmerSpacing.xs),
             SelectableText(group.joinLink),
-            const SizedBox(height: 16),
+            const SizedBox(height: WarmerSpacing.lg),
             FilledButton(
               onPressed: () {
                 Navigator.pop(ctx);
@@ -267,12 +268,12 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
                 child: const Center(
                   child: Card(
                     child: Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: EdgeInsets.all(WarmerSpacing.xl),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           CircularProgressIndicator(),
-                          SizedBox(height: 16),
+                          SizedBox(height: WarmerSpacing.lg),
                           Text('Connecting…'),
                         ],
                       ),
@@ -297,29 +298,29 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
     final groups = _groups!;
     if (groups.isEmpty) {
       return ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         children: [
           const SizedBox(height: 40),
           Icon(Icons.groups_outlined, size: 64, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
+          const SizedBox(height: WarmerSpacing.lg),
           Text(
             'Connect to play with friends',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: WarmerSpacing.sm),
           const Text(
             'Compare daily results on a private leaderboard — no email or '
             'password needed.',
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: WarmerSpacing.xl),
           FilledButton.icon(
             onPressed: _busy ? null : _createGroup,
             icon: const Icon(Icons.add),
             label: const Text('Create a group'),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: WarmerSpacing.md),
           OutlinedButton.icon(
             onPressed: _busy ? null : _joinByCode,
             icon: const Icon(Icons.group_add),
@@ -330,7 +331,7 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(WarmerSpacing.lg),
       children: [
         for (final g in groups)
           Card(
@@ -341,7 +342,7 @@ class _SocialHomeScreenState extends State<SocialHomeScreen> {
               onTap: () => _openGroup(g),
             ),
           ),
-        const SizedBox(height: 16),
+        const SizedBox(height: WarmerSpacing.lg),
         Center(
           child: OutlinedButton.icon(
             onPressed: _busy ? null : _createGroup,

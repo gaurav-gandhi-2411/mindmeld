@@ -33,15 +33,17 @@ class PacksEntryBanner extends StatelessWidget {
 
     return Padding(
       padding: compact
-          ? const EdgeInsets.fromLTRB(16, 8, 16, 0)
-          : const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          ? const EdgeInsets.fromLTRB(
+              WarmerSpacing.lg, WarmerSpacing.sm, WarmerSpacing.lg, 0)
+          : const EdgeInsets.fromLTRB(
+              WarmerSpacing.lg, WarmerSpacing.md, WarmerSpacing.lg, WarmerSpacing.xs),
       child: Card(
         clipBehavior: Clip.antiAlias,
         margin: EdgeInsets.zero,
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.all(compact ? 12 : 16),
+            padding: EdgeInsets.all(compact ? WarmerSpacing.md : WarmerSpacing.lg),
             child: Row(
               children: [
                 Container(
@@ -58,7 +60,7 @@ class PacksEntryBanner extends StatelessWidget {
                   child: Icon(Icons.auto_awesome,
                       color: Colors.white, size: compact ? 16 : 20),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: WarmerSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -123,7 +123,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Statistics')),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(WarmerSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -138,13 +138,13 @@ class _StatsScreenState extends State<StatsScreen> {
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: WarmerSpacing.xxl),
 
             Text(
               'Guess Distribution',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: WarmerSpacing.md),
 
             if (stats.guessDistribution.isEmpty)
               Text(
@@ -158,7 +158,7 @@ class _StatsScreenState extends State<StatsScreen> {
 
             // Streak-freeze count — surfaces non-zero values from IAP entitlements.
             if (_entitlements.streakFreezes > 0) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: WarmerSpacing.xl),
               Text(
                 'Streak freezes: ${_entitlements.streakFreezes}',
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -188,7 +188,7 @@ class _StatsScreenState extends State<StatsScreen> {
               width: 36,
               child: Text(key, textAlign: TextAlign.right, style: TextStyle(color: tokens.text2)),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: WarmerSpacing.sm),
             Expanded(
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
@@ -199,7 +199,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(WarmerRadius.xs),
                   ),
                   child: Text(
                     '$count',
@@ -229,7 +229,8 @@ class _StatBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding:
+          const EdgeInsets.symmetric(vertical: WarmerSpacing.md, horizontal: WarmerSpacing.sm),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),

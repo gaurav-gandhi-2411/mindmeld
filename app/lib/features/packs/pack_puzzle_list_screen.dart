@@ -148,7 +148,7 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(WarmerRadius.xs),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -156,7 +156,7 @@ class _PackPuzzleListScreenState extends State<PackPuzzleListScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: WarmerSpacing.sm),
             Text(pack.titleFor(widget.lang)),
           ],
         ),

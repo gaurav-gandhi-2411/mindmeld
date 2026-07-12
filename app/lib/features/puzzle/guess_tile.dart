@@ -50,7 +50,7 @@ class HintTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: heat.tintBg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         border: Border.all(color: heat.base.withValues(alpha: 0.25), width: 0.5),
       ),
       child: Row(
@@ -64,10 +64,10 @@ class HintTile extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.sm, vertical: 3),
             decoration: BoxDecoration(
               color: tokens.surface,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(WarmerRadius.xs),
               border: Border.all(color: tokens.hairline, width: 1),
             ),
             child: Text(
@@ -85,7 +85,7 @@ class HintTile extends StatelessWidget {
             '#${hint.rank}',
             style: TextStyle(fontWeight: FontWeight.w600, color: heat.text),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: WarmerSpacing.sm),
           Text(
             band.label,
             style: Theme.of(context)
@@ -129,7 +129,7 @@ class GuessTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: heat.tintBg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         border: isHighlighted
             ? Border.all(color: heat.base, width: 1.5)
             : Border.all(color: heat.base.withValues(alpha: 0.25), width: 0.5),
@@ -154,10 +154,10 @@ class GuessTile extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: WarmerSpacing.xs),
             decoration: BoxDecoration(
               color: isWin ? tokens.accent : heat.base.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(WarmerRadius.sm),
             ),
             child: Text(
               guess.band.label,
@@ -169,7 +169,7 @@ class GuessTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: WarmerSpacing.sm),
           Text(
             '$simPct%',
             style: Theme.of(context)

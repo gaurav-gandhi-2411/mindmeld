@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mindmeld/analytics/firebase_exporter.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/notifications/notification_client.dart';
 import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart' show AnalyticsEvent;
@@ -133,22 +134,22 @@ class _NotificationOptInCardState extends State<NotificationOptInCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: WarmerSpacing.sm),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(WarmerSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: WarmerSpacing.sm),
                 const Expanded(
                   child: Text("Want a reminder when tomorrow's Warmer is ready?"),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: WarmerSpacing.md),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -156,7 +157,7 @@ class _NotificationOptInCardState extends State<NotificationOptInCard> {
                   onPressed: _busy ? null : _dismiss,
                   child: const Text('Not now'),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: WarmerSpacing.sm),
                 FilledButton(
                   onPressed: _busy ? null : _optIn,
                   child: _busy

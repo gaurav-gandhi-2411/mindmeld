@@ -393,7 +393,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(WarmerRadius.lg),
         side: BorderSide(color: tokens.hairline, width: 1),
       ),
     ),
@@ -406,23 +406,23 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       filled: true,
       fillColor: tokens.surface,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.hairline, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.hairline, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: tokens.accent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: colorScheme.error, width: 1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(WarmerRadius.md),
         borderSide: BorderSide(color: colorScheme.error, width: 1.5),
       ),
       hintStyle: TextStyle(color: tokens.text3),
@@ -438,7 +438,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
           return tokens.accentInk;
         }),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w600),
@@ -450,7 +450,7 @@ ThemeData buildWarmerTheme(Brightness brightness) {
         foregroundColor: WidgetStatePropertyAll(tokens.accentText),
         side: WidgetStatePropertyAll(BorderSide(color: tokens.hairline)),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
       ),
     ),
@@ -485,25 +485,25 @@ ThemeData buildWarmerTheme(Brightness brightness) {
       backgroundColor: tokens.text1,
       contentTextStyle: TextStyle(color: tokens.canvas, fontSize: 14),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
     ),
     dialogTheme: DialogThemeData(
       backgroundColor: tokens.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.xl)),
     ),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: tokens.surface,
       surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(WarmerRadius.xl)),
       ),
     ),
     chipTheme: ChipThemeData(
       backgroundColor: tokens.canvas,
       side: BorderSide(color: tokens.hairline),
       labelStyle: TextStyle(color: tokens.text2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.sm)),
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(color: tokens.accent),
     segmentedButtonTheme: SegmentedButtonThemeData(
@@ -563,7 +563,7 @@ ThemeData buildPackTheme(ThemeData base, Color accent, Color accentDark) {
         backgroundColor: WidgetStatePropertyAll(accent),
         foregroundColor: WidgetStatePropertyAll(ink),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(WarmerRadius.md)),
         ),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w600),

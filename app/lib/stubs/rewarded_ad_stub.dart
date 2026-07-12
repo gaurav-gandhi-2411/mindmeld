@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindmeld/core/config.dart';
+import 'package:mindmeld/core/design_tokens.dart';
 
 /// Stub for the rewarded-ad flow.
 ///
@@ -84,7 +85,7 @@ class _SimulatedAdDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           CircularProgressIndicator(),
-          SizedBox(height: 16),
+          SizedBox(height: WarmerSpacing.lg),
           Text(
             'Simulated ad (Phase 1 stub). Ads will be real in Phase 2.',
             textAlign: TextAlign.center,
