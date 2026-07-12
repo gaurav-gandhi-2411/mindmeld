@@ -115,6 +115,23 @@ cd generator
 uv run publish --days 30
 ```
 
+**Recommended: `scripts/deploy-warmer.ps1`.** Wraps steps 1–6 above (build → both guards →
+SW rotation/staging → `vercel deploy --prod --yes` → the required smoke check) in the exact
+documented order, adding a dirty-working-tree guard (refuses to run if `git status
+--porcelain` isn't clean, so the recorded SHA is unambiguous) and a provenance log: every
+successful run appends `<ISO8601 UTC> sha=<full SHA> url=<deployment URL>
+target=production` to `reports/deploys.log`, then commits and pushes just that file
+(`chore(deploy): record production deploy <short-sha>`). Fails loudly and stops at the first
+failed step — a failed build, guard, or `vercel deploy` never reaches the log/commit step.
+Does not run payload publishing (still a separate manual step, see above) or the manual
+Vercel domain-alias/rename steps from the incidents below. The manual step-by-step flow
+above remains the ground truth this script wraps — use it directly if the script's
+assumptions (clean tree, `flutter`/`uv`/`node`/`vercel` already on `PATH`) don't hold.
+
+```powershell
+.\scripts\deploy-warmer.ps1
+```
+
 **Uptime monitoring.** `.github/workflows/uptime-check.yml` polls the live app,
 the CDN manifest, and one real CDN payload every 15 minutes
 (`scripts/check_uptime.py`) and opens a GitHub issue — which GitHub emails to
