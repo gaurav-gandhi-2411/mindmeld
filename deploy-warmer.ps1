@@ -114,13 +114,69 @@ Invoke-Step "Stage build into web-dist/" {
     Copy-Item (Join-Path $repoRoot 'app/build/web/*') $webDist -Recurse -Force
 }
 
+$global:deploymentUrl = $null
 Invoke-Step "Deploy to Vercel production" {
     Push-Location (Join-Path $repoRoot 'web-dist')
     try {
-        npx vercel deploy --prod --yes
+        $deployLines = npx vercel deploy --prod --yes 2>&1
+        $deployLines | ForEach-Object { Write-Host $_ }
+        # The JSON block is pretty-printed across multiple lines, so grab it by
+        # matching the "url" key directly rather than trying to isolate/parse
+        # a single JSON line (a prior version of this script tried the latter
+        # and always failed to find it — caught by this step's own throw,
+        # not silently, but fixing the root cause here).
+        $urlLine = $deployLines | Where-Object { $_ -match '^\s*"url":\s*"(https://[^"]+)"' } | Select-Object -First 1
+        if ($urlLine -and $urlLine -match '"url":\s*"(https://[^"]+)"') {
+            $global:deploymentUrl = $matches[1]
+        }
     } finally {
         Pop-Location
     }
+}
+
+Invoke-Step "Guard: explicitly re-point playwarmer.vercel.app at THIS deployment" {
+    # Real incident, launch-1 wave: `vercel deploy --prod` stopped auto-updating
+    # the short playwarmer.vercel.app alias partway through a session (instead
+    # only aliasing to the longer auto-generated *-gaurav-gandhi-2411s-
+    # projects.vercel.app form) -- silently, with no error, and every
+    # downstream check (smoke check, Lighthouse, screenshots) kept passing
+    # because they only proved SOME build boots, not THIS ONE specifically.
+    # Root cause not fully determined; this step makes the canonical domain's
+    # target explicit and verified on every deploy instead of trusting
+    # `vercel deploy`'s own automatic aliasing.
+    if (-not $global:deploymentUrl) {
+        throw "Could not parse the deployment URL from 'vercel deploy' output -- " +
+            "cannot verify playwarmer.vercel.app points at what was just deployed."
+    }
+    npx vercel alias set $global:deploymentUrl playwarmer.vercel.app
+    if ($LASTEXITCODE -ne 0) {
+        throw "vercel alias set failed (exit $LASTEXITCODE) -- playwarmer.vercel.app may not point at this deployment."
+    }
+}
+
+Invoke-Step "Guard: verify playwarmer.vercel.app actually serves THIS build" {
+    # Belt-and-suspenders on top of the alias step above: fetch the live
+    # main.dart.wasm and compare its byte size to the one just built. A
+    # mismatch means either the alias didn't take (see above) or an edge
+    # cache is serving stale content despite Cache-Control -- purge and
+    # re-check once before failing loudly (a purge was needed once already
+    # this wave even after a correct alias update).
+    $localSize = (Get-Item (Join-Path $repoRoot 'web-dist/main.dart.wasm')).Length
+    Start-Sleep -Seconds 3
+    $remoteSize = (Invoke-WebRequest -Uri 'https://playwarmer.vercel.app/main.dart.wasm' -UseBasicParsing).RawContentLength
+    if ($remoteSize -ne $localSize) {
+        Write-Host "  Mismatch (local $localSize vs live $remoteSize) -- purging CDN cache and re-checking once..." -ForegroundColor Yellow
+        Push-Location (Join-Path $repoRoot 'web-dist')
+        try { npx vercel cache purge --yes } finally { Pop-Location }
+        Start-Sleep -Seconds 3
+        $remoteSize = (Invoke-WebRequest -Uri 'https://playwarmer.vercel.app/main.dart.wasm' -UseBasicParsing).RawContentLength
+    }
+    if ($remoteSize -ne $localSize) {
+        throw "playwarmer.vercel.app is STILL serving a different main.dart.wasm size " +
+            "(local $localSize vs live $remoteSize) after an alias fix and a cache purge -- " +
+            "do not trust this deploy; investigate before relying on any measurement against it."
+    }
+    Write-Host "  OK: live main.dart.wasm matches this build ($localSize bytes)"
 }
 
 if (-not $SkipSmokeCheck) {
