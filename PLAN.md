@@ -1,3 +1,165 @@
+# PLAN — Launch-1 wave: aesthetic pass + launch gates (complete)
+
+Spec: `spec.md` (this branch, supersedes the phase-4-era scaffolding spec). Branch
+`wave-launch-1-readiness`, PR #8 (draft — human merges per plan-tier constraint).
+Autonomous run, orchestrator + 4 parallel executor subagents + 1 design-reviewer
+pass, 2026-07-12.
+
+## Riskiest assumption first (rule 77)
+
+- [x] Spec framed this as "CanvasKit vs HTML renderer." Verified against Flutter's
+  own docs/tracking issue (not memory): HTML renderer was removed in Flutter 3.29;
+  this toolchain is 3.44.2 — the choice doesn't exist. Tested the real available
+  lever instead: `--wasm` (Dart->WebAssembly compile). Built both targets from the
+  same source, functionally verified via puppeteer (not just build success),
+  measured with Lighthouse: TBT 221ms->13.5ms, LCP 2864ms->2635ms, -417KB, score
+  0.69->0.79 (sandbox, no analytics). **Adopted for all builds.** See
+  `reports/renderer-decision-2026-07-12.md`.
+
+## Analytics instrumentation (PM header's success metrics)
+
+- [x] Found: Firebase Analytics had **never** collected a single event in
+  production — `AppConfig.analyticsEnabled` requires `--dart-define=
+  ANALYTICS_ENABLED=true`, which no prior deploy command ever passed. D1
+  retention and daily-completion-rate were unmeasurable, exactly the "measurement
+  must exist before launch, or the success metric is fiction" risk. Fixed: the
+  flag is now part of the canonical build (`deploy-warmer.ps1`/README).
+- [x] Added `puzzle_completed` event (outcome: win/loss_budget/
+  loss_hint_exhausted/loss_gave_up) so "% of DAU completing the daily puzzle" is
+  one GA4 event, not a manual win-OR-loss union.
+- [x] Found and fixed a real pre-existing bug while wiring this: the
+  budget-exhausted-via-hint path recorded a loss to local stats but never fired
+  the `loss` analytics event at all (only the guess-exhaustion and give-up paths
+  did). 5 new tests, one specifically regression-testing this fix.
+- [x] Live-confirmed post-deploy: real `page_view`/`puzzle_started` events firing
+  to `google-analytics.com/g/collect` with correct params, seen in a live
+  puppeteer console capture.
+
+## Track A — aesthetic pass
+
+- [x] `WarmerTokens` extended with `WarmerSpacing`/`WarmerRadius` sibling classes
+  (rule 15b) — values grepped from real usage, not invented; plain
+  `static const double`s, not ThemeExtension fields (no brightness-dependent
+  lerp needed).
+- [x] **Real WCAG AA failures found and fixed**: text2/text3 measured 2.08-3.67:1
+  in light mode (text3 failing even the 3.0:1 large-text floor), dark text3 also
+  failing (3.05-3.32:1) — independently re-verified, not taken on the
+  design-reviewer's word. Root cause of the gap: `design_tokens_test.dart`'s WCAG
+  suite tested text1/accentInk/accentText but never text2/text3 — added 8 missing
+  test cases so this can't silently regress again.
+- [x] Applied `WarmerSpacing`/`WarmerRadius` across 16 files; guess `TextField`
+  got `labelText: 'Your guess'`; fresh-puzzle empty state (icon + "Make your
+  first guess above", was blank space before); load-error state got a "Retry"
+  button (was a dead end short of an app restart).
+- [x] **Design-reviewer sign-off: approved with suggestions.** All 5 prior
+  blocking findings independently re-verified fixed (contrast recomputed from
+  raw hex, not trusted). Non-blocking suggestions: 2 off-scale spacing values
+  (fixed same-day), AppBar centerTitle inconsistency (left as a defensible
+  brand-emphasis choice, logged), win-screen CTA density, unverified mobile/
+  keyboard dimensions, a possible tooltip artifact — all logged in
+  `docs/known-limitations.md` entry 17.
+- [x] Screenshots committed (`reports/screenshots/wave-launch-1-readiness/`,
+  rule 15c mechanism) against the confirmed-correct deployed build.
+
+## Track B — launch gates
+
+- [x] STRIDE doc (`docs/stride-launch-1.md`) — proportionate rule-98 pass, cites
+  `known-limitations.md`'s already-accepted risks rather than re-deriving them.
+  Confirmed guess submission never touches Firestore (the launch-check's
+  rate-limiting worry is a non-issue as framed). One new finding: unbounded
+  group/code creation by a scripted client (cost/clutter risk, not data risk) —
+  folded into `known-limitations.md` entry 11a.
+- [x] Perf budget measured, one lever applied (deferred Firebase/AdMob init past
+  first frame — real but small win, ~67ms, root-caused precisely: browser fetches
+  Firebase's JS in parallel at HTML-parse time regardless of Dart-level await
+  ordering), honestly documented. **LCP still fails the 3000ms tracked ceiling by
+  82ms** (3082ms verified) — a genuine, named tension between this wave's own
+  analytics and perf requirements, not an oversight. Documented as the wave's one
+  explicitly-accepted exception.
+- [x] Rollback exercise: real deploy N -> rollback to N-1 (verified via content,
+  not just HTTP 200) -> roll forward to N, all verified. `deploy-warmer.ps1`
+  created (spec referenced it; didn't exist before this wave).
+- [x] `docs/runbook.md` — deploy/rollback/Firebase console/FCM/payload-sync/
+  gotchas.
+- [x] `integration_test/app_test.dart` wired into CI (`.github/workflows/
+  e2e-web.yml`) — existed but was never run anywhere. Runs on Flutter web
+  (`-d web-server` via chromedriver), not the Android emulator the test's own
+  header mentions, since Warmer is a web-only product. Verified green in real
+  GitHub Actions (multiple runs, ~2.5min each), not just locally. No branch
+  protection on this plan tier, so it can't be a required check — documented in
+  the workflow's own header.
+
+## A real incident, found and fixed mid-wave
+
+While capturing screenshots for the design-reviewer gate, a shipped fix wasn't
+appearing on production despite a "successful" deploy. Root-caused to two
+compounding issues: (1) `vercel.json` had no `Cache-Control` rule for the new
+`main.dart.wasm`/`.mjs` files this wave introduced, and (2) more seriously,
+`vercel deploy --prod` had silently stopped updating the `playwarmer.vercel.app`
+alias partway through the session — every downstream check (smoke check,
+Lighthouse, screenshots) kept "passing" because they only proved *some* build
+boots, not *this one*. Fixed `vercel.json`, and hardened `deploy-warmer.ps1` with
+two mandatory post-deploy guards: explicit `vercel alias set` (never trust
+automatic aliasing again) and a byte-size comparison between the live and local
+`main.dart.wasm` (purging the CDN cache and re-checking once before failing
+loudly). Both verified working end-to-end. Practical implication: one
+intermediate Lighthouse measurement has uncertain provenance as a result — not
+hidden, flagged in `known-limitations.md` with the re-verified authoritative
+numbers alongside it. See `docs/runbook.md` gotcha 1a for the full writeup.
+
+## Final verification
+
+- [x] Flutter suite: 493/493 passing, `flutter analyze` clean (7 pre-existing
+  issues, unrelated).
+- [x] Generator suite: 377 passed / 4 skipped (Ollama-gated LLM-judge tests ran
+  for real this time, not skipped).
+- [x] E2E CI: green in real GitHub Actions on the final commit.
+- [x] Production deploy verified byte-for-byte matching the local build
+  (deploy-warmer.ps1's new guard).
+
+## `/launch-check` re-run
+
+```
+LAUNCH READINESS — mindmeld/Warmer  (tier: T2)
+================================================
+[pass] 1. Product review: spec.md has the 4-line PM header (target user, pain
+        point, success metric, who pays).
+[pass] 2. Design sign-off: design-reviewer SIGN-OFF: approved with suggestions.
+        All 5 prior blocking findings independently re-verified fixed.
+[pass] 3. Security pass: docs/stride-launch-1.md, proportionate rule-98 STRIDE
+        pass. One new low-severity finding folded into known-limitations.md.
+[fail] 4. Performance budgets: measured and artifacted
+        (reports/lighthouse-playwarmer-launch1-verified.report.{html,json}).
+        TBT/CLS/own-domain-JS pass. LCP 3082ms vs <=3000ms tracked ceiling --
+        FAILS by 82ms. Explicitly-accepted exception (known-limitations.md #14):
+        real tension between this wave's own analytics-instrumentation and
+        perf-budget requirements, root-caused precisely, one lever already
+        applied, next lever named (split Firebase's eager plugin loading) but
+        out of this wave's scope.
+[pass] 5. Rollback tested: real exercise performed and verified this wave (not
+        just documented) -- deploy N -> rollback to N-1 -> verify -> roll
+        forward to N, each step confirmed via content, not just HTTP 200.
+[pass] 6. Monitoring/alerts: uptime-check.yml active with real incident history
+        (prior wave). Crashlytics now actually wired AND live (analytics was
+        enabled this wave) -- error hooks confirmed registered in code and
+        Firebase confirmed initializing in production console logs; a real
+        crash event reaching the Crashlytics console specifically was not
+        independently confirmed (no crash occurred to test it).
+[pass] 7. Docs complete: README quick-start + new docs/runbook.md (on-call:
+        deploy, rollback, Firebase console, FCM, payload sync, gotchas).
+[pass] 8. Critical-path E2E: integration_test/app_test.dart wired into
+        .github/workflows/e2e-web.yml, confirmed green in real GitHub Actions
+        (not just local) across multiple runs on the final commit. Not a
+        required check (no branch protection on this plan tier) -- documented,
+        not hidden.
+
+OVERALL: 7/8 pass, 1 explicitly-accepted documented exception (gate 4) --
+meets this wave's own exit criteria ("8/8 pass, or failures reduced to
+explicitly-accepted, documented exceptions").
+```
+
+---
+
 # PLAN — Known-limitations ledger: fix what's worth fixing, document the rest (complete)
 
 Autonomous single-pass run, 2026-07-12. Full inventory of every known gap across
