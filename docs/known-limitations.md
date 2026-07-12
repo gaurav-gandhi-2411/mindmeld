@@ -348,6 +348,38 @@ Android build has ever been distributed, so this affects zero real players today
 **Revisit if:** a native Android release (Play Store) is ever pursued — needs a
 real applicationId decision and a release keystore before any distributable build.
 
+## From the launch-1 design-reviewer sign-off (approved with suggestions, not blocking)
+
+### 17. Win screen CTA density; unverified mobile/keyboard dimensions
+
+Design-reviewer sign-off for the launch-1 aesthetic pass (`reports/screenshots/
+wave-launch-1-readiness/`) was **approved with suggestions** — all 5 prior blocking
+findings independently re-verified fixed (contrast recomputed from raw hex values,
+not taken on faith). Non-blocking items logged here rather than fixed inline:
+
+- **Win-screen CTA density**: the win screen stacks 5 distinct interactive asks
+  (Copy & Share, Image, Challenge your group, notification opt-in Yes/Not-now,
+  Back) in one view right after the celebratory moment. Not wrong on its own
+  (Wordle/NYT-style result screens do this too), but approaching CTA fatigue.
+  **Revisit if:** analytics (now actually collecting data — see entry above) show
+  meaningful drop-off on this screen; a lighter-weight, collapsed-by-default
+  treatment for the notification opt-in card would be the first thing to try.
+- **Mobile breakpoint unverified**: all review screenshots were captured at a
+  single ~900px desktop-ish viewport; no ~360px mobile-width capture exists to
+  confirm no overflow/overlap there. **Revisit before/at next visual pass**:
+  capture a narrow-viewport screenshot set and re-check.
+- **Keyboard/focus-ring pass unverified**: `design_tokens.dart`'s
+  `inputDecorationTheme.focusedBorder` does define a visible focus indicator
+  (`tokens.accent`, 1.5px), a good sign, but actual tab-order and focus-ring
+  rendering in the running app was not verified live. **Revisit**: a manual
+  keyboard-only pass through the puzzle/settings/onboarding flows.
+- **Possible tooltip artifact**: a floating "Friends" pill appeared above the nav
+  bar in one captured screenshot, likely a `NavigationDestination` hover-tooltip
+  render artifact from the automated capture tool rather than a real layout bug
+  (unconfirmed either way — no live interaction was available in that review
+  pass). **Revisit if**: this reproduces during a live manual pass — would need a
+  real fix if so, not just a note.
+
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
 ### 16. Eval baseline report predates the maxGuesses tuning fix
