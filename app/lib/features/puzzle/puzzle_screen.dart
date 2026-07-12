@@ -787,6 +787,24 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ),
             ),
 
+          // "View result" — re-entry into the win/loss result screen (share
+          // card, Copy & Share, Image) after tapping Back on it. Daily mode
+          // only: pack mode already auto-redirects to the result screen on
+          // remount (see the already-finished-state redirect comment in
+          // _load() above), so this would be redundant there.
+          if (!_isPackMode && state.isFinished)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  onPressed: state.won ? widget.onWin : widget.onLoss,
+                  icon: const Icon(Icons.replay_outlined, size: 18),
+                  label: const Text('View result'),
+                ),
+              ),
+            ),
+
           // Rival strip (shown during active play only, hidden after game over)
           if (_rivalState != null && !state.isFinished)
             _buildRivalStrip(_rivalState!, context),

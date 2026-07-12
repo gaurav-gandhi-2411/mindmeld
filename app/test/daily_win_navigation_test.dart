@@ -294,6 +294,115 @@ void main() {
   );
 
   // ===========================================================================
+  // (b2) "View result" re-enters the win/loss screen after Back
+  // ===========================================================================
+
+  testWidgets(
+    'the finished board shows a "View result" affordance that re-shows the win screen',
+    (tester) async {
+      const date = '2099-01-01';
+      final payload = _buildOceanPayload();
+      final wonState = DayState(
+        date: date,
+        lang: 'en',
+        guesses: [
+          Guess(word: 'ocean', rank: 1, similarity: 1.0, band: TemperatureBand.win),
+        ],
+        hintsUsed: 0,
+        won: true,
+        gaveUp: false,
+      );
+      await tester.runAsync(() => AppPersistence.instance.saveDayState(wonState));
+
+      await tester.pumpWidget(WarmerApp(
+        overrides: AppOverrides(
+          fixedDate: date,
+          lang: 'en',
+          dbPath: dbPath,
+          skipOnboarding: true,
+          payloadClient: _FixedClient(payload),
+        ),
+      ));
+      await _settle(tester);
+      await _settle(tester);
+
+      final backButton = find.widgetWithText(TextButton, 'Back');
+      await tester.ensureVisible(backButton);
+      await _settle(tester);
+      await tester.tap(backButton);
+      await _settle(tester);
+      await _settle(tester);
+
+      expect(_appBarTitle('You got it!'), findsNothing,
+          reason: 'sanity: Back must dismiss the win screen first');
+      final viewResult = find.widgetWithText(OutlinedButton, 'View result');
+      expect(viewResult, findsOneWidget,
+          reason: 'the finished board must offer a way back to the win/share screen — '
+              'previously there was no way back without restarting the app');
+
+      await tester.ensureVisible(viewResult);
+      await _settle(tester);
+      await tester.tap(viewResult);
+      await _settle(tester);
+      await _settle(tester);
+
+      expect(_appBarTitle('You got it!'), findsOneWidget,
+          reason: 'tapping "View result" must re-show the win screen');
+    },
+  );
+
+  testWidgets(
+    'the finished board shows a "View result" affordance that re-shows the loss screen',
+    (tester) async {
+      const date = '2099-01-01';
+      final payload = _buildOceanPayload();
+      final lostState = DayState(
+        date: date,
+        lang: 'en',
+        guesses: [],
+        hintsUsed: 0,
+        won: false,
+        gaveUp: true,
+      );
+      await tester.runAsync(() => AppPersistence.instance.saveDayState(lostState));
+
+      await tester.pumpWidget(WarmerApp(
+        overrides: AppOverrides(
+          fixedDate: date,
+          lang: 'en',
+          dbPath: dbPath,
+          skipOnboarding: true,
+          payloadClient: _FixedClient(payload),
+        ),
+      ));
+      await _settle(tester);
+      await _settle(tester);
+
+      final backButton = find.widgetWithText(TextButton, 'Back');
+      await tester.ensureVisible(backButton);
+      await _settle(tester);
+      await tester.tap(backButton);
+      await _settle(tester);
+      await _settle(tester);
+
+      expect(_appBarTitle('Better luck next time 🌙'), findsNothing,
+          reason: 'sanity: Back must dismiss the loss screen first');
+      final viewResult = find.widgetWithText(OutlinedButton, 'View result');
+      expect(viewResult, findsOneWidget,
+          reason: 'the finished board must offer a way back to the loss/share screen');
+
+      await tester.ensureVisible(viewResult);
+      await _settle(tester);
+      await tester.tap(viewResult);
+      await _settle(tester);
+      await _settle(tester);
+
+      expect(_appBarTitle('Better luck next time 🌙'), findsOneWidget,
+          reason: 'tapping "View result" must re-show the loss screen');
+    },
+  );
+
+  // ===========================================================================
   // (c) onWin fires exactly once per completion
   // ===========================================================================
 
