@@ -3,27 +3,39 @@
 /// On native platforms the sqflite platform-channel factory is used.
 /// On web, sqflite_common_ffi_web provides a WASM/IndexedDB backend.
 ///
-/// Schema (v4):
+/// Schema (v5):
 ///   day_state      — one row per (date, lang): guess history, hints, won/gaveUp.
 ///   stats          — one row per lang: played, wins, streaks, distribution.
 ///   analytics      — ring buffer max 500 rows; FIFO eviction; flushed flag.
 ///   pack_progress  — one row per (pack_id, idx, lang): themed-pack puzzle
 ///                    state (phase 6c). Deliberately separate from day_state/
 ///                    stats so pack play never touches the daily streak.
+///   meta           — one row per (key): small internal flags, e.g. the
+///                    PrefsStore -> SQLite one-time migration marker (see
+///                    persistence.dart's wasm-stub-remediation migration).
 library;
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/storage_backend.dart';
+// dart.library.js_interop, not dart.library.html: html is FALSE under the
+// --wasm production build target, which silently selected the stub factory
+// (UnsupportedError at init, then AppPersistence fell back to PrefsStore) on
+// every production web build since the launch-1 wasm adoption. js_interop is
+// true for BOTH web compile targets (dart2js/DDC and dart2wasm), false on
+// native. See known-limitations entry 19 / reset_web.dart for the same fix
+// pattern applied elsewhere in this repo.
 import 'package:mindmeld/core/storage_factory_stub.dart'
     // ignore: uri_does_not_exist
     if (dart.library.io) 'package:mindmeld/core/storage_factory_io.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/core/storage_factory_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/core/storage_factory_web.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+import 'package:sqflite_common/utils/utils.dart' show firstIntValue;
 
 /// SQLite / WASM-SQLite implementation of [StorageBackend].
 class SqliteStore implements StorageBackend {
@@ -44,7 +56,14 @@ class SqliteStore implements StorageBackend {
 
     // On web, path_provider is not available; use a fixed virtual path that
     // sqflite_common_ffi_web maps to IndexedDB.
-    final bool isWeb = const bool.fromEnvironment('dart.library.html');
+    //
+    // kIsWeb (not a dart.library.* const check) so this stays correct on
+    // BOTH web compile targets — dart.library.html is FALSE under --wasm,
+    // which previously made this branch skip the virtual path and attempt a
+    // real filesystem path on web, throwing during init and silently
+    // dropping SqliteStore to the PrefsStore fallback (production since
+    // 2026-07-12). kIsWeb is a compile-time const on every platform.
+    final bool isWeb = kIsWeb;
     final String path;
     if (isWeb) {
       path = dbPath ?? 'mindmeld.db';
@@ -59,7 +78,7 @@ class SqliteStore implements StorageBackend {
     _db = await factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: 4,
+        version: 5,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       ),
@@ -116,11 +135,13 @@ class SqliteStore implements StorageBackend {
     ''');
 
     await db.execute(_createPackProgressSql);
+    await db.execute(_createMetaSql);
   }
 
   /// v1 → v2: add revealed_hints_json to day_state.
   /// v2 → v3: add flushed column to analytics.
   /// v3 → v4: add pack_progress table (phase 6c themed packs).
+  /// v4 → v5: add meta table (internal flags, e.g. migration markers).
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
@@ -134,6 +155,9 @@ class SqliteStore implements StorageBackend {
     }
     if (oldVersion < 4) {
       await db.execute(_createPackProgressSql);
+    }
+    if (oldVersion < 5) {
+      await db.execute(_createMetaSql);
     }
   }
 
@@ -150,6 +174,55 @@ class SqliteStore implements StorageBackend {
       PRIMARY KEY (pack_id, idx, lang)
     )
   ''';
+
+  static const String _createMetaSql = '''
+    CREATE TABLE IF NOT EXISTS meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  ''';
+
+  // ---------------------------------------------------------------------------
+  // Internal meta flags (e.g. the PrefsStore -> SQLite one-time migration
+  // marker — see persistence.dart's wasm-stub-remediation migration).
+  // ---------------------------------------------------------------------------
+
+  /// Reads a small internal flag by [key], or null if never set.
+  Future<String?> getMeta(String key) async {
+    final rows = await _database.query(
+      'meta',
+      where: 'key = ?',
+      whereArgs: [key],
+    );
+    if (rows.isEmpty) return null;
+    return rows.first['value'] as String?;
+  }
+
+  /// Persists a small internal flag [key] = [value] (upsert).
+  Future<void> setMeta(String key, String value) async {
+    await _database.insert(
+      'meta',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// True when this database has never recorded any player data (no `stats`
+  /// rows and no `day_state` rows) — used by [AppPersistence]'s one-time
+  /// PrefsStore migration to decide it is safe to copy data in without ever
+  /// overwriting existing sqlite data.
+  Future<bool> get isEmpty async {
+    final statsCount = firstIntValue(
+          await _database.rawQuery('SELECT COUNT(*) AS c FROM stats'),
+        ) ??
+        0;
+    if (statsCount > 0) return false;
+    final dayStateCount = firstIntValue(
+          await _database.rawQuery('SELECT COUNT(*) AS c FROM day_state'),
+        ) ??
+        0;
+    return dayStateCount == 0;
+  }
 
   // ---------------------------------------------------------------------------
   // Day state
