@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 """
-Assemble Hinglish contrastive training data from 4 sources (spec-hinglish-
+Assemble Hinglish contrastive training data from 5 sources (spec-hinglish-
 finetune.md's "Training data" section), respecting the frozen split
 (split.py) — NO training record may touch a held-out secret or its EN
 translation, verified by assertion at the end of this module.
@@ -19,6 +19,13 @@ Sources:
      translation.
   4. Alias variants — vocab/hi-en-aliases.txt (canonical, alias) trivial-
      positive pairs, excluding held-out canonicals.
+  5. Corpus PMI pairs — evals/finetune/data/raw/corpus_pmi_pairs_filtered.jsonl
+     (pmi_mine.py's corpus co-occurrence mining, LLM-judge quality-filtered by
+     pmi_quality_filter.py), re-excluding held-out secrets and
+     HOMOGRAPH_COLLISIONS independently of the upstream staging filters
+     (belt-and-suspenders, matching this module's existing per-source
+     paranoia — never trust an upstream filter alone). See
+     corpus_pmi_source's docstring for the MNRL score cutoff.
 
 Output (evals/finetune/data/):
   train_mnrl_pairs.jsonl    {"anchor", "positive", "source"}      — MultipleNegativesRankingLoss
@@ -43,6 +50,7 @@ SCENARIOS_PATH = Path(__file__).parent.parent / "scenarios" / "dim1_hien.json"
 ALIASES_PATH = Path(__file__).parent.parent.parent / "vocab" / "hi-en-aliases.txt"
 LLM_CACHE_PATH = DATA_DIR / "llm_triplets_accepted.json"
 HOMOGRAPH_EXCLUSIONS_PATH = DATA_DIR / "homograph_exclusions.json"
+CORPUS_PMI_FILTERED_PATH = DATA_DIR / "raw" / "corpus_pmi_pairs_filtered.jsonl"
 
 # GG review (post-data-approval): any romanized-Hindi word whose Latin
 # spelling ALSO happens to be a common, DIFFERENT-meaning English word is a
@@ -208,6 +216,71 @@ def alias_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
     return mnrl, graded
 
 
+def corpus_pmi_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
+    """
+    Corpus PMI-mined relatedness pairs (pmi_mine.py + pmi_quality_filter.py's
+    LLM-judge pass — see this module's docstring, source 5). Reads the
+    already quality-filtered staging file; does NOT re-run mining or judging.
+
+    Belt-and-suspenders re-filtering (matches every other source function in
+    this module): held-out secrets and HOMOGRAPH_COLLISIONS were already
+    excluded once upstream (pmi_mine.py step 5 / the judge filter doesn't
+    check these at all), but this function independently re-checks both
+    rather than trusting the staging file, exactly like crosslingual_source
+    and alias_source re-check `held_out` even though their own upstream data
+    sources are curated.
+
+    MNRL cutoff: only pairs whose score is in the upper half of THIS
+    source's own [min, max] score range are used as MNRL positives — i.e.
+    score > (min + max) / 2 — mirroring dim1_source's choice to use only
+    tier == "near" (the strongest slice) for MNRL, not "mid"/"far". Graded
+    pairs use the full filtered range, mirroring dim1_source's graded pairs
+    covering all three tiers.
+    """
+    if not CORPUS_PMI_FILTERED_PATH.exists():
+        return [], []
+
+    records: list[dict] = []
+    with CORPUS_PMI_FILTERED_PATH.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            records.append(json.loads(line))
+
+    kept: list[dict] = []
+    for r in records:
+        anchor = r["anchor"].lower()
+        neighbor = r["neighbor"].lower()
+        if anchor in held_out or neighbor in held_out:
+            continue
+        if anchor in HOMOGRAPH_COLLISIONS or neighbor in HOMOGRAPH_COLLISIONS:
+            continue
+        kept.append(r)
+
+    graded: list[dict] = [
+        {
+            "sentence1": r["anchor"],
+            "sentence2": r["neighbor"],
+            "score": r["score"],
+            "source": "corpus_pmi",
+        }
+        for r in kept
+    ]
+
+    if kept:
+        scores = [r["score"] for r in kept]
+        cutoff = (min(scores) + max(scores)) / 2
+    else:
+        cutoff = 0.0
+    mnrl: list[dict] = [
+        {"anchor": r["anchor"], "positive": r["neighbor"], "source": "corpus_pmi"}
+        for r in kept
+        if r["score"] > cutoff
+    ]
+    return mnrl, graded
+
+
 def _assert_no_leakage(mnrl: list[dict], graded: list[dict], held_out: set[str]) -> None:
     for rec in mnrl:
         for field in ("anchor", "positive"):
@@ -225,9 +298,10 @@ def build() -> dict:
     llm_mnrl, llm_graded, llm_stats = llm_source(held_out)
     cl_mnrl, cl_graded = crosslingual_source(held_out)
     al_mnrl, al_graded = alias_source(held_out)
+    pmi_mnrl, pmi_graded = corpus_pmi_source(held_out)
 
-    all_mnrl = d1_mnrl + llm_mnrl + cl_mnrl + al_mnrl
-    all_graded = d1_graded + llm_graded + al_graded + cl_graded
+    all_mnrl = d1_mnrl + llm_mnrl + cl_mnrl + al_mnrl + pmi_mnrl
+    all_graded = d1_graded + llm_graded + al_graded + cl_graded + pmi_graded
 
     # Dedup exact (anchor, positive) / (sentence1, sentence2, score) duplicates
     # that can arise across sources (e.g. dim1 and crosslingual both proposing
@@ -264,6 +338,7 @@ def build() -> dict:
             "llm_augmented": len(llm_mnrl),
             "crosslingual": len(cl_mnrl),
             "alias": len(al_mnrl),
+            "corpus_pmi": len(pmi_mnrl),
             "total_before_dedup": len(all_mnrl),
             "total_after_dedup": len(deduped_mnrl),
         },
@@ -272,6 +347,7 @@ def build() -> dict:
             "llm_augmented": len(llm_graded),
             "crosslingual": len(cl_graded),
             "alias": len(al_graded),
+            "corpus_pmi": len(pmi_graded),
             "total_before_dedup": len(all_graded),
             "total_after_dedup": len(deduped_graded),
         },
