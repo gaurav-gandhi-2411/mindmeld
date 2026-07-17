@@ -5,7 +5,7 @@
 /// Imported via conditional import (see [currentTimezone] call sites in
 /// notification_service.dart):
 ///   import 'timezone_stub.dart'
-///     if (dart.library.html) 'timezone_web.dart';
+///     if (dart.library.js_interop) 'timezone_web.dart';
 library;
 
 import 'dart:js_interop';

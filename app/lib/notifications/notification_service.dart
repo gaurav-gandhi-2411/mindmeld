@@ -37,14 +37,18 @@ library;
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// js_interop conditions (not html): html is FALSE under the --wasm
+// production target, which silently selected these stubs on live — wrong
+// timezone in scheduled-notification writes and no iOS-PWA nudge (entry 19).
+// Both web impls are already package:web / dart:js_interop.
 import 'package:mindmeld/notifications/ios_pwa_check_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/notifications/ios_pwa_check_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/notifications/ios_pwa_check_web.dart';
 import 'package:mindmeld/notifications/notification_client.dart';
 import 'package:mindmeld/notifications/notification_web_config.dart';
 import 'package:mindmeld/notifications/timezone_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/notifications/timezone_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/notifications/timezone_web.dart';
 import 'package:mindmeld/social/social_service.dart';
 
 /// Hard ceiling on every individual Firebase Messaging/Firestore call made

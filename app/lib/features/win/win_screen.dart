@@ -14,9 +14,12 @@ import 'package:mindmeld/features/puzzle/guess_tile.dart' show heatForBand;
 import 'package:mindmeld/notifications/notification_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart';
 
+// dart.library.js_interop, not dart.library.html: html is FALSE under the
+// --wasm production build target, which silently stubbed the share path on
+// live (known-limitations entry 19). share_web.dart is already package:web.
 import 'share_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'share_web.dart';
+    if (dart.library.js_interop) 'share_web.dart';
 
 /// Generate the spoiler-free heat-trail share card text.
 ///
