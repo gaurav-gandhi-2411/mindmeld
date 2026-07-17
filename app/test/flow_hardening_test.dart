@@ -29,6 +29,15 @@ class _FixedClient extends PayloadClient {
   @override
   Future<PayloadResult> fetch(String lang, String date) =>
       Future.value(PayloadResult(payload: _payload, source: PayloadSource.bundledAsset));
+
+  // Onboarding puzzle also fetches via [fetchOnboarding] (asset-first, see
+  // payload_client.dart) — served the same fixed payload here so S1 below
+  // never touches real assets/network. It doesn't need to be the REAL
+  // onboarding-shaped payload: S1 only asserts the onboarding puzzle UI
+  // shell renders, not its content.
+  @override
+  Future<PayloadResult> fetchOnboarding(String lang) =>
+      Future.value(PayloadResult(payload: _payload, source: PayloadSource.bundledAsset));
 }
 
 /// Pump the widget tree until the puzzle screen finishes its async _load().
@@ -78,12 +87,15 @@ void main() {
   // ===========================================================================
 
   group('Entry routing', () {
-    // Scenario 1: No state ever → onboarding → fresh board
-    // SharedPreferences is already cleared in setUp (no 'onboarding_done' key).
-    // AppPersistence is initialised in setUp with a fresh DB.
-    // WarmerApp._init() will find _backend != null (early return) and read
-    // hasSeenOnboarding() → false → show onboarding.
-    testWidgets('S1: no state → onboarding shown', (tester) async {
+    // Scenario 1: No state ever → onboarding puzzle → fresh board
+    // SharedPreferences is already cleared in setUp (no 'onboarding_done' or
+    // 'onboarding_puzzle_state' key). AppPersistence is initialised in setUp
+    // with a fresh, empty DB (played == 0 for every lang). WarmerApp._init()
+    // resolves the first-run gate via resolveOnboardingGate() -> genuinely
+    // new -> shows the onboarding puzzle (first-session-hook wave; the OLD
+    // static 4-page pager is no longer shown on first run at all — it now
+    // only appears via Settings > "Replay onboarding").
+    testWidgets('S1: no state → onboarding puzzle shown', (tester) async {
       await tester.pumpWidget(WarmerApp(
         overrides: AppOverrides(
           fixedDate: '2026-06-12',
@@ -92,14 +104,25 @@ void main() {
           payloadClient: _FixedClient(payload),
         ),
       ));
-      // Pump once to trigger initState → _init() which calls SharedPreferences
-      // (mocked) and AppPersistence (already initialised). Then pump again to
-      // flush the resulting setState call that sets _showOnboarding = true.
+      // Pump once to trigger initState → _init(), which now (first-session-hook
+      // wave) does REAL sqflite reads via resolveOnboardingGate()'s stats
+      // grandfather check before its first setState — runAsync must run
+      // BEFORE any pump that expects that setState to have landed, unlike the
+      // pre-wave version of this test (SharedPreferences-only, near-instant).
       await tester.pump();
+      await tester.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      });
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Welcome to Warmer'), findsOneWidget,
-          reason: 'S1: brand-new user must see onboarding');
+      // Settle the onboarding PuzzleScreen's own async _load() (fetchOnboarding).
+      await tester.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      });
+      await tester.pump();
+      expect(find.text('Welcome to Warmer'), findsNothing,
+          reason: 'S1: the OLD static 4-page pager must never show on first run');
+      expect(find.text('Learn to play'), findsOneWidget,
+          reason: 'S1: brand-new user must see the onboarding puzzle');
     });
 
     // Scenario 2: Returning same day, not started → fresh board, no onboarding

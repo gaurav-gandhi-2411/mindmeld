@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mindmeld/core/memory_store.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/persistence.dart';
+import 'package:mindmeld/features/onboarding/first_run.dart';
+import 'package:mindmeld/main.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -96,4 +98,27 @@ void main() {
     final day = await AppPersistence.instance.loadDayState('2026-06-12', 'en');
     expect(day, isNull, reason: 'MemoryStore clearAll wipes day state');
   });
+
+  test(
+    'reset hook: ?reset=1 pref-wipe list includes the onboarding first-run keys '
+    '(first-session-hook wave)',
+    () {
+      // main.dart's kIsWeb-gated ?reset=1 handler can't be exercised directly
+      // from a non-web test target, so this asserts on the extracted
+      // kResetWipedPrefKeys constant it actually iterates — a genuinely new
+      // profile after ?reset=1 requires BOTH of these keys to be wiped,
+      // otherwise a "brand-new" cold-profile verification would incorrectly
+      // resume/skip the onboarding puzzle instead of showing it fresh.
+      expect(
+        kResetWipedPrefKeys,
+        containsAll(<String>[
+          kOnboardingStateKey,
+          kOnboardingGraduatedDateKey,
+        ]),
+        reason: 'reset hook must wipe both onboarding_puzzle_state and '
+            'onboarding_graduated_date so ?reset=1 produces a genuinely '
+            'brand-new profile',
+      );
+    },
+  );
 }
