@@ -29,6 +29,7 @@ from pathlib import Path
 # This must run before the local imports below.
 sys.path.insert(0, str(Path(__file__).parent))
 
+from clues import clue_for_date, load_clues  # noqa: E402
 from config import (  # noqa: E402
     EN_MAX_GZIP_BYTES,
     HIEN_MAX_GZIP_BYTES,
@@ -37,7 +38,6 @@ from config import (  # noqa: E402
 from embeddings import embed_vocab  # noqa: E402
 from manifest import build_manifest, write_manifest  # noqa: E402
 from payload import build_payload, write_payload  # noqa: E402
-from clues import load_clues, clue_for_date  # noqa: E402
 from schedule import load_schedule, secret_for_date, validate_schedule  # noqa: E402
 from vocab import load_en_vocab, load_hien_vocab  # noqa: E402
 

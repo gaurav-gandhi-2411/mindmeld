@@ -19,6 +19,7 @@ dev = [
 [project.scripts]
 publish = "publish:main"
 build-packs = "build_packs:main"
+build-onboarding = "build_onboarding:main"
 
 [build-system]
 requires = ["hatchling"]

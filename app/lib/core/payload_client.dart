@@ -132,4 +132,56 @@ class PayloadClient {
   /// Explicitly load a pack payload from the bundled asset (public for testing).
   Future<PayloadResult> loadBundledPack(String packId, int idx, String lang) =>
       _loadPackFromAsset(packId, idx, lang);
+
+  /// Fetch the dedicated first-session onboarding puzzle for [lang]
+  /// (first-session-hook wave).
+  ///
+  /// Asset-FIRST, network fallback — the INVERSE order of [fetch]/[fetchPack].
+  /// A brand-new player's very first paint must never depend on the CDN being
+  /// reachable; the bundled asset ships with the app and changes far less
+  /// often than a daily puzzle, so serving it first costs nothing in practice
+  /// while removing "the onboarding puzzle wouldn't load on a bad connection"
+  /// as a failure mode entirely.
+  ///
+  /// Network fetch (only reached if the bundled asset itself fails to load —
+  /// should never happen in a shipped build, but keeps a future-app-update
+  /// refresh path open): GET {baseUrl}/onboarding/{lang}.json.gz
+  Future<PayloadResult> fetchOnboarding(String lang) async {
+    try {
+      final result = await _loadOnboardingFromAsset(lang);
+      lastSource = result.source;
+      return result;
+    } catch (_) {
+      // Fall through to network.
+    }
+
+    final url = Uri.parse('$_baseUrl/onboarding/$lang.json.gz');
+    final response = await _http.get(url).timeout(_timeout);
+    if (response.statusCode == 200) {
+      final payload = PayloadCodec.decode(
+        Uint8List.fromList(response.bodyBytes),
+      );
+      final result =
+          PayloadResult(payload: payload, source: PayloadSource.network);
+      lastSource = result.source;
+      return result;
+    }
+    throw Exception(
+        'Failed to fetch onboarding payload for $lang: HTTP ${response.statusCode}');
+  }
+
+  /// Load the onboarding payload directly from bundled assets (used by tests
+  /// and as [fetchOnboarding]'s primary path).
+  Future<PayloadResult> _loadOnboardingFromAsset(String lang) async {
+    final assetKey = 'assets/payloads/onboarding/$lang.json.gz';
+    final byteData = await _assets.load(assetKey);
+    final bytes = byteData.buffer.asUint8List();
+    final payload = PayloadCodec.decode(bytes);
+    return PayloadResult(payload: payload, source: PayloadSource.bundledAsset);
+  }
+
+  /// Explicitly load the onboarding payload from the bundled asset (public
+  /// for testing).
+  Future<PayloadResult> loadBundledOnboarding(String lang) =>
+      _loadOnboardingFromAsset(lang);
 }

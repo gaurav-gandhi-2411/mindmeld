@@ -136,6 +136,17 @@ def derive_obfuscate_key(salt: str, length: int) -> bytes:
 HINT_RANKS = [1000, 750, 500, 300, 200, 100, 50, 25, 10, 5, 2]
 
 # ---------------------------------------------------------------------------
+# Onboarding puzzle (first-session hook, spec-first-session-hook.md)
+# ---------------------------------------------------------------------------
+
+# Generous, fixed budget so a first-session win is near-guaranteed (spec:
+# "near-impossible to lose"). Deliberately NOT par-derived like daily/pack
+# budgets (rival.max_guesses_for_par) — this puzzle's job is to teach the
+# mechanic, not to be a fair daily challenge, so it gets a flat generous cap
+# instead of scaling with the rival-path par.
+ONBOARDING_MAX_GUESSES = 20
+
+# ---------------------------------------------------------------------------
 # Payload version
 # ---------------------------------------------------------------------------
 

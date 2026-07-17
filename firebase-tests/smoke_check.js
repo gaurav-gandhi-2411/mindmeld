@@ -34,7 +34,13 @@
 const puppeteer = require('puppeteer-core');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const URL = process.argv[2] || process.env.LIVE_URL || 'https://playwarmer.vercel.app/';
+// Named TARGET_URL, not URL: a module-scope `const URL` shadows the global
+// URL class, which made the requestfailed handler below throw ("URL is not
+// a constructor") and crash the whole check the first time ANY request
+// failed — i.e. precisely when the own-origin filter was needed. Dormant
+// until a benign non-origin failure occurred during a post-deploy run.
+const TARGET_URL = process.argv[2] || process.env.LIVE_URL || 'https://playwarmer.vercel.app/';
+const TARGET_ORIGIN = new URL(TARGET_URL).origin;
 const BOOT_TIMEOUT_MS = 30000;
 // Extra settle after the glass pane appears — mirrors this project's own
 // cold_repro_reload.js INITIAL_WAIT_MS convention (the glass pane can exist
@@ -58,7 +64,7 @@ async function main() {
     // Benign Firestore webchannel recycle events are expected noise even on
     // a healthy load (see PLAN.md prior live-verify notes) — only count
     // failures against the app's own origin as smoke-check failures.
-    if (req.url().startsWith(new URL(URL).origin)) {
+    if (req.url().startsWith(TARGET_ORIGIN)) {
       requestFailures.push(`${req.url()} -- ${req.failure()?.errorText}`);
     }
   });
@@ -68,7 +74,7 @@ async function main() {
   let bootError = null;
 
   try {
-    const response = await page.goto(URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    const response = await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 30000 });
     httpStatus = response ? response.status() : null;
 
     // flt-glass-pane (the Flutter web engine's root element) renders into a
@@ -101,7 +107,7 @@ async function main() {
     failures.push(`${requestFailures.length} requestfailed (own origin): ${requestFailures.join(' | ')}`);
   }
 
-  console.log(`URL: ${URL}`);
+  console.log(`URL: ${TARGET_URL}`);
   console.log(`HTTP status: ${httpStatus}`);
   console.log(`Booted: ${booted}`);
   console.log(`pageerror count: ${pageErrors.length}`);

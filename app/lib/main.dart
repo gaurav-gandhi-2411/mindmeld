@@ -20,6 +20,8 @@ import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/features/archive/archive_screen.dart';
 import 'package:mindmeld/features/branding/heat_rings_mark.dart';
+import 'package:mindmeld/features/onboarding/first_run.dart';
+import 'package:mindmeld/features/onboarding/onboarding_flow.dart';
 import 'package:mindmeld/features/onboarding/onboarding_screen.dart';
 import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 import 'package:mindmeld/features/settings/settings_screen.dart';
@@ -29,12 +31,16 @@ import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
 import 'package:mindmeld/social/social_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart' show AnalyticsEvent;
+// dart.library.js_interop (not dart.library.html): html is FALSE under
+// --wasm, which silently selected these stubs in every wasm production
+// build — ?reset=1 / ?notif=1 / join links dead on live, all DDC-run tests
+// green. js_interop is true for BOTH web compile targets, false on native.
 import 'package:mindmeld/core/reset_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/core/reset_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/core/reset_web.dart';
 import 'package:mindmeld/social/deep_link_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/social/deep_link_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/social/deep_link_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
@@ -87,6 +93,20 @@ class AppOverrides {
   /// instant-grant gate so hints are revealed with zero delay).
   final HintGate? hintGate;
 }
+
+/// Pref keys wiped by the `?reset=1` developer hook (web-only, used to
+/// simulate a genuinely first-time user for cold-profile verification) — kept
+/// as a top-level constant (rather than an inline list literal in [_init])
+/// so tests can assert on its membership without needing to exercise the
+/// `kIsWeb`-gated call path itself. See reset_hook_test.dart.
+const List<String> kResetWipedPrefKeys = [
+  kLegacyOnboardingDonePref,
+  kOnboardingStateKey,
+  kOnboardingGraduatedDateKey,
+  'selected_lang',
+  'rival_enabled',
+  'rival_tier',
+];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -190,7 +210,14 @@ class _AppShell extends StatefulWidget {
 
 class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
   bool _initialised = false;
+
+  /// Legacy static 4-page pager gate (see onboarding_screen.dart) — only ever
+  /// set true via Settings > "Replay onboarding" now; never set by [_init].
   bool _showOnboarding = false;
+
+  /// First-session-hook onboarding puzzle gate — resolved by [_init] via
+  /// [resolveOnboardingGate].
+  bool _showOnboardingPuzzle = false;
   String _lang = 'en';
   int _navIndex = 0;
   bool _won = false;
@@ -242,18 +269,33 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
     if (kIsWeb && hasResetParam()) {
       await AppPersistence.instance.clearAll();
       final prefs = await SharedPreferences.getInstance();
-      for (final key in [
-        'onboarding_done',
-        'selected_lang',
-        'rival_enabled',
-        'rival_tier',
-      ]) {
+      for (final key in kResetWipedPrefKeys) {
         await prefs.remove(key);
       }
       stripResetParam();
     }
 
-    final seen = await hasSeenOnboarding();
+    // First-run gate (first-session-hook wave): resolves whether a brand-new
+    // player is routed to the onboarding puzzle before today's real daily.
+    // See features/onboarding/first_run.dart for the full grandfather-check
+    // resolution order (robust against the app's rename/migration history).
+    final prefs = await SharedPreferences.getInstance();
+    var showOnboardingPuzzle = false;
+    var fireOnboardingStarted = false;
+    if (widget.overrides?.skipOnboarding ?? false) {
+      // Bypass entirely, but still write `done` so downstream logic (the
+      // reset hook, a later boot without the override) is consistent with
+      // having actually gone through onboarding.
+      await markOnboardingPuzzleDone(prefs);
+    } else {
+      final gate = await resolveOnboardingGate(
+        prefs: prefs,
+        persistence: AppPersistence.instance,
+      );
+      showOnboardingPuzzle = gate.showOnboarding;
+      fireOnboardingStarted = gate.fireStartedEvent;
+    }
+
     // Honour the lang override so integration tests don't depend on whatever
     // lang was last written to SharedPreferences by a previous test.
     final lang =
@@ -272,10 +314,15 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
       stripNotifOpenParam();
     }
 
+    if (fireOnboardingStarted) {
+      unawaited(
+        _exporter.logEvent(AnalyticsEvent.onboardingStarted, {'lang': lang}),
+      );
+    }
+
     if (mounted) {
       setState(() {
-        // If skipOnboarding override is set, always bypass the gate.
-        _showOnboarding = !seen && !(widget.overrides?.skipOnboarding ?? false);
+        _showOnboardingPuzzle = showOnboardingPuzzle;
         _lang = lang;
         _pendingJoinCode = joinCode;
         _initialised = true;
@@ -387,6 +434,22 @@ class _AppShellState extends State<_AppShell> with WidgetsBindingObserver {
             ],
           ),
         ),
+      );
+    }
+
+    if (_showOnboardingPuzzle) {
+      return OnboardingFlow(
+        lang: _lang,
+        today: _today,
+        payloadClient: widget.overrides?.payloadClient,
+        exporter: _exporter,
+        onLangChanged: (lang) => setState(() => _lang = lang),
+        onDone: () {
+          setState(() => _showOnboardingPuzzle = false);
+          // Fire-and-forget: today's daily may already be finished (unlikely
+          // for a brand-new player, but harmless/idempotent if so).
+          _deriveResultRouting(_lang);
+        },
       );
     }
 

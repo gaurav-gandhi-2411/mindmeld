@@ -12,6 +12,8 @@ import 'package:mindmeld/core/payload_codec.dart';
 import 'package:mindmeld/core/persistence.dart';
 import 'package:mindmeld/core/rival_state.dart';
 import 'package:mindmeld/features/branding/heat_rings_mark.dart';
+import 'package:mindmeld/features/onboarding/first_run.dart';
+import 'package:mindmeld/features/onboarding/onboarding_config.dart';
 import 'package:mindmeld/features/packs/pack_selector_screen.dart';
 import 'package:mindmeld/features/packs/packs_entry_banner.dart';
 import 'package:mindmeld/iap/entitlements.dart';
@@ -42,8 +44,12 @@ class PuzzleScreen extends StatefulWidget {
     this.packId,
     this.packIdx,
     this.packTitle,
-  }) : assert(packId == null || packIdx != null,
-            'packIdx is required when packId is set');
+    this.isOnboarding = false,
+    this.onSkip,
+  })  : assert(packId == null || packIdx != null,
+            'packIdx is required when packId is set'),
+        assert(!isOnboarding || onSkip != null,
+            'onSkip is required when isOnboarding is true');
 
   final String lang;
   final String date;
@@ -66,6 +72,18 @@ class PuzzleScreen extends StatefulWidget {
 
   /// Themed-pack display name shown in the app bar (phase 6c).
   final String? packTitle;
+
+  /// True when this screen is playing the dedicated first-session onboarding
+  /// puzzle (first-session-hook wave) rather than a themed pack or the daily.
+  ///
+  /// Callers must also set [packId]/[packIdx] (to [kOnboardingPackId]/
+  /// [kOnboardingPackIdx] — see onboarding_flow.dart) so the puzzle rides the
+  /// existing pack-mode persistence/stats-isolation machinery unchanged.
+  final bool isOnboarding;
+
+  /// Called when the player taps "Skip to today's puzzle" during onboarding.
+  /// Required when [isOnboarding] is true; unused otherwise.
+  final VoidCallback? onSkip;
 
   /// Optional override for the payload client (used in tests/integration tests).
   /// When null, a default [PayloadClient] is constructed (production behaviour).
@@ -135,6 +153,12 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   bool _rivalEnabled = true;
   String _rivalTier = 'even';
 
+  /// Whether the player has dismissed the onboarding-mode nudge shown under
+  /// the input before their first guess. Local to this widget instance —
+  /// intentionally not persisted, so switching onboarding language (which
+  /// remounts this widget under a new key) shows it again.
+  bool _nudgeDismissed = false;
+
   /// True when this screen is playing a themed-pack puzzle (phase 6c) rather
   /// than the daily puzzle.
   bool get _isPackMode => widget.packId != null;
@@ -193,9 +217,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   Future<void> _load() async {
     try {
       // Fetch payload and entitlements concurrently.
-      final payloadFuture = _isPackMode
-          ? _client.fetchPack(widget.packId!, widget.packIdx!, widget.lang)
-          : _client.fetch(widget.lang, widget.date);
+      final payloadFuture = widget.isOnboarding
+          ? _client.fetchOnboarding(widget.lang)
+          : _isPackMode
+              ? _client.fetchPack(widget.packId!, widget.packIdx!, widget.lang)
+              : _client.fetch(widget.lang, widget.date);
       final entitlementsFuture = _iapGateway.current();
       final payloadResult = await payloadFuture;
       final entitlements = await entitlementsFuture;
@@ -392,6 +418,26 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         'guess_number': newGuesses.length,
       });
 
+      // Onboarding-only funnel events — fired alongside (not instead of) the
+      // generic guess_made above. Daily-only events (puzzleStarted etc.)
+      // already don't fire here since onboarding rides pack mode's
+      // _skipStatsWrites gate below.
+      if (widget.isOnboarding) {
+        if (newGuesses.length == 1) {
+          await _analytics.logEvent(AnalyticsEvent.onboardingFirstGuess, {
+            'lang': widget.lang,
+            'rank': entry.rank,
+            'band': band.label,
+          });
+        }
+        if (won) {
+          await _analytics.logEvent(AnalyticsEvent.onboardingWon, {
+            'lang': widget.lang,
+            'guesses_used': newGuesses.length,
+          });
+        }
+      }
+
       if (won && !_skipStatsWrites) {
         await AppPersistence.instance.recordWin(
           lang: widget.lang,
@@ -405,11 +451,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           'max_guesses': payload.maxGuesses ?? 0,
           'par': payload.parGuesses ?? 0,
         });
-        await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
-          'lang': widget.lang,
-          'day': widget.date,
-          'outcome': 'win',
-        });
+        await _logPuzzleCompleted('win');
         await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: true);
       }
 
@@ -422,11 +464,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           'max_guesses': payload.maxGuesses ?? 0,
           'par': payload.parGuesses ?? 0,
         });
-        await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
-          'lang': widget.lang,
-          'day': widget.date,
-          'outcome': 'loss_budget',
-        });
+        await _logPuzzleCompleted('loss_budget');
         await _logRivalOutcome(payload, newGuesses, state.hintsUsed, won: false);
       }
 
@@ -528,11 +566,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             'max_guesses': maxG,
             'par': payload.parGuesses ?? 0,
           });
-          await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
-            'lang': widget.lang,
-            'day': widget.date,
-            'outcome': 'loss_hint_exhausted',
-          });
+          await _logPuzzleCompleted('loss_hint_exhausted');
         }
         final lostState = newState.copyWith(gaveUp: true);
         await _saveState(lostState);
@@ -579,17 +613,51 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
         'par': payload.parGuesses ?? 0,
         'gave_up': 1,
       });
-      await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
-        'lang': widget.lang,
-        'day': widget.date,
-        'outcome': 'loss_gave_up',
-      });
+      await _logPuzzleCompleted('loss_gave_up');
       await _logRivalOutcome(payload, state.guesses, state.hintsUsed, won: false);
     }
     if (mounted) {
       setState(() => _dayState = newState);
     }
     widget.onLoss();
+  }
+
+  /// Fires [AnalyticsEvent.puzzleCompleted] for [outcome] on every daily-mode
+  /// terminal state — win, budget exhausted via a guess or a hint, or
+  /// explicit give-up — exactly as before this helper existed. Callers are
+  /// all already gated by `!_skipStatsWrites`, so this never fires for
+  /// practice/pack/onboarding play.
+  ///
+  /// Additionally checks whether this daily completion graduates a player
+  /// who came from onboarding THAT SAME DAY (pref [kOnboardingGraduatedDateKey]
+  /// equals [widget.date], set only on the onboarding-win graduation path —
+  /// see onboarding_flow.dart): if so, also fires
+  /// [AnalyticsEvent.dailyCompletedAfterOnboarding] and clears the pref so it
+  /// can never double-fire on a later daily completion.
+  Future<void> _logPuzzleCompleted(String outcome) async {
+    await _analytics.logEvent(AnalyticsEvent.puzzleCompleted, {
+      'lang': widget.lang,
+      'day': widget.date,
+      'outcome': outcome,
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final graduatedDate = prefs.getString(kOnboardingGraduatedDateKey);
+      if (graduatedDate != null && graduatedDate == widget.date) {
+        await _analytics.logEvent(AnalyticsEvent.dailyCompletedAfterOnboarding, {
+          'lang': widget.lang,
+          'outcome': outcome,
+        });
+        await prefs.remove(kOnboardingGraduatedDateKey);
+      }
+    } catch (_) {
+      // SharedPreferences not available in test environments without mock
+      // setup (see _loadRivalSettings for the same pattern) — the daily
+      // puzzle_completed event above has already fired regardless; this is
+      // strictly additive, so silently skipping it here never breaks the
+      // completion event itself.
+    }
   }
 
   RivalState? get _rivalState {
@@ -752,6 +820,107 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     );
   }
 
+  /// Pre-seeded example guess shown pinned above the guess list in onboarding
+  /// mode, visible before the player's first input (spec: "the player
+  /// immediately sees ... so I should think bigger/closer").
+  ///
+  /// Computed on the fly from [exampleWordFor]/[_payload] — deliberately NOT
+  /// added to [DayState.guesses], so it never counts toward the guess budget
+  /// or guess-count display. Reuses [GuessTile]'s visuals (wrapped, not
+  /// forked) with a small "EXAMPLE" chip in the same style as [HintTile]'s
+  /// "Hint" chip. Returns null if the word can't be resolved against the
+  /// payload (defensive only — the authored onboarding payload always
+  /// contains its own example word).
+  Widget? _buildExampleTile(BuildContext context) {
+    final payload = _payload;
+    if (payload == null) return null;
+    final word = exampleWordFor(widget.lang);
+    final entry = PayloadCodec.lookupWord(word, payload);
+    if (entry == null) return null;
+    final band = bandForRank(entry.rank, payload.n);
+    final guess = Guess(
+      word: word,
+      rank: entry.rank,
+      similarity: entry.similarity,
+      band: band,
+    );
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(WarmerSpacing.lg, WarmerSpacing.sm, WarmerSpacing.lg, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: WarmerSpacing.sm, vertical: 2),
+            decoration: BoxDecoration(
+              color: tokens.surface,
+              borderRadius: BorderRadius.circular(WarmerRadius.xs),
+              border: Border.all(color: tokens.hairline, width: 1),
+            ),
+            child: Text(
+              'EXAMPLE',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+                color: tokens.text2,
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          GuessTile(guess: guess, vocabSize: payload.n),
+        ],
+      ),
+    );
+  }
+
+  /// Onboarding-only row shown under the input, in place of the hint/give-up
+  /// row (both hidden in onboarding mode): a dismissible one-line nudge
+  /// before the player's first guess, then plain-language coaching for the
+  /// latest guess's band for the first [kOnboardingCoachedGuesses] guesses,
+  /// then nothing (feedback reverts to the normal terse band + rank).
+  Widget _buildOnboardingCoachRow(DayState state, BuildContext context) {
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    final guessCount = state.guesses.length;
+
+    if (guessCount == 0) {
+      if (_nudgeDismissed) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(WarmerSpacing.lg, WarmerSpacing.xs, WarmerSpacing.lg, 0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                kOnboardingNudge,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: tokens.text2),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 16),
+              tooltip: 'Dismiss',
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => setState(() => _nudgeDismissed = true),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (guessCount > kOnboardingCoachedGuesses) return const SizedBox.shrink();
+
+    final latestBand = state.guesses.last.band;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(WarmerSpacing.lg, WarmerSpacing.xs, WarmerSpacing.lg, 0),
+      child: Text(
+        coachingLineFor(latestBand),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: tokens.text2),
+      ),
+    );
+  }
+
   String _formatDate() {
     try {
       final dt = DateTime.parse(widget.date);
@@ -832,18 +1001,30 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       appBar: AppBar(
         title: Column(
           children: [
-            _isPackMode
-                ? Text(widget.packTitle ?? 'Warmer')
-                : const WarmerWordmark(markSize: 20, fontSize: 18),
+            widget.isOnboarding
+                ? const Text('Learn to play')
+                : _isPackMode
+                    ? Text(widget.packTitle ?? 'Warmer')
+                    : const WarmerWordmark(markSize: 20, fontSize: 18),
             Text(
-              _isPackMode
-                  ? 'Puzzle #${widget.packIdx}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}'
-                  : '${_formatDate()}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}',
+              widget.isOnboarding
+                  ? (widget.lang == 'hi-en' ? 'Hinglish' : 'English')
+                  : _isPackMode
+                      ? 'Puzzle #${widget.packIdx}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}'
+                      : '${_formatDate()}  ·  ${widget.lang == 'hi-en' ? 'Hinglish' : 'English'}',
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],
         ),
         centerTitle: true,
+        actions: widget.isOnboarding
+            ? [
+                TextButton(
+                  onPressed: widget.onSkip,
+                  child: const Text("Skip to today's puzzle"),
+                ),
+              ]
+            : null,
       ),
       body: Column(
         children: [
@@ -880,8 +1061,10 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ),
             ),
 
-          // Rival strip (shown during active play only, hidden after game over)
-          if (_rivalState != null && !state.isFinished)
+          // Rival strip (shown during active play only, hidden after game
+          // over; always hidden in onboarding mode — the onboarding puzzle
+          // has no rival data anyway, but this is explicit for clarity).
+          if (_rivalState != null && !state.isFinished && !widget.isOnboarding)
             _buildRivalStrip(_rivalState!, context),
 
           // Clue display (Phase 5 — shown from puzzle start until game over)
@@ -946,8 +1129,13 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
               ),
             ),
 
-          // Hint + give-up row
-          if (!state.isFinished)
+          // Hint + give-up row — replaced by the onboarding nudge/coaching
+          // row in onboarding mode (no hints/give-up there: a generous fixed
+          // budget makes give-up unnecessary, and hints would undercut the
+          // "teach by playing" design).
+          if (!state.isFinished && widget.isOnboarding)
+            _buildOnboardingCoachRow(state, context)
+          else if (!state.isFinished)
             Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
@@ -1019,14 +1207,25 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
           ),
           _buildProgressRow(payload, state, context),
 
+          // Pre-seeded example guess (onboarding mode only) — pinned above
+          // the scrollable guess list, always visible, never scrolled away.
+          if (widget.isOnboarding) ...[
+            _buildExampleTile(context) ?? const SizedBox.shrink(),
+          ],
+
           const Divider(),
 
           // Combined scrollable: pinned hint tiles first, then guess history.
           // A truly fresh puzzle (no guesses, no hints revealed, not yet
           // finished) renders an empty-state nudge instead of blank space —
           // the already-finished zero-guess give-up case is excluded so its
-          // existing (distinct) rendering is untouched.
-          if (state.guesses.isEmpty && state.revealedHints.isEmpty && !state.isFinished)
+          // existing (distinct) rendering is untouched. Onboarding mode never
+          // shows the generic empty-state nudge: the pre-seeded example tile
+          // above already fills that role.
+          if (!widget.isOnboarding &&
+              state.guesses.isEmpty &&
+              state.revealedHints.isEmpty &&
+              !state.isFinished)
             Expanded(child: _buildEmptyGuessState(context))
           else
             Expanded(

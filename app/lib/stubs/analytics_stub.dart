@@ -35,6 +35,52 @@ class AnalyticsEvent {
   /// Fired on cold boot when the app is opened via a `?notif=1` deep link —
   /// i.e. a real click-through from a delivered daily notification (phase 6b).
   static const String notificationOpened = 'notification_opened';
+
+  // ---------------------------------------------------------------------------
+  // First-session hook (onboarding puzzle) — see spec-first-session-hook.md.
+  // ---------------------------------------------------------------------------
+
+  /// Fired exactly once, when a genuinely new player is routed into the
+  /// first-session onboarding puzzle. Never re-fired when an already-started
+  /// onboarding resumes on a later boot. Props: `{lang: String}`.
+  static const String onboardingStarted = 'onboarding_started';
+
+  /// Fired on the player's FIRST guess of the onboarding puzzle only (not
+  /// every guess — that's the generic [guessMade] above).
+  /// Props: `{lang: String, rank: int, band: String}`.
+  static const String onboardingFirstGuess = 'onboarding_first_guess';
+
+  /// Fired when the onboarding puzzle is won.
+  /// Props: `{lang: String, guesses_used: int}`.
+  static const String onboardingWon = 'onboarding_won';
+
+  /// Fired when the app is backgrounded/hidden while the onboarding puzzle
+  /// is still unfinished. May fire more than once across sessions if the
+  /// player backgrounds repeatedly without finishing — GA4 funnel analysis
+  /// counts distinct users, not raw event count.
+  /// Props: `{lang: String, guess_count: int}`.
+  static const String onboardingAbandoned = 'onboarding_abandoned';
+
+  /// Fired when the player taps "Skip to today's puzzle" during onboarding.
+  /// Props: `{lang: String, guess_count: int}`.
+  static const String onboardingSkipped = 'onboarding_skipped';
+
+  /// Fired when the player leaves the onboarding graduation view for today's
+  /// real daily (via the win or loss/skip CTA).
+  /// Props: `{lang: String, from: String}` where `from` is one of
+  /// 'win' | 'loss'. (A skip fires [onboardingSkipped] instead of this one —
+  /// skipping is graduation without ceremony, see onboarding_flow.dart.)
+  static const String graduatedToDaily = 'graduated_to_daily';
+
+  /// Fired when a player who graduated from onboarding via a WIN that same
+  /// day (tracked via the `onboarding_graduated_date` pref, see
+  /// features/onboarding/first_run.dart) subsequently completes today's real
+  /// daily. This closes the first-session funnel: onboarding_started ->
+  /// ... -> graduated_to_daily -> daily_completed_after_onboarding.
+  /// Props: `{lang: String, outcome: String}` (same outcome vocabulary as
+  /// [puzzleCompleted]).
+  static const String dailyCompletedAfterOnboarding =
+      'daily_completed_after_onboarding';
 }
 
 /// Analytics stub — logs events to the local SQLite ring buffer.

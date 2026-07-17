@@ -1,0 +1,4 @@
+# Onboarding puzzle — English clue, exactly one entry, keyed to secrets_en.txt
+# Frames the secret without naming it (spoiler-gated at build time, same as
+# daily/pack clues). APPROVED FINAL 2026-07-17.
+Man's best friend — it barks, wags its tail, and loves you back.

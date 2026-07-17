@@ -61,6 +61,8 @@ flutter:
     - assets/payloads/hi-en/2026-06-17.json.gz
     - assets/payloads/hi-en/2026-06-18.json.gz
     - assets/payloads/packs/manifest.json
+    - assets/payloads/onboarding/en.json.gz
+    - assets/payloads/onboarding/hi-en.json.gz
 
 flutter_launcher_icons:
   # Generate adaptive icons for Android (API 26+).

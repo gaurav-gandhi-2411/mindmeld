@@ -28,6 +28,18 @@ Future<String> loadSelectedLang() async {
   return prefs.getString(_kLangPref) ?? 'en';
 }
 
+/// Persists [lang] as the selected language — the write counterpart to
+/// [loadSelectedLang].
+///
+/// Exposed publicly (not just via [_SettingsScreenState._setLang]) so
+/// [OnboardingFlow]'s language toggle — a brand-new player choosing Hinglish
+/// before ever reaching Settings — can persist the same pref without
+/// duplicating the key.
+Future<void> setSelectedLang(String lang) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString(_kLangPref, lang);
+}
+
 /// Snackbar text shown after a purchase attempt in stub / coming-soon mode.
 const String _kComingSoonMessage =
     'Coming soon! In-app purchases will be available in the next update.';
@@ -197,8 +209,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _setLang(String lang) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kLangPref, lang);
+    await setSelectedLang(lang);
     setState(() => _lang = lang);
     widget.onLangChanged(lang);
   }
