@@ -291,6 +291,7 @@ class TestPayloadSchemaV2:
     def test_rival_gzip_reproducibility(self, tmp_path) -> None:
         """Rival data does not break byte-reproducibility (mtime=0 gzip)."""
         from pathlib import Path
+
         from payload import write_payload
 
         out = Path(str(tmp_path))
@@ -352,7 +353,6 @@ class TestLargeVocabBehavior:
         """No string values at all in rival section for large vocab."""
         n = 55000
         rival, _ = generate_rival_data(n, "ocean", "2026-06-15")
-        rival_json = json.dumps(rival)
         # No alphabetic sequences quoted as JSON strings should appear in values
         # (keys like "rank", "band", "even", etc. are fine as keys, not values)
         for step in rival["even"]["path"]:
