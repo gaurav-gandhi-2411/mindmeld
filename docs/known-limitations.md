@@ -380,6 +380,32 @@ not taken on faith). Non-blocking items logged here rather than fixed inline:
   pass). **Revisit if**: this reproduces during a live manual pass — would need a
   real fix if so, not just a note.
 
+### 19. P0 FOLLOW-UP — `dart.library.html` conditionals silently stub web features on --wasm builds
+
+Found live during the first-session-hook wave's cold-profile verification
+(2026-07-17): `dart.library.html` is FALSE under the `--wasm` compile target the
+canonical deploy has used since launch-1 (2026-07-12), so every
+`if (dart.library.html)` conditional import selects the **stub** in production
+while every DDC-run test (flutter test, chromedriver e2e) keeps passing. Fixed
+in that wave (migrated to package:web + `dart.library.js_interop`): `?reset=1`,
+`?notif=1`, `/join/{code}` deep links — re-verified working live post-fix.
+
+**Still stubbed on production wasm builds** (same class, deliberately NOT
+drive-by-fixed — each needs its own verified pass): `sqlite_store.dart`'s
+storage factory (production web runs the PrefsStore fallback, not SQLite/WASM —
+functional but not the designed backend), `share_web.dart` (win-screen share
+image/copy paths), `timezone_web.dart` and `ios_pwa_check_web.dart`
+(notification scheduling accuracy + iOS PWA detection), and `config.dart`'s
+`adsEnabledEffective`/`iapEnabledEffective` web guards (latent: only bites if a
+web build is ever shipped with MONETIZED=true — it would activate native-only
+plugin paths).
+
+**Revisit:** next wave, as its own spec — migrate each to package:web /
+`dart.library.js_interop`, with per-feature live verification (which storage
+backend actually initialises, a real share tap, a scheduled notification) —
+plus an e2e or build-time guard that fails when a wasm build resolves a stub
+where the web implementation was intended.
+
 ### 18. hi-en Warm band is structurally ~23 ranks wide (coarser gradient than EN)
 
 The temperature bands are computed as `max(floor, n × fraction)` of vocab size

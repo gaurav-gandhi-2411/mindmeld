@@ -18,19 +18,42 @@ Spec: `spec-first-session-hook.md`. Branch `feat/first-session-hook`. Orchestrat
 - [x] hi-en Warm band structural narrowness documented as known-limitations
   entry 18 (Hot floor 500 vs Warm ceiling ~523 at n≈10.5k).
 
-## Build (in progress)
+## Build (complete)
 
-- [ ] Generator: `build_onboarding.py`, payloads `onboarding/{lang}.json.gz`
-  (maxGuesses=20), publish.py sync, spoiler + band-quality gates in pytest.
-- [ ] App: first-run gate (`onboarding_puzzle_state` pref + legacy
+- [x] Generator: `build_onboarding.py`, payloads `onboarding/{lang}.json.gz`
+  (maxGuesses=20, 777KB en / 152KB hi-en gz), publish.py sync, spoiler +
+  band-quality gates in pytest (skip cleanly without .model-cache). 405
+  generator tests green.
+- [x] App: first-run gate (`onboarding_puzzle_state` pref + legacy
   `onboarding_done` + stats-grandfather for migration robustness), onboarding
   mode on PuzzleScreen (pack-machinery reuse: stats isolation + resume for
   free), pre-seeded example tile, 3-guess coaching layer, dismissible nudge,
-  skip escape, graduation CTA, funnel analytics
-  (onboarding_started/first_guess/won/abandoned/skipped, graduated_to_daily,
-  daily_completed_after_onboarding).
-- [ ] Integration tests: cold-profile EN + Hinglish full flow; existing-user
-  non-regression. Live verify + deploy (byte-verify per hardened flow).
+  skip escape, graduation CTA, funnel analytics. 515/515 app tests (22 new).
+- [x] Integration tests: 5 e2e flows (cold EN, cold Hinglish via toggle,
+  legacy existing-user, resume-no-strand, skip), wired into e2e-web.yml and
+  EXECUTED locally green via chromedriver 150 (not just authored).
+- [x] Deployed (deploy-warmer.ps1, alias re-pointed, wasm byte-verified
+  2,732,565 B, smoke check PASS) and live-verified on a real cold profile:
+  full EN funnel wire-confirmed on GA4 collect (onboarding_started →
+  onboarding_first_guess {rank 20, Scorching} → onboarding_won →
+  graduated_to_daily {from: win} → daily puzzle_started →
+  daily_completed_after_onboarding {outcome: win}); Hinglish funnel (toggle →
+  water #2 Scorching coaching → paani win → hi-en daily); returning +
+  legacy-pref users boot straight to the daily. Screenshots:
+  `reports/screenshots/first-session-hook/`.
+
+## Incidents found & fixed during this wave
+
+- **smoke_check.js crashed on any failed request** (`const URL` shadowed the
+  global URL class inside the requestfailed handler) — dormant since
+  launch-1, surfaced on this wave's post-deploy run. Fixed, re-run PASS.
+- **P0 class discovered: `dart.library.html` conditionals are stubs under
+  --wasm** (the production build target since 2026-07-12). ?reset=1, ?notif=1
+  and /join/{code} were dead on live — fixed this wave (package:web +
+  `dart.library.js_interop`), re-verified live. Storage factory, share_web,
+  timezone/PWA-check remain stubbed → **known-limitations entry 19, needs its
+  own next-wave spec** (production web currently persists via PrefsStore
+  fallback, share taps are no-ops on wasm).
 
 # PLAN — Launch-1 wave: aesthetic pass + launch gates (complete)
 
