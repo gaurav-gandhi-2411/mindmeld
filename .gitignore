@@ -20,6 +20,15 @@ payloads/*
 # Model caches
 .model-cache/
 
+# Fine-tune training artifacts — large binaries, reproducible from the
+# committed recipe (evals/finetune/{split,assemble_data,train,eval_model}.py
+# + cached training data) + fixed seed. Not committed unless/until a
+# fine-tune actually ships (see PLAN.md).
+generator/evals/finetune/model/
+generator/evals/finetune/checkpoints/
+generator/evals/finetune/data/train_run.log
+generator/evals/finetune/data/assemble_run.log
+
 # Flutter / Dart
 app/.dart_tool/
 app/.flutter-plugins

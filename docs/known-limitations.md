@@ -35,8 +35,27 @@ Warmer-specific fine-tune on Hinglish similarity pairs — a real ML project (da
 collection, fine-tuning, eval-gated bake-off against the current champion), not a
 config change or a bug fix.
 
+**Fine-tune attempted 2026-07-17, did not ship** (`reports/spec-hinglish-finetune.md`,
+`generator/evals/finetune/data/ship_decision_report.md`): SBERT contrastive fine-tune of
+`l3cube-pune/indic-sentence-bert-nli` on 543 MNRL / 705 graded Hinglish pairs (dim1
+triplets, local-LLM-augmented triplets, cross-lingual pairs, alias variants — frozen
+train/dev/test split, held-out secrets never trained on, verified by assertion). Result:
+held-out TEST Spearman **regressed** (0.435 -> 0.376 on the restricted 8-secret test
+subset) and broke 5 previously-correct dim1 pairs while fixing 3 — a net regression,
+failing the "zero net regression" ship gate. Dev-set metrics improved substantially
+(0.781 -> 0.838) without matching test improvement — the classic small-data-fine-tune
+overfitting signature the spec's risk section explicitly anticipated. One genuine partial
+win: 2 of the 5 residual-weak pairs below (`rasoi`, `bachpan`) fixed on the held-out
+residual-pair check — but this didn't clear the other gates, so the fine-tune was
+**not shipped**; off-the-shelf `l3cube-pune/indic-sentence-bert-nli` remains in
+production. Likely fix needs substantially more training data (the LLM-augmentation
+source, after homograph-collision and quality filtering, contributed only 89 of the 543
+pairs) and/or a smaller effective parameter budget (LoRA, frozen lower layers) — not
+attempted this round; recipe is fully reproducible (seed 42, committed data) if revisited.
+
 **Revisit if:** Hinglish becomes a primary (not secondary) language for the player
-base, or a suitable pre-trained checkpoint closer to EN parity ships publicly.
+base, a suitable pre-trained checkpoint closer to EN parity ships publicly, or a future
+fine-tune attempt has meaningfully more/better training data.
 
 ### 2. LLM-judge solvability score is not gate-worthy; spoiler-safety is
 

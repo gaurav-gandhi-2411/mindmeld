@@ -1,3 +1,72 @@
+# PLAN — Hinglish embedding fine-tune (complete — did not ship, 2026-07-17)
+
+Spec: `reports/spec-hinglish-finetune.md`. Branch `feat/hinglish-finetune`. Goal: beat the
+off-the-shelf hi-en champion (`l3cube-pune/indic-sentence-bert-nli`, Spearman 0.639) via a
+Warmer-specific contrastive fine-tune. Full report:
+`generator/evals/finetune/data/ship_decision_report.md`.
+
+## Frozen split + no-leakage guarantee (complete)
+
+60 daily-schedule hi-en secrets → 33 train / 11 dev / 16 test (`evals/finetune/split.py`,
+seed 42). The 5 documented residual-weak secrets (titli, khamoshi, rasoi, samunder,
+bachpan — known-limitations.md #1) forced into test, never trainable. Every training
+record asserted (code + test) to exclude held-out secrets/translations —
+`tests/test_finetune_no_leakage.py`.
+
+## Data assembly (complete) — 543 MNRL / 705 graded pairs, 4 sources
+
+dim1 triplets (train-secrets only, 24/108), LLM-augmented via local qwen3:8b + isolated
+judge filter (89/178, 37% acceptance), cross-lingual `hinglish.txt` pairs (421/421, after
+dropping 57 degenerate self-identical loanword pairs), alias variants (32/32). GG
+spot-check of a 25-pair sample caught a critical bug class before training: **homograph
+collisions** — romanized-Hindi words whose Latin spelling coincides with a real,
+different-meaning English word (door=far in Hindi vs door=entrance in English). Audited
+all 119 candidates where the Hindi-side token also appears in the game's English vocab;
+two automated local-LLM-judge passes proved unreliable (over-flagged genuine loanword
+synonyms like mobile→phone; recalibrated version still missed a real collision) — final
+list is a manual linguistic review (`evals/finetune/data/homograph_exclusions.json`). 13
+words dropped entirely (door, din, band, pair, pet, chain, beta, pita, teen, agar, koi,
+mama, nana — the last two are gender-flipped collisions, English mama/nana = mother/
+grandmother vs Hindi = maternal uncle/grandfather) + 2 fuzzy LLM negatives corrected
+(guru→music, jar→can — too related to serve as "unrelated" negatives).
+
+## Training (complete)
+
+SBERT contrastive fine-tune, MNRL + CosineSimilarityLoss, 4 epochs, lr=2e-5, batch=16,
+early-stopping on DEV (patience=2), seed 42, CPU-only/$0/no API key. Dev-curve stable,
+no divergence (spearman_cosine 0.840→0.833→0.845→0.842).
+
+## Ship decision: **NOT SHIPPED**
+
+Held-out TEST Spearman **regressed** (0.435→0.376 on the restricted 8-secret subset with
+dim1 curated scenarios) instead of improving; dim1_test broke 5 previously-correct pairs
+while fixing 3 (net -2, fails the zero-regression gate); dim2_test cross-language
+consistency stayed flat with a worse median rank. Meanwhile DEV metrics improved
+substantially (0.781→0.838) — the classic small-data-fine-tune overfitting signature the
+spec's risk section explicitly anticipated: the model adapted to dev-adjacent vocabulary
+without generalizing to genuinely unseen test words. One partial win: 2 of the 5
+residual-weak pairs (rasoi, bachpan) fixed on the held-out check, but this didn't clear
+the other gates. Off-the-shelf model stays in production; `docs/known-limitations.md` #1
+updated with the honest result and a documented next step (more training data — LLM
+augmentation contributed only 89 of 543 pairs after filtering — and/or LoRA/frozen-layers
+to reduce the effective parameter budget). Recipe fully reproducible (seed 42, all data
+committed except the 913MB checkpoint / 5.4GB training checkpoints, gitignored since
+nothing shipped).
+
+## Gotchas discovered
+
+- Ollama's `format: "json"` mode collapses a requested JSON *array* of N items down to a
+  single object on qwen3:8b — fixed by passing an explicit JSON-schema `format` (Ollama
+  structured outputs) instead of the bare string `"json"`.
+- A local-LLM judge asked to spot bad word-association pairs is unreliable for nuanced
+  linguistic judgment even after few-shot recalibration (14/18 on hand-labeled cases) —
+  a manual review by the orchestrating model was more accurate and not meaningfully
+  slower for a bounded (~119-item) candidate list.
+- The machine slept mid-session during a background audit run; the task sat in "running"
+  state for ~4 real-world hours with zero progress. `TaskOutput(block=false)` caught it;
+  killed and re-ran cleanly. Worth checking wall-clock-vs-expected-runtime before trusting
+  a "still running" status on a long gap.
+
 # PLAN — WASM-stub remediation wave (P0, in progress)
 
 Spec: known-limitations entry 19 + GG's P0 directive 2026-07-17. Branch
