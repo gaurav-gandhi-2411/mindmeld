@@ -1,8 +1,8 @@
 {
   "mnrl_sample": [
     {
-      "anchor": "yaar",
-      "positive": "buddy",
+      "anchor": "zindagi",
+      "positive": "life",
       "source": "crosslingual"
     },
     {
@@ -11,75 +11,75 @@
       "source": "llm_augmented"
     },
     {
-      "anchor": "andhera",
-      "positive": "darkness",
+      "anchor": "jharna",
+      "positive": "waterfall",
       "source": "crosslingual"
     },
     {
-      "anchor": "door",
-      "positive": "far",
+      "anchor": "andar",
+      "positive": "inside",
       "source": "crosslingual"
     },
     {
-      "anchor": "purana",
-      "positive": "old",
+      "anchor": "lamba",
+      "positive": "tall",
       "source": "crosslingual"
     },
     {
-      "anchor": "pyaar",
-      "positive": "love",
+      "anchor": "chawal",
+      "positive": "rice",
       "source": "crosslingual"
     },
     {
-      "anchor": "prayer",
-      "positive": "namaz",
+      "anchor": "god",
+      "positive": "bhagwan",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "shak",
+      "positive": "symptom",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "do",
+      "positive": "two",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "sahayak",
+      "positive": "assistant",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "sahayak",
+      "positive": "helper",
       "source": "llm_augmented"
     },
     {
       "anchor": "sundar",
-      "positive": "beautiful",
+      "positive": "attractive",
       "source": "llm_augmented"
     },
     {
-      "anchor": "ladka",
-      "positive": "boy",
+      "anchor": "videshi",
+      "positive": "foreign",
       "source": "crosslingual"
     },
     {
-      "anchor": "sahayata",
-      "positive": "aid",
-      "source": "llm_augmented"
-    },
-    {
-      "anchor": "sahayata",
-      "positive": "support",
-      "source": "llm_augmented"
-    },
-    {
-      "anchor": "sahay",
-      "positive": "help",
-      "source": "llm_augmented"
-    },
-    {
-      "anchor": "methi",
-      "positive": "fenugreek",
+      "anchor": "safed",
+      "positive": "white",
       "source": "crosslingual"
     },
     {
-      "anchor": "nila",
-      "positive": "blue",
-      "source": "crosslingual"
-    },
-    {
-      "anchor": "badla",
-      "positive": "revenge",
-      "source": "crosslingual"
+      "anchor": "mombatti",
+      "positive": "mombati",
+      "source": "alias"
     }
   ],
   "graded_sample": [
     {
-      "sentence1": "dadi",
-      "sentence2": "grandmother",
+      "sentence1": "ladka",
+      "sentence2": "boy",
       "score": 0.9,
       "source": "crosslingual"
     },
@@ -90,50 +90,50 @@
       "source": "dim1_triplets"
     },
     {
-      "sentence1": "ghutna",
-      "sentence2": "knee",
+      "sentence1": "jaan",
+      "sentence2": "life",
       "score": 0.9,
       "source": "crosslingual"
     },
     {
-      "sentence1": "song",
-      "sentence2": "umbrella",
+      "sentence1": "beat",
+      "sentence2": "laptop",
       "score": 0.05,
       "source": "llm_augmented"
     },
     {
-      "sentence1": "agar",
-      "sentence2": "if",
+      "sentence1": "aage",
+      "sentence2": "forward",
       "score": 0.9,
       "source": "crosslingual"
     },
     {
-      "sentence1": "jawaani",
-      "sentence2": "youth",
+      "sentence1": "baal",
+      "sentence2": "hair",
       "score": 0.9,
       "source": "crosslingual"
     },
     {
-      "sentence1": "haath",
-      "sentence2": "hand",
+      "sentence1": "nila",
+      "sentence2": "blue",
       "score": 0.9,
       "source": "crosslingual"
     },
     {
-      "sentence1": "patla",
-      "sentence2": "thin",
-      "score": 0.9,
-      "source": "crosslingual"
-    },
-    {
-      "sentence1": "safar",
+      "sentence1": "khaas",
       "sentence2": "ladder",
       "score": 0.05,
       "source": "llm_augmented"
     },
     {
-      "sentence1": "mushkil",
-      "sentence2": "difficult",
+      "sentence1": "garm",
+      "sentence2": "hot",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "shishya",
+      "sentence2": "student",
       "score": 0.9,
       "source": "crosslingual"
     }

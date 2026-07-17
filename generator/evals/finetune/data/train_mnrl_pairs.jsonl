@@ -25,7 +25,6 @@
 {"anchor": "dada", "positive": "uncle", "source": "llm_augmented"}
 {"anchor": "bhai", "positive": "brother", "source": "llm_augmented"}
 {"anchor": "beti", "positive": "daughter", "source": "llm_augmented"}
-{"anchor": "beta", "positive": "son", "source": "llm_augmented"}
 {"anchor": "nani", "positive": "grandma", "source": "llm_augmented"}
 {"anchor": "mangal", "positive": "marriage", "source": "llm_augmented"}
 {"anchor": "sahayata", "positive": "support", "source": "llm_augmented"}
@@ -115,10 +114,8 @@
 {"anchor": "yaar", "positive": "buddy", "source": "crosslingual"}
 {"anchor": "zindagi", "positive": "life", "source": "crosslingual"}
 {"anchor": "raat", "positive": "night", "source": "crosslingual"}
-{"anchor": "din", "positive": "day", "source": "crosslingual"}
 {"anchor": "bachcha", "positive": "child", "source": "crosslingual"}
 {"anchor": "maa", "positive": "mother", "source": "crosslingual"}
-{"anchor": "pita", "positive": "father", "source": "crosslingual"}
 {"anchor": "behen", "positive": "sister", "source": "crosslingual"}
 {"anchor": "kitaab", "positive": "book", "source": "crosslingual"}
 {"anchor": "naach", "positive": "dance", "source": "crosslingual"}
@@ -248,7 +245,6 @@
 {"anchor": "abhi", "positive": "now", "source": "crosslingual"}
 {"anchor": "jaldi", "positive": "quickly", "source": "crosslingual"}
 {"anchor": "dheere", "positive": "slowly", "source": "crosslingual"}
-{"anchor": "door", "positive": "far", "source": "crosslingual"}
 {"anchor": "paas", "positive": "near", "source": "crosslingual"}
 {"anchor": "upar", "positive": "above", "source": "crosslingual"}
 {"anchor": "neeche", "positive": "below", "source": "crosslingual"}
@@ -257,7 +253,6 @@
 {"anchor": "seedha", "positive": "straight", "source": "crosslingual"}
 {"anchor": "ulta", "positive": "opposite", "source": "crosslingual"}
 {"anchor": "khula", "positive": "open", "source": "crosslingual"}
-{"anchor": "band", "positive": "closed", "source": "crosslingual"}
 {"anchor": "accha", "positive": "good", "source": "crosslingual"}
 {"anchor": "bura", "positive": "bad", "source": "crosslingual"}
 {"anchor": "bhada", "positive": "ugly", "source": "crosslingual"}
@@ -362,7 +357,6 @@
 {"anchor": "suii", "positive": "needle", "source": "crosslingual"}
 {"anchor": "patli", "positive": "bandage", "source": "crosslingual"}
 {"anchor": "haath", "positive": "hand", "source": "crosslingual"}
-{"anchor": "pair", "positive": "foot", "source": "crosslingual"}
 {"anchor": "aankhein", "positive": "eyes", "source": "crosslingual"}
 {"anchor": "naak", "positive": "nose", "source": "crosslingual"}
 {"anchor": "muh", "positive": "mouth", "source": "crosslingual"}
@@ -375,7 +369,6 @@
 {"anchor": "gardan", "positive": "neck", "source": "crosslingual"}
 {"anchor": "kandha", "positive": "shoulder", "source": "crosslingual"}
 {"anchor": "seena", "positive": "chest", "source": "crosslingual"}
-{"anchor": "pet", "positive": "stomach", "source": "crosslingual"}
 {"anchor": "kamar", "positive": "waist", "source": "crosslingual"}
 {"anchor": "ghutna", "positive": "knee", "source": "crosslingual"}
 {"anchor": "tahni", "positive": "ankle", "source": "crosslingual"}
@@ -394,7 +387,6 @@
 {"anchor": "tadap", "positive": "yearning", "source": "crosslingual"}
 {"anchor": "ghabrana", "positive": "anxiety", "source": "crosslingual"}
 {"anchor": "sukoon", "positive": "peace", "source": "crosslingual"}
-{"anchor": "chain", "positive": "peace", "source": "crosslingual"}
 {"anchor": "takleef", "positive": "trouble", "source": "crosslingual"}
 {"anchor": "rahat", "positive": "relief", "source": "crosslingual"}
 {"anchor": "anand", "positive": "joy", "source": "crosslingual"}
@@ -420,11 +412,9 @@
 {"anchor": "rishtedaar", "positive": "relatives", "source": "crosslingual"}
 {"anchor": "dada", "positive": "grandfather", "source": "crosslingual"}
 {"anchor": "dadi", "positive": "grandmother", "source": "crosslingual"}
-{"anchor": "nana", "positive": "grandfather", "source": "crosslingual"}
 {"anchor": "nani", "positive": "grandmother", "source": "crosslingual"}
 {"anchor": "chacha", "positive": "uncle", "source": "crosslingual"}
 {"anchor": "chachi", "positive": "aunt", "source": "crosslingual"}
-{"anchor": "mama", "positive": "maternal uncle", "source": "crosslingual"}
 {"anchor": "mami", "positive": "aunt", "source": "crosslingual"}
 {"anchor": "fufa", "positive": "uncle", "source": "crosslingual"}
 {"anchor": "bua", "positive": "aunt", "source": "crosslingual"}
@@ -441,7 +431,6 @@
 {"anchor": "doosra", "positive": "other", "source": "crosslingual"}
 {"anchor": "ek", "positive": "one", "source": "crosslingual"}
 {"anchor": "do", "positive": "two", "source": "crosslingual"}
-{"anchor": "teen", "positive": "three", "source": "crosslingual"}
 {"anchor": "chaar", "positive": "four", "source": "crosslingual"}
 {"anchor": "paanch", "positive": "five", "source": "crosslingual"}
 {"anchor": "chhe", "positive": "six", "source": "crosslingual"}
@@ -468,7 +457,6 @@
 {"anchor": "kitne", "positive": "how many", "source": "crosslingual"}
 {"anchor": "aur", "positive": "and", "source": "crosslingual"}
 {"anchor": "lekin", "positive": "but", "source": "crosslingual"}
-{"anchor": "agar", "positive": "if", "source": "crosslingual"}
 {"anchor": "toh", "positive": "then", "source": "crosslingual"}
 {"anchor": "isliye", "positive": "therefore", "source": "crosslingual"}
 {"anchor": "shayad", "positive": "maybe", "source": "crosslingual"}
@@ -497,7 +485,6 @@
 {"anchor": "adha", "positive": "half", "source": "crosslingual"}
 {"anchor": "sab", "positive": "all", "source": "crosslingual"}
 {"anchor": "kuch", "positive": "some", "source": "crosslingual"}
-{"anchor": "koi", "positive": "someone", "source": "crosslingual"}
 {"anchor": "har", "positive": "every", "source": "crosslingual"}
 {"anchor": "kuch bhi", "positive": "anything", "source": "crosslingual"}
 {"anchor": "parchhain", "positive": "shadow", "source": "crosslingual"}

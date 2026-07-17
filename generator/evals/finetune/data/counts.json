@@ -1,24 +1,43 @@
 {
   "mnrl_pairs": {
     "dim1_triplets": 24,
-    "llm_augmented": 90,
-    "crosslingual": 434,
+    "llm_augmented": 89,
+    "crosslingual": 421,
     "alias": 32,
-    "total_before_dedup": 580,
-    "total_after_dedup": 556
+    "total_before_dedup": 566,
+    "total_after_dedup": 543
   },
   "graded_pairs": {
     "dim1_triplets": 108,
-    "llm_augmented": 180,
-    "crosslingual": 434,
+    "llm_augmented": 178,
+    "crosslingual": 421,
     "alias": 32,
-    "total_before_dedup": 754,
-    "total_after_dedup": 719
+    "total_before_dedup": 739,
+    "total_after_dedup": 705
   },
   "llm_augment_pipeline_stats": {
     "loaded_from_cache": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\data\\llm_triplets_accepted.json",
     "n_accepted_after_judge": 90
   },
   "held_out_secret_count": 27,
+  "homograph_collisions_excluded": [
+    "agar",
+    "band",
+    "beta",
+    "chain",
+    "din",
+    "door",
+    "koi",
+    "mama",
+    "nana",
+    "pair",
+    "pet",
+    "pita",
+    "teen"
+  ],
+  "fuzzy_negative_pairs_excluded": [
+    "guru->music",
+    "jar->can"
+  ],
   "no_leakage_assertion": "passed \u2014 no training record contains a held-out secret or its EN translation (see _assert_no_leakage)"
 }

@@ -42,6 +42,28 @@ DATA_DIR = Path(__file__).parent / "data"
 SCENARIOS_PATH = Path(__file__).parent.parent / "scenarios" / "dim1_hien.json"
 ALIASES_PATH = Path(__file__).parent.parent.parent / "vocab" / "hi-en-aliases.txt"
 LLM_CACHE_PATH = DATA_DIR / "llm_triplets_accepted.json"
+HOMOGRAPH_EXCLUSIONS_PATH = DATA_DIR / "homograph_exclusions.json"
+
+# GG review (post-data-approval): any romanized-Hindi word whose Latin
+# spelling ALSO happens to be a common, DIFFERENT-meaning English word is a
+# training hazard — it teaches the model a false association for a real
+# English word used in code-mixed play (e.g. "door" = far in Hinglish vs
+# "door" = entrance in English). See data/homograph_exclusions.json for the
+# full audit (two automated local-LLM-judge passes were tried and rejected
+# as unreliable; this is a manual linguistic review). Dropped entirely from
+# every source below — not disambiguated, just excluded, per GG's
+# instruction ("a small fraction, not worth the risk").
+HOMOGRAPH_COLLISIONS = frozenset(
+    {
+        "door", "din", "band", "pair", "pet", "chain", "beta", "pita",
+        "teen", "agar", "koi", "mama", "nana",
+    }
+)
+
+# GG review: LLM-generated "unrelated" negatives that turned out to be
+# genuinely (if indirectly) related, not safe hard negatives — a fuzzy
+# negative teaches a fuzzy boundary. (word, unrelated) pairs to drop.
+FUZZY_NEGATIVE_EXCLUSIONS = frozenset({("guru", "music"), ("jar", "can")})
 
 TIER_SCORE = {"near": 0.85, "mid": 0.55, "far": 0.05}
 LLM_RELATED_SCORE = 0.80
@@ -108,23 +130,27 @@ def llm_source(held_out: set[str]) -> tuple[list[dict], list[dict], dict]:
     mnrl: list[dict] = []
     graded: list[dict] = []
     for t in accepted:
-        mnrl.append({"anchor": t["word"], "positive": t["related"], "source": "llm_augmented"})
+        word = t["word"]
+        if word.lower() in HOMOGRAPH_COLLISIONS:
+            continue
+        mnrl.append({"anchor": word, "positive": t["related"], "source": "llm_augmented"})
         graded.append(
             {
-                "sentence1": t["word"],
+                "sentence1": word,
                 "sentence2": t["related"],
                 "score": LLM_RELATED_SCORE,
                 "source": "llm_augmented",
             }
         )
-        graded.append(
-            {
-                "sentence1": t["word"],
-                "sentence2": t["unrelated"],
-                "score": LLM_UNRELATED_SCORE,
-                "source": "llm_augmented",
-            }
-        )
+        if (word.lower(), t["unrelated"].lower()) not in FUZZY_NEGATIVE_EXCLUSIONS:
+            graded.append(
+                {
+                    "sentence1": word,
+                    "sentence2": t["unrelated"],
+                    "score": LLM_UNRELATED_SCORE,
+                    "source": "llm_augmented",
+                }
+            )
     return mnrl, graded, stats
 
 
@@ -134,6 +160,8 @@ def crosslingual_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
     graded: list[dict] = []
     for word, anchor in pairs:
         if word.lower() in held_out or anchor.lower() in held_out:
+            continue
+        if word.lower() in HOMOGRAPH_COLLISIONS:
             continue
         if word.lower() == anchor.lower():
             # English loanwords used as-is in Hinglish (school->school,
@@ -249,6 +277,10 @@ def build() -> dict:
         },
         "llm_augment_pipeline_stats": llm_stats,
         "held_out_secret_count": len(split["held_out_secrets"]),
+        "homograph_collisions_excluded": sorted(HOMOGRAPH_COLLISIONS),
+        "fuzzy_negative_pairs_excluded": sorted(
+            f"{w}->{u}" for w, u in FUZZY_NEGATIVE_EXCLUSIONS
+        ),
         "no_leakage_assertion": "passed — no training record contains a held-out "
         "secret or its EN translation (see _assert_no_leakage)",
     }

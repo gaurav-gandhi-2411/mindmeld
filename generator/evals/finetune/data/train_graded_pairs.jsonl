@@ -112,8 +112,6 @@
 {"sentence1": "bhai", "sentence2": "cloud", "score": 0.05, "source": "llm_augmented"}
 {"sentence1": "beti", "sentence2": "daughter", "score": 0.8, "source": "llm_augmented"}
 {"sentence1": "beti", "sentence2": "book", "score": 0.05, "source": "llm_augmented"}
-{"sentence1": "beta", "sentence2": "son", "score": 0.8, "source": "llm_augmented"}
-{"sentence1": "beta", "sentence2": "chair", "score": 0.05, "source": "llm_augmented"}
 {"sentence1": "nani", "sentence2": "grandma", "score": 0.8, "source": "llm_augmented"}
 {"sentence1": "nani", "sentence2": "phone", "score": 0.05, "source": "llm_augmented"}
 {"sentence1": "mangal", "sentence2": "marriage", "score": 0.8, "source": "llm_augmented"}
@@ -310,10 +308,8 @@
 {"sentence1": "yaar", "sentence2": "buddy", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "zindagi", "sentence2": "life", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "raat", "sentence2": "night", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "din", "sentence2": "day", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "bachcha", "sentence2": "child", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "maa", "sentence2": "mother", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "pita", "sentence2": "father", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "behen", "sentence2": "sister", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "kitaab", "sentence2": "book", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "naach", "sentence2": "dance", "score": 0.9, "source": "crosslingual"}
@@ -443,7 +439,6 @@
 {"sentence1": "abhi", "sentence2": "now", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "jaldi", "sentence2": "quickly", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "dheere", "sentence2": "slowly", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "door", "sentence2": "far", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "paas", "sentence2": "near", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "upar", "sentence2": "above", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "neeche", "sentence2": "below", "score": 0.9, "source": "crosslingual"}
@@ -452,7 +447,6 @@
 {"sentence1": "seedha", "sentence2": "straight", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "ulta", "sentence2": "opposite", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "khula", "sentence2": "open", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "band", "sentence2": "closed", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "accha", "sentence2": "good", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "bura", "sentence2": "bad", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "bhada", "sentence2": "ugly", "score": 0.9, "source": "crosslingual"}
@@ -557,7 +551,6 @@
 {"sentence1": "suii", "sentence2": "needle", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "patli", "sentence2": "bandage", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "haath", "sentence2": "hand", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "pair", "sentence2": "foot", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "aankhein", "sentence2": "eyes", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "naak", "sentence2": "nose", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "muh", "sentence2": "mouth", "score": 0.9, "source": "crosslingual"}
@@ -570,7 +563,6 @@
 {"sentence1": "gardan", "sentence2": "neck", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "kandha", "sentence2": "shoulder", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "seena", "sentence2": "chest", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "pet", "sentence2": "stomach", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "kamar", "sentence2": "waist", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "ghutna", "sentence2": "knee", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "tahni", "sentence2": "ankle", "score": 0.9, "source": "crosslingual"}
@@ -589,7 +581,6 @@
 {"sentence1": "tadap", "sentence2": "yearning", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "ghabrana", "sentence2": "anxiety", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "sukoon", "sentence2": "peace", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "chain", "sentence2": "peace", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "takleef", "sentence2": "trouble", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "rahat", "sentence2": "relief", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "anand", "sentence2": "joy", "score": 0.9, "source": "crosslingual"}
@@ -615,11 +606,9 @@
 {"sentence1": "rishtedaar", "sentence2": "relatives", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "dada", "sentence2": "grandfather", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "dadi", "sentence2": "grandmother", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "nana", "sentence2": "grandfather", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "nani", "sentence2": "grandmother", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "chacha", "sentence2": "uncle", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "chachi", "sentence2": "aunt", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "mama", "sentence2": "maternal uncle", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "mami", "sentence2": "aunt", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "fufa", "sentence2": "uncle", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "bua", "sentence2": "aunt", "score": 0.9, "source": "crosslingual"}
@@ -636,7 +625,6 @@
 {"sentence1": "doosra", "sentence2": "other", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "ek", "sentence2": "one", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "do", "sentence2": "two", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "teen", "sentence2": "three", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "chaar", "sentence2": "four", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "paanch", "sentence2": "five", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "chhe", "sentence2": "six", "score": 0.9, "source": "crosslingual"}
@@ -663,7 +651,6 @@
 {"sentence1": "kitne", "sentence2": "how many", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "aur", "sentence2": "and", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "lekin", "sentence2": "but", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "agar", "sentence2": "if", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "toh", "sentence2": "then", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "isliye", "sentence2": "therefore", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "shayad", "sentence2": "maybe", "score": 0.9, "source": "crosslingual"}
@@ -692,7 +679,6 @@
 {"sentence1": "adha", "sentence2": "half", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "sab", "sentence2": "all", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "kuch", "sentence2": "some", "score": 0.9, "source": "crosslingual"}
-{"sentence1": "koi", "sentence2": "someone", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "har", "sentence2": "every", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "kuch bhi", "sentence2": "anything", "score": 0.9, "source": "crosslingual"}
 {"sentence1": "parchhain", "sentence2": "shadow", "score": 0.9, "source": "crosslingual"}
