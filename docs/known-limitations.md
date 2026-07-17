@@ -380,6 +380,27 @@ not taken on faith). Non-blocking items logged here rather than fixed inline:
   pass). **Revisit if**: this reproduces during a live manual pass — would need a
   real fix if so, not just a note.
 
+### 18. hi-en Warm band is structurally ~23 ranks wide (coarser gradient than EN)
+
+The temperature bands are computed as `max(floor, n × fraction)` of vocab size
+(`bandForRank` in `app/lib/core/models.dart`, constants in `core/config.dart`):
+Scorching ≤ max(50, 0.1%·n), Hot ≤ max(500, 1%·n), Warm ≤ 5%·n. For the hi-en
+vocab (n ≈ 10.5k) the Hot floor of 500 nearly swallows the Warm ceiling of
+`0.05·n ≈ 523`, leaving Warm only ~23 ranks wide — so Hinglish play effectively
+has a 4-band gradient (Scorching/Hot/Cold/Freezing) where EN (n = 55k) has all
+five. Found while authoring the first-session onboarding puzzle: the hi-en
+pre-seeded example guess targets **Hot** as its "mid" teaching band because Warm
+is not reliably targetable at this vocab size.
+
+**Why accepted:** the floors exist to keep bands meaningful under the current
+model's neighborhood structure — hi-en similarity is noisy enough (entry 1) that
+a proportional-only Hot band (~105 ranks) would misclassify genuinely-close
+guesses as Warm. Narrowing the floors is a band-tuning exercise that only makes
+sense on top of a better embedding model, not before it.
+
+**Revisit:** together with the Hinglish fine-tune (entry 1's revisit condition) —
+re-derive band fractions/floors from the improved model's rank distributions.
+
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
 ### 16. Eval baseline report predates the maxGuesses tuning fix

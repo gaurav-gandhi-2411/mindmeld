@@ -1,3 +1,37 @@
+# PLAN — First-session hook wave (in progress)
+
+Spec: `spec-first-session-hook.md`. Branch `feat/first-session-hook`. Orchestrator
++ 2 parallel executors (generator content / app flow), 2026-07-17.
+
+## Content gate (GG review — passed)
+
+- [x] Onboarding puzzle content proposed from REAL embedding checks against the
+  production matrices (script: scratchpad `onboarding_content_check.py`; ranks
+  are production ranks, not estimates). **Approved:** EN `dog` (example guess
+  `bone` → rank 1,400 = Warm), hi-en `paani` (example guess `nadi` → rank 119 =
+  Hot). Rejected by the check: `dil`, `khana`, `aam`, `seb`, `machli`, `sitara`
+  (surface-form neighborhoods under the 0.639 model), `roti` (natural guess
+  `khana` reads Freezing).
+- [x] paani clue reworded per GG to avoid rain/weather pattern-matching
+  (`baarish` reads Freezing at rank 3,880): thirst/drinking framing only.
+  Both clues pass `clue_leak_reason` spoiler gate.
+- [x] hi-en Warm band structural narrowness documented as known-limitations
+  entry 18 (Hot floor 500 vs Warm ceiling ~523 at n≈10.5k).
+
+## Build (in progress)
+
+- [ ] Generator: `build_onboarding.py`, payloads `onboarding/{lang}.json.gz`
+  (maxGuesses=20), publish.py sync, spoiler + band-quality gates in pytest.
+- [ ] App: first-run gate (`onboarding_puzzle_state` pref + legacy
+  `onboarding_done` + stats-grandfather for migration robustness), onboarding
+  mode on PuzzleScreen (pack-machinery reuse: stats isolation + resume for
+  free), pre-seeded example tile, 3-guess coaching layer, dismissible nudge,
+  skip escape, graduation CTA, funnel analytics
+  (onboarding_started/first_guess/won/abandoned/skipped, graduated_to_daily,
+  daily_completed_after_onboarding).
+- [ ] Integration tests: cold-profile EN + Hinglish full flow; existing-user
+  non-regression. Live verify + deploy (byte-verify per hardened flow).
+
 # PLAN — Launch-1 wave: aesthetic pass + launch gates (complete)
 
 Spec: `spec.md` (this branch, supersedes the phase-4-era scaffolding spec). Branch
