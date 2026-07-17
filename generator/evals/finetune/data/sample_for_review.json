@@ -1,0 +1,141 @@
+{
+  "mnrl_sample": [
+    {
+      "anchor": "yaar",
+      "positive": "buddy",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "bhai",
+      "positive": "brother",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "andhera",
+      "positive": "darkness",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "door",
+      "positive": "far",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "purana",
+      "positive": "old",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "pyaar",
+      "positive": "love",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "prayer",
+      "positive": "namaz",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "sundar",
+      "positive": "beautiful",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "ladka",
+      "positive": "boy",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "sahayata",
+      "positive": "aid",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "sahayata",
+      "positive": "support",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "sahay",
+      "positive": "help",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "methi",
+      "positive": "fenugreek",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "nila",
+      "positive": "blue",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "badla",
+      "positive": "revenge",
+      "source": "crosslingual"
+    }
+  ],
+  "graded_sample": [
+    {
+      "sentence1": "dadi",
+      "sentence2": "grandmother",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "gaana",
+      "sentence2": "geet",
+      "score": 0.85,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "ghutna",
+      "sentence2": "knee",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "song",
+      "sentence2": "umbrella",
+      "score": 0.05,
+      "source": "llm_augmented"
+    },
+    {
+      "sentence1": "agar",
+      "sentence2": "if",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "jawaani",
+      "sentence2": "youth",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "haath",
+      "sentence2": "hand",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "patla",
+      "sentence2": "thin",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "safar",
+      "sentence2": "ladder",
+      "score": 0.05,
+      "source": "llm_augmented"
+    },
+    {
+      "sentence1": "mushkil",
+      "sentence2": "difficult",
+      "score": 0.9,
+      "source": "crosslingual"
+    }
+  ]
+}
