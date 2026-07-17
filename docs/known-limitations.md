@@ -35,7 +35,7 @@ Warmer-specific fine-tune on Hinglish similarity pairs — a real ML project (da
 collection, fine-tuning, eval-gated bake-off against the current champion), not a
 config change or a bug fix.
 
-**Fine-tune attempted 2026-07-17, did not ship** (`reports/spec-hinglish-finetune.md`,
+**Fine-tune attempted 2026-07-17 (v1), did not ship** (`reports/spec-hinglish-finetune.md`,
 `generator/evals/finetune/data/ship_decision_report.md`): SBERT contrastive fine-tune of
 `l3cube-pune/indic-sentence-bert-nli` on 543 MNRL / 705 graded Hinglish pairs (dim1
 triplets, local-LLM-augmented triplets, cross-lingual pairs, alias variants — frozen
@@ -46,16 +46,48 @@ failing the "zero net regression" ship gate. Dev-set metrics improved substantia
 (0.781 -> 0.838) without matching test improvement — the classic small-data-fine-tune
 overfitting signature the spec's risk section explicitly anticipated. One genuine partial
 win: 2 of the 5 residual-weak pairs below (`rasoi`, `bachpan`) fixed on the held-out
-residual-pair check — but this didn't clear the other gates, so the fine-tune was
-**not shipped**; off-the-shelf `l3cube-pune/indic-sentence-bert-nli` remains in
-production. Likely fix needs substantially more training data (the LLM-augmentation
-source, after homograph-collision and quality filtering, contributed only 89 of the 543
-pairs) and/or a smaller effective parameter budget (LoRA, frozen lower layers) — not
-attempted this round; recipe is fully reproducible (seed 42, committed data) if revisited.
+residual-pair check — but this didn't clear the other gates, so v1 was **not shipped**.
+Hypothesized root cause: insufficient training-data volume (543/705 pairs is small
+relative to a ~110M-parameter BERT-base model).
 
-**Revisit if:** Hinglish becomes a primary (not secondary) language for the player
-base, a suitable pre-trained checkpoint closer to EN parity ships publicly, or a future
-fine-tune attempt has meaningfully more/better training data.
+**Retry attempted 2026-07-18 (v2) with expanded real/corpus data, did not ship, and
+regressed FURTHER than v1** (`spec-hinglish-data-expansion.md`,
+`generator/evals/finetune/data/ship_decision_report_v2.md`): a licensing-gated search
+across 5 candidate real-data sources (Hindi WordSim-353, Multi-SimLex Hindi, Hindi
+WordNet/IndoWordNet, IndicCorp, HingCorpus, Aksharantar) found that 3 were unusable
+(WordSim-353/Multi-SimLex Hindi don't verifiably exist for Hindi; IndoWordNet's data is
+license-gated to research use) and 2 were non-commercial (IndicCorp v1, HingCorpus).
+Only IndicCorp v2 (CC0) and Aksharantar (CC-BY/CC0) were commercial-clean. Mined 2,718
+candidate relatedness pairs from real IndicCorp v2 Hindi corpus co-occurrence (PMI),
+quality-filtered via an isolated LLM judge (`pmi_quality_filter.py`, same pattern as
+`homograph_audit.py`) down to 326 (later 325 after dropping one platform-context-noise
+pair, `gaana`/`views`) trustworthy pairs — expanding the training set to 756 MNRL / 1028
+graded pairs (+39%/+46% over v1). Same frozen split, same method/hyperparameters as v1
+(held constant deliberately, so the delta is attributable to data alone). Result:
+**held-out TEST Spearman regressed further, to 0.324** (worse than v1's 0.376); dim1_test
+net regression -3 (worse than v1's -2); dim2_test net regression -2 with 0 pairs fixed
+(worse than v1's net 0 with 2 fixed); residual-weak dim2 pass-rate dropped to 0/5 (worse
+than v1's 2/5 — v1 had actually pushed `rasoi` and `bachpan` into the Hot band, v2 does
+not). **More training data made every held-out metric worse, not better — this falsifies
+the v1 hypothesis that data volume was the bottleneck.** Off-the-shelf
+`l3cube-pune/indic-sentence-bert-nli` remains in production, unchanged. Plausible
+(unconfirmed — no ablation run) mechanisms: the new PMI-mined source is a noisier
+co-occurrence-based signal than curated/judged pairs and may dilute a small clean signal;
+dev Spearman kept climbing every epoch with no early-stop trigger (0.780 -> 0.816), the
+same dev/test decoupling overfitting signature as v1, now steeper. The commercial-data
+well is now genuinely exhausted at reasonable engineering effort — the honest ceiling is
+that real-data-at-scale, gated to what's actually available and licensable, still doesn't
+clear the bar with this method. Both recipes are fully reproducible (seed 42, committed
+data, checkpoints gitignored).
+
+**Revisit if:** Hinglish becomes a primary (not secondary) language for the player base;
+a suitable pre-trained checkpoint closer to EN parity ships publicly; a future attempt
+changes the OPTIMIZATION axis instead of data volume (frozen lower layers, LoRA, lower
+LR/fewer epochs — untested by either v1 or v2, and v2's result argues this is the more
+promising remaining lever); or real player-guess data accumulates post-launch as an
+in-domain training signal no external corpus can match (players' actual Hinglish guesses
+for actual game secrets is a fundamentally better-targeted signal than general-corpus PMI
+mining, and requires zero further licensing work).
 
 ### 2. LLM-judge solvability score is not gate-worthy; spoiler-safety is
 

@@ -1,3 +1,92 @@
+# PLAN — Hinglish data expansion + retrain v2 (complete — did not ship, 2026-07-18)
+
+Spec: `spec-hinglish-data-expansion.md`. Branch `feat/hinglish-finetune` (continuation).
+Orchestrator + executor subagents, autonomous run with one GG review gate (data-sample
+approval before training). Full report: `generator/evals/finetune/data/ship_decision_report_v2.md`.
+
+## Licensing gate (complete) — 3 of 5 candidate sources ruled out
+
+Researched availability + commercial license for all 5 spec-candidate sources before
+touching any of them: Hindi WordSim-353 (not verifiably available anywhere — no public
+dataset found despite two independent research passes), Multi-SimLex Hindi (Hindi not in
+its 12-language core set), Hindi WordNet/IndoWordNet (data stated "provided openly for
+the purpose of research" — research-only, excluded), IndicCorp v1 + HingCorpus
+(CC-BY-NC-SA-4.0 — excluded). Only **IndicCorp v2** (CC0) and **Aksharantar** (CC-BY/CC0)
+cleared the gate. IndicXlit (the spec's named transliteration engine) failed to install
+on this Windows/Python 3.13 machine (confirmed live: `fairseq` build error, matches an
+open unresolved upstream GitHub issue) — substituted Aksharantar's own (Devanagari,
+romanized) pairs as a static transliteration dictionary instead.
+
+## Data assembly (complete) — corpus-PMI mining + quality filter, GG-approved
+
+Aksharantar's Hindi dictionary turned out to have poor coverage of short common bare-stem
+words (0/20 on a spot-check against existing `hinglish.txt` vocabulary) — worked around
+with a local-LLM (qwen3:8b) transliteration fallback gated by real corpus-occurrence
+verification (an LLM-proposed Devanagari spelling was only trusted if it actually appears
+>=3 times in the downloaded corpus sample). Mined 2,718 candidate relatedness pairs via
+PMI co-occurrence over a 209,168-sentence IndicCorp v2 Hindi sample (150MB, CC0),
+restricted to a 396-word verified anchor vocabulary. Dict-vs-LLM transliteration
+calibration agreement was only 34.6% (reported honestly, not hidden) — noise appeared
+across the full PMI-score range, not just at the bottom, so a score floor alone couldn't
+clean it up. Ran an isolated LLM-judge quality filter (same pattern as
+`homograph_audit.py`): 2,718 -> 326 accepted (12%, deliberately conservative — all 6
+known-bad examples flagged in the mining report were correctly rejected). **GG review
+gate**: presented full licensing report, per-source counts, and a cross-source sample for
+approval before training — GG approved with one edit (dropped `gaana`/`views`, a
+platform-engagement-metric artifact, not semantic relatedness; scanned for and confirmed
+no other platform-context pairs of that type slipped through). Final: 756 MNRL / 1028
+graded pairs (+39%/+46% over v1's 543/705), 5 sources, no-leakage assertion passed.
+
+## Retrain + eval (complete) — regressed further than v1, did not ship
+
+Same method/hyperparameters as v1 (held constant deliberately): SBERT contrastive,
+MNRL + CosineSimilarityLoss, 4 epochs, lr=2e-5, seed 42, CPU-only, ~9min runtime, ran to
+completion (no early stop, dev Spearman 0.780->0.816 monotonic). **Held-out TEST Spearman
+0.324 (worse than v1's 0.376, worse than baseline's 0.435)**; dim1_test net regression -3
+(worse than v1's -2); dim2_test net -2 with 0 pairs fixed (worse than v1's net 0 with 2
+fixed); residual-weak dim2 pass-rate 0/5 (worse than v1's 2/5). **All 3 ship gates fail,
+more severely than v1.** The key finding: 43% more training data made every held-out
+metric worse, not better — this falsifies the v1 hypothesis that data volume was the
+bottleneck. Off-the-shelf `l3cube-pune/indic-sentence-bert-nli` stays in production,
+unchanged (EN-unchanged proof: `config.py` byte-identical, `train.py` never imports
+`config` at all).
+
+## Ship decision: **NOT SHIPPED**
+
+`docs/known-limitations.md` entry 1 updated with the full v1+v2 history. No payload
+regeneration, no live spot-check (nothing shipped — off-the-shelf model already live).
+Commercial-data avenue now genuinely exhausted at reasonable engineering effort — next
+lever if revisited is the OPTIMIZATION axis (LoRA, frozen layers, lower LR — untested by
+either attempt), or real player-guess data post-launch (in-domain signal no external
+corpus can match, zero further licensing risk).
+
+## Gotchas discovered
+
+- Academic word-similarity benchmarks (WordSim-353, SimLex-999/Multi-SimLex) that "should"
+  exist for a major language like Hindi sometimes don't have a confirmed public release —
+  don't assume availability from a paper title; verify a real download link before
+  planning around it.
+- A "provided openly for the purpose of research" phrase in a dataset's own README is a
+  clear non-commercial signal even without a formal SPDX license tag — don't require a
+  named license to treat data as excluded.
+- `pip install` failures for ML packages with native/compiled dependencies (`fairseq`) on
+  Windows are worth testing directly (in an isolated scratch venv) rather than trusting an
+  old GitHub issue's staleness — it reproduced exactly as reported.
+- A dictionary mined from running text (Aksharantar) systematically under-covers short,
+  high-frequency bare-stem words relative to longer/compound/inflected forms — a coverage
+  gap that doesn't show up until you spot-check against the SPECIFIC vocabulary you need,
+  not the dataset's aggregate size.
+- PMI-mined corpus relatedness needs an isolated LLM-judge quality pass, not just a score
+  threshold — noise (transliteration hallucination AND spurious co-occurrence) appeared
+  across the full PMI-score range in this run, so raising the floor alone wouldn't have
+  cleaned it up.
+- More training data is not a universal fix for a small-fine-tune overfitting signature —
+  this session directly tested and falsified that hypothesis; the dev/test decoupling
+  pattern (dev climbs, test doesn't) persisted and got worse with more data, pointing at
+  the optimization/regularization axis instead.
+
+---
+
 # PLAN — Hinglish embedding fine-tune (complete — did not ship, 2026-07-17)
 
 Spec: `reports/spec-hinglish-finetune.md`. Branch `feat/hinglish-finetune`. Goal: beat the
