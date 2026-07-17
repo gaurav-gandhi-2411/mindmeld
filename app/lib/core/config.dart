@@ -52,9 +52,14 @@ class AppConfig {
   /// google_mobile_ads is a native-only plugin; web builds always use the stub.
   // ignore: do_not_use_environment — kIsWeb is a compile-time const on all targets
   static bool get adsEnabledEffective {
-    // kIsWeb is a bool const in flutter/foundation.dart; tree-shaken at compile time.
-    // We reference it via a conditional to keep this file free of dart:html imports.
-    if (const bool.fromEnvironment('dart.library.html')) return false;
+    // dart.library.js_interop, not dart.library.html: html is FALSE under the
+    // --wasm production build target, which would let this guard fall through
+    // to `adsEnabled` on web (google_mobile_ads is native-only and must never
+    // be invoked there). js_interop is true for BOTH web compile targets
+    // (dart2js/DDC and dart2wasm), false on native — this must return false on
+    // BOTH web targets. We reference it via a conditional to keep this file
+    // free of dart:html/js_interop imports.
+    if (const bool.fromEnvironment('dart.library.js_interop')) return false;
     return adsEnabled;
   }
 
@@ -62,7 +67,9 @@ class AppConfig {
   ///
   /// purchases_flutter is a native-only plugin; web builds always use the stub.
   static bool get iapEnabledEffective {
-    if (const bool.fromEnvironment('dart.library.html')) return false;
+    // See adsEnabledEffective above: must be false on BOTH web compile
+    // targets, so this keys on dart.library.js_interop, not dart.library.html.
+    if (const bool.fromEnvironment('dart.library.js_interop')) return false;
     return iapEnabled;
   }
 

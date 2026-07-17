@@ -5,7 +5,7 @@
 /// Imported via conditional import (see [isIosPwaNotInstalled] call sites in
 /// notification_service.dart):
 ///   import 'ios_pwa_check_stub.dart'
-///     if (dart.library.html) 'ios_pwa_check_web.dart';
+///     if (dart.library.js_interop) 'ios_pwa_check_web.dart';
 library;
 
 import 'package:web/web.dart' as web;

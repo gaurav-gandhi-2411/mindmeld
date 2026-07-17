@@ -1,8 +1,8 @@
-/// Web share helper — used when compiling for web (dart:html is available).
+/// Web share helper — used when compiling for web (JS or WebAssembly).
 ///
 /// Imported via conditional import in [win_screen.dart]:
 ///   import 'share_stub.dart'
-///     if (dart.library.html) 'share_web.dart';
+///     if (dart.library.js_interop) 'share_web.dart';
 ///
 /// Uses the Web Share API (navigator.share / navigator.canShare) via
 /// package:web. On desktop browsers where navigator.share is unavailable,

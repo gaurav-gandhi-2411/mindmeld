@@ -106,3 +106,83 @@ jobs:
             -d web-server \
             --browser-name=chrome \
             --web-port=7358
+
+  # WASM lane — the root fix for known-limitations entry 19. Production ships
+  # `flutter build web --wasm`, where dart.library.html is FALSE: any
+  # conditional import keyed on it silently compiles the no-op stub in
+  # production while the DDC-compiled job above stays green (this is exactly
+  # how ?reset=1, /join links, share, and the SQLite storage backend were all
+  # dead/stubbed on live between 2026-07-12 and 2026-07-17). This job runs the
+  # SAME integration suite against a dart2wasm compile, plus a storage-backend
+  # probe against the real production build artifact, so a dart:html-era stub
+  # can never again pass CI while breaking production.
+  e2e-web-wasm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.44.2'
+
+      - name: flutter pub get
+        working-directory: app
+        run: flutter pub get
+
+      - uses: nanasess/setup-chromedriver@v3
+
+      - name: Start chromedriver
+        run: |
+          chromedriver --port=4444 &
+          sleep 2
+          curl -sf http://localhost:4444/status
+
+      - name: Run integration_test/app_test.dart on WASM (Chrome via WebDriver)
+        working-directory: app
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/app_test.dart \
+            -d web-server \
+            --browser-name=chrome \
+            --web-port=7359 \
+            --wasm
+
+      - name: Run integration_test/first_session_test.dart on WASM (Chrome via WebDriver)
+        working-directory: app
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/first_session_test.dart \
+            -d web-server \
+            --browser-name=chrome \
+            --web-port=7360 \
+            --wasm
+
+      # Storage-backend probe against the real production artifact: builds
+      # web --wasm exactly as deploy-warmer.ps1 does and asserts the
+      # SQLite/WASM backend actually initialises (console signal + IndexedDB
+      # database present + persistence across reload) — NOT the PrefsStore
+      # fallback. See firebase-tests/wasm_storage_check.js.
+      - name: Build production wasm artifact
+        working-directory: app
+        run: flutter build web --release --no-web-resources-cdn --wasm
+
+      - name: npm ci (puppeteer harness)
+        working-directory: firebase-tests
+        run: npm ci
+
+      - name: WASM storage-backend probe
+        # python3 (preinstalled) instead of npx serve: a cold `npx --yes serve`
+        # downloads the package first, so a fixed sleep raced the server and
+        # the probe hit ERR_CONNECTION_REFUSED. Readiness is polled, not slept.
+        run: |
+          python3 -m http.server 8321 --directory app/build/web &
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:8321/ && break
+            sleep 1
+          done
+          CHROME_PATH="$(which google-chrome || which chromium-browser || which chromium)" \
+            node firebase-tests/wasm_storage_check.js http://localhost:8321/

@@ -7,8 +7,10 @@ import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/social/social_models.dart';
 import 'package:mindmeld/social/social_service.dart';
 
+// js_interop condition (not html): see win_screen.dart / entry 19 — html is
+// false under --wasm, which silently selected the share stub on production.
 import 'package:mindmeld/features/win/share_stub.dart'
-    if (dart.library.html) 'package:mindmeld/features/win/share_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/features/win/share_web.dart';
 
 /// Per-group, per-day leaderboard.
 ///

@@ -2,7 +2,7 @@
 ///
 /// Imported via conditional import in [win_screen.dart]:
 ///   import 'share_stub.dart'
-///     if (dart.library.html) 'share_web.dart';
+///     if (dart.library.js_interop) 'share_web.dart';
 ///
 /// On native platforms the Web Share API is not available; this stub always
 /// returns false so the caller falls back to the clipboard+dialog path.

@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:mindmeld/core/config.dart';
 import 'package:mindmeld/core/memory_store.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/prefs_store.dart';
@@ -68,6 +70,108 @@ StreakResult updateStreak({
   );
 }
 
+/// [SqliteStore.meta] key marking the one-time PrefsStore -> SQLite
+/// migration (wasm-stub-remediation wave, see [migratePrefsIntoSqliteIfNeeded])
+/// as done. Bump the suffix (`_v2`, ...) if the migration logic itself ever
+/// changes in a way that should force a re-evaluation.
+const String kPrefsMigrationMetaKey = 'prefs_to_sqlite_migration_v1';
+
+/// One-time PrefsStore -> SqliteStore migration, run from [AppPersistence
+/// ._initWeb] immediately after a SqliteStore successfully initialises.
+///
+/// Context: production web persisted via [PrefsStore] (localStorage) from
+/// 2026-07-12 until the wasm-stub-remediation fix (known-limitations entry
+/// 19) restored real SQLite/IndexedDB storage. Without this migration, a
+/// returning player's existing PrefsStore data would become invisible the
+/// moment SqliteStore starts working again — most importantly their win
+/// streak.
+///
+/// Runs at most once per sqlite database (see [kPrefsMigrationMetaKey]) and
+/// only when [sqlite] is provably empty (no `stats` rows, no `day_state`
+/// rows — see [SqliteStore.isEmpty]), so it can never clobber real sqlite
+/// data, whether from a previous migration or from a pre-regression install.
+///
+/// What migrates (fully expressible via the narrow [StorageBackend]
+/// interface, without adding a raw key-enumeration primitive to either
+/// concrete store):
+///   - [PlayerStats] + last-win-date for every [AppConfig.supportedLangs]
+///     entry — this alone preserves the streak, the P0 concern that
+///     motivated this migration.
+///   - Unflushed analytics events (bounded, ≤500 rows; already-flushed rows
+///     are intentionally skipped — [StorageBackend.exportUnflushedEvents]
+///     does exactly that filtering for us).
+///
+/// What does NOT migrate, and why (documented rather than silently dropped):
+///   - `day_state`: [StorageBackend] only exposes a keyed lookup
+///     (`loadDayState(date, lang)`); there is no "list every (date, lang)
+///     this player ever played" primitive, and adding a raw key-scan to
+///     [PrefsStore]/[StorageBackend] is out of this migration's scope.
+///     Impact: if today's puzzle was already finished under PrefsStore, it
+///     will look unstarted once under SQLite and can simply be replayed;
+///     older Archive-only entries are not recoverable. The streak itself is
+///     unaffected — it lives in `stats`, migrated above, independently of
+///     `day_state`.
+///   - `pack_progress`: enumerating it requires knowing every pack id the
+///     player has touched, which is only discoverable via the themed-pack
+///     manifest (a network/bundled-asset fetch that belongs to the
+///     features/packs layer, not the storage layer). Same graceful
+///     degradation as `day_state`: a finished pack puzzle looks unplayed
+///     once; no data corruption, no streak impact.
+///
+/// Failures here are logged and swallowed (never fatal — a migration bug
+/// must not turn into a boot failure); the app proceeds on the fresh, empty
+/// SqliteStore exactly as it would have before this migration existed.
+Future<void> migratePrefsIntoSqliteIfNeeded(SqliteStore sqlite) async {
+  try {
+    if (await sqlite.getMeta(kPrefsMigrationMetaKey) == '1') return;
+
+    if (!await sqlite.isEmpty) {
+      // Real sqlite data already exists (a previous migration that crashed
+      // before recording the marker, or a pre-regression install that never
+      // needed migrating) — never overwrite it. Just record the marker so
+      // this check doesn't re-run on every future boot.
+      await sqlite.setMeta(kPrefsMigrationMetaKey, '1');
+      return;
+    }
+
+    final prefs = PrefsStore();
+    await prefs.init();
+
+    var migratedStats = 0;
+    for (final lang in AppConfig.supportedLangs) {
+      final stats = await prefs.loadStats(lang);
+      final lastWinDate = await prefs.loadLastWinDate(lang);
+      if (stats.played == 0 && lastWinDate == null) continue;
+      await sqlite.saveStats(lang, stats, lastWinDate);
+      migratedStats++;
+    }
+
+    final unflushed = await prefs.exportUnflushedEvents();
+    for (final row in unflushed) {
+      final propsRaw = row['props_json'];
+      final props = propsRaw is String
+          ? jsonDecode(propsRaw) as Map<String, dynamic>
+          : <String, dynamic>{};
+      await sqlite.logEvent(row['event_name'] as String, props);
+    }
+
+    await sqlite.setMeta(kPrefsMigrationMetaKey, '1');
+    dev.log(
+      'AppPersistence: PrefsStore -> SQLite migration complete '
+      '($migratedStats lang(s) of stats, ${unflushed.length} analytics event(s))',
+      name: 'AppPersistence',
+    );
+  } catch (e, st) {
+    dev.log(
+      'AppPersistence: PrefsStore -> SQLite migration failed (non-fatal, '
+      'proceeding on the fresh SqliteStore): $e',
+      name: 'AppPersistence',
+      error: e,
+      stackTrace: st,
+    );
+  }
+}
+
 /// SQLite-backed persistence layer for Mindmeld with shared_preferences fallback.
 ///
 /// On web, SQLite is attempted first (sqflite_common_ffi_web / WASM).  If the
@@ -118,6 +222,7 @@ class AppPersistence {
       _backend = store;
       dev.log('AppPersistence: SQLite/WASM backend active (web)',
           name: 'AppPersistence');
+      await migratePrefsIntoSqliteIfNeeded(store);
     } catch (e, st) {
       dev.log(
         'AppPersistence: SQLite/WASM init failed — falling back to PrefsStore. Error: $e',
