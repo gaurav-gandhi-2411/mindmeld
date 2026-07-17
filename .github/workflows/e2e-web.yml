@@ -10,6 +10,12 @@ name: E2E web (integration_test)
 # card) into CI. It previously existed on disk but was never run anywhere
 # (found by a /launch-check audit).
 #
+# Also wires integration_test/first_session_test.dart (first-session-hook
+# wave): the onboarding-puzzle funnel end to end -- cold-profile EN and
+# Hinglish onboarding -> win -> graduate to the live daily, an existing
+# (legacy-onboarded) user never seeing onboarding, resume-not-strand across
+# a simulated app restart, and the skip escape hatch.
+#
 # Why web, not the Android emulator the test file's own header comment
 # mentions: mindmeld/Warmer is a WEB-ONLY product (production is
 # playwarmer.vercel.app; there is no distributed native build). Spinning up
@@ -33,8 +39,10 @@ name: E2E web (integration_test)
 # something to mock, but it does mean this job's result depends on that
 # host's availability, same as uptime-check.yml.
 #
-# Expected runtime: ~3-5 minutes per run (cold DDC compile of a Firebase-heavy
-# app is the dominant cost, not the test body itself).
+# Expected runtime: ~3-5 minutes per `flutter drive` invocation (cold DDC
+# compile of a Firebase-heavy app is the dominant cost, not the test body
+# itself) -- two invocations now that first_session_test.dart is wired in
+# too, so timeout-minutes below is sized for both sequentially, not one.
 
 on:
   push:
@@ -51,7 +59,7 @@ permissions:
 jobs:
   e2e-web:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
 
@@ -75,7 +83,7 @@ jobs:
           sleep 2
           curl -sf http://localhost:4444/status
 
-      - name: Run integration_test on Flutter web (Chrome via WebDriver)
+      - name: Run integration_test/app_test.dart on Flutter web (Chrome via WebDriver)
         working-directory: app
         run: |
           flutter drive \
@@ -84,3 +92,17 @@ jobs:
             -d web-server \
             --browser-name=chrome \
             --web-port=7357
+
+      # Separate `flutter drive` invocation (integration_test's single-target
+      # driver doesn't support running multiple test files in one pass) --
+      # sequential after the step above, same chromedriver server, a
+      # different --web-port so nothing races the just-released 7357.
+      - name: Run integration_test/first_session_test.dart on Flutter web (Chrome via WebDriver)
+        working-directory: app
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/first_session_test.dart \
+            -d web-server \
+            --browser-name=chrome \
+            --web-port=7358
