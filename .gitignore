@@ -29,6 +29,11 @@ generator/evals/finetune/checkpoints/
 generator/evals/finetune/data/train_run.log
 generator/evals/finetune/data/assemble_run.log
 
+# Raw external corpus downloads (Aksharantar, IndicCorp v2) — large,
+# re-fetchable from the committed recipe (evals/finetune/fetch_corpus_data.py)
+# against the same public dataset revisions. Not committed.
+generator/evals/finetune/data/raw/
+
 # Flutter / Dart
 app/.dart_tool/
 app/.flutter-plugins

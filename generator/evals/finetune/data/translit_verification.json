@@ -1,0 +1,185 @@
+[
+  {
+    "devanagari_tried": [
+      "दोस्त"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "dost",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "यार"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "yaar",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "ज़िंदगी",
+      "जिंदगी"
+    ],
+    "devanagari_matched": "ज़िंदगी",
+    "expected_existing_romanization": "zindagi",
+    "dict_romanization": "zinagi",
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "सपना"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "sapna",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "रात"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "raat",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "खाना"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "khana",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "चाय"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "chai",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "बारिश"
+    ],
+    "devanagari_matched": "बारिश",
+    "expected_existing_romanization": "baarish",
+    "dict_romanization": "baris",
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "बच्चा"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "bachcha",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "माँ",
+      "मां"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "maa",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "पिता"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "pita",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "भाई"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "bhai",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "बहन"
+    ],
+    "devanagari_matched": "बहन",
+    "expected_existing_romanization": "behen",
+    "dict_romanization": "behn",
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "किताब"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "kitaab",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "गाना"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "gaana",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "शहर"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "shehar",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "पैसा"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "paisa",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "काम"
+    ],
+    "devanagari_matched": null,
+    "expected_existing_romanization": "kaam",
+    "dict_romanization": null,
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "ख़ुशी",
+      "खुशी"
+    ],
+    "devanagari_matched": "ख़ुशी",
+    "expected_existing_romanization": "khushi",
+    "dict_romanization": "khusi",
+    "match": "no"
+  },
+  {
+    "devanagari_tried": [
+      "उम्मीद"
+    ],
+    "devanagari_matched": "उम्मीद",
+    "expected_existing_romanization": "ummeed",
+    "dict_romanization": "umid",
+    "match": "no"
+  }
+]
