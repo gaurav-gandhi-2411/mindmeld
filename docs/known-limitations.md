@@ -380,31 +380,37 @@ not taken on faith). Non-blocking items logged here rather than fixed inline:
   pass). **Revisit if**: this reproduces during a live manual pass — would need a
   real fix if so, not just a note.
 
-### 19. P0 FOLLOW-UP — `dart.library.html` conditionals silently stub web features on --wasm builds
+### 19. REMEDIATED (2026-07-17) — `dart.library.html` conditionals silently stubbed web features on --wasm builds
 
-Found live during the first-session-hook wave's cold-profile verification
-(2026-07-17): `dart.library.html` is FALSE under the `--wasm` compile target the
-canonical deploy has used since launch-1 (2026-07-12), so every
-`if (dart.library.html)` conditional import selects the **stub** in production
-while every DDC-run test (flutter test, chromedriver e2e) keeps passing. Fixed
-in that wave (migrated to package:web + `dart.library.js_interop`): `?reset=1`,
-`?notif=1`, `/join/{code}` deep links — re-verified working live post-fix.
+Incident record, kept for the mechanism. `dart.library.html` is FALSE under
+the `--wasm` compile target the canonical deploy has used since launch-1
+(2026-07-12), so every `if (dart.library.html)` conditional import selected
+the **stub** in production while every DDC-run test kept passing. Between
+07-12 and 07-17, live production had: PrefsStore/localStorage persistence
+instead of SQLite/IndexedDB, no-op share/download buttons, stub timezone in
+notification writes, no iOS-PWA nudge, and (fixed mid-window) dead
+`?reset=1`/`?notif=1`/`/join/{code}` handling.
 
-**Still stubbed on production wasm builds** (same class, deliberately NOT
-drive-by-fixed — each needs its own verified pass): `sqlite_store.dart`'s
-storage factory (production web runs the PrefsStore fallback, not SQLite/WASM —
-functional but not the designed backend), `share_web.dart` (win-screen share
-image/copy paths), `timezone_web.dart` and `ios_pwa_check_web.dart`
-(notification scheduling accuracy + iOS PWA detection), and `config.dart`'s
-`adsEnabledEffective`/`iapEnabledEffective` web guards (latent: only bites if a
-web build is ever shipped with MONETIZED=true — it would activate native-only
-plugin paths).
+**Remediation (wasm-stub-remediation wave, PR #10):** every site migrated to
+package:web / `dart.library.js_interop`. The storage fix additionally needed
+`sqflite_common_ffi_web` 0.4.5→1.1.2 — the old vendored worker COMPILED under
+wasm but failed `WebAssembly.instantiate` at runtime — plus a one-time
+PrefsStore→SQLite migration preserving fallback-era stats/streaks (day_state/
+pack_progress not enumerable via StorageBackend; documented in
+`persistence.dart` — worst case is a replayable-looking old puzzle, never a
+lost streak).
 
-**Revisit:** next wave, as its own spec — migrate each to package:web /
-`dart.library.js_interop`, with per-feature live verification (which storage
-backend actually initialises, a real share tap, a scheduled notification) —
-plus an e2e or build-time guard that fails when a wasm build resolves a stub
-where the web implementation was intended.
+**Why it can't recur:** (1) `test/wasm_stub_guard_test.dart` fails the suite
+on any non-comment dart:html-era pattern in lib/; (2) the `e2e-web-wasm` CI
+job runs the full integration suite via `flutter drive --wasm` AND probes the
+production wasm artifact's storage backend at the IndexedDB level
+(`firebase-tests/wasm_storage_check.js`). The test/prod compile-target gap
+that hid this class is closed.
+
+**Residual:** the PrefsStore fallback path in `persistence.dart` still exists
+by design (real WASM-init failures on exotic browsers degrade gracefully);
+`wasm_storage_check.js` distinguishes the two, so a silent regression to the
+fallback now fails CI.
 
 ### 18. hi-en Warm band is structurally ~23 ranks wide (coarser gradient than EN)
 
