@@ -5,13 +5,17 @@ Unit tests for publish.py.
 
 Covers:
   - _commit_message formatting
-  - _collect_sync_plan logic
+  - _collect_sync_plan logic (daily, themed packs, onboarding first-session hook)
   - _count_changed_files diff detection
   - _apply_sync copy behaviour
   - end-to-end dry-run (no git mutations)
   - end-to-end commit+push path against a local bare remote + clone (no network)
+  - _run_build actually produces onboarding/{lang}.json.gz (real vocab, cache-gated
+    — skipped cleanly where the local .model-cache isn't warm, e.g. in CI)
 
-All tests use tmp_path fixtures; no network calls, no real payloads repo touched.
+All tests use tmp_path fixtures; no network calls, no real payloads repo touched
+(the one exception — TestRunBuildOnboardingIntegration — reads local disk cache
+only, never the network; it self-skips when that cache is absent).
 """
 
 import gzip
@@ -22,14 +26,18 @@ from pathlib import Path
 
 import pytest
 
+from config import CACHE_DIR, MODELS
+from embeddings import _cache_key
 from publish import (  # noqa: I001 — conftest adds generator/ to sys.path
     _apply_sync,
     _collect_sync_plan,
     _commit_message,
     _count_changed_files,
     _git_has_changes,
+    _run_build,
     main,
 )
+from vocab import load_en_vocab
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -75,6 +83,12 @@ def _make_fake_pack_output(out_dir: Path, pack_id: str, langs: list[str], count:
             )
     manifest = {"v": 1, "packs": [{"id": pack_id, "count": count}]}
     (out_dir / "packs" / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+
+def _make_fake_onboarding_output(out_dir: Path, langs: list[str]) -> None:
+    """Create a realistic-looking onboarding build output tree under out_dir/onboarding/."""
+    for lang in langs:
+        _write_gz(out_dir / "onboarding" / f"{lang}.json.gz", {"pack": "onboarding", "idx": 1})
 
 
 def _init_local_git_remote(tmp_path: Path) -> tuple[Path, Path]:
@@ -306,6 +320,46 @@ class TestCollectSyncPlanPacks:
         assert (payloads / "packs" / "bollywood" / "en" / "001.json.gz") in dst_paths
         # cricket has count=0 → no payload files, but its manifest is a single
         # shared packs/manifest.json, already asserted included above.
+
+
+# ---------------------------------------------------------------------------
+# Tests: _collect_sync_plan — onboarding puzzle (first-session hook)
+# ---------------------------------------------------------------------------
+
+
+class TestCollectSyncPlanOnboarding:
+    """Verify the sync plan picks up the onboarding/ tree when present, unchanged otherwise."""
+
+    def test_no_onboarding_dir_leaves_plan_unchanged(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        plan = _collect_sync_plan(src, payloads, ["en"])
+        assert not any("onboarding" in dst.parts for _, dst in plan)
+
+    def test_onboarding_files_included(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_onboarding_output(src, ["en", "hi-en"])
+
+        plan = _collect_sync_plan(src, payloads, ["en", "hi-en"])
+        dst_paths = {dst for _, dst in plan}
+
+        assert (payloads / "onboarding" / "en.json.gz") in dst_paths
+        assert (payloads / "onboarding" / "hi-en.json.gz") in dst_paths
+
+    def test_onboarding_and_packs_coexist(self, tmp_path: Path) -> None:
+        src = tmp_path / "build"
+        payloads = tmp_path / "payloads"
+        _make_fake_build_output(src, ["en"], [date(2026, 6, 12)])
+        _make_fake_pack_output(src, "bollywood", ["en"], count=1)
+        _make_fake_onboarding_output(src, ["en"])
+
+        plan = _collect_sync_plan(src, payloads, ["en"])
+        dst_paths = {dst for _, dst in plan}
+        assert (payloads / "packs" / "bollywood" / "en" / "001.json.gz") in dst_paths
+        assert (payloads / "onboarding" / "en.json.gz") in dst_paths
 
 
 # ---------------------------------------------------------------------------
@@ -627,3 +681,42 @@ class TestCommitAndPushLocal:
         assert (clone / "README.md").exists(), "README.md was deleted by publish"
         assert (clone / "README.md").read_text(encoding="utf-8") == readme_content
         assert (clone / ".nojekyll").exists(), ".nojekyll was deleted by publish"
+
+
+# ---------------------------------------------------------------------------
+# Tests: _run_build builds the onboarding puzzle in-process (real vocab)
+# ---------------------------------------------------------------------------
+
+
+def _cache_available(vocab: list[str], lang: str) -> bool:
+    """
+    Return True iff the local embedding cache already has this exact vocab embedded.
+
+    Same rationale as generator/tests/test_onboarding_build.py's helper: CI never
+    has .model-cache (gitignored, no network calls in CI), so this test is
+    real-vocab/real-embedding but self-skips instead of triggering a download.
+    """
+    key = _cache_key(vocab, MODELS[lang])
+    return (CACHE_DIR / f"{lang}-{key}.npy").exists()
+
+
+_EN_CACHE_AVAILABLE = _cache_available(load_en_vocab(), "en")
+
+
+class TestRunBuildOnboardingIntegration:
+    """
+    Verifies _run_build's onboarding wiring end to end against the REAL vocab
+    (reusing the already-embedded matrix, no second embed_vocab call) — proves
+    the publish pipeline actually produces onboarding/{lang}.json.gz, not just
+    that _collect_sync_plan would pick it up if it existed.
+    """
+
+    @pytest.mark.skipif(not _EN_CACHE_AVAILABLE, reason="EN embedding cache not warm locally")
+    def test_run_build_writes_onboarding_payload(self, tmp_path: Path) -> None:
+        _run_build(days=1, langs=["en"], out_dir=tmp_path)
+        onboarding_path = tmp_path / "onboarding" / "en.json.gz"
+        assert onboarding_path.exists()
+
+        decoded = json.loads(gzip.decompress(onboarding_path.read_bytes()))
+        assert decoded["pack"] == "onboarding"
+        assert decoded["maxGuesses"] == 20

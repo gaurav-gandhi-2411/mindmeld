@@ -10,10 +10,18 @@ Usage:
 
 Steps:
   1. Run the build (via build.main internals) into a temporary output directory.
-  2. Sync en/, hi-en/, manifest.json into the payloads repo working tree
-     (copy/overwrite; never delete unknown files like README.md or .nojekyll).
+     Also builds the onboarding puzzles (build_onboarding internals, first-session
+     hook — spec-first-session-hook.md) into the same temp dir, reusing each
+     lang's already-embedded vocab/matrix rather than re-embedding.
+  2. Sync en/, hi-en/, manifest.json, onboarding/ into the payloads repo working
+     tree (copy/overwrite; never delete unknown files like README.md or .nojekyll).
   3. In the payloads repo: git add -A, commit with a conventional message, and
      git push origin main. If nothing changed, skip commit/push and say so.
+
+Note on themed packs: unlike the daily + onboarding builds above, packs/ is
+NOT built by this script — pack publish is orchestrated separately (run
+build_packs.py into the same directory this script syncs from at drop time).
+_collect_sync_plan picks up packs/ if present, but _run_build never produces it.
 
 --dry-run is fully read-only: reports what would be copied/committed without
 writing into the payloads repo or executing any git mutating commands.
@@ -91,6 +99,7 @@ def _run_build(
     from datetime import timedelta  # noqa: I001
 
     import build as _build  # local module inside generator/
+    import build_onboarding  # local module inside generator/
 
     from clues import clue_for_date, load_clues
     from embeddings import embed_vocab
@@ -141,6 +150,16 @@ def _run_build(
 
         lang_days[lang] = day_records
 
+        # Onboarding puzzle (first-session hook, spec-first-session-hook.md):
+        # reuses this lang's already-loaded vocab/matrix rather than re-embedding.
+        if lang in build_onboarding.LANG_LOADERS:
+            print(f"[{lang}] Building onboarding puzzle...")
+            try:
+                build_onboarding.build_and_write_onboarding(lang, vocab, matrix, out_dir)
+            except ValueError as exc:
+                print(f"[{lang}] Onboarding build FAILED:\n{exc}")
+                sys.exit(1)
+
     manifest = build_manifest(lang_days)
     manifest_path = write_manifest(manifest, out_dir)
     print(f"\nManifest written: {manifest_path}")
@@ -160,7 +179,8 @@ def _collect_sync_plan(
     Return a list of (src_file, dst_file) pairs that represent the sync plan.
 
     Covers each lang subdirectory, manifest.json, and — if present — the
-    themed-pack tree (packs/{packId}/{lang}/*.json.gz + packs/manifest.json).
+    themed-pack tree (packs/{packId}/{lang}/*.json.gz + packs/manifest.json)
+    and the onboarding tree (onboarding/{lang}.json.gz, first-session hook).
     Does NOT touch README.md, .nojekyll, or any file not produced by the build.
     """
     plan: list[tuple[Path, Path]] = []
@@ -188,6 +208,15 @@ def _collect_sync_plan(
             if src_file.is_file():
                 rel = src_file.relative_to(src_packs_dir)
                 plan.append((src_file, payloads_repo / "packs" / rel))
+
+    # Onboarding puzzles (first-session hook): sync the whole onboarding/ tree
+    # verbatim if _run_build produced one. Mirrors the packs/ block above.
+    src_onboarding_dir = src_dir / "onboarding"
+    if src_onboarding_dir.exists():
+        for src_file in sorted(src_onboarding_dir.rglob("*")):
+            if src_file.is_file():
+                rel = src_file.relative_to(src_onboarding_dir)
+                plan.append((src_file, payloads_repo / "onboarding" / rel))
 
     return plan
 

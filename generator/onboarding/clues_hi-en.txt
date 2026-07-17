@@ -1,0 +1,5 @@
+# Onboarding puzzle — Hinglish clue, exactly one entry, keyed to secrets_hi-en.txt
+# Written for an Indian player — culturally native, not translated. Frames the
+# secret without naming it (spoiler-gated at build time, same as daily/pack
+# clues). APPROVED FINAL 2026-07-17.
+Pyaas lagi? Jo cheez peekar pyaas bujhti hai — zindagi iske bina namumkin.
