@@ -31,12 +31,16 @@ import 'package:mindmeld/features/stats/stats_screen.dart';
 import 'package:mindmeld/features/win/win_screen.dart';
 import 'package:mindmeld/social/social_service.dart';
 import 'package:mindmeld/stubs/analytics_stub.dart' show AnalyticsEvent;
+// dart.library.js_interop (not dart.library.html): html is FALSE under
+// --wasm, which silently selected these stubs in every wasm production
+// build — ?reset=1 / ?notif=1 / join links dead on live, all DDC-run tests
+// green. js_interop is true for BOTH web compile targets, false on native.
 import 'package:mindmeld/core/reset_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/core/reset_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/core/reset_web.dart';
 import 'package:mindmeld/social/deep_link_stub.dart'
     // ignore: uri_does_not_exist
-    if (dart.library.html) 'package:mindmeld/social/deep_link_web.dart';
+    if (dart.library.js_interop) 'package:mindmeld/social/deep_link_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Test-only overrides for the app shell.
