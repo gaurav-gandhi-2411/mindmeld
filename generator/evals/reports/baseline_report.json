@@ -1,6 +1,7 @@
 {
   "generated_notes": [
-    "2026-07-18: hi-en model swapped to gauravgandhi2411/hinglish-relatedness-sbert (spec-hinglish-diagnostic-sweep.md / ship_decision_report_v3.md). Only legacy_fixtures/dimension1_ranking/dimension2_crosslang recomputed -- dimension3_judge/4_rival/5_winrate are model-independent (verified: neither references embed_vocab or config.MODELS) and are carried forward unchanged from the prior report rather than re-run for zero new information."
+    "2026-07-18: hi-en model swapped to gauravgandhi2411/hinglish-relatedness-sbert (spec-hinglish-diagnostic-sweep.md / ship_decision_report_v3.md). Only legacy_fixtures/dimension1_ranking/dimension2_crosslang recomputed -- dimension3_judge/4_rival/5_winrate are model-independent (verified: neither references embed_vocab or config.MODELS) and are carried forward unchanged from the prior report rather than re-run for zero new information.",
+    "2026-07-18: dim1_en.json/dim1_hien.json regenerated after fixing gen_dim1_scenarios.py's far-tier word sampling from a single RNG shared sequentially across all secrets (order/count-dependent) to a per-secret hash-seeded RNG (order/count-independent) -- see evals/finetune/data/ship_decision_report_v3.md Step 0 and spec-hinglish-benchmark.md Phase 1. No model swap this run; hi-en model unchanged (gauravgandhi2411/hinglish-relatedness-sbert). Full-set numbers shift only because far-tier words changed: EN dim1 Spearman 0.837->0.842, hi-en dim1 Spearman 0.800->0.813 (this note replaces the incorrectly-duplicated model-swap note that regen_baseline_report.py unconditionally appends)."
   ],
   "legacy_fixtures": {
     "passed": 70,
@@ -11,17 +12,17 @@
       "lang": "en",
       "n_scenarios": 227,
       "band_accuracy": {
-        "overall": 0.748898678414097,
+        "overall": 0.7797356828193832,
         "near": 0.96,
         "mid": 0.07692307692307693,
-        "far": 0.944
+        "far": 1.0
       },
       "band_accuracy_hien_near_split": null,
-      "spearman_correlation": 0.8369394623806077,
+      "spearman_correlation": 0.8417295932578888,
       "monotonicity": {
         "total_pairs": 614,
-        "violations": 38,
-        "violation_rate": 0.06188925081433225,
+        "violations": 36,
+        "violation_rate": 0.05863192182410423,
         "examples": [
           {
             "secret": "courage",
@@ -84,11 +85,6 @@
             "farther": "trust (mid, rank 4107)"
           },
           {
-            "secret": "friend",
-            "closer": "companion (near, rank 10086)",
-            "farther": "thinking (far, rank 6401)"
-          },
-          {
             "secret": "garden",
             "closer": "yard (near, rank 29)",
             "farther": "flower (mid, rank 27)"
@@ -121,7 +117,12 @@
           {
             "secret": "letter",
             "closer": "post (mid, rank 9979)",
-            "farther": "toasting (far, rank 7775)"
+            "farther": "warning (far, rank 6964)"
+          },
+          {
+            "secret": "market",
+            "closer": "shop (near, rank 236)",
+            "farther": "vendor (mid, rank 136)"
           }
         ]
       },
@@ -211,19 +212,6 @@
           "note": null
         },
         {
-          "secret": "family",
-          "word": "troops",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 993,
-          "note": null
-        },
-        {
           "secret": "fire",
           "word": "smoke",
           "tier": "mid",
@@ -245,19 +233,6 @@
           ],
           "actual_band": 2,
           "actual_rank": 57,
-          "note": null
-        },
-        {
-          "secret": "fire",
-          "word": "strike",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1180,
           "note": null
         },
         {
@@ -455,19 +430,6 @@
           "note": null
         },
         {
-          "secret": "market",
-          "word": "confused",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 673,
-          "note": null
-        },
-        {
           "secret": "memory",
           "word": "nostalgia",
           "tier": "mid",
@@ -636,19 +598,6 @@
           "note": null
         },
         {
-          "secret": "rain",
-          "word": "siren",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 667,
-          "note": null
-        },
-        {
           "secret": "river",
           "word": "bank",
           "tier": "mid",
@@ -670,19 +619,6 @@
           ],
           "actual_band": 2,
           "actual_rank": 87,
-          "note": null
-        },
-        {
-          "secret": "river",
-          "word": "marty",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1558,
           "note": null
         },
         {
@@ -770,19 +706,6 @@
           "note": null
         },
         {
-          "secret": "victory",
-          "word": "knock",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1088,
-          "note": null
-        },
-        {
           "secret": "wisdom",
           "word": "wise",
           "tier": "mid",
@@ -805,19 +728,6 @@
           "actual_band": 2,
           "actual_rank": 539,
           "note": null
-        },
-        {
-          "secret": "wisdom",
-          "word": "cognition",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 805,
-          "note": null
         }
       ],
       "resolution_errors": []
@@ -826,10 +736,10 @@
       "lang": "hi-en",
       "n_scenarios": 227,
       "band_accuracy": {
-        "overall": 0.7312775330396476,
+        "overall": 0.7533039647577092,
         "near": 0.92,
         "mid": 0.019230769230769232,
-        "far": 0.952
+        "far": 0.992
       },
       "band_accuracy_hien_near_split": {
         "translation": {
@@ -841,11 +751,11 @@
           "band_accuracy": 0.8666666666666667
         }
       },
-      "spearman_correlation": 0.8002413004349358,
+      "spearman_correlation": 0.8129183365093288,
       "monotonicity": {
         "total_pairs": 614,
-        "violations": 34,
-        "violation_rate": 0.05537459283387622,
+        "violations": 41,
+        "violation_rate": 0.06677524429967427,
         "examples": [
           {
             "secret": "aaina",
@@ -858,14 +768,19 @@
             "farther": "glass (mid, rank 46)"
           },
           {
-            "secret": "bachpan",
-            "closer": "innocence (mid, rank 3693)",
-            "farther": "cares (far, rank 1324)"
+            "secret": "aaina",
+            "closer": "bathroom (mid, rank 861)",
+            "farther": "rim (far, rank 819)"
+          },
+          {
+            "secret": "aaina",
+            "closer": "bathroom (mid, rank 861)",
+            "farther": "beans (far, rank 597)"
           },
           {
             "secret": "bachpan",
             "closer": "innocence (mid, rank 3693)",
-            "farther": "champagne (far, rank 1115)"
+            "farther": "well (far, rank 2753)"
           },
           {
             "secret": "bachpan",
@@ -875,17 +790,12 @@
           {
             "secret": "bachpan",
             "closer": "innocence (mid, rank 3693)",
-            "farther": "panthers (far, rank 407)"
+            "farther": "garlic (far, rank 1476)"
           },
           {
             "secret": "bachpan",
             "closer": "past (mid, rank 4269)",
-            "farther": "cares (far, rank 1324)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "past (mid, rank 4269)",
-            "farther": "champagne (far, rank 1115)"
+            "farther": "well (far, rank 2753)"
           },
           {
             "secret": "bachpan",
@@ -895,7 +805,7 @@
           {
             "secret": "bachpan",
             "closer": "past (mid, rank 4269)",
-            "farther": "panthers (far, rank 407)"
+            "farther": "garlic (far, rank 1476)"
           },
           {
             "secret": "bagicha",
@@ -925,27 +835,27 @@
           {
             "secret": "bhook",
             "closer": "meal (mid, rank 3017)",
-            "farther": "tommy (far, rank 2643)"
+            "farther": "thought (far, rank 2227)"
           },
           {
             "secret": "chaand",
             "closer": "satellite (near, rank 3791)",
-            "farther": "putin (far, rank 1894)"
+            "farther": "gut (far, rank 2185)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "satellite (near, rank 3791)",
+            "farther": "popping (far, rank 3291)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "satellite (near, rank 3791)",
+            "farther": "eggs (far, rank 1663)"
           },
           {
             "secret": "chaand",
             "closer": "eclipse (mid, rank 3834)",
-            "farther": "putin (far, rank 1894)"
-          },
-          {
-            "secret": "chaand",
-            "closer": "sky (mid, rank 5982)",
-            "farther": "environment (far, rank 5563)"
-          },
-          {
-            "secret": "chaand",
-            "closer": "sky (mid, rank 5982)",
-            "farther": "directly (far, rank 5797)"
+            "farther": "gut (far, rank 2185)"
           }
         ]
       },
@@ -1056,19 +966,6 @@
           ],
           "actual_band": 5,
           "actual_rank": 4269,
-          "note": null
-        },
-        {
-          "secret": "bachpan",
-          "word": "panthers",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 407,
           "note": null
         },
         {
@@ -1243,19 +1140,6 @@
           "note": null
         },
         {
-          "secret": "dost",
-          "word": "happy",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 225,
-          "note": null
-        },
-        {
           "secret": "gaana",
           "word": "concert",
           "tier": "mid",
@@ -1400,19 +1284,6 @@
           "note": null
         },
         {
-          "secret": "khat",
-          "word": "brief",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 412,
-          "note": null
-        },
-        {
           "secret": "khazana",
           "word": "gold",
           "tier": "near",
@@ -1522,6 +1393,19 @@
           "note": null
         },
         {
+          "secret": "pahad",
+          "word": "strain",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 480,
+          "note": null
+        },
+        {
           "secret": "parivar",
           "word": "parents",
           "tier": "mid",
@@ -1543,19 +1427,6 @@
           ],
           "actual_band": 1,
           "actual_rank": 20,
-          "note": null
-        },
-        {
-          "secret": "parivar",
-          "word": "homes",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 82,
           "note": null
         },
         {
@@ -1592,19 +1463,6 @@
           ],
           "actual_band": 4,
           "actual_rank": 826,
-          "note": null
-        },
-        {
-          "secret": "samunder",
-          "word": "jimmy",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 434,
           "note": null
         },
         {
@@ -1653,19 +1511,6 @@
           ],
           "actual_band": 5,
           "actual_rank": 3025,
-          "note": null
-        },
-        {
-          "secret": "sipahi",
-          "word": "flagship",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 221,
           "note": null
         },
         {
@@ -5165,5 +5010,5 @@
       }
     ]
   },
-  "elapsed_seconds": 28.7
+  "elapsed_seconds": 64.5
 }

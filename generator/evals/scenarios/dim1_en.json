@@ -43,7 +43,7 @@
   },
   {
     "secret": "childhood",
-    "word": "ofcom",
+    "word": "rome",
     "tier": "far",
     "expected_bands": [
       4,
@@ -54,7 +54,7 @@
   },
   {
     "secret": "childhood",
-    "word": "lily",
+    "word": "houdini",
     "tier": "far",
     "expected_bands": [
       4,
@@ -65,7 +65,7 @@
   },
   {
     "secret": "childhood",
-    "word": "roll",
+    "word": "photogenic",
     "tier": "far",
     "expected_bands": [
       4,
@@ -76,7 +76,7 @@
   },
   {
     "secret": "childhood",
-    "word": "businessweek",
+    "word": "trafficking",
     "tier": "far",
     "expected_bands": [
       4,
@@ -87,7 +87,7 @@
   },
   {
     "secret": "childhood",
-    "word": "uncanny",
+    "word": "howie",
     "tier": "far",
     "expected_bands": [
       4,
@@ -140,7 +140,7 @@
   },
   {
     "secret": "courage",
-    "word": "lunches",
+    "word": "furor",
     "tier": "far",
     "expected_bands": [
       4,
@@ -151,7 +151,7 @@
   },
   {
     "secret": "courage",
-    "word": "paralysis",
+    "word": "facilitators",
     "tier": "far",
     "expected_bands": [
       4,
@@ -162,7 +162,7 @@
   },
   {
     "secret": "courage",
-    "word": "trent",
+    "word": "dna",
     "tier": "far",
     "expected_bands": [
       4,
@@ -173,7 +173,7 @@
   },
   {
     "secret": "courage",
-    "word": "righty",
+    "word": "tnt",
     "tier": "far",
     "expected_bands": [
       4,
@@ -184,7 +184,7 @@
   },
   {
     "secret": "courage",
-    "word": "geneva",
+    "word": "acetone",
     "tier": "far",
     "expected_bands": [
       4,
@@ -237,7 +237,7 @@
   },
   {
     "secret": "dream",
-    "word": "sov",
+    "word": "keenan",
     "tier": "far",
     "expected_bands": [
       4,
@@ -248,7 +248,7 @@
   },
   {
     "secret": "dream",
-    "word": "niqab",
+    "word": "cleavage",
     "tier": "far",
     "expected_bands": [
       4,
@@ -259,7 +259,7 @@
   },
   {
     "secret": "dream",
-    "word": "parti",
+    "word": "alles",
     "tier": "far",
     "expected_bands": [
       4,
@@ -270,7 +270,7 @@
   },
   {
     "secret": "dream",
-    "word": "harrison",
+    "word": "infestation",
     "tier": "far",
     "expected_bands": [
       4,
@@ -281,7 +281,7 @@
   },
   {
     "secret": "dream",
-    "word": "multitudes",
+    "word": "nath",
     "tier": "far",
     "expected_bands": [
       4,
@@ -334,7 +334,7 @@
   },
   {
     "secret": "family",
-    "word": "maturation",
+    "word": "goner",
     "tier": "far",
     "expected_bands": [
       4,
@@ -345,7 +345,7 @@
   },
   {
     "secret": "family",
-    "word": "troops",
+    "word": "annan",
     "tier": "far",
     "expected_bands": [
       4,
@@ -356,7 +356,7 @@
   },
   {
     "secret": "family",
-    "word": "teach",
+    "word": "puerto",
     "tier": "far",
     "expected_bands": [
       4,
@@ -367,7 +367,7 @@
   },
   {
     "secret": "family",
-    "word": "effectiveness",
+    "word": "roti",
     "tier": "far",
     "expected_bands": [
       4,
@@ -378,7 +378,7 @@
   },
   {
     "secret": "family",
-    "word": "malware",
+    "word": "havana",
     "tier": "far",
     "expected_bands": [
       4,
@@ -431,7 +431,7 @@
   },
   {
     "secret": "fire",
-    "word": "debuts",
+    "word": "nixon",
     "tier": "far",
     "expected_bands": [
       4,
@@ -442,7 +442,7 @@
   },
   {
     "secret": "fire",
-    "word": "dictatorships",
+    "word": "shoemaker",
     "tier": "far",
     "expected_bands": [
       4,
@@ -453,7 +453,7 @@
   },
   {
     "secret": "fire",
-    "word": "anselm",
+    "word": "vardy",
     "tier": "far",
     "expected_bands": [
       4,
@@ -464,7 +464,7 @@
   },
   {
     "secret": "fire",
-    "word": "strike",
+    "word": "insurance",
     "tier": "far",
     "expected_bands": [
       4,
@@ -475,7 +475,7 @@
   },
   {
     "secret": "fire",
-    "word": "cuddled",
+    "word": "arrangement",
     "tier": "far",
     "expected_bands": [
       4,
@@ -528,7 +528,7 @@
   },
   {
     "secret": "flower",
-    "word": "cater",
+    "word": "uttar",
     "tier": "far",
     "expected_bands": [
       4,
@@ -539,7 +539,7 @@
   },
   {
     "secret": "flower",
-    "word": "satanism",
+    "word": "csa",
     "tier": "far",
     "expected_bands": [
       4,
@@ -550,7 +550,7 @@
   },
   {
     "secret": "flower",
-    "word": "mfw",
+    "word": "mccracken",
     "tier": "far",
     "expected_bands": [
       4,
@@ -561,7 +561,7 @@
   },
   {
     "secret": "flower",
-    "word": "wiretaps",
+    "word": "vegan",
     "tier": "far",
     "expected_bands": [
       4,
@@ -572,7 +572,7 @@
   },
   {
     "secret": "flower",
-    "word": "pewter",
+    "word": "cation",
     "tier": "far",
     "expected_bands": [
       4,
@@ -625,7 +625,7 @@
   },
   {
     "secret": "forest",
-    "word": "outwards",
+    "word": "pitfall",
     "tier": "far",
     "expected_bands": [
       4,
@@ -636,7 +636,7 @@
   },
   {
     "secret": "forest",
-    "word": "pisses",
+    "word": "sabra",
     "tier": "far",
     "expected_bands": [
       4,
@@ -647,7 +647,7 @@
   },
   {
     "secret": "forest",
-    "word": "dermatology",
+    "word": "merger",
     "tier": "far",
     "expected_bands": [
       4,
@@ -658,7 +658,7 @@
   },
   {
     "secret": "forest",
-    "word": "slop",
+    "word": "millar",
     "tier": "far",
     "expected_bands": [
       4,
@@ -669,7 +669,7 @@
   },
   {
     "secret": "forest",
-    "word": "westwood",
+    "word": "spectator",
     "tier": "far",
     "expected_bands": [
       4,
@@ -722,7 +722,7 @@
   },
   {
     "secret": "friend",
-    "word": "janos",
+    "word": "reef",
     "tier": "far",
     "expected_bands": [
       4,
@@ -733,7 +733,7 @@
   },
   {
     "secret": "friend",
-    "word": "thinking",
+    "word": "derailment",
     "tier": "far",
     "expected_bands": [
       4,
@@ -744,7 +744,7 @@
   },
   {
     "secret": "friend",
-    "word": "pronunciations",
+    "word": "gallup",
     "tier": "far",
     "expected_bands": [
       4,
@@ -755,7 +755,7 @@
   },
   {
     "secret": "friend",
-    "word": "amjad",
+    "word": "compulsive",
     "tier": "far",
     "expected_bands": [
       4,
@@ -766,7 +766,7 @@
   },
   {
     "secret": "friend",
-    "word": "vogue",
+    "word": "laborious",
     "tier": "far",
     "expected_bands": [
       4,
@@ -829,7 +829,7 @@
   },
   {
     "secret": "garden",
-    "word": "youngs",
+    "word": "retro",
     "tier": "far",
     "expected_bands": [
       4,
@@ -840,7 +840,7 @@
   },
   {
     "secret": "garden",
-    "word": "clung",
+    "word": "banner",
     "tier": "far",
     "expected_bands": [
       4,
@@ -851,7 +851,7 @@
   },
   {
     "secret": "garden",
-    "word": "entice",
+    "word": "dixon",
     "tier": "far",
     "expected_bands": [
       4,
@@ -862,7 +862,7 @@
   },
   {
     "secret": "garden",
-    "word": "routed",
+    "word": "routes",
     "tier": "far",
     "expected_bands": [
       4,
@@ -873,7 +873,7 @@
   },
   {
     "secret": "garden",
-    "word": "monks",
+    "word": "zain",
     "tier": "far",
     "expected_bands": [
       4,
@@ -926,7 +926,7 @@
   },
   {
     "secret": "hunger",
-    "word": "provoke",
+    "word": "wainwright",
     "tier": "far",
     "expected_bands": [
       4,
@@ -937,7 +937,7 @@
   },
   {
     "secret": "hunger",
-    "word": "paragliding",
+    "word": "quiche",
     "tier": "far",
     "expected_bands": [
       4,
@@ -948,7 +948,7 @@
   },
   {
     "secret": "hunger",
-    "word": "fenced",
+    "word": "tips",
     "tier": "far",
     "expected_bands": [
       4,
@@ -959,7 +959,7 @@
   },
   {
     "secret": "hunger",
-    "word": "surveys",
+    "word": "codex",
     "tier": "far",
     "expected_bands": [
       4,
@@ -970,7 +970,7 @@
   },
   {
     "secret": "hunger",
-    "word": "stan",
+    "word": "deployed",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1023,7 +1023,7 @@
   },
   {
     "secret": "letter",
-    "word": "stargate",
+    "word": "paralympics",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1034,7 +1034,7 @@
   },
   {
     "secret": "letter",
-    "word": "remainder",
+    "word": "babylon",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1045,7 +1045,7 @@
   },
   {
     "secret": "letter",
-    "word": "mayan",
+    "word": "ransomware",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1056,7 +1056,7 @@
   },
   {
     "secret": "letter",
-    "word": "atrocious",
+    "word": "warning",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1067,7 +1067,7 @@
   },
   {
     "secret": "letter",
-    "word": "toasting",
+    "word": "nirvana",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1120,7 +1120,7 @@
   },
   {
     "secret": "market",
-    "word": "dracula",
+    "word": "martinis",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1131,7 +1131,7 @@
   },
   {
     "secret": "market",
-    "word": "rls",
+    "word": "kingship",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1142,7 +1142,7 @@
   },
   {
     "secret": "market",
-    "word": "confused",
+    "word": "biennial",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1153,7 +1153,7 @@
   },
   {
     "secret": "market",
-    "word": "teachable",
+    "word": "cosmos",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1164,7 +1164,7 @@
   },
   {
     "secret": "market",
-    "word": "walla",
+    "word": "russ",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1217,7 +1217,7 @@
   },
   {
     "secret": "memory",
-    "word": "anni",
+    "word": "recitals",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1228,7 +1228,7 @@
   },
   {
     "secret": "memory",
-    "word": "maya",
+    "word": "maven",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1239,7 +1239,7 @@
   },
   {
     "secret": "memory",
-    "word": "ukrainians",
+    "word": "facilitation",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1250,7 +1250,7 @@
   },
   {
     "secret": "memory",
-    "word": "organisations",
+    "word": "drills",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1261,7 +1261,7 @@
   },
   {
     "secret": "memory",
-    "word": "huck",
+    "word": "junkyard",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1324,7 +1324,7 @@
   },
   {
     "secret": "mirror",
-    "word": "cont",
+    "word": "blackmailed",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1335,7 +1335,7 @@
   },
   {
     "secret": "mirror",
-    "word": "ifi",
+    "word": "hrw",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1346,7 +1346,7 @@
   },
   {
     "secret": "mirror",
-    "word": "marten",
+    "word": "pulaski",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1357,7 +1357,7 @@
   },
   {
     "secret": "mirror",
-    "word": "bronzes",
+    "word": "acutely",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1368,7 +1368,7 @@
   },
   {
     "secret": "mirror",
-    "word": "fosters",
+    "word": "usf",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1421,7 +1421,7 @@
   },
   {
     "secret": "moon",
-    "word": "skippy",
+    "word": "capitulation",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1432,7 +1432,7 @@
   },
   {
     "secret": "moon",
-    "word": "nicola",
+    "word": "scents",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1443,7 +1443,7 @@
   },
   {
     "secret": "moon",
-    "word": "nicolai",
+    "word": "uhhhh",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1454,7 +1454,7 @@
   },
   {
     "secret": "moon",
-    "word": "accessible",
+    "word": "workhorse",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1465,7 +1465,7 @@
   },
   {
     "secret": "moon",
-    "word": "illness",
+    "word": "terminates",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1518,7 +1518,7 @@
   },
   {
     "secret": "mountain",
-    "word": "glycerin",
+    "word": "adn",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1529,7 +1529,7 @@
   },
   {
     "secret": "mountain",
-    "word": "accelerating",
+    "word": "hing",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1540,7 +1540,7 @@
   },
   {
     "secret": "mountain",
-    "word": "staines",
+    "word": "chakra",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1551,7 +1551,7 @@
   },
   {
     "secret": "mountain",
-    "word": "transports",
+    "word": "reformer",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1562,7 +1562,7 @@
   },
   {
     "secret": "mountain",
-    "word": "adventures",
+    "word": "gaggle",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1615,7 +1615,7 @@
   },
   {
     "secret": "music",
-    "word": "illusions",
+    "word": "rino",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1626,7 +1626,7 @@
   },
   {
     "secret": "music",
-    "word": "borrow",
+    "word": "delinquent",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1637,7 +1637,7 @@
   },
   {
     "secret": "music",
-    "word": "scotsman",
+    "word": "dispersed",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1648,7 +1648,7 @@
   },
   {
     "secret": "music",
-    "word": "proprietor",
+    "word": "rejuvenate",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1659,7 +1659,7 @@
   },
   {
     "secret": "music",
-    "word": "sheraton",
+    "word": "puncture",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1712,7 +1712,7 @@
   },
   {
     "secret": "ocean",
-    "word": "leaded",
+    "word": "ambulatory",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1723,7 +1723,7 @@
   },
   {
     "secret": "ocean",
-    "word": "atc",
+    "word": "endorses",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1734,7 +1734,7 @@
   },
   {
     "secret": "ocean",
-    "word": "traitor",
+    "word": "umpires",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1745,7 +1745,7 @@
   },
   {
     "secret": "ocean",
-    "word": "debtor",
+    "word": "seinfeld",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1756,7 +1756,7 @@
   },
   {
     "secret": "ocean",
-    "word": "belinda",
+    "word": "squirting",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1809,7 +1809,7 @@
   },
   {
     "secret": "rain",
-    "word": "siren",
+    "word": "baggins",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1820,7 +1820,7 @@
   },
   {
     "secret": "rain",
-    "word": "headquarter",
+    "word": "dench",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1831,7 +1831,7 @@
   },
   {
     "secret": "rain",
-    "word": "phoned",
+    "word": "firming",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1842,7 +1842,7 @@
   },
   {
     "secret": "rain",
-    "word": "hariri",
+    "word": "irrelevant",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1853,7 +1853,7 @@
   },
   {
     "secret": "rain",
-    "word": "brainstem",
+    "word": "gillian",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1906,7 +1906,7 @@
   },
   {
     "secret": "river",
-    "word": "arma",
+    "word": "savoy",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1917,7 +1917,7 @@
   },
   {
     "secret": "river",
-    "word": "invested",
+    "word": "blume",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1928,7 +1928,7 @@
   },
   {
     "secret": "river",
-    "word": "asghar",
+    "word": "tedium",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1939,7 +1939,7 @@
   },
   {
     "secret": "river",
-    "word": "fms",
+    "word": "assortment",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1950,7 +1950,7 @@
   },
   {
     "secret": "river",
-    "word": "marty",
+    "word": "buford",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2003,7 +2003,7 @@
   },
   {
     "secret": "soldier",
-    "word": "nist",
+    "word": "hour",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2014,7 +2014,7 @@
   },
   {
     "secret": "soldier",
-    "word": "undercarriage",
+    "word": "friar",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2025,7 +2025,7 @@
   },
   {
     "secret": "soldier",
-    "word": "hurdle",
+    "word": "endangerment",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2036,7 +2036,7 @@
   },
   {
     "secret": "soldier",
-    "word": "vows",
+    "word": "lookup",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2047,7 +2047,7 @@
   },
   {
     "secret": "soldier",
-    "word": "monika",
+    "word": "felipe",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2100,7 +2100,7 @@
   },
   {
     "secret": "temple",
-    "word": "boyz",
+    "word": "extrusion",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2111,7 +2111,7 @@
   },
   {
     "secret": "temple",
-    "word": "viva",
+    "word": "petrochemical",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2122,7 +2122,7 @@
   },
   {
     "secret": "temple",
-    "word": "baidu",
+    "word": "vlc",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2133,7 +2133,7 @@
   },
   {
     "secret": "temple",
-    "word": "accruing",
+    "word": "vladivostok",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2144,7 +2144,7 @@
   },
   {
     "secret": "temple",
-    "word": "candidly",
+    "word": "pius",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2197,7 +2197,7 @@
   },
   {
     "secret": "treasure",
-    "word": "guinness",
+    "word": "bono",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2208,7 +2208,7 @@
   },
   {
     "secret": "treasure",
-    "word": "energizing",
+    "word": "childers",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2219,7 +2219,7 @@
   },
   {
     "secret": "treasure",
-    "word": "lithuanian",
+    "word": "overarching",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2230,7 +2230,7 @@
   },
   {
     "secret": "treasure",
-    "word": "fft",
+    "word": "castings",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2241,7 +2241,7 @@
   },
   {
     "secret": "treasure",
-    "word": "cpe",
+    "word": "dotted",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2294,7 +2294,7 @@
   },
   {
     "secret": "victory",
-    "word": "knock",
+    "word": "rounder",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2305,7 +2305,7 @@
   },
   {
     "secret": "victory",
-    "word": "horrifying",
+    "word": "opt",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2316,7 +2316,7 @@
   },
   {
     "secret": "victory",
-    "word": "functionalities",
+    "word": "gwyn",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2327,7 +2327,7 @@
   },
   {
     "secret": "victory",
-    "word": "blame",
+    "word": "implicates",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2338,7 +2338,7 @@
   },
   {
     "secret": "victory",
-    "word": "immunizations",
+    "word": "dutton",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2391,7 +2391,7 @@
   },
   {
     "secret": "wisdom",
-    "word": "justine",
+    "word": "combing",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2402,7 +2402,7 @@
   },
   {
     "secret": "wisdom",
-    "word": "coutinho",
+    "word": "crushes",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2413,7 +2413,7 @@
   },
   {
     "secret": "wisdom",
-    "word": "cognition",
+    "word": "abington",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2424,7 +2424,7 @@
   },
   {
     "secret": "wisdom",
-    "word": "approaches",
+    "word": "brewer",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2435,7 +2435,7 @@
   },
   {
     "secret": "wisdom",
-    "word": "nfc",
+    "word": "selectors",
     "tier": "far",
     "expected_bands": [
       4,

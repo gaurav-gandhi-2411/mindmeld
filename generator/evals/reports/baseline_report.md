@@ -1,6 +1,6 @@
 # Warmer — Applied-AI Eval Harness: Baseline Report
 
-Generated in 28.7s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
+Generated in 64.5s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
 
 ## Legacy pairwise-ordering fixtures (subsumed, not replaced)
 
@@ -11,19 +11,19 @@ Generated in 28.7s. See the sibling `.json` file for full per-record detail (eve
 ### en
 
 - n_scenarios: 227
-- band-accuracy: overall 74.9%, near 96.0%, mid 7.7%, far 94.4%
-- Spearman correlation: 0.837
-- monotonicity violations: 38/614 (6.2%)
-- flagged weak pairs: 57
+- band-accuracy: overall 78.0%, near 96.0%, mid 7.7%, far 100.0%
+- Spearman correlation: 0.842
+- monotonicity violations: 36/614 (5.9%)
+- flagged weak pairs: 50
 
 ### hi-en
 
 - n_scenarios: 227
-- band-accuracy: overall 73.1%, near 92.0%, mid 1.9%, far 95.2%
+- band-accuracy: overall 75.3%, near 92.0%, mid 1.9%, far 99.2%
 - **hi-en near-tier split** (GG review — do not blend these): translation 100.0% (n=20), associate 86.7% (n=30)
-- Spearman correlation: 0.800
-- monotonicity violations: 34/614 (5.5%)
-- flagged weak pairs: 61
+- Spearman correlation: 0.813
+- monotonicity violations: 41/614 (6.7%)
+- flagged weak pairs: 56
 
 ## Dimension 2 — Cross-language consistency
 
