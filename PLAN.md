@@ -1032,3 +1032,29 @@ orchestrator review), live-verified 2026-07-11.
   everything staged for a final orchestrator commit -- fine in this case (each commit was itself
   tested and atomic) but worth being explicit about commit ownership when running several parallel
   executors against the same repo.
+
+## Hinglish benchmark -- Phase 1 (spec-hinglish-benchmark.md), COMPLETE, awaiting GG go for Phase 2
+
+- [x] Fixed the shared-sequential-RNG bug in `gen_dim1_scenarios.py` blocking safe held-out
+  expansion (`16f35d1`) -- per-secret hash-derived seeding, one-time documented break of the old
+  (buggy) `baseline_report.md` numbers (EN 0.837->0.842, hi-en 0.800->0.813).
+- [x] Expanded held-out test secrets 16 -> 50 across 7 domains (nature/emotion/abstract/object/
+  place/food/kinship), fully separate from the production 25-secret pipeline (`704cabd`).
+  Bollywood/Cricket pack secrets explicitly rejected as a source -- verified most already leaked
+  into training via open-vocabulary data-assembly paths. No-leakage re-verified against all 5
+  training files, twice.
+- [x] Found (during my own review, not the executor's) a 42-word vocab-coverage gap -- near/mid
+  curated words outside `HIEN_EN_TOP_N`'s frequency cutoff, concentrated in the new secrets' most
+  diagnostic tier. Fixed + re-ran the full bake-off (`78df6f2`): dim1 resolution 334/379 -> 376/379.
+- [x] 8-model comparative bake-off (5 original baselines + IBM Granite-311m-r2 + Qwen3-Embedding-0.6B
+  + our shipped fine-tune) on the same expanded set, paired bootstrap CIs (`d73db64`, `78df6f2`).
+  **Verdict: shipped model leads all 7, CI-significant on both dim1/dim2, zero exceptions across 14
+  comparisons. No newer base beats l3cube-pune off-the-shelf -- Phase 2c's "fine-tune a newer base"
+  does not apply.** Full report: `generator/evals/finetune/data/phase1_benchmark_report.md`.
+- [ ] **STOP POINT for GG**: go/no-go on Phase 2 (accuracy push). Also needs a decision on three
+  items surfaced but deliberately not resolved: (1) a latent `embeddings.py` cache-key/row-order
+  bug found as a side effect (real, contained, needs its own before/after payload verification --
+  out of benchmark scope); (2) `hf_model_card.md`'s published held-out numbers are now stale on two
+  counts (RNG fix + new 50-secret comparator) -- republish now or bundle with Phase 2?; (3) public
+  benchmark proposal (spec 1c) -- recommend publishing only the 34 new supplement secrets (the
+  original 16 are live game secrets, would need scrubbing; the 34 new ones never were).
