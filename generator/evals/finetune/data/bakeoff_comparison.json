@@ -42,7 +42,7 @@
         "far": 0.9571428571428572
       },
       "near_far_separation": 0.02222482535726944,
-      "wall_clock_seconds": 59.0
+      "wall_clock_seconds": 50.2
     },
     "l3cube-pune/indic-sentence-bert-nli": {
       "model": "l3cube-pune/indic-sentence-bert-nli",
@@ -75,7 +75,7 @@
         "far": 0.9428571428571428
       },
       "near_far_separation": 0.33235663415510963,
-      "wall_clock_seconds": 67.8
+      "wall_clock_seconds": 51.7
     },
     "google/muril-base-cased": {
       "model": "google/muril-base-cased",
@@ -108,7 +108,7 @@
         "far": 0.9333333333333333
       },
       "near_far_separation": 0.1781369377010158,
-      "wall_clock_seconds": 55.5
+      "wall_clock_seconds": 49.8
     },
     "BAAI/bge-m3": {
       "model": "BAAI/bge-m3",
@@ -141,7 +141,7 @@
         "far": 0.9571428571428572
       },
       "near_far_separation": 0.07892832711198589,
-      "wall_clock_seconds": 154.2
+      "wall_clock_seconds": 143.9
     },
     "intfloat/multilingual-e5-large": {
       "model": "intfloat/multilingual-e5-large",
@@ -174,7 +174,7 @@
         "far": 0.9761904761904762
       },
       "near_far_separation": 0.12937952749172377,
-      "wall_clock_seconds": 174.5
+      "wall_clock_seconds": 124.0
     },
     "ibm-granite/granite-embedding-311m-multilingual-r2": {
       "model": "ibm-granite/granite-embedding-311m-multilingual-r2",
@@ -207,7 +207,7 @@
         "far": 0.9714285714285714
       },
       "near_far_separation": 0.1016232655703832,
-      "wall_clock_seconds": 303.0
+      "wall_clock_seconds": 335.5
     },
     "Qwen/Qwen3-Embedding-0.6B": {
       "model": "Qwen/Qwen3-Embedding-0.6B",
@@ -240,7 +240,7 @@
         "far": 0.9476190476190476
       },
       "near_far_separation": 0.1420612161381576,
-      "wall_clock_seconds": 1226.2
+      "wall_clock_seconds": 1883.2
     },
     "gauravgandhi2411/hinglish-relatedness-sbert": {
       "model": "gauravgandhi2411/hinglish-relatedness-sbert",
@@ -273,7 +273,7 @@
         "far": 0.9476190476190476
       },
       "near_far_separation": 0.44759620838110586,
-      "wall_clock_seconds": 8.4
+      "wall_clock_seconds": 10.4
     }
   },
   "paired_deltas_vs_shipped": {
