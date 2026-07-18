@@ -4,31 +4,31 @@
   "n_dim1_scenarios": 379,
   "n_dim2_pairs": 50,
   "dim1_spearman_ci": {
-    "point": 0.6564790621009217,
+    "point": 0.6748987706342632,
     "ci_95": [
-      0.5729999605699032,
-      0.7288778439064373
+      0.6008033420545759,
+      0.7413355597554782
     ],
     "n_clusters": 42,
-    "n_scenarios": 334,
+    "n_scenarios": 376,
     "n_valid_bootstrap_draws": 10000,
-    "std": 0.03960352401531304
+    "std": 0.03596419917799734
   },
   "dim2_pass_rate_ci": {
-    "point": 0.7111111111111111,
+    "point": 0.74,
     "ci_95": [
-      0.5777777777777777,
-      0.8444444444444444
+      0.62,
+      0.86
     ],
-    "n_pairs": 45
+    "n_pairs": 50
   },
   "band_accuracy": {
-    "overall": 0.6306068601583114,
-    "near": 0.4642857142857143,
+    "overall": 0.6728232189973615,
+    "near": 0.6547619047619048,
     "mid": 0.011764705882352941,
     "far": 0.9476190476190476
   },
-  "near_far_separation": 0.45306072977373874,
+  "near_far_separation": 0.44759620838110586,
   "dim1_records": [
     {
       "secret": "bachpan",
@@ -69,7 +69,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3718,
+      "actual_rank": 3739,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -83,7 +83,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4294,
+      "actual_rank": 4315,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -98,7 +98,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9669,
+      "actual_rank": 9674,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -113,7 +113,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2774,
+      "actual_rank": 2793,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -128,7 +128,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3112,
+      "actual_rank": 3131,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -143,7 +143,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8647,
+      "actual_rank": 8656,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -158,7 +158,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1488,
+      "actual_rank": 1502,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -173,7 +173,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 1235,
+      "actual_rank": 1256,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -188,7 +188,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 474,
+      "actual_rank": 482,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -202,7 +202,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 353,
+      "actual_rank": 357,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -216,7 +216,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1249,
+      "actual_rank": 1270,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -230,7 +230,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 986,
+      "actual_rank": 1002,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -245,7 +245,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10114,
+      "actual_rank": 10115,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -260,7 +260,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6578,
+      "actual_rank": 6589,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -275,7 +275,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2380,
+      "actual_rank": 2404,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -290,7 +290,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7772,
+      "actual_rank": 7780,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -305,7 +305,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4872,
+      "actual_rank": 4892,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -320,8 +320,8 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 50,
-      "actual_band": 1,
+      "actual_rank": 51,
+      "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
     },
@@ -335,7 +335,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 3815,
+      "actual_rank": 3831,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -349,7 +349,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3858,
+      "actual_rank": 3874,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -363,7 +363,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6007,
+      "actual_rank": 6021,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -378,7 +378,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2207,
+      "actual_rank": 2227,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -393,7 +393,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4869,
+      "actual_rank": 4883,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -408,7 +408,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3316,
+      "actual_rank": 3334,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -423,7 +423,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1684,
+      "actual_rank": 1702,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -438,7 +438,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8242,
+      "actual_rank": 8248,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -468,7 +468,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 514,
+      "actual_rank": 518,
       "actual_band": 3,
       "in_expected_band": false,
       "resolution_error": null
@@ -482,7 +482,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1532,
+      "actual_rank": 1535,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -496,7 +496,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4168,
+      "actual_rank": 4175,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -511,7 +511,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2499,
+      "actual_rank": 2502,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -526,7 +526,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1255,
+      "actual_rank": 1259,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -541,7 +541,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6315,
+      "actual_rank": 6325,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -556,7 +556,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4597,
+      "actual_rank": 4609,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -571,7 +571,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5381,
+      "actual_rank": 5394,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -586,7 +586,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 417,
+      "actual_rank": 423,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -601,7 +601,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 122,
+      "actual_rank": 124,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -615,7 +615,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1506,
+      "actual_rank": 1517,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -629,7 +629,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1083,
+      "actual_rank": 1097,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -644,7 +644,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6327,
+      "actual_rank": 6334,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -659,7 +659,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 487,
+      "actual_rank": 493,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -674,7 +674,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5723,
+      "actual_rank": 5733,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -689,7 +689,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8075,
+      "actual_rank": 8080,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -704,7 +704,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1783,
+      "actual_rank": 1795,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -777,7 +777,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4520,
+      "actual_rank": 4524,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -792,7 +792,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3920,
+      "actual_rank": 3926,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -807,7 +807,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6999,
+      "actual_rank": 7001,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -822,7 +822,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6424,
+      "actual_rank": 6427,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -837,7 +837,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4039,
+      "actual_rank": 4045,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -881,7 +881,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 507,
+      "actual_rank": 514,
       "actual_band": 3,
       "in_expected_band": true,
       "resolution_error": null
@@ -895,7 +895,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 20,
+      "actual_rank": 22,
       "actual_band": 1,
       "in_expected_band": false,
       "resolution_error": null
@@ -910,7 +910,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4140,
+      "actual_rank": 4156,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -925,7 +925,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9042,
+      "actual_rank": 9047,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -940,7 +940,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1478,
+      "actual_rank": 1492,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -955,7 +955,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9563,
+      "actual_rank": 9567,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -970,7 +970,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6250,
+      "actual_rank": 6263,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -985,7 +985,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 53,
+      "actual_rank": 54,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -1000,7 +1000,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 138,
+      "actual_rank": 139,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -1014,7 +1014,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1664,
+      "actual_rank": 1678,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1028,7 +1028,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 838,
+      "actual_rank": 849,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1043,7 +1043,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9191,
+      "actual_rank": 9194,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1058,7 +1058,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8737,
+      "actual_rank": 8741,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1073,7 +1073,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6803,
+      "actual_rank": 6812,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1088,7 +1088,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8221,
+      "actual_rank": 8224,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1103,7 +1103,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7540,
+      "actual_rank": 7547,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1176,7 +1176,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5652,
+      "actual_rank": 5666,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1191,7 +1191,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3657,
+      "actual_rank": 3668,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1221,7 +1221,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4041,
+      "actual_rank": 4051,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1236,7 +1236,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9877,
+      "actual_rank": 9879,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1251,10 +1251,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='basti' or word='hamlet' not in vocab"
+      "actual_rank": 15,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "basti",
@@ -1280,10 +1280,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 651,
-      "actual_band": 4,
+      "actual_rank": null,
+      "actual_band": null,
       "in_expected_band": false,
-      "resolution_error": null
+      "resolution_error": "secret='basti' or word='migrant' not in vocab"
     },
     {
       "secret": "basti",
@@ -1294,7 +1294,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 20,
+      "actual_rank": 22,
       "actual_band": 1,
       "in_expected_band": false,
       "resolution_error": null
@@ -1309,7 +1309,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1914,
+      "actual_rank": 1921,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1324,7 +1324,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1195,
+      "actual_rank": 1196,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1339,7 +1339,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6283,
+      "actual_rank": 6289,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1354,7 +1354,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2634,
+      "actual_rank": 2640,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1369,7 +1369,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8306,
+      "actual_rank": 8311,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1384,10 +1384,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 782,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='besan' or word='legume' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "besan",
@@ -1399,7 +1399,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 580,
+      "actual_rank": 583,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1413,7 +1413,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1623,
+      "actual_rank": 1631,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1427,7 +1427,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1333,
+      "actual_rank": 1340,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1442,7 +1442,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9725,
+      "actual_rank": 9727,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1457,7 +1457,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1763,
+      "actual_rank": 1770,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1472,7 +1472,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6623,
+      "actual_rank": 6634,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1487,7 +1487,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2177,
+      "actual_rank": 2186,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1502,7 +1502,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8204,
+      "actual_rank": 8212,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1517,10 +1517,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 4251,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='bhanja' or word='kin' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "bhanja",
@@ -1532,7 +1532,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 1291,
+      "actual_rank": 1306,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1546,7 +1546,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3982,
+      "actual_rank": 3991,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1560,7 +1560,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5064,
+      "actual_rank": 5072,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1575,7 +1575,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3953,
+      "actual_rank": 3961,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1590,7 +1590,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3742,
+      "actual_rank": 3751,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1605,7 +1605,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4888,
+      "actual_rank": 4898,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1620,7 +1620,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10116,
+      "actual_rank": 10117,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1635,7 +1635,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4387,
+      "actual_rank": 4398,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1650,10 +1650,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 2291,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='bhanji' or word='kin' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "bhanji",
@@ -1665,7 +1665,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 187,
+      "actual_rank": 190,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -1679,7 +1679,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4072,
+      "actual_rank": 4083,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1693,10 +1693,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 323,
+      "actual_band": 2,
       "in_expected_band": false,
-      "resolution_error": "secret='bhanji' or word='auntie' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "bhanji",
@@ -1708,7 +1708,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9206,
+      "actual_rank": 9209,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1723,7 +1723,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 692,
+      "actual_rank": 698,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1738,7 +1738,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2067,
+      "actual_rank": 2079,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1753,7 +1753,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5627,
+      "actual_rank": 5634,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1768,7 +1768,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1907,
+      "actual_rank": 1919,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -1783,7 +1783,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 4649,
+      "actual_rank": 4664,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1798,7 +1798,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 2063,
+      "actual_rank": 2079,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -1812,10 +1812,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1280,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='chaabi' or word='padlock' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "chaabi",
@@ -1826,7 +1826,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9168,
+      "actual_rank": 9170,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1841,7 +1841,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9524,
+      "actual_rank": 9525,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1856,7 +1856,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7948,
+      "actual_rank": 7956,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1871,7 +1871,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6288,
+      "actual_rank": 6301,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1886,7 +1886,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5240,
+      "actual_rank": 5257,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1901,7 +1901,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3918,
+      "actual_rank": 3931,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1916,10 +1916,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='chattan' or word='boulder' not in vocab"
+      "actual_rank": 132,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "chattan",
@@ -1931,7 +1931,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 218,
+      "actual_rank": 220,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -1945,7 +1945,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 127,
+      "actual_rank": 128,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -1959,7 +1959,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3906,
+      "actual_rank": 3921,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -1974,7 +1974,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7650,
+      "actual_rank": 7658,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -1989,7 +1989,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3594,
+      "actual_rank": 3611,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2004,7 +2004,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1761,
+      "actual_rank": 1773,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -2019,7 +2019,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 567,
+      "actual_rank": 570,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -2034,7 +2034,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 421,
+      "actual_rank": 426,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2049,10 +2049,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1859,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='chimni' or word='flue' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "chimni",
@@ -2064,10 +2064,10 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='chimni' or word='chimney' not in vocab"
+      "actual_rank": 2,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "chimni",
@@ -2078,10 +2078,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 613,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='chimni' or word='soot' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "chimni",
@@ -2092,10 +2092,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 966,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='chimni' or word='duct' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "chimni",
@@ -2107,7 +2107,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3932,
+      "actual_rank": 3951,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2122,7 +2122,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9853,
+      "actual_rank": 9854,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2137,7 +2137,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6508,
+      "actual_rank": 6518,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2152,7 +2152,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7136,
+      "actual_rank": 7142,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2167,7 +2167,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6921,
+      "actual_rank": 6927,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2182,10 +2182,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='chinta' or word='unease' not in vocab"
+      "actual_rank": 226,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "chinta",
@@ -2211,7 +2211,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 267,
+      "actual_rank": 269,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2225,7 +2225,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 235,
+      "actual_rank": 236,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2240,7 +2240,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6784,
+      "actual_rank": 6789,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2255,7 +2255,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3337,
+      "actual_rank": 3339,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2270,7 +2270,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4652,
+      "actual_rank": 4660,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2285,7 +2285,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2068,
+      "actual_rank": 2071,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -2300,7 +2300,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4997,
+      "actual_rank": 5006,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2315,10 +2315,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='dahi' or word='curd' not in vocab"
+      "actual_rank": 3,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "dahi",
@@ -2330,10 +2330,10 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='dahi' or word='yogurt' not in vocab"
+      "actual_rank": 2,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "dahi",
@@ -2344,7 +2344,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 339,
+      "actual_rank": 346,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2358,10 +2358,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1340,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='dahi' or word='chilled' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "dahi",
@@ -2373,7 +2373,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7004,
+      "actual_rank": 7011,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2388,7 +2388,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7546,
+      "actual_rank": 7552,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2403,7 +2403,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6976,
+      "actual_rank": 6983,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2418,7 +2418,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10211,
+      "actual_rank": 10212,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2433,7 +2433,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5709,
+      "actual_rank": 5715,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2448,7 +2448,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 4350,
+      "actual_rank": 4366,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -2463,7 +2463,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 4159,
+      "actual_rank": 4175,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -2477,10 +2477,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 5917,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='dehat' or word='meadow' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "dehat",
@@ -2491,10 +2491,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 3723,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='dehat' or word='pastoral' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "dehat",
@@ -2506,7 +2506,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8396,
+      "actual_rank": 8400,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2521,7 +2521,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6259,
+      "actual_rank": 6270,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2536,7 +2536,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8230,
+      "actual_rank": 8234,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2551,7 +2551,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8302,
+      "actual_rank": 8306,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2566,7 +2566,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8840,
+      "actual_rank": 8844,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2581,10 +2581,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='dhoop' or word='brightness' not in vocab"
+      "actual_rank": 277,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "dhoop",
@@ -2624,7 +2624,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2080,
+      "actual_rank": 2097,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -2639,7 +2639,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9098,
+      "actual_rank": 9103,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2654,7 +2654,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7823,
+      "actual_rank": 7830,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2669,7 +2669,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8340,
+      "actual_rank": 8345,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2684,7 +2684,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 184,
+      "actual_rank": 187,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2699,7 +2699,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7697,
+      "actual_rank": 7705,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2772,7 +2772,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10044,
+      "actual_rank": 10046,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2802,7 +2802,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6860,
+      "actual_rank": 6863,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2847,10 +2847,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1146,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='jheel' or word='lagoon' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "jheel",
@@ -2862,7 +2862,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 1599,
+      "actual_rank": 1616,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -2876,7 +2876,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3162,
+      "actual_rank": 3182,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -2890,7 +2890,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 202,
+      "actual_rank": 205,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -2905,7 +2905,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8633,
+      "actual_rank": 8640,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2920,7 +2920,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5101,
+      "actual_rank": 5120,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2935,7 +2935,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10405,
+      "actual_rank": 10406,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2950,7 +2950,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5254,
+      "actual_rank": 5272,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2965,7 +2965,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6788,
+      "actual_rank": 6802,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -2980,10 +2980,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 3050,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='judwaa' or word='duplicate' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "judwaa",
@@ -2995,7 +2995,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 224,
+      "actual_rank": 226,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -3009,7 +3009,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4219,
+      "actual_rank": 4240,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3023,7 +3023,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5134,
+      "actual_rank": 5151,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3038,7 +3038,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10456,
+      "actual_rank": 10457,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3053,7 +3053,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6685,
+      "actual_rank": 6696,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3068,7 +3068,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9885,
+      "actual_rank": 9890,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3083,10 +3083,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4741,
-      "actual_band": 5,
-      "in_expected_band": true,
-      "resolution_error": null
+      "actual_rank": null,
+      "actual_band": null,
+      "in_expected_band": false,
+      "resolution_error": "secret='judwaa' or word='retailer' not in vocab"
     },
     {
       "secret": "judwaa",
@@ -3098,7 +3098,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1999,
+      "actual_rank": 2016,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3113,10 +3113,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 3660,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='junoon' or word='zeal' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "junoon",
@@ -3128,7 +3128,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 3377,
+      "actual_rank": 3396,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3142,7 +3142,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6604,
+      "actual_rank": 6615,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3156,7 +3156,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9017,
+      "actual_rank": 9025,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3171,7 +3171,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8951,
+      "actual_rank": 8959,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3186,7 +3186,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 57,
+      "actual_rank": 58,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -3201,7 +3201,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3096,
+      "actual_rank": 3115,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3216,7 +3216,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6350,
+      "actual_rank": 6362,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3231,7 +3231,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2083,
+      "actual_rank": 2101,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3304,7 +3304,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6212,
+      "actual_rank": 6218,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3319,7 +3319,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7412,
+      "actual_rank": 7419,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3334,7 +3334,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6507,
+      "actual_rank": 6515,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3349,7 +3349,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8462,
+      "actual_rank": 8466,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3364,7 +3364,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6322,
+      "actual_rank": 6327,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3379,10 +3379,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='khichdi' or word='porridge' not in vocab"
+      "actual_rank": 9,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "khichdi",
@@ -3408,7 +3408,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3168,
+      "actual_rank": 3182,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3422,10 +3422,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 4165,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='khichdi' or word='hearty' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "khichdi",
@@ -3437,7 +3437,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 415,
+      "actual_rank": 425,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -3452,7 +3452,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9682,
+      "actual_rank": 9687,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3467,7 +3467,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7863,
+      "actual_rank": 7871,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3482,7 +3482,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8964,
+      "actual_rank": 8970,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3497,7 +3497,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4516,
+      "actual_rank": 4530,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3512,7 +3512,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 770,
+      "actual_rank": 777,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -3527,10 +3527,10 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='mausi' or word='auntie' not in vocab"
+      "actual_rank": 8,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "mausi",
@@ -3541,7 +3541,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 637,
+      "actual_rank": 642,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -3570,7 +3570,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8038,
+      "actual_rank": 8041,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3585,7 +3585,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1586,
+      "actual_rank": 1594,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3600,7 +3600,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4043,
+      "actual_rank": 4051,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3615,9 +3615,9 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 521,
-      "actual_band": 3,
-      "in_expected_band": false,
+      "actual_rank": 526,
+      "actual_band": 4,
+      "in_expected_band": true,
       "resolution_error": null
     },
     {
@@ -3630,7 +3630,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9280,
+      "actual_rank": 9281,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3645,10 +3645,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='mazaa' or word='amusement' not in vocab"
+      "actual_rank": 8,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "mazaa",
@@ -3660,7 +3660,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 13,
+      "actual_rank": 15,
       "actual_band": 1,
       "in_expected_band": true,
       "resolution_error": null
@@ -3674,7 +3674,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 66,
+      "actual_rank": 67,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -3688,10 +3688,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 961,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='mazaa' or word='playful' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "mazaa",
@@ -3703,7 +3703,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5646,
+      "actual_rank": 5652,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3718,7 +3718,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 283,
+      "actual_rank": 288,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -3733,9 +3733,9 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 519,
-      "actual_band": 3,
-      "in_expected_band": false,
+      "actual_rank": 525,
+      "actual_band": 4,
+      "in_expected_band": true,
       "resolution_error": null
     },
     {
@@ -3748,7 +3748,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9282,
+      "actual_rank": 9287,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3763,7 +3763,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1935,
+      "actual_rank": 1942,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3778,7 +3778,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 4,
+      "actual_rank": 6,
       "actual_band": 1,
       "in_expected_band": true,
       "resolution_error": null
@@ -3793,7 +3793,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 16,
+      "actual_rank": 19,
       "actual_band": 1,
       "in_expected_band": true,
       "resolution_error": null
@@ -3807,10 +3807,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 3,
+      "actual_band": 1,
       "in_expected_band": false,
-      "resolution_error": "secret='mithai' or word='sweetness' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "mithai",
@@ -3821,7 +3821,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1683,
+      "actual_rank": 1693,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -3836,7 +3836,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5606,
+      "actual_rank": 5621,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3851,7 +3851,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3280,
+      "actual_rank": 3293,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3866,7 +3866,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2038,
+      "actual_rank": 2047,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3881,7 +3881,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1621,
+      "actual_rank": 1631,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3896,7 +3896,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2496,
+      "actual_rank": 2506,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -3911,10 +3911,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='mohalla' or word='locality' not in vocab"
+      "actual_rank": 4,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "mohalla",
@@ -3926,7 +3926,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 25,
+      "actual_rank": 24,
       "actual_band": 1,
       "in_expected_band": true,
       "resolution_error": null
@@ -3940,7 +3940,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 184,
+      "actual_rank": 188,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -3954,7 +3954,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2725,
+      "actual_rank": 2740,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -3969,7 +3969,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8351,
+      "actual_rank": 8355,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3984,7 +3984,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8947,
+      "actual_rank": 8949,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -3999,7 +3999,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9199,
+      "actual_rank": 9200,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4014,7 +4014,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9339,
+      "actual_rank": 9340,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4029,7 +4029,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6453,
+      "actual_rank": 6460,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4044,10 +4044,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='paneer' or word='curd' not in vocab"
+      "actual_rank": 14,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "paneer",
@@ -4073,7 +4073,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1253,
+      "actual_rank": 1258,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -4087,7 +4087,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 171,
+      "actual_rank": 174,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -4102,7 +4102,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8724,
+      "actual_rank": 8730,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4117,7 +4117,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6674,
+      "actual_rank": 6684,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4132,7 +4132,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2251,
+      "actual_rank": 2264,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -4147,7 +4147,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7976,
+      "actual_rank": 7984,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4162,7 +4162,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4370,
+      "actual_rank": 4387,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4177,10 +4177,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 3085,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='patta' or word='foliage' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "patta",
@@ -4206,7 +4206,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 650,
+      "actual_rank": 652,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -4220,10 +4220,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 197,
+      "actual_band": 2,
       "in_expected_band": false,
-      "resolution_error": "secret='patta' or word='twig' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "patta",
@@ -4235,7 +4235,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7965,
+      "actual_rank": 7970,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4250,7 +4250,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7628,
+      "actual_rank": 7632,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4265,7 +4265,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3608,
+      "actual_rank": 3607,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4280,7 +4280,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 605,
+      "actual_rank": 607,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -4295,7 +4295,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6237,
+      "actual_rank": 6242,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4310,10 +4310,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 2614,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='registan' or word='wasteland' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "registan",
@@ -4325,7 +4325,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 4820,
+      "actual_rank": 4815,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -4339,10 +4339,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 7302,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='registan' or word='dune' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "registan",
@@ -4368,7 +4368,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2849,
+      "actual_rank": 2847,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4383,7 +4383,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8574,
+      "actual_rank": 8575,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4398,7 +4398,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4118,
+      "actual_rank": 4112,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4413,7 +4413,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5798,
+      "actual_rank": 5792,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4428,7 +4428,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3563,
+      "actual_rank": 3558,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4486,10 +4486,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 25,
+      "actual_band": 1,
       "in_expected_band": false,
-      "resolution_error": "secret='sadak' or word='pavement' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "sadak",
@@ -4501,7 +4501,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8303,
+      "actual_rank": 8305,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4516,7 +4516,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2743,
+      "actual_rank": 2750,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4531,7 +4531,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5565,
+      "actual_rank": 5570,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4546,7 +4546,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2029,
+      "actual_rank": 2033,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -4561,7 +4561,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8761,
+      "actual_rank": 8762,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4576,7 +4576,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 1999,
+      "actual_rank": 2015,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -4591,7 +4591,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 76,
+      "actual_rank": 79,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -4605,7 +4605,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1689,
+      "actual_rank": 1705,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -4619,7 +4619,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5769,
+      "actual_rank": 5781,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -4634,7 +4634,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5842,
+      "actual_rank": 5853,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4649,7 +4649,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6332,
+      "actual_rank": 6340,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4664,7 +4664,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9672,
+      "actual_rank": 9675,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4679,7 +4679,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5028,
+      "actual_rank": 5043,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4694,7 +4694,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10240,
+      "actual_rank": 10242,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4752,10 +4752,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 2740,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='sarhad' or word='checkpoint' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "sarhad",
@@ -4782,7 +4782,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7715,
+      "actual_rank": 7719,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4812,7 +4812,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8000,
+      "actual_rank": 8003,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4842,10 +4842,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='sawaal' or word='query' not in vocab"
+      "actual_rank": 6,
+      "actual_band": 1,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "sawaal",
@@ -4871,7 +4871,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 66,
+      "actual_rank": 67,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -4885,7 +4885,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 32,
+      "actual_rank": 33,
       "actual_band": 1,
       "in_expected_band": false,
       "resolution_error": null
@@ -4900,7 +4900,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5695,
+      "actual_rank": 5690,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4915,7 +4915,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3551,
+      "actual_rank": 3550,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4930,7 +4930,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1197,
+      "actual_rank": 1196,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -4945,7 +4945,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1857,
+      "actual_rank": 1858,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -4960,7 +4960,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6626,
+      "actual_rank": 6627,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -4975,10 +4975,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='sharm' or word='modesty' not in vocab"
+      "actual_rank": 55,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "sharm",
@@ -4990,10 +4990,10 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='sharm' or word='shyness' not in vocab"
+      "actual_rank": 311,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "sharm",
@@ -5004,10 +5004,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1665,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='sharm' or word='blush' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "sharm",
@@ -5018,10 +5018,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 7897,
+      "actual_band": 5,
       "in_expected_band": false,
-      "resolution_error": "secret='sharm' or word='introvert' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "sharm",
@@ -5033,7 +5033,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9590,
+      "actual_rank": 9592,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5048,7 +5048,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8622,
+      "actual_rank": 8626,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5063,7 +5063,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8464,
+      "actual_rank": 8469,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5078,7 +5078,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3027,
+      "actual_rank": 3037,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5093,7 +5093,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 5092,
+      "actual_rank": 5103,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5108,7 +5108,7 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": 2068,
+      "actual_rank": 2074,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -5123,10 +5123,10 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
-      "in_expected_band": false,
-      "resolution_error": "secret='thaali' or word='platter' not in vocab"
+      "actual_rank": 206,
+      "actual_band": 2,
+      "in_expected_band": true,
+      "resolution_error": null
     },
     {
       "secret": "thaali",
@@ -5137,10 +5137,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 267,
+      "actual_band": 2,
       "in_expected_band": false,
-      "resolution_error": "secret='thaali' or word='cutlery' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "thaali",
@@ -5151,7 +5151,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3840,
+      "actual_rank": 3849,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -5166,7 +5166,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7891,
+      "actual_rank": 7896,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5181,7 +5181,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 7531,
+      "actual_rank": 7536,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5196,7 +5196,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3564,
+      "actual_rank": 3572,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5211,7 +5211,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 4644,
+      "actual_rank": 4653,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5226,7 +5226,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6374,
+      "actual_rank": 6382,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5241,10 +5241,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 2370,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='tokri' or word='hamper' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "tokri",
@@ -5256,7 +5256,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 24,
+      "actual_rank": 26,
       "actual_band": 1,
       "in_expected_band": true,
       "resolution_error": null
@@ -5270,10 +5270,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 1506,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='tokri' or word='weave' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "tokri",
@@ -5284,7 +5284,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 955,
+      "actual_rank": 964,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -5299,7 +5299,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1054,
+      "actual_rank": 1065,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5314,7 +5314,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 3292,
+      "actual_rank": 3305,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5329,7 +5329,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 8106,
+      "actual_rank": 8112,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5344,7 +5344,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1302,
+      "actual_rank": 1315,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5359,7 +5359,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9808,
+      "actual_rank": 9813,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5374,10 +5374,10 @@
       ],
       "subtype": "associate",
       "note": null,
-      "actual_rank": null,
-      "actual_band": null,
+      "actual_rank": 626,
+      "actual_band": 4,
       "in_expected_band": false,
-      "resolution_error": "secret='udaasi' or word='melancholy' not in vocab"
+      "resolution_error": null
     },
     {
       "secret": "udaasi",
@@ -5389,7 +5389,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 1070,
+      "actual_rank": 1082,
       "actual_band": 4,
       "in_expected_band": false,
       "resolution_error": null
@@ -5403,7 +5403,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2991,
+      "actual_rank": 3006,
       "actual_band": 5,
       "in_expected_band": false,
       "resolution_error": null
@@ -5417,7 +5417,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 259,
+      "actual_rank": 265,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -5432,7 +5432,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2504,
+      "actual_rank": 2517,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5447,7 +5447,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2046,
+      "actual_rank": 2061,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5462,7 +5462,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 6381,
+      "actual_rank": 6392,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5477,7 +5477,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 376,
+      "actual_rank": 382,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -5492,10 +5492,10 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 682,
-      "actual_band": 4,
-      "in_expected_band": true,
-      "resolution_error": null
+      "actual_rank": null,
+      "actual_band": null,
+      "in_expected_band": false,
+      "resolution_error": "secret='udaasi' or word='pleasing' not in vocab"
     },
     {
       "secret": "waqt",
@@ -5522,7 +5522,7 @@
       ],
       "subtype": "translation",
       "note": null,
-      "actual_rank": 228,
+      "actual_rank": 226,
       "actual_band": 2,
       "in_expected_band": true,
       "resolution_error": null
@@ -5565,7 +5565,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 9210,
+      "actual_rank": 9216,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5580,7 +5580,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 291,
+      "actual_rank": 289,
       "actual_band": 2,
       "in_expected_band": false,
       "resolution_error": null
@@ -5595,7 +5595,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 10334,
+      "actual_rank": 10335,
       "actual_band": 5,
       "in_expected_band": true,
       "resolution_error": null
@@ -5610,7 +5610,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 2346,
+      "actual_rank": 2354,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5625,7 +5625,7 @@
       ],
       "subtype": null,
       "note": null,
-      "actual_rank": 1296,
+      "actual_rank": 1299,
       "actual_band": 4,
       "in_expected_band": true,
       "resolution_error": null
@@ -5635,8 +5635,8 @@
     {
       "en_secret": "ocean",
       "hien_secret": "samunder",
-      "rank": 450,
-      "rank_percentile": 4.29,
+      "rank": 458,
+      "rank_percentile": 4.36,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5653,8 +5653,8 @@
     {
       "en_secret": "mountain",
       "hien_secret": "pahad",
-      "rank": 122,
-      "rank_percentile": 1.16,
+      "rank": 124,
+      "rank_percentile": 1.18,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5662,8 +5662,8 @@
     {
       "en_secret": "kitchen",
       "hien_secret": "rasoi",
-      "rank": 182,
-      "rank_percentile": 1.73,
+      "rank": 186,
+      "rank_percentile": 1.77,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5671,8 +5671,8 @@
     {
       "en_secret": "garden",
       "hien_secret": "bagicha",
-      "rank": 474,
-      "rank_percentile": 4.52,
+      "rank": 482,
+      "rank_percentile": 4.59,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5689,8 +5689,8 @@
     {
       "en_secret": "butterfly",
       "hien_secret": "titli",
-      "rank": 111,
-      "rank_percentile": 1.06,
+      "rank": 112,
+      "rank_percentile": 1.07,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5698,8 +5698,8 @@
     {
       "en_secret": "silence",
       "hien_secret": "khamoshi",
-      "rank": 888,
-      "rank_percentile": 8.46,
+      "rank": 894,
+      "rank_percentile": 8.52,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -5743,9 +5743,9 @@
     {
       "en_secret": "moon",
       "hien_secret": "chaand",
-      "rank": 50,
-      "rank_percentile": 0.48,
-      "band": 1,
+      "rank": 51,
+      "rank_percentile": 0.49,
+      "band": 2,
       "consistent": true,
       "resolution_error": null
     },
@@ -5779,8 +5779,8 @@
     {
       "en_secret": "desert",
       "hien_secret": "registan",
-      "rank": 4820,
-      "rank_percentile": 45.93,
+      "rank": 4815,
+      "rank_percentile": 45.88,
       "band": 5,
       "consistent": false,
       "resolution_error": null
@@ -5788,8 +5788,8 @@
     {
       "en_secret": "lake",
       "hien_secret": "jheel",
-      "rank": 1599,
-      "rank_percentile": 15.24,
+      "rank": 1616,
+      "rank_percentile": 15.4,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -5797,8 +5797,8 @@
     {
       "en_secret": "rock",
       "hien_secret": "chattan",
-      "rank": 218,
-      "rank_percentile": 2.08,
+      "rank": 220,
+      "rank_percentile": 2.1,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5824,10 +5824,11 @@
     {
       "en_secret": "shyness",
       "hien_secret": "sharm",
-      "rank": null,
-      "band": null,
-      "consistent": null,
-      "resolution_error": "secret or translation missing from hi-en vocab"
+      "rank": 311,
+      "rank_percentile": 2.96,
+      "band": 2,
+      "consistent": true,
+      "resolution_error": null
     },
     {
       "en_secret": "worry",
@@ -5841,8 +5842,8 @@
     {
       "en_secret": "enjoyment",
       "hien_secret": "mazaa",
-      "rank": 13,
-      "rank_percentile": 0.12,
+      "rank": 15,
+      "rank_percentile": 0.14,
       "band": 1,
       "consistent": true,
       "resolution_error": null
@@ -5850,8 +5851,8 @@
     {
       "en_secret": "passion",
       "hien_secret": "junoon",
-      "rank": 3377,
-      "rank_percentile": 32.18,
+      "rank": 3396,
+      "rank_percentile": 32.36,
       "band": 5,
       "consistent": false,
       "resolution_error": null
@@ -5859,8 +5860,8 @@
     {
       "en_secret": "sadness",
       "hien_secret": "udaasi",
-      "rank": 1070,
-      "rank_percentile": 10.2,
+      "rank": 1082,
+      "rank_percentile": 10.31,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -5886,8 +5887,8 @@
     {
       "en_secret": "duration",
       "hien_secret": "waqt",
-      "rank": 228,
-      "rank_percentile": 2.17,
+      "rank": 226,
+      "rank_percentile": 2.15,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5913,8 +5914,8 @@
     {
       "en_secret": "key",
       "hien_secret": "chaabi",
-      "rank": 2063,
-      "rank_percentile": 19.66,
+      "rank": 2079,
+      "rank_percentile": 19.81,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -5922,8 +5923,8 @@
     {
       "en_secret": "trunk",
       "hien_secret": "sandook",
-      "rank": 76,
-      "rank_percentile": 0.72,
+      "rank": 79,
+      "rank_percentile": 0.75,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -5931,16 +5932,17 @@
     {
       "en_secret": "platter",
       "hien_secret": "thaali",
-      "rank": null,
-      "band": null,
-      "consistent": null,
-      "resolution_error": "secret or translation missing from hi-en vocab"
+      "rank": 206,
+      "rank_percentile": 1.96,
+      "band": 2,
+      "consistent": true,
+      "resolution_error": null
     },
     {
       "en_secret": "basket",
       "hien_secret": "tokri",
-      "rank": 24,
-      "rank_percentile": 0.23,
+      "rank": 26,
+      "rank_percentile": 0.25,
       "band": 1,
       "consistent": true,
       "resolution_error": null
@@ -5948,10 +5950,11 @@
     {
       "en_secret": "chimney",
       "hien_secret": "chimni",
-      "rank": null,
-      "band": null,
-      "consistent": null,
-      "resolution_error": "secret or translation missing from hi-en vocab"
+      "rank": 2,
+      "rank_percentile": 0.02,
+      "band": 1,
+      "consistent": true,
+      "resolution_error": null
     },
     {
       "en_secret": "road",
@@ -5983,8 +5986,8 @@
     {
       "en_secret": "neighborhood",
       "hien_secret": "mohalla",
-      "rank": 25,
-      "rank_percentile": 0.24,
+      "rank": 24,
+      "rank_percentile": 0.23,
       "band": 1,
       "consistent": true,
       "resolution_error": null
@@ -5992,8 +5995,8 @@
     {
       "en_secret": "countryside",
       "hien_secret": "dehat",
-      "rank": 4159,
-      "rank_percentile": 39.63,
+      "rank": 4175,
+      "rank_percentile": 39.78,
       "band": 5,
       "consistent": false,
       "resolution_error": null
@@ -6001,8 +6004,8 @@
     {
       "en_secret": "dessert",
       "hien_secret": "mithai",
-      "rank": 16,
-      "rank_percentile": 0.15,
+      "rank": 19,
+      "rank_percentile": 0.18,
       "band": 1,
       "consistent": true,
       "resolution_error": null
@@ -6010,10 +6013,11 @@
     {
       "en_secret": "yogurt",
       "hien_secret": "dahi",
-      "rank": null,
-      "band": null,
-      "consistent": null,
-      "resolution_error": "secret or translation missing from hi-en vocab"
+      "rank": 2,
+      "rank_percentile": 0.02,
+      "band": 1,
+      "consistent": true,
+      "resolution_error": null
     },
     {
       "en_secret": "paneer",
@@ -6027,8 +6031,8 @@
     {
       "en_secret": "gram",
       "hien_secret": "besan",
-      "rank": 580,
-      "rank_percentile": 5.53,
+      "rank": 583,
+      "rank_percentile": 5.56,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -6045,16 +6049,17 @@
     {
       "en_secret": "auntie",
       "hien_secret": "mausi",
-      "rank": null,
-      "band": null,
-      "consistent": null,
-      "resolution_error": "secret or translation missing from hi-en vocab"
+      "rank": 8,
+      "rank_percentile": 0.08,
+      "band": 1,
+      "consistent": true,
+      "resolution_error": null
     },
     {
       "en_secret": "nephew",
       "hien_secret": "bhanja",
-      "rank": 1291,
-      "rank_percentile": 12.3,
+      "rank": 1306,
+      "rank_percentile": 12.44,
       "band": 4,
       "consistent": false,
       "resolution_error": null
@@ -6062,8 +6067,8 @@
     {
       "en_secret": "niece",
       "hien_secret": "bhanji",
-      "rank": 187,
-      "rank_percentile": 1.78,
+      "rank": 190,
+      "rank_percentile": 1.81,
       "band": 2,
       "consistent": true,
       "resolution_error": null
@@ -6071,12 +6076,12 @@
     {
       "en_secret": "twin",
       "hien_secret": "judwaa",
-      "rank": 224,
-      "rank_percentile": 2.13,
+      "rank": 226,
+      "rank_percentile": 2.15,
       "band": 2,
       "consistent": true,
       "resolution_error": null
     }
   ],
-  "wall_clock_seconds": 8.6
+  "wall_clock_seconds": 8.4
 }
