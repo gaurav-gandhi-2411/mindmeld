@@ -1,0 +1,83 @@
+{
+  "seed": 42,
+  "total_secrets": 34,
+  "dev_secrets": [
+    "basti",
+    "bhanji",
+    "chaabi",
+    "chattan",
+    "dahi",
+    "insaaf",
+    "judwaa",
+    "kanoon",
+    "khichdi",
+    "mazaa",
+    "mithai",
+    "patta",
+    "sandook",
+    "sarhad",
+    "sawaal",
+    "sharm",
+    "thaali"
+  ],
+  "test_secrets": [
+    "azaadi",
+    "besan",
+    "bhanja",
+    "chimni",
+    "chinta",
+    "dehat",
+    "dhoop",
+    "jheel",
+    "junoon",
+    "mausi",
+    "mohalla",
+    "paneer",
+    "registan",
+    "sadak",
+    "tokri",
+    "udaasi",
+    "waqt"
+  ],
+  "domain_counts": {
+    "abstract": {
+      "dev": 3,
+      "test": 2,
+      "total": 5
+    },
+    "emotion": {
+      "dev": 2,
+      "test": 3,
+      "total": 5
+    },
+    "food": {
+      "dev": 3,
+      "test": 2,
+      "total": 5
+    },
+    "kinship": {
+      "dev": 2,
+      "test": 2,
+      "total": 4
+    },
+    "nature": {
+      "dev": 2,
+      "test": 3,
+      "total": 5
+    },
+    "object": {
+      "dev": 3,
+      "test": 2,
+      "total": 5
+    },
+    "place": {
+      "dev": 2,
+      "test": 3,
+      "total": 5
+    }
+  },
+  "counts": {
+    "dev": 17,
+    "test": 17
+  }
+}

@@ -1,3 +1,82 @@
+# PLAN — Hinglish research release, Phase 1 (in progress, 2026-07-19)
+
+Spec: `spec-hinglish-research-release.md` (new, supersedes spec-hinglish-benchmark.md
+going forward -- that older spec's own Phase 1, 50-secret/8-model bake-off, is done
+and committed through `d212af0`). This phase targets the new spec's bigger Phase-1
+bar: a several-hundred-pair public benchmark with a dev/test split that actually
+predicts test (old problem: dev-test corr only 0.12), commercial-licensed-or-honestly-
+labeled sourcing, and a strict scrub. **STOP gate after this phase, per spec: present
+benchmark size/sample/dev-test corr/scrub result to GG before it's used as the ruler
+for anything downstream.**
+
+## Recovered mid-session state (this session started here, not from scratch)
+
+Found uncommitted, unexplained tree state at session start: a P0 cache-key fix
+(`embeddings.py` + `generator/tests/test_embeddings.py`), a partially re-run 8-model
+bake-off (6/8 checkpoints re-run clean, only `wall_clock_seconds` changed -- confirms
+the fix didn't change committed Phase-1 numbers), and a new, not-yet-wired-in
+`generator/evals/finetune/data/public_benchmark_staging/` (276 dim1_en + 274 dim1_hien
++ 30 dim2 draft pairs, 31 of the existing 34 "benchmark-only" secrets from
+`phase1_benchmark_report.md`'s domain table). Diagnosed as this same task's own prior
+progress, interrupted mid-run by a context compaction (order of missing bake-off
+checkpoints exactly matches `CANDIDATE_MODELS` list order; `run_model()`'s
+checkpoint-immediately-per-model design is resumable by construction). **Confirmed
+with GG** (AskUserQuestion, this session): resume as own work, don't discard; source
+the benchmark as majority expert-tiered/synthetic (same near/mid/far/subtype rigor
+already proven) + IndicCorp v2 CC0 supplement, honestly labeled -- not overclaimed as
+human-annotated commercial data (that data doesn't exist for Hindi, per the licensing
+gate already run in the data-expansion wave, see PLAN.md's "Licensing gate" section
+below).
+
+## In flight
+
+- Bake-off re-run resumed in background (`benchmark_bakeoff.py --all`) to regenerate
+  the 2 missing checkpoints (Qwen3-Embedding-0.6B, shipped model) -- CPU inference,
+  ~45-60min estimated. Once done: all 8 checkpoints confirmed post-fix, then commit
+  the P0 fix + test + bakeoff_raw/*.json as one atomic commit.
+- Executor subagent dispatched (background) to: add the 3 missing benchmark-only
+  secrets (junoon/insaaf/udaasi) to the staging files with verified in-vocab words;
+  write + run `scrub_public_benchmark.py` (per-word collision check against every
+  live daily-schedule secret + every pack secret + aliases + morphological variants,
+  stricter than the precedent `publish_to_hf.py` 2-co-occurring-secrets check since a
+  benchmark word list is a single-collision risk, not a co-occurrence risk); build a
+  domain-stratified dev/test split of the 34 secrets and MEASURE (not estimate)
+  dev<->test correlation using the 8 bake-off models' already-computed dim1_records,
+  sliced by secret membership; compute bootstrap CIs on the finalized 34-secret set;
+  write `public_benchmark_phase1_report.md`. Explicitly told not to touch git or
+  production game content, and not to force/fudge the correlation number.
+
+## Update: both background jobs landed, P0 fix committed (f31b0f5)
+
+- Bake-off re-run: all 8/8 checkpoints regenerated post-fix; every score byte-
+  identical to pre-fix (only wall_clock_seconds differs, verified via git diff);
+  `bakeoff_comparison.md` byte-identical. Committed as `f31b0f5`.
+- Benchmark-finalization executor: completed 34/34 secrets, built+ran
+  `scrub_public_benchmark.py` (found/fixed 16 real blocking collisions, incl. one
+  it introduced itself; 539 advisory Levenshtein-only hits disclosed, non-blocking
+  by design -- rationale in the script's docstring), built a stratified 17/17
+  dev/test split (seed=42), measured dev<->test Pearson r=0.885 (n=8 models) vs the
+  old 0.12 baseline, computed bootstrap CIs (full/dev/test). Full report:
+  `generator/evals/finetune/data/public_benchmark_phase1_report.md`.
+- **Independently re-verified by me** (not just trusted): re-ran
+  `scrub_public_benchmark.py` myself -> same 0/539 blocking/advisory split; re-ran
+  `public_benchmark_analysis.py` myself -> same r=0.8852940766818941, n=8.
+- Full generator test suite running in background to confirm nothing broke
+  repo-wide before the benchmark files are committed (executor's own in-session run
+  already showed 496 passed/4 skipped -- the 4 skips are the pre-existing,
+  documented, unrelated Ollama-judge flake).
+
+## Next
+
+Once the full-suite re-run confirms green, commit the benchmark finalization
+(staging files, scrub/split/analysis scripts + their tests, the report) as its own
+atomic commit, then present the full Phase-1 picture to GG at the spec's STOP gate
+(benchmark size, pair sample, dev<->test corr, scrub result, the 16 word
+substitutions, the dim2 stability caveat) before Phase 2 (scale training data)
+starts. Do not publish or treat the benchmark as the ruler before that review.
+
+---
+
 # PLAN — Hinglish diagnostic sweep v3 (SHIPPED 2026-07-18)
 
 Spec: `spec-hinglish-diagnostic-sweep.md`. Branch `feat/hinglish-finetune` (continuation).

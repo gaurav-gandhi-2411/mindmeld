@@ -1,0 +1,172 @@
+[
+  {
+    "hien_secret": "registan",
+    "en_gloss": "desert",
+    "domain": "nature"
+  },
+  {
+    "hien_secret": "jheel",
+    "en_gloss": "lake",
+    "domain": "nature"
+  },
+  {
+    "hien_secret": "chattan",
+    "en_gloss": "rock",
+    "domain": "nature"
+  },
+  {
+    "hien_secret": "dhoop",
+    "en_gloss": "sunlight",
+    "domain": "nature"
+  },
+  {
+    "hien_secret": "patta",
+    "en_gloss": "leaf",
+    "domain": "nature"
+  },
+  {
+    "hien_secret": "sharm",
+    "en_gloss": "shyness",
+    "domain": "emotion"
+  },
+  {
+    "hien_secret": "chinta",
+    "en_gloss": "worry",
+    "domain": "emotion"
+  },
+  {
+    "hien_secret": "mazaa",
+    "en_gloss": "enjoyment",
+    "domain": "emotion"
+  },
+  {
+    "hien_secret": "junoon",
+    "en_gloss": "passion",
+    "domain": "emotion"
+  },
+  {
+    "hien_secret": "udaasi",
+    "en_gloss": "sadness",
+    "domain": "emotion"
+  },
+  {
+    "hien_secret": "azaadi",
+    "en_gloss": "freedom",
+    "domain": "abstract"
+  },
+  {
+    "hien_secret": "insaaf",
+    "en_gloss": "justice",
+    "domain": "abstract"
+  },
+  {
+    "hien_secret": "waqt",
+    "en_gloss": "duration",
+    "domain": "abstract"
+  },
+  {
+    "hien_secret": "sawaal",
+    "en_gloss": "question",
+    "domain": "abstract"
+  },
+  {
+    "hien_secret": "kanoon",
+    "en_gloss": "law",
+    "domain": "abstract"
+  },
+  {
+    "hien_secret": "chaabi",
+    "en_gloss": "key",
+    "domain": "object"
+  },
+  {
+    "hien_secret": "sandook",
+    "en_gloss": "trunk",
+    "domain": "object"
+  },
+  {
+    "hien_secret": "thaali",
+    "en_gloss": "platter",
+    "domain": "object"
+  },
+  {
+    "hien_secret": "tokri",
+    "en_gloss": "basket",
+    "domain": "object"
+  },
+  {
+    "hien_secret": "chimni",
+    "en_gloss": "chimney",
+    "domain": "object"
+  },
+  {
+    "hien_secret": "sadak",
+    "en_gloss": "road",
+    "domain": "place"
+  },
+  {
+    "hien_secret": "sarhad",
+    "en_gloss": "border",
+    "domain": "place"
+  },
+  {
+    "hien_secret": "basti",
+    "en_gloss": "settlement",
+    "domain": "place"
+  },
+  {
+    "hien_secret": "mohalla",
+    "en_gloss": "neighborhood",
+    "domain": "place"
+  },
+  {
+    "hien_secret": "dehat",
+    "en_gloss": "countryside",
+    "domain": "place"
+  },
+  {
+    "hien_secret": "mithai",
+    "en_gloss": "dessert",
+    "domain": "food"
+  },
+  {
+    "hien_secret": "dahi",
+    "en_gloss": "yogurt",
+    "domain": "food"
+  },
+  {
+    "hien_secret": "paneer",
+    "en_gloss": "paneer",
+    "domain": "food"
+  },
+  {
+    "hien_secret": "besan",
+    "en_gloss": "gram",
+    "domain": "food"
+  },
+  {
+    "hien_secret": "khichdi",
+    "en_gloss": "khichdi",
+    "domain": "food"
+  },
+  {
+    "hien_secret": "mausi",
+    "en_gloss": "auntie",
+    "domain": "kinship"
+  },
+  {
+    "hien_secret": "bhanja",
+    "en_gloss": "nephew",
+    "domain": "kinship"
+  },
+  {
+    "hien_secret": "bhanji",
+    "en_gloss": "niece",
+    "domain": "kinship"
+  },
+  {
+    "hien_secret": "judwaa",
+    "en_gloss": "twin",
+    "domain": "kinship"
+  }
+]

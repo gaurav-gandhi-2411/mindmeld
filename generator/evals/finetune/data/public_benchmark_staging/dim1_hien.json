@@ -1,0 +1,3245 @@
+[
+  {
+    "secret": "azaadi",
+    "word": "liberty",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "freedom",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "rights",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "release",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "knives",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "theoretical",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "popularity",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "sufficient",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "azaadi",
+    "word": "casting",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "hamlet",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "settlement",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "migrant",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "housing",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "latino",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "roller",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "dhanyawaad",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "browser",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "basti",
+    "word": "commenced",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "legume",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "gram",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "cooking",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "protein",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "throw",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "frank",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "algebra",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "favorites",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "besan",
+    "word": "deeds",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "kin",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "nephew",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "household",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "cousin",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "pace",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "nickel",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "stand",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "convey",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanja",
+    "word": "affection",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "kin",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "niece",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "household",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "auntie",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "idaho",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "bucket",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "antonio",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "healthier",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "bolt",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "key",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "padlock",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "security",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "unions",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "slopes",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "promotion",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "fellows",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chaabi",
+    "word": "singh",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "boulder",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "rock",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "cliff",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "mineral",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "municipal",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "embraced",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "regional",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "archive",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chattan",
+    "word": "breasts",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "flue",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "chimney",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "soot",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "duct",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "cease",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "knew",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "commitments",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "securities",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chimni",
+    "word": "signature",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "unease",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "worry",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "stress",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "nervous",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "persuade",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "panthers",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "margins",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "legend",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "chinta",
+    "word": "shepherd",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "curd",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "yogurt",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "breakfast",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "chilled",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "euros",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "drive",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "volleyball",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "johnston",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dahi",
+    "word": "attending",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "rural",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "countryside",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "meadow",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "pastoral",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "answering",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "jackson",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "shores",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "recommendations",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dehat",
+    "word": "administrative",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "brightness",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "sunlight",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "warmth",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "ray",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "proved",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "info",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "opposing",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "apple",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "dhoop",
+    "word": "tenth",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "fairness",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "justice",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "verdict",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "judge",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "textbook",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "received",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "loss",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "fork",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "insaaf",
+    "word": "peoples",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "lagoon",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "lake",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "shore",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "fishing",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "joined",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "carpenter",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "murderer",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "jheel",
+    "word": "feminist",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "duplicate",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "twin",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "household",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "identical",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "travelled",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "connecting",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "outcome",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "retailer",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "judwaa",
+    "word": "garcia",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "zeal",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "passion",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "obsession",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "drive",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "exports",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "sunshine",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "oven",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "labels",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "junoon",
+    "word": "fried",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "rule",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "law",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "court",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "legislation",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "houston",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "internet",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "supplied",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "possible",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "kanoon",
+    "word": "retaining",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "porridge",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "khichdi",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "comfort",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "hearty",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "mill",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "define",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "crime",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "crashed",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "khichdi",
+    "word": "happily",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "relative",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "auntie",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "household",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "niece",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "logic",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "jelly",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "elaichi",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "gora",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mausi",
+    "word": "reservation",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "amusement",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "enjoyment",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "cheer",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "playful",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "quote",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "kissed",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "relaxing",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "conservation",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mazaa",
+    "word": "prescribed",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "candy",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "dessert",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "sweetness",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "treat",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "lord",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "mistress",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "cooper",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "leisure",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mithai",
+    "word": "practically",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "locality",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "neighborhood",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "neighbor",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "block",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "has",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "info",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "due",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "jointly",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "mohalla",
+    "word": "subject",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "curd",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "paneer",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "cube",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "curry",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "halo",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "magazines",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "traits",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "paneer",
+    "word": "mph",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "foliage",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "leaf",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "stem",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "twig",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "pigs",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "consequences",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "frequently",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "gallery",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "patta",
+    "word": "infrastructure",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "wasteland",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "desert",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "dune",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "drought",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "amounts",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "infinite",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "judgement",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "rhetoric",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "registan",
+    "word": "comparing",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "street",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "road",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "traffic",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "pavement",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "volunteers",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "packing",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "claiming",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "farmers",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sadak",
+    "word": "denial",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "vault",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "trunk",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "storage",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "luggage",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "tightly",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "refuses",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "came",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "advise",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sandook",
+    "word": "exile",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "border",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "fence",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "checkpoint",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "probability",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "jersey",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "customers",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sarhad",
+    "word": "steam",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "query",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "question",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "answer",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "doubt",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "estimates",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "initial",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "owns",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "smile",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sawaal",
+    "word": "acquired",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "modesty",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "shyness",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "blush",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "introvert",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "anticipated",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "gifts",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "pushed",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "mines",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "sharm",
+    "word": "hawks",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "dish",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "platter",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "cutlery",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "serving",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "survived",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "real",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "beloved",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "improves",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "thaali",
+    "word": "laboratory",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "hamper",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "basket",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "weave",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "picnic",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "drawer",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "ill",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "prestigious",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "packet",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "tokri",
+    "word": "sailor",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "melancholy",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "sadness",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "misery",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "despair",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "kane",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "phillips",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "fail",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "rahat",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "udaasi",
+    "word": "optical",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": "production supplement used \"pleasing\" here, which is unresolvable in the current hi-en vocab (report residual finding); swapped for a verified in-vocab far-tier word"
+  },
+  {
+    "secret": "waqt",
+    "word": "interval",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "associate",
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "duration",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": "translation",
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "schedule",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "era",
+    "tier": "mid",
+    "expected_bands": [
+      3
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "zombies",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "cabinet",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "definitely",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "masks",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "waqt",
+    "word": "suddenly",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
+  }
+]
