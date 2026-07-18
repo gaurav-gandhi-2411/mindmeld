@@ -23,7 +23,7 @@
   },
   {
     "secret": "auntie",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -76,7 +76,7 @@
   },
   {
     "secret": "auntie",
-    "word": "amnesia",
+    "word": "carpenter",
     "tier": "far",
     "expected_bands": [
       4,
@@ -905,7 +905,7 @@
   },
   {
     "secret": "freedom",
-    "word": "spending",
+    "word": "tablecloth",
     "tier": "far",
     "expected_bands": [
       4,
@@ -982,7 +982,7 @@
   },
   {
     "secret": "gram",
-    "word": "cooking",
+    "word": "mattress",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1079,7 +1079,7 @@
   },
   {
     "secret": "justice",
-    "word": "verdict",
+    "word": "envelope",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1089,7 +1089,7 @@
   },
   {
     "secret": "justice",
-    "word": "judge",
+    "word": "adjudicator",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1681,7 +1681,7 @@
   },
   {
     "secret": "neighborhood",
-    "word": "military",
+    "word": "binder",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1758,7 +1758,7 @@
   },
   {
     "secret": "nephew",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1855,7 +1855,7 @@
   },
   {
     "secret": "niece",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -2911,7 +2911,7 @@
   },
   {
     "secret": "trunk",
-    "word": "storage",
+    "word": "generator",
     "tier": "mid",
     "expected_bands": [
       3
@@ -3008,7 +3008,7 @@
   },
   {
     "secret": "twin",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -3244,7 +3244,7 @@
   },
   {
     "secret": "yogurt",
-    "word": "lights",
+    "word": "thermostat",
     "tier": "far",
     "expected_bands": [
       4,

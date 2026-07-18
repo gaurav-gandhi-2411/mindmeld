@@ -245,6 +245,93 @@ exists" is not automatically "a leak."
 
 `tests/test_semantic_scrub_public_benchmark.py` (5 tests) — all pass.
 
+### 2c. GG's targeted pass: 20 words swapped, resolving 20 of the 44 rank≤10 hits
+
+GG's call: the "public model already discloses this" reasoning is sound —
+leave chance-level associations alone — but swap the OBVIOUS one-hop
+associates (near-synonym or immediately-obvious functional pairing, the
+`border→boundary`/`storage→memory` class) for the optics of a citable
+public artifact. Went through all 44 by hand against that bar.
+
+**2 of the 44 turned out to be unswappable by construction**, not left by
+choice: `border` (rank 4, en+hi-en) and `sunlight` (rank 9, en) are the
+secrets' own ground-truth EN *translations* — `sarhad` literally means
+"border," `dhoop` literally means "sunlight." These aren't fillable
+associate words; they're what the secret IS, used by the translation-
+tagged near-word check and the dim2 cross-lingual pair specifically to
+test correct-translation ranking. Swapping them would break the
+measurement, not fix a defect. Their coincidental closeness to live
+secrets `boundary` (a cricket term) and `sunrise` is an inherent property
+of English having common words with overlapping senses — not a chosen
+associate word failing a bar, and not fixable short of dropping the
+secret entirely (not done — 34/34 secrets preserved).
+
+**20 genuine associate-word swaps applied** (verified in-vocab,
+string-clean, and — using the SAME rank≤10 bar that flagged the
+originals, not the much stricter "zero hot-band hits anywhere" bar,
+which chance-baseline analysis in 2b showed is nearly unachievable in a
+10.5k-word vocab against 110 live secrets):
+
+| Lang | Secret | Tier | Old word | New word |
+|---|---|---|---|---|
+| en | trunk | mid | storage | generator |
+| en | neighborhood | far | military | binder |
+| en | auntie | far | amnesia | carpenter |
+| en | gram | mid | cooking | mattress |
+| en | justice | mid | verdict | envelope |
+| en | justice | mid | judge | adjudicator |
+| en | freedom | far | spending | tablecloth |
+| en | yogurt | far | lights | thermostat |
+| en | auntie/nephew/niece/twin | mid | household | bracket (×4, shared word by original design) |
+| hi-en | dahi | mid | breakfast | cabinet |
+| hi-en | bhanja/bhanji/judwaa/mausi | mid | household | bracket (×4, mirrors EN) |
+| hi-en | bhanja | far | affection | municipal |
+| hi-en | thaali | far | beloved | satellite |
+| hi-en | insaaf | far | textbook | printer |
+| hi-en | tokri | far | prestigious | tribunal |
+| hi-en | basti | far | commenced | vacuum |
+| hi-en | sawaal | far | initial | archive |
+| hi-en | judwaa | far | travelled | toaster |
+
+`household`→`bracket` was applied identically across all 4 kinship
+secrets in BOTH language files, preserving the original design's EN/hi-en
+mid-tier mirroring (`_build_hien_curated()`'s "mid = EN's mid list
+verbatim" rule in `gen_dim1_benchmark_supplement.py`).
+
+**Remaining 24 of 44, left unchanged** — reviewed individually, not just
+threshold-filtered: mostly phonetic-clustering artifacts between short
+Hindi/Hinglish words with no semantic link (`chaabi`/`chaand`,
+`khichdi`/`khidki`, `mohalla`/`mahal`), a few coincidental self-
+referential secret-vs-secret proximities (`sarhad`/`pahad`,
+`mazaa`/`razaai`), loose same-domain-but-not-synonymous associations
+(`twig`/`titli`, `foliage`/`phool`, `outcome`/`finalist`), plus `border`/
+`sunlight` (unswappable, above) and `batter`/`bat` (a coincidental
+substring artifact — `batter` contains `bat`, already in the string
+scrub's advisory list at the sub-4-character floor; semantically cooking
+batter and a cricket bat are unrelated, this is a token-overlap artifact
+not a real association).
+
+Re-ran both scrubs after the swaps: string scrub still 0 blocking (547
+advisory, up from 540 as an incidental side effect of new words entering
+the checked set). Semantic scrub rank≤10 count: 44 → 24, every targeted
+word confirmed gone, zero new hits introduced by the replacements.
+`tests/test_scrub_public_benchmark.py` and
+`tests/test_semantic_scrub_public_benchmark.py` both pass.
+
+**Accuracy check on the headline numbers**: the swaps changed actual WORD
+content in `dim1_hien.json`, but section 3/4's dev↔test correlation and
+bootstrap CIs below were originally computed from the bake-off
+checkpoints (`bakeoff_raw/*.json`), which reflect the PRE-swap production
+scenario files, not the published staging content. Built
+`evals/finetune/public_benchmark_reverify.py` to recompute both against
+the actual final staging file (reusing each of the 8 models' already-
+cached full-vocab embeddings — no re-inference) rather than assume the
+20-word swap (out of ~600 total words) didn't matter. It didn't, within
+noise: dev↔test Pearson r = **0.894** (was 0.885 pre-swap, both are within
+each other's expected sampling variation for n=8); shipped model full-34
+dim1 Spearman = **0.656** (was 0.657). **The numbers reported below (section
+3/4) are the reverify (post-swap, actually-published) numbers.**
+
 ---
 
 ## 3. Dev/test split and dev↔test correlation
@@ -299,26 +386,31 @@ up the 2 additional checkpoints.
 
 | Model | dev score | test score |
 |---|---|---|
-| paraphrase-multilingual-MiniLM-L12-v2 | -0.057 | 0.097 |
-| l3cube-pune/indic-sentence-bert-nli | 0.547 | 0.415 |
-| google/muril-base-cased | 0.272 | 0.093 |
-| BAAI/bge-m3 | 0.098 | 0.079 |
-| intfloat/multilingual-e5-large | 0.217 | 0.179 |
-| ibm-granite/granite-embedding-311m-multilingual-r2 | 0.227 | 0.036 |
-| Qwen/Qwen3-Embedding-0.6B | 0.213 | 0.106 |
-| gauravgandhi2411/hinglish-relatedness-sbert (shipped) | 0.688 | 0.628 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 0.005 | 0.144 |
+| l3cube-pune/indic-sentence-bert-nli | 0.561 | 0.438 |
+| google/muril-base-cased | 0.230 | 0.088 |
+| BAAI/bge-m3 | 0.122 | 0.065 |
+| intfloat/multilingual-e5-large | 0.221 | 0.165 |
+| ibm-granite/granite-embedding-311m-multilingual-r2 | 0.207 | 0.040 |
+| Qwen/Qwen3-Embedding-0.6B | 0.263 | 0.103 |
+| gauravgandhi2411/hinglish-relatedness-sbert (shipped) | 0.671 | 0.641 |
 
-**Dev↔test Pearson r = 0.885 (n=8 models, the full CANDIDATE_MODELS list).**
+**Dev↔test Pearson r = 0.894 (n=8 models).** *(Recomputed by
+`public_benchmark_reverify.py` against the FINAL published word content
+post-scrub — see section 2c. The originally-measured value against the
+pre-swap production scenario words was 0.885; both numbers, and the
+n=6/8 interim read of 0.767 before that, are kept below rather than
+overwritten — see the caveats.)*
 
 ### Interpretation
 
-This **materially beats the old n=16 problem's ~0.12 correlation** — 0.885
-vs 0.12 is a +0.765 improvement. The stratified 17/17 split with 7-domain
+This **materially beats the old n=16 problem's ~0.12 correlation** — 0.894
+vs 0.12 is a +0.774 improvement. The stratified 17/17 split with 7-domain
 coverage in both halves produces a benchmark whose dev half is a strongly
 predictive proxy for its test half — a model that looks good on dev also
 looks good on test, which was NOT true of the old, much smaller held-out
-set. Notably, the shipped model has both the highest dev score (0.688) and
-the highest test score (0.628) of all 8 candidates — consistent with
+set. Notably, the shipped model has both the highest dev score (0.671) and
+the highest test score (0.641) of all 8 candidates — consistent with
 `phase1_benchmark_report.md`'s full-set finding that it leads every
 alternative — so the dev/test split doesn't just correlate well in the
 aggregate, it preserves the same leadership ranking on each half
@@ -326,17 +418,18 @@ independently.
 
 **Honest caveats, not smoothed over:**
 - n=8 model-pairs is still a small sample for a correlation estimate; the
-  true population correlation could differ from 0.885 by a real margin (a
+  true population correlation could differ from 0.894 by a real margin (a
   bootstrap CI on this specific correlation was out of this task's
   explicit scope, which asked for the point estimate — flagging as a
   natural Phase 2 follow-up).
 - This correlation was **not** used to retroactively adjust the split —
   the split was built first (`public_benchmark_split.py`, seed=42,
   domain-stratified), then the correlation was measured against it as-is,
-  both before and after the 2 additional checkpoints landed. No post-hoc
-  reshuffling was performed to improve this number, and the earlier n=6/8
-  result (0.767) is left in this report's history rather than silently
-  overwritten, since both are honest, real, sequentially-measured numbers.
+  at three points in this same session as more data became available (n=6/8
+  read of 0.767 → n=8/8 pre-scrub read of 0.885 → n=8/8 post-scrub,
+  actually-published read of 0.894). No post-hoc reshuffling was performed
+  to improve this number at any point; all three are disclosed here rather
+  than silently overwritten by the latest.
 
 ---
 
@@ -349,15 +442,21 @@ the P0 `embeddings.py` cache-key bugfix was still in flight, per the task
 brief), but landed before this session ended. `evals/finetune/
 public_benchmark_analysis.py`'s `shipped_model_bootstrap_cis()` was run
 against it (cluster-by-secret bootstrap, `n_boot=10,000`, `seed=42`,
-mirroring `bootstrap_ci.py`'s own methodology exactly) with no re-embedding
-— all numbers below are sliced straight from the already-computed
-checkpoint's `dim1_records`/`dim2_records`.
+mirroring `bootstrap_ci.py`'s own methodology exactly) with no re-embedding.
+
+**dim1 Spearman below is the reverify (post-scrub, actually-published-word)
+number** from `public_benchmark_reverify.py` (section 2c) — the pre-scrub
+figures were 0.657 / 0.688 / 0.628, all within noise of the numbers below.
+**dim2 pass-rate is unchanged from the original run** — dim2 pairs are
+(en_secret, hien_secret) NAME tuples, and no secret name was ever swapped,
+only near/mid/far associate words, so dim2 is unaffected by construction
+(see section 2c) and was not recomputed.
 
 | Slice | dim1 Spearman [95% CI] | n secrets / scenarios | dim2 pass-rate [95% CI] | n pairs |
 |---|---|---|---|---|
-| full 34-secret benchmark | 0.657 [0.574, 0.732] | 34 / 303 | 0.706 [0.559, 0.853] | 34 |
-| dev_bench only | 0.688 [0.611, 0.765] | 17 / 151 | 0.882 [0.706, 1.000] | 17 |
-| test_bench only | 0.628 [0.481, 0.755] | 17 / 152 | 0.529 [0.294, 0.765] | 17 |
+| full 34-secret benchmark | 0.656 [0.569, 0.735] | 34 / 303 | 0.706 [0.559, 0.853] | 34 |
+| dev_bench only | 0.671 [0.574, 0.759] | 17 / 151 | 0.882 [0.706, 1.000] | 17 |
+| test_bench only | 0.641 [0.493, 0.766] | 17 / 152 | 0.529 [0.294, 0.765] | 17 |
 
 **Observations:**
 - dim1 Spearman is stable and CI-overlapping across all three slices

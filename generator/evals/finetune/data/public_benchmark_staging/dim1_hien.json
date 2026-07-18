@@ -184,7 +184,7 @@
   },
   {
     "secret": "basti",
-    "word": "commenced",
+    "word": "vacuum",
     "tier": "far",
     "expected_bands": [
       4,
@@ -314,7 +314,7 @@
   },
   {
     "secret": "bhanja",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -378,7 +378,7 @@
   },
   {
     "secret": "bhanja",
-    "word": "affection",
+    "word": "municipal",
     "tier": "far",
     "expected_bands": [
       4,
@@ -411,7 +411,7 @@
   },
   {
     "secret": "bhanji",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -885,7 +885,7 @@
   },
   {
     "secret": "dahi",
-    "word": "breakfast",
+    "word": "cabinet",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1196,7 +1196,7 @@
   },
   {
     "secret": "insaaf",
-    "word": "textbook",
+    "word": "printer",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1359,7 +1359,7 @@
   },
   {
     "secret": "judwaa",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -1379,7 +1379,7 @@
   },
   {
     "secret": "judwaa",
-    "word": "travelled",
+    "word": "toaster",
     "tier": "far",
     "expected_bands": [
       4,
@@ -1747,7 +1747,7 @@
   },
   {
     "secret": "mausi",
-    "word": "household",
+    "word": "bracket",
     "tier": "mid",
     "expected_bands": [
       3
@@ -2715,7 +2715,7 @@
   },
   {
     "secret": "sawaal",
-    "word": "initial",
+    "word": "archive",
     "tier": "far",
     "expected_bands": [
       4,
@@ -2920,7 +2920,7 @@
   },
   {
     "secret": "thaali",
-    "word": "beloved",
+    "word": "satellite",
     "tier": "far",
     "expected_bands": [
       4,
@@ -3017,7 +3017,7 @@
   },
   {
     "secret": "tokri",
-    "word": "prestigious",
+    "word": "tribunal",
     "tier": "far",
     "expected_bands": [
       4,
