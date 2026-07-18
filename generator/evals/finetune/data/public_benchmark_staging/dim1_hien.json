@@ -3241,5 +3241,16 @@
     ],
     "subtype": null,
     "note": null
+  },
+  {
+    "secret": "bhanji",
+    "word": "muscle",
+    "tier": "far",
+    "expected_bands": [
+      4,
+      5
+    ],
+    "subtype": null,
+    "note": null
   }
 ]

@@ -157,6 +157,94 @@ verbose output. `tests/test_scrub_public_benchmark.py` (9 tests, including
 a regression test that re-runs the real scrub against the real staging
 files) — all pass.
 
+### Correction (found during GG's review pass): a 17th collision was silently dropped, not substituted
+
+Re-verifying this table against the live staging files (not just trusting
+the report) found a discrepancy: `bhanji`'s hi-en far tier had only 4 words
+where its EN counterpart (`niece`) had 5. Root cause: `helmet` (bhanji's
+5th far-tier word, sourced from the production supplement) is an EXACT
+match for the live Cricket pack secret `helmet` — a real 17th blocking
+collision — but it was removed rather than substituted, and the removal
+was never added to the table above or disclosed as a change. Fixed:
+added a verified replacement (`muscle` — confirmed far/band-4 from
+`bhanji`, zero string collisions, zero semantic collisions per the section
+below) restoring `bhanji`'s hi-en far tier to 5 words. `dim1_hien.json` is
+now 302 records (was 301). Flagging this plainly: the original 16-item
+table undercounted; the correct count is 17, and this specific one was a
+straight drop, not a same-tier swap.
+
+---
+
+## 2b. Semantic-proximity scrub (addendum — requested by GG, not in original scope)
+
+`scrub_public_benchmark.py` (above) catches STRING/morphological collisions
+only. It cannot catch a benchmark word that is a strong SEMANTIC associate
+of a live secret with zero string overlap (e.g. a benchmark word meaning
+something ocean-adjacent, where a live pack secret genuinely IS "ocean").
+Built `evals/finetune/semantic_scrub_public_benchmark.py` to check this,
+reusing the exact production rank/band machinery (`embeddings.embed_vocab`
++ `rival.band_for_rank` — the same code a real payload build uses), not an
+invented cosine threshold.
+
+**A necessary calibration finding, not initially anticipated**: the 34-
+secret benchmark's ~325 distinct words per language are themselves **~3%
+(EN, 55k vocab) to ~3% (hi-en, 10.5k vocab)** of the entire embeddable
+vocabulary. At that density, a meaningful number of (benchmark word, live
+secret) pairs land in a tight embedding-rank band **by pure chance**, with
+zero real semantic relationship — the exact same "combinatorial noise"
+failure mode the string scrub already found for coincidental edit-distance
+matches, but for embedding rank instead of Levenshtein distance. Computed
+the actual chance baseline rather than guessing:
+
+| Lang | distinct bench words | distinct live secrets | expected hits/secret @rank≤50 | actual hits/secret @rank≤50 | expected @rank≤500 | actual @rank≤500 |
+|---|---|---|---|---|---|---|
+| en | 327 | 110 | 0.30 | 0.87 | 2.97 | 6.95 |
+| hi-en | 325 | 110 | 1.55 | 1.86 | 15.49 | 19.51 |
+
+Actual rates run only **~1.3–2.9x** chance-expected — elevated, but nowhere
+near the "nearly every pair collides" read the raw hit count (3,159 total
+across both langs, mostly at the loose rank≤500 "hot" band) would suggest
+in isolation. Treating every hot-band hit as "blocking" would fail the
+scrub almost everywhere and force degrading dozens of words to fix
+statistical noise, not real risk — the same over-broad-check trap already
+documented and avoided once in section 2's Levenshtein tiering.
+
+**A separate, load-bearing consideration**: the shipped model
+(`gauravgandhi2411/hinglish-relatedness-sbert`) is **already public** on
+HF Hub. A benchmark word's raw embedding-rank proximity to a live secret,
+with no string overlap, discloses nothing a player couldn't already compute
+themselves in 30 seconds by querying the public model directly. This is a
+materially different risk than the string scrub protects against (which
+prevents literally handing someone a live secret's answer). This
+consideration doesn't make the check pointless, but it does mean "a hit
+exists" is not automatically "a leak."
+
+**What I actually fixed, versus what remains open:**
+- `physician` (yogurt's far-tier substitute from section 2's fix table)
+  turned out to be rank=3 (near-synonym) against the live EN secret
+  `doctor`. Fixed regardless of the leak-philosophy question above, on
+  simple hygiene grounds: a far-tier filler shouldn't be a strong
+  near-synonym of ANY common word if a clean alternative exists.
+  Replaced with `tribunal` (rank 52,017 vs `yogurt`, zero string or
+  semantic hits against any live secret). Regression test added:
+  `tests/test_semantic_scrub_public_benchmark.py::test_known_fixed_collision_no_longer_blocking`.
+- **44 remaining pairs at rank≤10** (the tightest, least chance-explicable
+  band) were NOT unilaterally fixed — several read as genuine, not
+  coincidental (e.g. `border`↔`boundary` rank 4, `storage`↔`memory` rank 6,
+  `cooking`↔`kitchen` rank 9), and per the public-model reasoning above
+  they may not constitute a real leak even so. This is a judgment call
+  about what counts as disclosure-worthy given the model's public status —
+  not mine to resolve unilaterally for a citable public artifact. Full
+  list left for GG's review below.
+- The script's current BLOCKING/ADVISORY split (bands 0/1/2 vs band 3) is
+  **not yet re-calibrated** to the chance-baseline finding above — as
+  coded it still fails on the hot-band noise. Recalibrating it (e.g. to
+  bands 0/1 only, or to a statistical-significance test per secret) is a
+  follow-up **pending GG's call on the interpretation question**, not done
+  unilaterally here.
+
+`tests/test_semantic_scrub_public_benchmark.py` (5 tests) — all pass.
+
 ---
 
 ## 3. Dev/test split and dev↔test correlation
@@ -290,18 +378,39 @@ checkpoint's `dim1_records`/`dim2_records`.
 
 ## 5. Licensing / sourcing — honest statement
 
-This benchmark is **majority expert-tiered, project-authored content**
-(near/mid/far tier assignments and word selections curated by this
-project's own methodology, `evals/gen_dim1_benchmark_supplement.py`'s
-`build_scenarios()` — hashed-RNG far-tier sampling from the game's own
-vocabulary, hand-curated near/mid tiers), **not externally-sourced
-commercial data**. This is stated explicitly and is not to be presented
-otherwise: prior research already on record in this project's `PLAN.md`
-found no commercially-licensed Hindi word-relatedness dataset exists
-(WordSim-353 Hindi unavailable, Multi-SimLex excludes Hindi, IndoWordNet
-is research-only) — this benchmark does not change that fact, it is a
-new, small, synthetic-but-methodologically-rigorous dataset built to fill
-that gap, and must be labeled as such wherever it is described publicly.
+This benchmark is **majority expert-tiered, project-authored content**,
+**not externally-sourced commercial data**, and specifically **not
+human-annotated by an independent linguist or crowd-sourced annotators**.
+Precise authorship, by component:
+
+- **Near/mid tier word associations** (the curated, semantically-load-
+  bearing part): hand-authored as literal Python data
+  (`EN_CURATED_SUPPLEMENT` in `evals/gen_dim1_benchmark_supplement.py`) by
+  the AI coding assistant (Claude, Anthropic) during this project's
+  development, across earlier sessions implementing
+  `spec-hinglish-benchmark.md` Phase 1a. Not generated by a separate/
+  runtime LLM call, not sourced from any external dataset — static,
+  version-controlled curation choices, spot-checked by GG at specific
+  project gates (e.g. the original 25-secret set's homograph-collision
+  review) but not independently re-annotated word-by-word by a human.
+- **Far-tier filler words**: mechanically sampled via a hash-seeded RNG
+  over the project's own vocabulary (`build_scenarios()`,
+  `evals/gen_dim1_scenarios.py`) — not curated at all, by design; their
+  only property is "not near/mid," verified after the fact.
+- **The 17 collision-driven substitution words** (section 2/2b): chosen by
+  an AI coding-assistant subagent (Claude/Sonnet) during this session,
+  verified in-vocab and scrub-clean before being kept, same authorship
+  category as the near/mid tiers above — not independently sourced.
+
+This is stated explicitly and is not to be presented otherwise: prior
+research already on record in this project's `PLAN.md` found no
+commercially-licensed Hindi word-relatedness dataset exists (WordSim-353
+Hindi unavailable, Multi-SimLex excludes Hindi, IndoWordNet is research-
+only) — this benchmark does not change that fact, it is a new, small,
+AI-assistant-authored-and-verified, methodologically-rigorous dataset
+built to fill that gap, and must be labeled as such (not as "human-
+annotated" or "expert-annotated" in the sense of an independent linguist)
+wherever it is described publicly.
 
 Proposed license (unchanged from the Phase 1 proposal in
 `phase1_benchmark_report.md` section 1c): **CC-BY-4.0**, matching the
@@ -319,10 +428,16 @@ applied to any published artifact — no publish has happened.
    production supplement scenarios, one word (`udaasi`'s far-tier filler)
    swapped for a vocab-resolvable replacement.
 2. Automated scrub check built and RUN, real hits fixed, not
-   silently-passing: **done** — `scrub_public_benchmark.py`, 0 blocking
-   collisions after 16 real fixes; 539 advisory (non-blocking,
-   Levenshtein-only coincidental) hits fully disclosed, not hidden.
-   `tests/test_scrub_public_benchmark.py` 9/9 pass.
+   silently-passing: **done for string/morphological collisions** —
+   `scrub_public_benchmark.py`, 0 blocking collisions after **17** real
+   fixes (corrected from an initial undercount of 16, see section 2's
+   correction note); 540 advisory (non-blocking, Levenshtein-only
+   coincidental) hits fully disclosed, not hidden.
+   `tests/test_scrub_public_benchmark.py` 9/9 pass. **Semantic-proximity
+   scrub (section 2b, addendum): built, run, one real fix applied
+   (`physician`→`tribunal`); 44 rank≤10 hits remain OPEN pending GG's
+   read on the public-model-disclosure question — not silently passed,
+   not silently blocked either.**
 3. Dev/test split built, seed=42, domain-stratified, written to
    `public_benchmark_split.json`: **done** — 17/17, every domain covered
    in both halves. `tests/test_public_benchmark_split.py` 4/4 pass.
