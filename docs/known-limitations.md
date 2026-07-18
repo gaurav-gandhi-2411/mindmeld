@@ -10,24 +10,26 @@ behind each one.
 
 ## Product / gameplay
 
-### 1. Hinglish semantic ranking quality is well below English
+### 1. Hinglish semantic ranking quality — SHIPPED fine-tune, near EN parity (2026-07-18)
 
-Measured via the applied-AI eval harness (`generator/evals/harness/`, full production
-vocab + 60-day schedule): hi-en Spearman correlation **0.639** vs EN **0.837**;
-hi-en band-accuracy 67.8% vs EN 74.9% (`generator/evals/reports/baseline_report.md`,
-regenerated after the 2026-07 Hinglish-fix pass — see PLAN.md's "Hinglish semantic
-engine fix" section for the full 9-candidate bake-off). This was a categorical fix
-from a genuinely broken starting point (Spearman **-0.003**, i.e. no correlation at
-all, cross-language pass rate 5.1%) to a working-but-imperfect state (cross-language
-pass rate 54.2%), by swapping the hi-en embedding model to
-`l3cube-pune/indic-sentence-bert-nli`.
+**Current state** (`generator/evals/reports/baseline_report.md`, regenerated after the
+v3 fine-tune shipped): hi-en Spearman correlation **0.800** vs EN **0.837** — up from
+0.639 at the last off-the-shelf baseline, and from the original broken starting point
+of -0.003. hi-en band-accuracy 73.1% vs EN 74.9%; near-tier split translation 100%
+(n=20, was 85.0%) / associate 86.7% (n=30, was 56.7%); dim2 cross-language pass rate
+**78.0%** (was 54.2%). The 5 previously-worst-diverging pairs (titli, khamoshi, rasoi,
+samunder, bachpan) are no longer in the top-10 divergent list at all except khamoshi
+(now 8.4th percentile, was 78.8th) and rasoi (now 1.7th percentile, was 61.1th) — both
+now solidly in-band rather than near the bottom of the vocab.
 
-Residual worst-diverging pairs (a player who guesses the literal English translation
-of a Hinglish secret still gets muted temperature signal), worst-first:
-`titli`←butterfly, `khamoshi`←silence, `rasoi`←kitchen, `samunder`←ocean,
-`bachpan`←childhood. (Full residual list of 10 in the baseline report also includes
-khidki←window, tyohar←festival, razaai←blanket, parchhain←shadow, pul←bridge, all
-progressively less severe.)
+Note on this number vs the fine-tune's own reported result: 0.800 is the FULL
+25-secret production scenario set, which — unlike every prior off-the-shelf baseline —
+now includes secrets the model was directly fine-tuned on (33 train + 11 dev of the
+60-secret schedule), so it is not a fair apples-to-apples generalization number against
+the old 0.639 off-the-shelf figure. The honest, held-out generalization claim is
+**0.4350 -> 0.7044** (paired-CI-significant, [+0.130,+0.412]) — see below and
+`ship_decision_report_v3.md`. Both numbers are real; they answer different questions
+("how good is production today" vs "does this generalize to secrets never trained on").
 
 **Why accepted:** every off-the-shelf multilingual/code-mixed embedding model tested
 (9 candidates) underperforms EN parity on romanized Hindi. Closing the gap needs a
@@ -80,14 +82,40 @@ that real-data-at-scale, gated to what's actually available and licensable, stil
 clear the bar with this method. Both recipes are fully reproducible (seed 42, committed
 data, checkpoints gitignored).
 
-**Revisit if:** Hinglish becomes a primary (not secondary) language for the player base;
-a suitable pre-trained checkpoint closer to EN parity ships publicly; a future attempt
-changes the OPTIMIZATION axis instead of data volume (frozen lower layers, LoRA, lower
-LR/fewer epochs — untested by either v1 or v2, and v2's result argues this is the more
-promising remaining lever); or real player-guess data accumulates post-launch as an
-in-domain training signal no external corpus can match (players' actual Hinglish guesses
-for actual game secrets is a fundamentally better-targeted signal than general-corpus PMI
-mining, and requires zero further licensing work).
+**v3 diagnostic sweep 2026-07-18 — SHIPPED** (`spec-hinglish-diagnostic-sweep.md`,
+`generator/evals/finetune/data/ship_decision_report_v3.md`): v1/v2 both varied data
+while holding the training METHOD fixed (full-parameter fine-tune); this session held
+data at v2's set and swept the METHOD instead — confirming the OPTIMIZATION axis
+flagged above as v2's most-promising untested lever actually WAS the fault. 13
+capacity-control configs (full-finetune LR sweep, frozen layers, LoRA r=8/16/32,
+head-only): every full/frozen config stayed within noise of baseline; every LoRA
+config beat it, three CI-significantly (paired bootstrap vs the correct held-out
+baseline — 0.639 was never a held-out number, only 0.4350 is; see report). Winner
+(LoRA r=8, lr=2e-4, 4 epochs) plus mined hard negatives: held-out dim1_test Spearman
+**0.4350 -> 0.7044** (paired-CI [+0.130,+0.412]), dim2_test pass-rate **0.375 ->
+0.8125** (paired-CI [+0.188,+0.688]), regression floor net +7 on both dimensions
+(dim2 strictly zero-broken), residual-weakest pairs (titli/khamoshi/rasoi/samunder/
+bachpan) dim2 pass-rate **0.0 -> 0.8** (beats v1's best partial result 2x over).
+Learning curve at 25/50/100% data is monotonically rising — once capacity is
+controlled, more data helps, confirming both v1/v2's "not a data problem" finding
+AND this session's "it was a method problem" finding were each partially right.
+
+**Shipped 2026-07-18**: checkpoint published publicly to
+[`gauravgandhi2411/hinglish-relatedness-sbert`](https://huggingface.co/gauravgandhi2411/hinglish-relatedness-sbert)
+(CC-BY-4.0, full attribution + honest limitations in the model card; auto-generated
+training-sample leak scrubbed before publish — see model card / `publish_to_hf.py`),
+loaded with zero runtime auth since it's public. `config.MODELS["hi-en"]` flipped;
+`baseline_report.md` regenerated (full-set hi-en Spearman 0.639 -> **0.800**, EN is
+0.837 — see top of this entry); all hi-en daily + Bollywood + Cricket pack payloads
+regenerated and deployed to the payloads GitHub Pages site, byte-verified (all 111
+`.gz` files confirmed byte-identical between the git commit and the live served
+content). Live spot-check results below.
+
+**Revisit if:** the live spot-check below surfaces a live/metric mismatch (would
+need investigation, not a revert by default given the scriptable-gate strength); or
+Hinglish becomes a primary (not secondary) language for the player base; or real
+player-guess data accumulates post-launch (still a genuine secondary lever per the
+v3 learning curve, even after the method fix).
 
 ### 2. LLM-judge solvability score is not gate-worthy; spoiler-safety is
 

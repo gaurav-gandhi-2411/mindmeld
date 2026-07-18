@@ -1,0 +1,30 @@
+{
+  "candidate_model": "evals/finetune/checkpoints/cap_lora_r8_lr2e-4/model",
+  "baseline_model": "l3cube-pune/indic-sentence-bert-nli",
+  "trained_vocab_drift": {
+    "n": 924,
+    "mean": 0.15215860894232086,
+    "median": 0.1336582899093628,
+    "p90": 0.25437195897102366,
+    "std": 0.07280839510100867
+  },
+  "broad_sample_drift": {
+    "n": 500,
+    "mean": 0.12419059562683106,
+    "median": 0.10908752679824829,
+    "p90": 0.1850736975669861,
+    "std": 0.051023944187700024
+  },
+  "held_out_drift": {
+    "n": 51,
+    "mean": 0.15141412557340136,
+    "median": 0.13271164894104004,
+    "p90": 0.251289427280426,
+    "std": 0.0681157992825028
+  },
+  "n_trained_words_in_vocab": 924,
+  "n_held_out_words_in_vocab": 51,
+  "broad_sample_size": 500,
+  "broad_to_trained_drift_ratio": 0.8161917126484003,
+  "diffuse_drift_signature": true
+}

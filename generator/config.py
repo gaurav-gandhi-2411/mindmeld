@@ -11,16 +11,26 @@ import hashlib
 from datetime import date
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 
 GENERATOR_DIR = Path(__file__).parent
+REPO_ROOT = GENERATOR_DIR.parent
 VOCAB_DIR = GENERATOR_DIR / "vocab"
 CACHE_DIR = GENERATOR_DIR / ".model-cache"
 EVALS_DIR = GENERATOR_DIR / "evals"
 EVALS_FIXTURES_DIR = EVALS_DIR / "fixtures"
 EVALS_KNOWN_FAILURES_DIR = EVALS_DIR / "fixtures_known_failures"
+
+# Loads the repo-root .env (HF_TOKEN, etc.) into os.environ for local runs.
+# No-op if the file doesn't exist (e.g. CI, which sets env vars/secrets
+# directly) -- production Cloud Run/Vercel never import this module at all,
+# since the fine-tuned hi-en model is only ever loaded at generator/build
+# time (see embeddings.embed_vocab), never in the deployed app.
+load_dotenv(REPO_ROOT / ".env")
 
 # ---------------------------------------------------------------------------
 # Model names per language
@@ -35,11 +45,18 @@ MODELS: dict[str, str] = {
     # Hindi in Devanagari script, not Latin-script romanized Hindi, so it embeds
     # romanized tokens by surface form rather than meaning (see
     # spec-hinglish-fix.md / evals/reports/baseline_report.md for the bake-off).
-    # l3cube-pune/indic-sentence-bert-nli is an SBERT model fine-tuned on
-    # cross-lingual NLI/STS pairs across Hindi + English + other Indic
-    # languages incl. romanized text (L3Cube-IndicSBERT, CC-BY-4.0), and won a
-    # 9-candidate bake-off: Spearman 0.639, cross-language pass 54.2%.
-    "hi-en": "l3cube-pune/indic-sentence-bert-nli",
+    # l3cube-pune/indic-sentence-bert-nli (CC-BY-4.0) won a 9-candidate
+    # bake-off (Spearman 0.639, cross-language pass 54.2%) and shipped as-is
+    # for a full season. Two data-only fine-tune retries (v1/v2) both
+    # regressed held-out performance -- a diagnostic sweep then found the
+    # TRAINING METHOD (unconstrained full-parameter fine-tuning) was the
+    # fault, not data volume: LoRA r=8 + mined hard negatives fixed it.
+    # gauravgandhi2411/hinglish-relatedness-sbert (CC-BY-4.0, public,
+    # portfolio model card) is that fine-tune -- held-out dim1 Spearman
+    # 0.4350 -> 0.7044, dim2 cross-language pass-rate 0.375 -> 0.8125, both
+    # paired-CI-significant, zero net regression (spec-hinglish-diagnostic-
+    # sweep.md / ship_decision_report_v3.md). No auth needed to load (public).
+    "hi-en": "gauravgandhi2411/hinglish-relatedness-sbert",
 }
 
 # ---------------------------------------------------------------------------

@@ -1,3 +1,151 @@
+# PLAN — Hinglish diagnostic sweep v3 (SHIPPED 2026-07-18)
+
+Spec: `spec-hinglish-diagnostic-sweep.md`. Branch `feat/hinglish-finetune` (continuation).
+Autonomous orchestrator run. Full report:
+`generator/evals/finetune/data/ship_decision_report_v3.md`.
+
+## The reframe: method was the fault, not data (confirmed)
+
+v1 and v2 both regressed while holding the training METHOD fixed (full-parameter
+fine-tune) and varying data — v2's regression got WORSE with 43% more data, which was
+correctly read as "not a data problem" but never led to testing the METHOD axis. This
+session held data at v2's set (756/1028 pairs) and swept 13 capacity-control configs
+(full-finetune LR sweep, frozen-layers, LoRA r=8/16/32, head-only). **Every full/frozen
+config stayed within noise of baseline; every LoRA config beat it, three CI-significantly.**
+
+## Correction to spec's baseline number
+
+Spec's Step 0 says "bootstrap a CI on the baseline 0.639 held-out Spearman" — 0.639 is
+NOT held-out, it's the FULL 25-secret production set score (`baseline_report.md`), which
+includes train/dev secrets. The correct held-out comparator (established by v1/v2's own
+ship reports, reused here): dim1_test Spearman restricted to the 16 frozen TEST secrets
+(8 with dim1 scenarios, n=73) = **0.4350**, 95% bootstrap CI [0.223, 0.632] (cluster-by-
+secret, n=8 clusters — wide, as expected). Every config below is judged with a PAIRED
+bootstrap against this number (same-secret resample applied to both models at once —
+much tighter than the marginal CI, and the statistically correct test for "does candidate
+beat baseline on identical items").
+
+Test-set expansion (the spec's stated fallback for a noisy ruler) was considered and
+explicitly rejected this session: the only 25 curated dim1 secrets share ONE sequential
+seeded RNG across `gen_dim1_scenarios.py`'s far-tier sampler — adding secrets would shift
+the RNG draws for every EXISTING secret's far words, silently corrupting the checked-in
+`baseline_report.md` numbers other docs/gates depend on. Flagged as a real, low-risk,
+scoped follow-up (seed far-sampling per-secret via hash) rather than done unsafely.
+
+## Winning config: LoRA r=8, lr=2e-4, 4 epochs + mined hard negatives
+
+Full 19-config sweep table in the v3 report. Capacity-control winner
+(`cap_lora_r8_lr2e-4`): dim1_test 0.6339 (paired-CI [+0.033,+0.377], regression floor net
++4). Layering mined hard negatives on top (`hard_negatives.py`: per-anchor confusable
+vocab word ranked 50-500 under the OFF-THE-SHELF model, not a random easy negative) pushed
+further — **`obj_hard_neg`: dim1_test 0.7044 (paired-CI [+0.130,+0.412]), dim2_test 0.8125
+(paired-CI [+0.188,+0.688]), dim1 regression floor 9 fixed/2 broken (net +7), dim2
+regression floor 7 fixed/0 broken (net +7, strictly zero-broken).** Residual-weakest pairs
+(titli/khamoshi/rasoi/samunder/bachpan — held out, never trained): dim2 pass-rate 0.0 ->
+**0.8 (4/5)**, beating v1's best partial result (0.4) by 2x.
+
+Objective-alignment side-finding: dev-vs-test Spearman correlation across the wave-1
+sweep is only **0.12** — the DEV evaluator used for checkpoint selection barely predicts
+held-out TEST performance (dev clusters 0.72-0.82 regardless of config; test ranges
+0.32-0.66). The training loop's own success signal is nearly uninformative about the
+real target — a distinct, useful diagnostic finding independent of the capacity result.
+
+Forgetting check: `obj_hard_neg`'s raw embedding drift (0.180 mean, trained-vocab) is
+comparable to the badly-regressed full-finetune's (0.217) — drift MAGNITUDE alone doesn't
+predict harm. What differs is LoRA's low-rank constraint (0.12% of params trainable):
+movement is confined to a small subspace shaped by genuine contrastive signal, not a
+free-form update that can chase spurious correlations.
+
+Input-quality cleaning (vocab-presence filter on the noisy `corpus_pmi` source, 756/1028
+-> 669/888 pairs) slightly HURT once capacity was controlled (0.6339 -> 0.6098) — not
+pursued further.
+
+**Learning curve (winning config, 25%/50%/100% data): 0.4713 -> 0.5517 -> 0.6339,
+monotonically RISING.** Definitive: once the method is fixed, more data DOES help. v1/v2's
+finding that more data hurt was real but attributable to the uncontrolled method
+amplifying noise, not data volume being intrinsically harmful — both diagnoses were
+partially right, method was just the blocking constraint tested last.
+
+## Ship decision: **SHIPPED 2026-07-18**
+
+All 5 scriptable ship gates passed (held-out Spearman paired-CI-significant, dim2 improved
+paired-CI-significant, zero net regression on both dims with dim2 strictly zero-broken,
+EN-unchanged proof, frozen-split/no-leakage + full suite green: 458 passed/4 skipped).
+Two items were reserved for GG per the orchestrating task's explicit "only GG can do
+this" carve-out, both now resolved: **(1) production hosting** — GG chose public HF Hub
+(portfolio asset) over private; checkpoint pushed to
+`gauravgandhi2411/hinglish-relatedness-sbert` (CC-BY-4.0), loaded with zero runtime auth
+since it's public — simpler than the originally-scoped private-repo-plus-token path.
+**(2) live spot-check** — results below.
+
+### Publish pipeline (complete)
+
+- `HF_TOKEN` set locally (repo-root `.env`, loaded via `python-dotenv` in `config.py`) and
+  as a GitHub secret (no workflow currently consumes it — payload publishing is a local
+  script, not CI — but set per GG's request for future use). **Security-verified before
+  any commit**: `.env` confirmed gitignored (`git check-ignore` exit 0), not tracked
+  (`git ls-files` empty), and never present anywhere in git history (`git log --all -p`
+  search for the filename and for any `hf_`-shaped token string, both zero hits).
+- **Scrub catch**: `SentenceTransformer.save()`'s auto-generated checkpoint `README.md`
+  embedded literal training-sample word pairs as widget examples and a training-data
+  table — including actual daily-schedule game secrets (`aag`->flame/fire/smoke,
+  `baarish`->shower) and their trained relatedness. Never uploaded. Replaced with a
+  hand-written model card (task description, held-out eval table with CIs, LoRA config,
+  full attribution, honest limitations, a usage snippet using words verified absent from
+  the 60-secret schedule) plus an automated scrub scan (2+ distinct game secrets
+  co-occurring on one line fails the push) that was verified to actually catch the
+  original leak before being trusted.
+- License chain verified directly against source pages (not assumed from old comments):
+  base model `l3cube-pune/indic-sentence-bert-nli` CC-BY-4.0, IndicCorp v2 CC0, Aksharantar
+  CC-BY/CC0, Qwen3-8B (LLM-augmented pairs + translit fallback) Apache-2.0. HingCorpus/
+  IndoWordNet (non-commercial/research-only) confirmed zero contribution — never
+  referenced anywhere in `assemble_data.py`'s 5 actual sources.
+- `config.MODELS["hi-en"]` flipped to the public HF ID. `embeddings.py` now passes
+  `token=os.environ.get("HF_TOKEN")` explicitly to `SentenceTransformer(...)` (a no-op
+  for public repos, needed if a future model swap goes private again).
+- All hi-en daily (60 days, 2026-06-12..2026-08-10) + Bollywood (25) + Cricket (25) pack
+  payloads regenerated with the new model (`publish_all.py`, a new orchestration script
+  that closes a gap in `publish.py`'s own documented "packs are orchestrated separately"
+  design by reusing both scripts' existing tested internals against one shared temp dir).
+  Schedule-validation, spoiler-gate, and `--strict-sizes` size-gate all passed. Deployed to
+  the payloads GitHub Pages site; **byte-verified**: all 111 `.gz` payload files fetched
+  live and `cmp`'d against the git-committed bytes, 0 mismatches (the human-readable
+  `manifest.json` shows a diff under naive `diff`, traced to git's standard CRLF-local/
+  LF-blob line-ending normalization on Windows, confirmed benign by comparing decoded
+  JSON content field-by-field, not a real content or determinism issue).
+- `baseline_report.md`/`.json` regenerated: `legacy_fixtures` + `dimension1_ranking` +
+  `dimension2_crosslang` recomputed with the new model (the only 3 sections that read
+  `embed_vocab`/`config.MODELS` — verified by grep); `dimension3_judge` (LLM clue
+  judging) / `dimension4_rival` / `dimension5_winrate` carried forward unchanged since
+  neither references the embedding model at all — re-running them would reproduce
+  identical output for ~40 minutes of LLM-judge cost. New hi-en Spearman (full 25-secret
+  production set): **0.639 -> 0.800** (EN 0.837). This full-set number is NOT the
+  apples-to-apples generalization claim (it now includes trained secrets, unlike the old
+  baseline) — the honest number remains the held-out 0.4350 -> 0.7044 above; both are
+  reported, neither hidden.
+
+## Gotchas discovered
+
+- `sentence_transformers.base.modules.transformer.Transformer.auto_model` is a read-only
+  property aliasing the real backing attribute `.model` — assigning `module.auto_model =
+  peft_model` silently no-ops (nn.Module's `__setattr__` stores it under a throwaway
+  `_modules` key without ever invoking the property's setter, and there is no setter).
+  Wrapping/merging a LoRA adapter into an SBERT `SentenceTransformer` must assign the real
+  `.model` attribute, not the convenience property — otherwise training silently proceeds
+  on the UN-wrapped base model with 100% trainable params while every other signal (no
+  errors, plausible loss curve) looks fine. Caught only by explicitly asserting
+  `isinstance(peft_model, PeftModel)` post-training and printing `trainable_fraction`.
+- LoRA capacity snapshotting must happen BEFORE `merge_and_unload()` — merging folds
+  adapter weights into plain frozen `Linear` layers and zeroes `requires_grad` everywhere,
+  so computing `n_trainable_params` after merge misreports every LoRA run as having
+  trained 0 parameters.
+- Doubling MNRL batch size (more random in-batch negatives) on top of mined hard negatives
+  made results WORSE than hard negatives alone (0.632 vs 0.704 dim1_test) — more negatives
+  isn't strictly better; random in-batch negatives can dilute a deliberately-mined hard
+  negative's contrastive pressure rather than reinforcing it.
+
+---
+
 # PLAN — Hinglish data expansion + retrain v2 (complete — did not ship, 2026-07-18)
 
 Spec: `spec-hinglish-data-expansion.md`. Branch `feat/hinglish-finetune` (continuation).

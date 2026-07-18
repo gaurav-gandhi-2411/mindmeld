@@ -1,0 +1,253 @@
+[
+  {
+    "name": "lc_winner_frac25",
+    "method": "lora",
+    "hyperparams": {
+      "method": "lora",
+      "freeze_n_layers": 0,
+      "lora_r": 8,
+      "lora_alpha": 16,
+      "learning_rate": 0.0002,
+      "num_epochs": 4,
+      "batch_size": 16,
+      "warmup_ratio": 0.1,
+      "early_stopping_patience": 2,
+      "seed": 42
+    },
+    "n_mnrl_pairs": 189,
+    "n_graded_pairs": 257,
+    "trainable_fraction": 0.0012399015828118644,
+    "n_trainable_params": 294912,
+    "best_dev_spearman_cosine": 0.6689582845527453,
+    "dim1_test_spearman": 0.47127960747088493,
+    "dim1_delta_vs_baseline": {
+      "baseline_point": 0.43502792396018175,
+      "candidate_point": 0.47127960747088493,
+      "delta_point": 0.03625168351070318,
+      "delta_ci_95": [
+        0.004467481238535798,
+        0.06715322091081435
+      ],
+      "ci_significant_improvement": true,
+      "ci_significant_regression": false,
+      "n_clusters": 8,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 73,
+      "n_fixed": 1,
+      "n_broken": 1,
+      "net": 0,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "samunder/sea"
+      ],
+      "broken_pairs": [
+        "samunder/wave"
+      ]
+    },
+    "dim2_test_pass_rate": 0.375,
+    "dim2_delta_vs_baseline": {
+      "baseline_point": 0.375,
+      "candidate_point": 0.375,
+      "delta_point": 0.0,
+      "delta_ci_95": [
+        0.0,
+        0.0
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_pairs": 16
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 16,
+      "n_fixed": 0,
+      "n_broken": 0,
+      "net": 0,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [],
+      "broken_pairs": []
+    },
+    "residual_weak_dim1_spearman": 0.04130309354163657,
+    "residual_weak_dim2_pass_rate": 0.0,
+    "data_fraction": 0.25
+  },
+  {
+    "name": "lc_winner_frac50",
+    "method": "lora",
+    "hyperparams": {
+      "method": "lora",
+      "freeze_n_layers": 0,
+      "lora_r": 8,
+      "lora_alpha": 16,
+      "learning_rate": 0.0002,
+      "num_epochs": 4,
+      "batch_size": 16,
+      "warmup_ratio": 0.1,
+      "early_stopping_patience": 2,
+      "seed": 42
+    },
+    "n_mnrl_pairs": 378,
+    "n_graded_pairs": 514,
+    "trainable_fraction": 0.0012399015828118644,
+    "n_trainable_params": 294912,
+    "best_dev_spearman_cosine": 0.8213480468635974,
+    "dim1_test_spearman": 0.5517387215822241,
+    "dim1_delta_vs_baseline": {
+      "baseline_point": 0.43502792396018175,
+      "candidate_point": 0.5517387215822241,
+      "delta_point": 0.1167107976220424,
+      "delta_ci_95": [
+        -0.025649018627308402,
+        0.2557334725062865
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_clusters": 8,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 73,
+      "n_fixed": 5,
+      "n_broken": 2,
+      "net": 3,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "bachpan/childhood",
+        "bachpan/notch",
+        "pahad/mountain",
+        "pahad/peak",
+        "samunder/sea"
+      ],
+      "broken_pairs": [
+        "bachpan/panthers",
+        "samunder/wave"
+      ]
+    },
+    "dim2_test_pass_rate": 0.5625,
+    "dim2_delta_vs_baseline": {
+      "baseline_point": 0.375,
+      "candidate_point": 0.5625,
+      "delta_point": 0.1875,
+      "delta_ci_95": [
+        0.0,
+        0.375
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_pairs": 16
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 16,
+      "n_fixed": 3,
+      "n_broken": 0,
+      "net": 3,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [
+        "childhood->bachpan",
+        "festival->tyohar",
+        "mountain->pahad"
+      ],
+      "broken_pairs": []
+    },
+    "residual_weak_dim1_spearman": 0.39237938864554733,
+    "residual_weak_dim2_pass_rate": 0.2,
+    "data_fraction": 0.5
+  },
+  {
+    "name": "cap_lora_r8_lr2e-4",
+    "method": "lora",
+    "hyperparams": {
+      "method": "lora",
+      "freeze_n_layers": 0,
+      "lora_r": 8,
+      "lora_alpha": 16,
+      "learning_rate": 0.0002,
+      "num_epochs": 4,
+      "batch_size": 16,
+      "warmup_ratio": 0.1,
+      "early_stopping_patience": 2,
+      "seed": 42
+    },
+    "n_mnrl_pairs": 756,
+    "n_graded_pairs": 1028,
+    "trainable_fraction": 0.0012399015828118644,
+    "n_trainable_params": 294912,
+    "best_dev_spearman_cosine": 0.8444932661393046,
+    "dim1_test_spearman": 0.6339398841779006,
+    "dim1_delta_vs_baseline": {
+      "baseline_point": 0.43502792396018175,
+      "candidate_point": 0.6339398841779006,
+      "delta_point": 0.19891196021771884,
+      "delta_ci_95": [
+        0.03294984369213021,
+        0.3767587128625487
+      ],
+      "ci_significant_improvement": true,
+      "ci_significant_regression": false,
+      "n_clusters": 8,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 73,
+      "n_fixed": 7,
+      "n_broken": 3,
+      "net": 4,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "bachpan/childhood",
+        "bachpan/notch",
+        "bachpan/youth",
+        "bagicha/garden",
+        "pahad/mountain",
+        "samunder/paani",
+        "samunder/sea"
+      ],
+      "broken_pairs": [
+        "bachpan/panthers",
+        "phool/walsh",
+        "samunder/wave"
+      ]
+    },
+    "dim2_test_pass_rate": 0.6875,
+    "dim2_delta_vs_baseline": {
+      "baseline_point": 0.375,
+      "candidate_point": 0.6875,
+      "delta_point": 0.3125,
+      "delta_ci_95": [
+        0.125,
+        0.5625
+      ],
+      "ci_significant_improvement": true,
+      "ci_significant_regression": false,
+      "n_pairs": 16
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 16,
+      "n_fixed": 5,
+      "n_broken": 0,
+      "net": 5,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [
+        "butterfly->titli",
+        "childhood->bachpan",
+        "festival->tyohar",
+        "garden->bagicha",
+        "mountain->pahad"
+      ],
+      "broken_pairs": []
+    },
+    "residual_weak_dim1_spearman": 0.5507079138884876,
+    "residual_weak_dim2_pass_rate": 0.4,
+    "data_fraction": 1.0
+  }
+]

@@ -1,0 +1,101 @@
+{
+  "name": "lc_winner_frac25",
+  "method": "lora",
+  "n_mnrl_pairs": 189,
+  "n_graded_pairs": 257,
+  "n_dev_scenarios": 46,
+  "best_dev_spearman_cosine": 0.6689582845527453,
+  "dev_curve": [
+    {
+      "loss": 1.0701967239379884,
+      "epoch": 0.3448275862068966,
+      "step": 10
+    },
+    {
+      "loss": 0.7996602535247803,
+      "epoch": 0.6896551724137931,
+      "step": 20
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6273788198362092,
+      "epoch": 1.0,
+      "step": 29
+    },
+    {
+      "loss": 0.7073064327239991,
+      "epoch": 1.0344827586206897,
+      "step": 30
+    },
+    {
+      "loss": 1.3009527206420899,
+      "epoch": 1.3793103448275863,
+      "step": 40
+    },
+    {
+      "loss": 0.48548221588134766,
+      "epoch": 1.7241379310344827,
+      "step": 50
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6372104174046512,
+      "epoch": 2.0,
+      "step": 58
+    },
+    {
+      "loss": 0.7601247310638428,
+      "epoch": 2.0689655172413794,
+      "step": 60
+    },
+    {
+      "loss": 0.5695068359375,
+      "epoch": 2.413793103448276,
+      "step": 70
+    },
+    {
+      "loss": 1.3660240173339844,
+      "epoch": 2.7586206896551726,
+      "step": 80
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6562591376935076,
+      "epoch": 3.0,
+      "step": 87
+    },
+    {
+      "loss": 0.8104652404785156,
+      "epoch": 3.103448275862069,
+      "step": 90
+    },
+    {
+      "loss": 0.930635643005371,
+      "epoch": 3.4482758620689653,
+      "step": 100
+    },
+    {
+      "loss": 0.7665353775024414,
+      "epoch": 3.793103448275862,
+      "step": 110
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6689582845527453,
+      "epoch": 4.0,
+      "step": 116
+    }
+  ],
+  "n_trainable_params": 294912,
+  "n_total_params": 237851136,
+  "trainable_fraction": 0.0012399015828118644,
+  "output_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\lc_winner_frac25\\model",
+  "hyperparams": {
+    "method": "lora",
+    "freeze_n_layers": 0,
+    "lora_r": 8,
+    "lora_alpha": 16,
+    "learning_rate": 0.0002,
+    "num_epochs": 4,
+    "batch_size": 16,
+    "warmup_ratio": 0.1,
+    "early_stopping_patience": 2,
+    "seed": 42
+  }
+}

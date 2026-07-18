@@ -59,9 +59,16 @@ def embed_vocab(
 
     logger.info("loading model %s for lang=%s", model_name, lang)
 
+    import os
+
     from sentence_transformers import SentenceTransformer
 
-    model = SentenceTransformer(model_name)
+    # Explicit token pass-through rather than relying on huggingface_hub's
+    # implicit env-var detection: MODELS["hi-en"] can point at a PRIVATE HF
+    # Hub repo (the fine-tuned checkpoint) once shipped, and this makes the
+    # auth path visible/greppable here instead of magic. token=None for a
+    # public repo (the off-the-shelf models) is a no-op, same as before.
+    model = SentenceTransformer(model_name, token=os.environ.get("HF_TOKEN"))
 
     logger.info("embedding %d words (batch_size=%d)", len(vocab), batch_size)
     raw: NDArray[np.float32] = model.encode(

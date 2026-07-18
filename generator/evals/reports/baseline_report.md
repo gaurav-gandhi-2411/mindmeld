@@ -1,6 +1,6 @@
 # Warmer — Applied-AI Eval Harness: Baseline Report
 
-Generated in 2388.8s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
+Generated in 28.7s. See the sibling `.json` file for full per-record detail (every flagged scenario, every judged clue, every simulated puzzle).
 
 ## Legacy pairwise-ordering fixtures (subsumed, not replaced)
 
@@ -19,29 +19,29 @@ Generated in 2388.8s. See the sibling `.json` file for full per-record detail (e
 ### hi-en
 
 - n_scenarios: 227
-- band-accuracy: overall 67.8%, near 68.0%, mid 1.9%, far 95.2%
-- **hi-en near-tier split** (GG review — do not blend these): translation 85.0% (n=20), associate 56.7% (n=30)
-- Spearman correlation: 0.639
-- monotonicity violations: 94/614 (15.3%)
-- flagged weak pairs: 73
+- band-accuracy: overall 73.1%, near 92.0%, mid 1.9%, far 95.2%
+- **hi-en near-tier split** (GG review — do not blend these): translation 100.0% (n=20), associate 86.7% (n=30)
+- Spearman correlation: 0.800
+- monotonicity violations: 34/614 (5.5%)
+- flagged weak pairs: 61
 
 ## Dimension 2 — Cross-language consistency
 
 - 59/60 pairs resolved (1 vocab-coverage errors)
-- pass rate (translation lands Scorching/Hot): 54.2%
-- median rank: 20.0 (0.2th percentile of vocab)
+- pass rate (translation lands Scorching/Hot): 78.0%
+- median rank: 3.0 (0.0th percentile of vocab)
 - worst-diverging pairs (translation ranks near the BOTTOM of the vocab):
 
-  - `khamoshi` <- `silence`: rank 8244 (78.8%ile)
-  - `rasoi` <- `kitchen`: rank 6393 (61.1%ile)
-  - `samunder` <- `ocean`: rank 3809 (36.4%ile)
-  - `bachpan` <- `childhood`: rank 3773 (36.1%ile)
-  - `titli` <- `butterfly`: rank 3761 (36.0%ile)
-  - `khidki` <- `window`: rank 3190 (30.5%ile)
-  - `tyohar` <- `festival`: rank 3012 (28.8%ile)
-  - `razaai` <- `blanket`: rank 2706 (25.9%ile)
-  - `parchhain` <- `shadow`: rank 2610 (24.9%ile)
-  - `pul` <- `bridge`: rank 2534 (24.2%ile)
+  - `razaai` <- `blanket`: rank 1821 (17.4%ile)
+  - `khamoshi` <- `silence`: rank 882 (8.4%ile)
+  - `pul` <- `bridge`: rank 766 (7.3%ile)
+  - `parchhain` <- `shadow`: rank 561 (5.4%ile)
+  - `bagicha` <- `garden`: rank 465 (4.4%ile)
+  - `samunder` <- `ocean`: rank 445 (4.2%ile)
+  - `khidki` <- `window`: rank 430 (4.1%ile)
+  - `mombatti` <- `candle`: rank 350 (3.4%ile)
+  - `bhook` <- `hunger`: rank 216 (2.1%ile)
+  - `rasoi` <- `kitchen`: rank 174 (1.7%ile)
 
 ## Dimension 3 — Clue quality (local LLM judge, qwen3:8b)
 
