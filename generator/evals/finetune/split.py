@@ -25,6 +25,23 @@ for whether the fine-tune actually helps the hard cases, so they must never
 be trained on. The remaining 55 schedule secrets are shuffled with a fixed
 seed and split ~60/20/20 into train/dev/test.
 
+Benchmark-supplement secrets (spec-hinglish-benchmark.md Phase 1a):
+`evals/gen_dim1_benchmark_supplement.py`'s 34 additional held-out secrets are
+unioned into test_secrets/held_out_secrets/held_out_en_translations by
+`build_split_with_supplement()` below, AFTER `build_split()`'s own schedule-
+only computation and assertions have already run and returned. This is
+deliberate: `build_split()` itself is NEVER modified (its 60-word daily-
+schedule train/dev/test assignment stays byte-identical, so
+tests/test_finetune_split.py's existing invariants — which call
+build_split() directly — keep passing against the pure schedule-only
+split), while `build_split_with_supplement()`'s enriched result is what
+actually gets WRITTEN to split.json. Every downstream reader of the
+persisted file — assemble_data.py (so future re-assembly runs also exclude
+the 34 new secrets from training) and tests/test_finetune_no_leakage.py
+(so its membership check automatically covers the bigger held-out set) —
+goes through `load_split()`, which just reads split.json, so both pick up
+the union for free with zero changes to their own code.
+
 Run: uv run python -m evals.finetune.split
 Output: evals/finetune/data/split.json
 """
@@ -100,6 +117,42 @@ def build_split() -> dict:
     return result
 
 
+def build_split_with_supplement() -> dict:
+    """`build_split()`'s result, plus the benchmark-supplement secrets
+    (evals/gen_dim1_benchmark_supplement.py) unioned into
+    test_secrets/held_out_secrets/held_out_en_translations/test_pairs — see
+    module docstring's "Benchmark-supplement secrets" section for why this
+    is a separate wrapper rather than a change to build_split() itself.
+    """
+    from evals.gen_dim1_benchmark_supplement import BENCHMARK_SUPPLEMENT_PAIRS
+
+    split = build_split()
+
+    supplement_hien = sorted(hien for hien, _en, _domain in BENCHMARK_SUPPLEMENT_PAIRS)
+    supplement_en = sorted(en for _hien, en, _domain in BENCHMARK_SUPPLEMENT_PAIRS)
+
+    # Never touches train_secrets/dev_secrets, never overlaps the daily-schedule
+    # 60-secret pool — asserted, not assumed.
+    schedule_secrets = (
+        set(split["train_secrets"]) | set(split["dev_secrets"]) | set(split["test_secrets"])
+    )
+    overlap = set(supplement_hien) & schedule_secrets
+    assert not overlap, f"benchmark-supplement secret collides with daily schedule: {overlap}"
+
+    split["benchmark_supplement_secrets"] = supplement_hien
+    split["benchmark_supplement_en_translations"] = supplement_en
+    split["test_secrets"] = sorted(set(split["test_secrets"]) | set(supplement_hien))
+    split["held_out_secrets"] = sorted(set(split["held_out_secrets"]) | set(supplement_hien))
+    split["held_out_en_translations"] = sorted(
+        set(split["held_out_en_translations"]) | set(supplement_en)
+    )
+    split["test_pairs"] = split["test_pairs"] + [
+        [en, hien] for hien, en, _domain in BENCHMARK_SUPPLEMENT_PAIRS
+    ]
+    split["counts"]["test"] = len(split["test_secrets"])
+    return split
+
+
 def load_split() -> dict:
     if not OUT_PATH.exists():
         raise FileNotFoundError(
@@ -109,10 +162,14 @@ def load_split() -> dict:
 
 
 if __name__ == "__main__":
-    split = build_split()
+    split = build_split_with_supplement()
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(split, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {OUT_PATH}")
     print(f"counts: {split['counts']}")
     print(f"forced-test (residual weak): {split['forced_test_secrets']}")
+    print(
+        f"benchmark_supplement_secrets ({len(split['benchmark_supplement_secrets'])}): "
+        f"{split['benchmark_supplement_secrets']}"
+    )
     print(f"held_out_secrets ({len(split['held_out_secrets'])}): {split['held_out_secrets']}")

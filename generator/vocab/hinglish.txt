@@ -529,3 +529,43 @@ bowler	bowler
 fielder	fielder
 finalist	finalist
 chant	chant
+# Phase 1a (spec-hinglish-benchmark.md) — held-out benchmark-supplement
+# secrets ONLY (evals/gen_dim1_benchmark_supplement.py). These 34 words are
+# NEVER part of the daily-schedule 60-secret pool (vocab/secrets_hi-en.txt) —
+# eval-gated additions purely so they're embeddable for benchmark scoring.
+# Verified zero leakage into evals/finetune/data/train_*.jsonl (all 5
+# assembled training files) and zero homograph collision with vocab/en.txt.
+registan	desert
+jheel	lake
+chattan	rock
+dhoop	sunlight
+patta	leaf
+sharm	shyness
+chinta	worry
+mazaa	enjoyment
+junoon	passion
+udaasi	sadness
+azaadi	freedom
+insaaf	justice
+waqt	duration
+sawaal	question
+kanoon	law
+chaabi	key
+sandook	trunk
+thaali	platter
+tokri	basket
+chimni	chimney
+sadak	road
+sarhad	border
+basti	settlement
+mohalla	neighborhood
+dehat	countryside
+mithai	dessert
+dahi	yogurt
+paneer	paneer
+besan	gram
+khichdi	khichdi
+mausi	auntie
+bhanja	nephew
+bhanji	niece
+judwaa	twin

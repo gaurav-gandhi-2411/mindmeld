@@ -1,4 +1,13 @@
 # Auto-generated English vocab — do not edit manually
+# Manual eval-gated exception (spec-hinglish-benchmark.md Phase 1a): "paneer"
+# and "khichdi" added here (not in the wordfreq top-N derivation) as the
+# identical-spelling EN glosses for two benchmark-supplement secrets in
+# evals/gen_dim1_benchmark_supplement.py (same pattern as existing
+# island/school/hospital/train/teacher/doctor identical EN<->hi-en pairs).
+# Inserted right after the header (not appended) so load_en_vocab()'s
+# EN_VOCAB_MAX=55000 read-cap can never truncate them off the tail.
+paneer
+khichdi
 the
 and
 for

@@ -57,80 +57,182 @@
     "yaad"
   ],
   "test_secrets": [
+    "azaadi",
     "bachpan",
     "bagicha",
+    "basti",
+    "besan",
+    "bhanja",
+    "bhanji",
     "birthday",
+    "chaabi",
     "chaand",
+    "chattan",
+    "chimni",
+    "chinta",
+    "dahi",
+    "dehat",
+    "dhoop",
+    "insaaf",
+    "jheel",
+    "judwaa",
+    "junoon",
+    "kanoon",
     "khamoshi",
     "khazana",
+    "khichdi",
     "library",
     "mahal",
+    "mausi",
+    "mazaa",
+    "mithai",
+    "mohalla",
     "pahad",
+    "paneer",
     "parivar",
+    "patta",
     "phool",
     "rasoi",
+    "registan",
+    "sadak",
     "samunder",
+    "sandook",
+    "sarhad",
+    "sawaal",
     "shaadi",
+    "sharm",
+    "thaali",
     "titli",
-    "tyohar"
+    "tokri",
+    "tyohar",
+    "udaasi",
+    "waqt"
   ],
   "held_out_secrets": [
     "aaina",
+    "azaadi",
     "bachpan",
     "bagicha",
+    "basti",
     "bazar",
+    "besan",
+    "bhanja",
+    "bhanji",
     "birthday",
+    "chaabi",
     "chaand",
     "chai",
+    "chattan",
+    "chimni",
+    "chinta",
+    "dahi",
+    "dehat",
+    "dhoop",
     "dost",
     "fasal",
     "hansi",
+    "insaaf",
+    "jheel",
+    "judwaa",
+    "junoon",
+    "kanoon",
     "khamoshi",
     "khazana",
+    "khichdi",
     "khidki",
     "library",
     "mahal",
+    "mausi",
+    "mazaa",
+    "mithai",
+    "mohalla",
     "nadi",
     "pahad",
+    "paneer",
     "parivar",
     "patang",
+    "patta",
     "phool",
     "pul",
     "rasoi",
+    "registan",
+    "sadak",
     "samunder",
+    "sandook",
+    "sarhad",
+    "sawaal",
     "shaadi",
+    "sharm",
+    "thaali",
     "titli",
+    "tokri",
     "tyohar",
+    "udaasi",
+    "waqt",
     "yaad"
   ],
   "held_out_en_translations": [
+    "auntie",
+    "basket",
     "birthday",
+    "border",
     "bridge",
     "butterfly",
     "childhood",
+    "chimney",
     "coffee",
+    "countryside",
+    "desert",
+    "dessert",
+    "duration",
+    "enjoyment",
     "family",
     "festival",
     "flower",
+    "freedom",
     "friend",
     "garden",
+    "gram",
     "harvest",
+    "justice",
+    "key",
+    "khichdi",
     "kitchen",
     "kite",
+    "lake",
     "laughter",
+    "law",
+    "leaf",
     "library",
     "market",
     "memory",
     "mirror",
     "moon",
     "mountain",
+    "neighborhood",
+    "nephew",
+    "niece",
     "ocean",
     "palace",
+    "paneer",
+    "passion",
+    "platter",
+    "question",
     "river",
+    "road",
+    "rock",
+    "sadness",
+    "settlement",
+    "shyness",
     "silence",
+    "sunlight",
     "treasure",
+    "trunk",
+    "twin",
     "wedding",
-    "window"
+    "window",
+    "worry",
+    "yogurt"
   ],
   "train_pairs": [
     [
@@ -376,11 +478,219 @@
     [
       "festival",
       "tyohar"
+    ],
+    [
+      "desert",
+      "registan"
+    ],
+    [
+      "lake",
+      "jheel"
+    ],
+    [
+      "rock",
+      "chattan"
+    ],
+    [
+      "sunlight",
+      "dhoop"
+    ],
+    [
+      "leaf",
+      "patta"
+    ],
+    [
+      "shyness",
+      "sharm"
+    ],
+    [
+      "worry",
+      "chinta"
+    ],
+    [
+      "enjoyment",
+      "mazaa"
+    ],
+    [
+      "passion",
+      "junoon"
+    ],
+    [
+      "sadness",
+      "udaasi"
+    ],
+    [
+      "freedom",
+      "azaadi"
+    ],
+    [
+      "justice",
+      "insaaf"
+    ],
+    [
+      "duration",
+      "waqt"
+    ],
+    [
+      "question",
+      "sawaal"
+    ],
+    [
+      "law",
+      "kanoon"
+    ],
+    [
+      "key",
+      "chaabi"
+    ],
+    [
+      "trunk",
+      "sandook"
+    ],
+    [
+      "platter",
+      "thaali"
+    ],
+    [
+      "basket",
+      "tokri"
+    ],
+    [
+      "chimney",
+      "chimni"
+    ],
+    [
+      "road",
+      "sadak"
+    ],
+    [
+      "border",
+      "sarhad"
+    ],
+    [
+      "settlement",
+      "basti"
+    ],
+    [
+      "neighborhood",
+      "mohalla"
+    ],
+    [
+      "countryside",
+      "dehat"
+    ],
+    [
+      "dessert",
+      "mithai"
+    ],
+    [
+      "yogurt",
+      "dahi"
+    ],
+    [
+      "paneer",
+      "paneer"
+    ],
+    [
+      "gram",
+      "besan"
+    ],
+    [
+      "khichdi",
+      "khichdi"
+    ],
+    [
+      "auntie",
+      "mausi"
+    ],
+    [
+      "nephew",
+      "bhanja"
+    ],
+    [
+      "niece",
+      "bhanji"
+    ],
+    [
+      "twin",
+      "judwaa"
     ]
   ],
   "counts": {
     "train": 33,
     "dev": 11,
-    "test": 16
-  }
+    "test": 50
+  },
+  "benchmark_supplement_secrets": [
+    "azaadi",
+    "basti",
+    "besan",
+    "bhanja",
+    "bhanji",
+    "chaabi",
+    "chattan",
+    "chimni",
+    "chinta",
+    "dahi",
+    "dehat",
+    "dhoop",
+    "insaaf",
+    "jheel",
+    "judwaa",
+    "junoon",
+    "kanoon",
+    "khichdi",
+    "mausi",
+    "mazaa",
+    "mithai",
+    "mohalla",
+    "paneer",
+    "patta",
+    "registan",
+    "sadak",
+    "sandook",
+    "sarhad",
+    "sawaal",
+    "sharm",
+    "thaali",
+    "tokri",
+    "udaasi",
+    "waqt"
+  ],
+  "benchmark_supplement_en_translations": [
+    "auntie",
+    "basket",
+    "border",
+    "chimney",
+    "countryside",
+    "desert",
+    "dessert",
+    "duration",
+    "enjoyment",
+    "freedom",
+    "gram",
+    "justice",
+    "key",
+    "khichdi",
+    "lake",
+    "law",
+    "leaf",
+    "neighborhood",
+    "nephew",
+    "niece",
+    "paneer",
+    "passion",
+    "platter",
+    "question",
+    "road",
+    "rock",
+    "sadness",
+    "settlement",
+    "shyness",
+    "sunlight",
+    "trunk",
+    "twin",
+    "worry",
+    "yogurt"
+  ]
 }
