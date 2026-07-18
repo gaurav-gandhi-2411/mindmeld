@@ -66,6 +66,44 @@ below).
   already showed 496 passed/4 skipped -- the 4 skips are the pre-existing,
   documented, unrelated Ollama-judge flake).
 
+## Phase 1: CLEARED and PUBLISHED (2026-07-19)
+
+GG's review found a real gap I'd missed (bhanji's hi-en far tier silently short a word --
+17th collision, not 16) and asked two follow-ups before clearing: a semantic-proximity
+scrub (string scrub alone can't catch a benchmark word that's a strong SEMANTIC associate
+of a live secret with zero string overlap) and precise provenance language. Both done:
+- `semantic_scrub_public_benchmark.py` built, reusing production rank/band machinery.
+  Necessary calibration finding: at this benchmark's word density (~325 words / 10.5k-55k
+  vocab), naive hot-band hits are mostly chance noise (~1.3-2.9x baseline, computed not
+  assumed) -- same trap the string scrub's Levenshtein branch hit once already.
+- GG's targeted pass: 20 genuine "obvious one-hop associate" words swapped (the
+  border->boundary/storage->memory class), 24 chance-level ones left alone, 2
+  (`border`/`sunlight`) left as unswappable ground-truth secret translations.
+- Reverified headline numbers against the ACTUALLY-published (post-swap) word content
+  rather than trust the pre-swap bake-off numbers: negligible drift (r=0.894 vs 0.885;
+  shipped Spearman 0.656 vs 0.657).
+- Provenance confirmed accurate and shipped verbatim: AI-authored near/mid tiers,
+  hash-sampled far tiers, not independently human-annotated, not commercial data.
+
+**Published**: https://huggingface.co/datasets/gauravgandhi2411/hinglish-relatedness-benchmark
+(CC-BY-4.0, dim1 headline + dim2 secondary with honest per-domain table). Commits:
+`c63a935` (correction + semantic scrub), `5a9d30f` (targeted swap + reverify), `01540dd`
+(publish).
+
+## IMPORTANT correction before Phase 2 starts: the "abstract-emotional cluster" premise doesn't match the data
+
+GG's Phase-2 direction named "the abstract-emotional cluster" as the benchmark's localized
+weakness (echoing khamoshi/bachpan from the OLD 60-secret known-limitations list). Checked
+this against the ACTUAL dim2 per-domain fail-rate on the new 34-secret benchmark before
+building anything on it (rule: verify premises against ground truth, the requester can be
+wrong) -- it doesn't hold for this benchmark: abstract is the STRONGEST domain (0/5 failed,
+0%), not the weakest. The real weak clusters here are **food (3/5, 60%), nature (2/5, 40%),
+and emotion (2/5, 40%)** -- emotion partially overlaps GG's instinct but abstract does not,
+and food is the actual worst performer, unmentioned in the original framing. n=4-5/domain is
+small (one flip moves a domain's rate 20-25pp), flagged as directional not tight in the
+published card. **Surfaced to GG for confirmation before Phase 2's data-mining effort spends
+GCP credits targeting the wrong cluster.**
+
 ## Next
 
 Once the full-suite re-run confirms green, commit the benchmark finalization
