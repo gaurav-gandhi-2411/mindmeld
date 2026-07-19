@@ -1,3 +1,42 @@
+# PLAN — Hinglish residual-attack probe wave (STOP gate reached, 2026-07-19)
+
+Spec: `spec-residual-attack.md`. Probed all 6 non-combination levers (L1-L6)
+against the two documented residuals (subword-collision: junoon/registan/
+jheel/udaasi; associative-commonsense: property/taste/color facts, curated
+word list at `generator/evals/finetune/data/commonsense_residual_
+candidates.json`). Entry-21 LoRA-checkpoint fix (a7a7109) confirmed merged
+first, per spec order.
+
+**Result**: L1 (higher LoRA capacity) and L3 (alternative base tokenization)
+PROVEN DEAD. L2 (Devanagari-hybrid embedding, inference-time) and L5
+(ranking-time rank-override, build-time) GRADUATE — neither needs model
+retraining. L4 (targeted distillation) GRADUATES with bounded scope (safe,
+zero-regression on 5/8 trained candidates, not generalization evidence). L6
+(commonsense-shaped data, held-out generalization test) is genuinely
+INCONCLUSIVE — mixed 5/3 signal, small domain-imbalanced training set (n=8),
+not CI-significant, not zero-regression-strict.
+
+Local GPU/Ollama were contended by unrelated concurrent local sessions
+(`aetherart` SDXL job + a `reclaim` project session) for L4/L6's probes; GG
+approved GCP fallback (only billing-enabled project `triageiq-portfolio-
+495022`, GPU quota 0 everywhere so on-demand CPU VMs were used — the LoRA
+training code is CPU-only by design already). Two GCP VM sessions total
+(first hit reproducible blockers -- 3/8 L4 candidates fail qwen3:8b
+calibration, L6's 30s timeout too short for VM latency; both fixed and
+retried), cleanly torn down each time, **total GCP spend $0.536**. Commits:
+`b173af4` (L1/L2/L3/L5 + curation), `2654b9c` (L4/L6 GCP results + a real
+persistence-order bug an agent caught mid-run).
+
+**STOP gate**: comparison table presented to GG per spec's explicit
+"STOP after probes" instruction, before any L7 combination or ship
+decision. Awaiting GG's go/no-go on which lever(s) to carry into
+production wiring (L2/L5 need no further training — they need generalizing
+past the 4-8 hand-curated words and wiring into `embeddings.py`/`payload.py`
+respectively; L4's bounded win doesn't need scaling, it needs a scope
+decision on whether bounded-safe is enough to ship at all).
+
+---
+
 # PLAN — Hinglish research release, Phase 1 (in progress, 2026-07-19)
 
 Spec: `spec-hinglish-research-release.md` (new, supersedes spec-hinglish-benchmark.md
