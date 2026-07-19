@@ -93,20 +93,36 @@ stable across the split).
 
 Dim2 measures whether a secret's correct English translation lands in the expected
 relatedness band. **This metric is noticeably less stable across domains than dim1**, and
-degrades in specific, identifiable clusters rather than uniformly:
+degrades in specific, identifiable clusters rather than uniformly.
 
-| Domain | Fail rate (34-secret set, n=4-5/domain) |
+**Methodology note (found during Phase 1 review, corrected before this was final)**: 2 of
+the 34 secrets (`paneer`, `khichdi`) are loanwords spelled identically in both languages —
+their EN gloss and hi-en secret are the literal same string, so they trivially self-match
+at rank 1 ("win" band). The pass/fail definition here treats only bands 1-2 ("scorching"/
+"hot") as consistent, deliberately excluding band 0 to prevent literal string duplicates
+from gaming the metric in the general case — but for a genuinely-identical loanword pair
+this excludes the ONE correct outcome, scoring a trivial self-match as a "failure." These 2
+items are not a meaningful test of cross-lingual understanding either way (a lookup table
+scores them identically) and are excluded from the domain rates below, which reflect only
+the 32 informative (non-degenerate) pairs.
+
+| Domain | Fail rate (32 informative pairs, n=3-5/domain) |
 |---|---|
-| food | 3/5 (60%) |
-| nature | 2/5 (40%) |
 | emotion | 2/5 (40%) |
+| nature | 2/5 (40%) |
+| food | 1/3 (33%)* |
 | kinship | 1/4 (25%) |
 | place | 1/5 (20%) |
 | object | 1/5 (20%) |
 | **abstract** | **0/5 (0%)** |
 
-**Food, nature, and emotion cluster weakest**; abstract and object cluster strongest (abstract
-is, in fact, perfect on this small sample). At n=4-5 secrets per domain this is a
+*food's denominator is 3, not 5 — `paneer`/`khichdi` excluded as degenerate, see above.
+
+**Emotion and nature cluster weakest, food closely behind at a much smaller informative
+n**; abstract and object cluster strongest (abstract is, in fact, perfect on this small
+sample). Read this as **soft cluster (food/nature/emotion — concrete-sensory, culturally-
+specific concepts) vs. strong cluster (abstract/object/place/kinship), not a precise rank
+order within the soft cluster** — at n=3-5 secrets per domain this is a
 directional signal, not a statistically tight one — a single item flipping changes a
 domain's rate by 20-25 points. Reported honestly rather than smoothed into a single
 aggregate pass-rate (0.706 [0.559, 0.853] overall), which would hide this structure.

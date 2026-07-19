@@ -576,3 +576,26 @@ publicly — until:
 3. GG confirms the CC-BY-4.0 license and "expert-tiered, not
    externally-sourced" honesty statement (section 5) before any public
    HF Datasets push, per the spec's mandatory publish gate.
+
+---
+
+## Addendum (Phase 2 kickoff): a methodology artifact found while diagnosing the
+soft cluster, corrected on the published card
+
+While diagnosing why food/nature/emotion score weaker on dim2 (per GG's Phase 2
+direction), found that 2 of the 5 reported food-domain "failures"
+(`paneer`, `khichdi`) are not real: `_GOOD_BANDS = {1, 2}` in `eval_model.py`
+deliberately excludes band 0 ("win", rank==1) from "consistent," to stop a
+literal duplicate string from trivially gaming the metric — but `paneer` and
+`khichdi` are loanwords spelled identically in EN and hi-en, so their EN gloss
+IS their hi-en secret, and they trivially self-match at rank 1. Excluding band
+0 in the general case is correct; scoring these two specific degenerate,
+self-identical pairs as failures is not — a lookup table would "fail" them too.
+Excluded from the informative fail-rate: food corrects from 3/5 (60%) to 1/3
+(33%, n reduced since 2 of 5 are degenerate). Corrected table (32 informative
+pairs): emotion 2/5 (40%), nature 2/5 (40%), food 1/3 (33%), kinship 1/4 (25%),
+place 1/5 (20%), object 1/5 (20%), abstract 0/5 (0%). **The uncorrected 60%
+figure WAS live on the published HF Dataset card briefly** (published, then
+this artifact found during the very next diagnostic pass) — fixed and
+republished the same session; `public_benchmark_card.md` now carries the
+corrected table.
