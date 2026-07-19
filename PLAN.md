@@ -104,6 +104,45 @@ small (one flip moves a domain's rate 20-25pp), flagged as directional not tight
 published card. **Surfaced to GG for confirmation before Phase 2's data-mining effort spends
 GCP credits targeting the wrong cluster.**
 
+## GG's redirect: fix the benchmark first, re-derive weakness, probe before mining (2026-07-19)
+
+GG's Phase-2-mining instruction included fabricated examples (`bhutta`->maize,
+`jheel`->pond) attributed to "the report" -- neither exists anywhere in this project's
+data or anything I wrote. Verified via direct grep/file-read before acting (rule: the
+requester can be wrong), flagged it, GG confirmed a reviewer had invented them and
+retracted. Proceeded with the REAL findings instead:
+
+- **besan/gram was a second labeling defect**, distinct from the paneer/khichdi
+  degenerate-pair artifact already fixed: "gram" reads in this corpus as the Indian-
+  English "gram panchayat" (village) sense (checked via gram's own nearest neighbors:
+  village/rural/hamlet/countryside), not "gram flour." Fixed -> `besan`/**flour**
+  (verified unambiguous: dough/wheat/grain/bread neighborhood; besan now hot-band,
+  correctly consistent). `dim1_en`'s mirrored "gram" secret renamed/rebuilt against
+  verified bands. Republished as **v1.1** with a visible Changelog section (not a
+  silent overwrite, per GG's explicit request). Commit `2341d39`.
+- **Corrected, complete domain table**: food's apparent 60%->33%->**0%** fail rate was
+  entirely a labeling artifact (2 degenerate pairs + 1 bad gloss), not model weakness.
+  Real residual: **emotion + nature specifically (40% each)** -- object/place/kinship
+  each have exactly one real failure (chaabi, dehat, bhanja resp.), not clustered.
+- **junoon/registan root-caused as subword-tokenization collision** (nearest-neighbor
+  inspection: junoon~afternoon/noon/june, registan~register/registry/registration) --
+  correctly-spelled romanizations, no better spelling exists, EN glosses are clean.
+  This is a genuine model/tokenizer characteristic, NOT benchmark-editable like
+  besan/gram was -- documented as such in the card, not smoothed over.
+- Reverified headline numbers post-fix: dev<->test Pearson r **0.920** (was 0.894, was
+  0.885), shipped full-34 dim1 Spearman **0.657 [0.569, 0.736]**.
+
+**Cheap probe launched (background executor, before any GCP spend)**: find 5-10 OTHER
+short/rare hi-en words (NOT benchmark secrets, no-leakage-verified) showing the same
+subword-collision signature, build ~20-40 targeted contrastive pairs + hard negatives
+against the identified spurious neighbors, fine-tune via `train_lib.py`'s existing LoRA
+config with pairs injected in-memory (no on-disk training-file changes), evaluate on the
+frozen 34-secret benchmark with paired bootstrap CIs vs the current shipped checkpoint.
+Question: does junoon/registan/jheel/udaasi move at all? If yes -> GCP-scale mining is
+justified; if no -> document as an architectural limitation (retrieval-augmentation or
+different-architecture territory), don't spend credits scaling something a cheap probe
+shows won't work. Result pending.
+
 ## Next
 
 Once the full-suite re-run confirms green, commit the benchmark finalization
