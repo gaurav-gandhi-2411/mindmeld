@@ -959,30 +959,8 @@
     "note": null
   },
   {
-    "secret": "gram",
-    "word": "legume",
-    "tier": "near",
-    "expected_bands": [
-      1,
-      2
-    ],
-    "subtype": null,
-    "note": null
-  },
-  {
-    "secret": "gram",
+    "secret": "flour",
     "word": "batter",
-    "tier": "near",
-    "expected_bands": [
-      1,
-      2
-    ],
-    "subtype": null,
-    "note": null
-  },
-  {
-    "secret": "gram",
-    "word": "mattress",
     "tier": "mid",
     "expected_bands": [
       3
@@ -991,7 +969,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "protein",
     "tier": "mid",
     "expected_bands": [
@@ -1001,7 +979,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "outstanding",
     "tier": "far",
     "expected_bands": [
@@ -1012,7 +990,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "depot",
     "tier": "far",
     "expected_bands": [
@@ -1023,7 +1001,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "jason",
     "tier": "far",
     "expected_bands": [
@@ -1034,7 +1012,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "commissions",
     "tier": "far",
     "expected_bands": [
@@ -1045,7 +1023,7 @@
     "note": null
   },
   {
-    "secret": "gram",
+    "secret": "flour",
     "word": "font",
     "tier": "far",
     "expected_bands": [
@@ -3260,6 +3238,28 @@
     "expected_bands": [
       4,
       5
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "flour",
+    "word": "dough",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
+    ],
+    "subtype": null,
+    "note": null
+  },
+  {
+    "secret": "flour",
+    "word": "wheat",
+    "tier": "near",
+    "expected_bands": [
+      1,
+      2
     ],
     "subtype": null,
     "note": null

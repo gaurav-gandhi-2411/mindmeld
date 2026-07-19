@@ -195,7 +195,7 @@
   },
   {
     "secret": "besan",
-    "word": "legume",
+    "word": "wheat",
     "tier": "near",
     "expected_bands": [
       1,
@@ -206,7 +206,7 @@
   },
   {
     "secret": "besan",
-    "word": "gram",
+    "word": "flour",
     "tier": "near",
     "expected_bands": [
       1,

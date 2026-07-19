@@ -599,3 +599,63 @@ figure WAS live on the published HF Dataset card briefly** (published, then
 this artifact found during the very next diagnostic pass) — fixed and
 republished the same session; `public_benchmark_card.md` now carries the
 corrected table.
+
+---
+
+## v1.1 addendum: besan's EN gloss was a second labeling defect, not model weakness
+
+GG's next redirect asked to re-verify the soft-cluster diagnosis rather than
+proceed straight to data mining. Doing so found a second, distinct labeling
+defect beyond the degenerate-pair artifact above: `besan`'s EN gloss
+"gram" reads in this embedding space as the Indian-English "gram
+panchayat" (village council) sense — checked directly via `gram`'s own
+nearest neighbors (`village`, `rural`, `hamlet`, `countryside`), not
+assumed — not "gram flour." `besan`→`gram` scored a spurious dim2 failure
+(rank 583, band 4/cold) purely because of this gloss ambiguity, not
+because the model fails to relate besan to flour-adjacent concepts.
+
+Fixed: `besan`'s gloss → **`flour`** (verified unambiguous neighborhood:
+dough, wheat, grain, bread; besan now ranks 408/band 2, correctly
+"consistent"), and its near-tier associate word `legume`→`wheat` (legume
+scored band 4 against besan directly, a pre-existing imprecision;
+`wheat` scores band 2). `dim1_en.json`'s mirrored "gram" secret (9
+records) renamed to "flour" with the near/mid tiers rebuilt against
+verified bands (`dough`/`wheat` near, `batter`/`protein` mid — `batter`
+moved from near to mid, since it bands at 3/warm against `flour`, not
+1-2). Every new word individually verified: in-vocab, string-scrub-clean,
+and semantic-scrub-clean at the same rank<=10 bar established in section
+2c. Full detail and every replacement word: `public_benchmark_card.md`'s
+Changelog (v1.1) and dim2 methodology-notes section.
+
+**Corrected, complete domain fail-rate table (32 informative pairs, both
+fixes applied)**: emotion 2/5 (40%), nature 2/5 (40%), kinship 1/4 (25%),
+place 1/5 (20%), object 1/5 (20%), **food 0/3 (0%)**, abstract 0/5 (0%).
+Food's apparent weakness is now fully explained as labeling artifacts
+(2 degenerate pairs + 1 bad gloss) — **the real residual is emotion and
+nature specifically**, not a broad food/nature/emotion pattern. Object,
+place, and kinship each have exactly one real failure (chaabi/key,
+dehat/countryside, bhanja/nephew) — present but not clustered.
+
+**Root cause of the emotion/nature residual, checked not assumed**: for
+`junoon`, `registan`, and partially `jheel`/`udaasi`, the failing word's
+own nearest neighbors are dominated by unrelated English words sharing a
+coincidental subword fragment (`junoon`→afternoon/noon/june,
+`registan`→register/registry/registration). These are conventionally,
+correctly spelled romanizations — no alternate spelling exists in vocab,
+and none of the EN glosses (passion, desert, sadness, lake) show any
+comparable ambiguity in their own neighborhoods. **This is a genuine
+model/tokenizer characteristic (short/rare romanized tokens fragmenting
+into subword pieces that collide with common English morphemes), not a
+benchmark-editable labeling defect** — unlike besan/gram above, there is
+no gloss or associate-word swap that fixes this; the benchmark is
+correctly measuring a real model limitation here.
+
+Reverified headline numbers post-fix (same no-re-inference method as
+section 2c, `public_benchmark_reverify.py`): dev<->test Pearson r =
+**0.920** (was 0.894 pre-fix, 0.885 before that); shipped full-34 dim1
+Spearman **0.657 [0.569, 0.736]** (dev 0.671, test 0.642 — both point
+estimates and CIs sourced from the actual re-resolved staging content).
+
+Published dataset re-pushed as **v1.1**, changelog entry added to the
+card per GG's explicit request for visible, transparent versioning
+rather than a silent overwrite. Both scrubs re-run clean post-fix.

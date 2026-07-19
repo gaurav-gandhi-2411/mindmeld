@@ -4,66 +4,66 @@
   "per_model_dev_test_scores": {
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": {
       "dev_score": 0.005194270492126409,
-      "test_score": 0.14372850733849132,
+      "test_score": 0.10048185417316279,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "l3cube-pune/indic-sentence-bert-nli": {
       "dev_score": 0.5610868489082003,
-      "test_score": 0.4381439973290237,
+      "test_score": 0.41467559115473823,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "google/muril-base-cased": {
       "dev_score": 0.22989417402663803,
-      "test_score": 0.08829871719482334,
+      "test_score": 0.10071212629838872,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "BAAI/bge-m3": {
       "dev_score": 0.12223704064073167,
-      "test_score": 0.065102243662157,
+      "test_score": 0.06032753182639381,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "intfloat/multilingual-e5-large": {
       "dev_score": 0.22116091988170894,
-      "test_score": 0.16544181420538254,
+      "test_score": 0.1644259077705623,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "ibm-granite/granite-embedding-311m-multilingual-r2": {
       "dev_score": 0.20672608972593864,
-      "test_score": 0.03970549359252658,
+      "test_score": 0.038705067636713116,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "Qwen/Qwen3-Embedding-0.6B": {
       "dev_score": 0.2633432117613223,
-      "test_score": 0.1029414946786149,
+      "test_score": 0.11574967831855909,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     },
     "gauravgandhi2411/hinglish-relatedness-sbert": {
       "dev_score": 0.6711699256923409,
-      "test_score": 0.6410381175833634,
+      "test_score": 0.642280435766519,
       "n_dev_secrets_resolved": 17,
       "n_test_secrets_resolved": 17
     }
   },
-  "dev_test_pearson_r": 0.8939878553564279,
+  "dev_test_pearson_r": 0.9199152667028314,
   "prior_reported_pearson_r_pre_scrub_words": 0.8852940766818941,
   "shipped_model_bootstrap_ci": {
     "full_34": {
-      "point": 0.6557604018621108,
+      "point": 0.6567424350745239,
       "ci_95": [
-        0.5689155855330439,
-        0.7347977631224131
+        0.5694949186519466,
+        0.7358202558015653
       ],
       "n_clusters": 34,
       "n_scenarios": 300,
       "n_valid_bootstrap_draws": 10000,
-      "std": 0.04253838719525894
+      "std": 0.04254732680858316
     },
     "dev_only": {
       "point": 0.6711699256923409,
@@ -77,15 +77,15 @@
       "std": 0.04800359332899861
     },
     "test_only": {
-      "point": 0.6410381175833634,
+      "point": 0.642280435766519,
       "ci_95": [
-        0.4931251906637082,
-        0.7657985518994711
+        0.4943007233000051,
+        0.7670123659340732
       ],
       "n_clusters": 17,
       "n_scenarios": 151,
       "n_valid_bootstrap_draws": 10000,
-      "std": 0.06963995412271574
+      "std": 0.06978923430274254
     }
   },
   "prior_reported_shipped_bootstrap_ci_pre_scrub_words": {
