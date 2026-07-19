@@ -163,6 +163,40 @@ same LoRA capacity) -- awaiting GG's call: accept as a documented limitation and
 here, probe a materially different lever first (large-scale iterative mining, higher
 LoRA rank, non-fine-tuning mitigation), or override with reasoning I'm missing.
 
+## Closed cleanly at field-leading state (2026-07-19) -- GG's 3-part close-out
+
+1. **Fixed entry 21 despite being flagged out-of-scope**: root-caused
+   `load_best_model_at_end`'s silent LoRA bug precisely (`transformers.Trainer.
+   _load_best_model()` branches on `_is_peft_model(self.model)`, but `self.model`
+   is always the outer `SentenceTransformer`, never the nested `PeftModel` --
+   always False, falls through to a path expecting a full `model.safetensors` a
+   LoRA checkpoint never has). Fixed via explicit `peft.set_peft_model_state_dict`
+   restoration + a hard assertion the reload reproduces the tracked-best score.
+   Regression test runs a REAL small LoRA loop (not mocked -- a mock wouldn't have
+   caught the original bug). Checked impact on the shipped model: immaterial
+   (Delta 0.0014) and moot regardless (TEST numbers always come from the actual
+   saved artifact). Commit `a7a7109`.
+2. **Reframed entry 20** from "accepted limitation" to a triaged, ranked attack
+   list for a future resume (higher LoRA capacity / iterative large-scale
+   hard-negative mining / retrieval-time reranking / better-tokenization base /
+   post-launch player data) with LEVER 1 (more same-recipe hard negatives)
+   explicitly marked proven-dead so it isn't re-tested by a future session.
+   Commit (reframe).
+3. **Republished the model card** (was stale since the 50-secret bake-off/public
+   benchmark shipped): now leads all 7 alternatives claim front and center
+   (0.675/0.740, 14/14 CI-significant), links the public benchmark, notes the
+   dev-test-correlation fix (0.12->0.920), documents the residual as open/
+   characterized (not closed). Scrub-verified before push, live-fetched and
+   confirmed after. Commit `7d7317d`.
+
+**Final published state, byte-verified not just trusted**:
+- Model: `gauravgandhi2411/hinglish-relatedness-sbert` -- field-leading, card current.
+- Benchmark: `gauravgandhi2411/hinglish-relatedness-benchmark` v1.1 -- corrected,
+  changelog visible, residual documented consistently with the model card and
+  known-limitations.md.
+- No GCP spend this session (probe ran locally/CPU, same as every other experiment
+  in this project's history). No further training.
+
 ## Next
 
 Once the full-suite re-run confirms green, commit the benchmark finalization
