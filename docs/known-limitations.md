@@ -512,56 +512,84 @@ sense on top of a better embedding model, not before it.
 **Revisit:** together with the Hinglish fine-tune (entry 1's revisit condition) —
 re-derive band fractions/floors from the improved model's rank distributions.
 
-### 20. Subword-tokenization collision on short/rare romanized Hindi tokens —
-probed with targeted training data, does not reliably move (2026-07-19)
+### 20. CHARACTERIZED BOUNDARY, NOT CLOSED — subword-collision + associative-
+commonsense relatedness on a handful of words; one lever proven dead, four
+live attacks triaged for a future resume (2026-07-19)
 
-The public 34-secret benchmark (`gauravgandhi2411/hinglish-relatedness-benchmark`,
-v1.1) localized a residual weakness to the emotion/nature domains specifically —
-`junoon`, `registan`, and partially `jheel`/`udaasi` — after two labeling
-artifacts in the benchmark itself (2 degenerate self-identical loanword pairs, 1
-ambiguous EN gloss) were found and fixed and did NOT explain it. Root-caused via
-direct nearest-neighbor inspection: these words' own embeddings are dominated by
+**Status: this is a triaged attack list, not an accepted-and-parked
+limitation.** The Hinglish accuracy push is closing cleanly at its current
+field-leading state (see entry 1) because the one lever tested came back
+negative — not because the residual is believed unfixable. Anyone resuming
+this work should start from the live-attacks list below, not from scratch.
+
+**What the residual actually is**: the public 34-secret benchmark
+(`gauravgandhi2411/hinglish-relatedness-benchmark`, v1.1) localized a
+weakness to the emotion/nature domains specifically — `junoon`, `registan`,
+and partially `jheel`/`udaasi` — after two labeling artifacts in the
+benchmark itself (2 degenerate self-identical loanword pairs, 1 ambiguous
+EN gloss) were found, fixed, and did NOT explain it. Root-caused via direct
+nearest-neighbor inspection: these words' own embeddings are dominated by
 unrelated English words sharing a coincidental subword fragment (`junoon`
-neighbors `afternoon`/`noon`/`june`; `registan` neighbors `register`/`registry`/
-`registration`) — correctly, conventionally spelled romanizations (no better
-spelling exists in vocab), not a transliteration error and not a benchmark-
-editable defect.
+neighbors `afternoon`/`noon`/`june`; `registan` neighbors `register`/
+`registry`/`registration`) — correctly, conventionally spelled romanizations
+(no better spelling exists in vocab), not a transliteration error and not a
+benchmark-editable defect. This is best characterized as a mix of subword-
+tokenization collision (mechanical: the base tokenizer fragments short/rare
+romanized tokens into pieces that happen to match common English morphemes)
+and associative/world-knowledge relatedness (a handful of these words need
+cultural/associative context a distributional embedding doesn't get for
+free from co-occurrence alone) — both plausible, not cleanly separated by
+the evidence gathered so far.
 
-**Probed before committing to GCP-scale data mining** (per spec-hinglish-
-research-release.md's own risk section: "don't spend GCP credits scaling data
-that a cheap probe shows won't move the metric"): found 9 other short/rare
-hi-en words (no-leakage-verified against all 60 daily-schedule secrets + every
-pack + the 34 benchmark secrets) with the same collision signature — and
-discovered they ALREADY had one round of mined hard negatives in the shipped
-model's own training data (`hard_negatives.py`'s rank-band-50-500 mining) and
-still failed, meaning "add a hard negative" was already tried and insufficient.
-Built a SECOND, more precisely-targeted round (the literal top confusion word
-per candidate, not a rank-band sample), fine-tuned with the winning LoRA recipe
-(r=8/alpha=16/lr=2e-4/4 epochs) via in-memory data injection (no benchmark or
-training-file leakage), evaluated on the frozen public benchmark.
-
-**Result: no clean win.** Full-34 dim1 Spearman delta +0.0037 [-0.026,+0.033],
-not CI-significant. Dim2 pass-rate delta -0.0606 [-0.152, 0.000], not
-CI-significant but the CI upper bound sits at exactly zero — a directionally
-negative result, not a clean null. The 4 target secrets moved inconsistently
-(registan/jheel modestly closer but still failing; junoon flat; udaasi got
-worse) with zero pass/fail flips. Two previously-passing, unrelated secrets
-(`bhanji`, `judwaa`) newly regressed — not a zero-regression outcome even
-setting the weak headline numbers aside.
-
-**Why accepted (for now):** a second, hand-precision-targeted round of hard
-negatives on a proven-working recipe (0.12% trainable params) failing to move
-9 independently-selected words showing the identical failure signature is
-real evidence against "more of this same kind of data, same LoRA capacity"
-scaling cleanly. Full detail: `generator/evals/finetune/probe_subword_collision.py`,
+**LEVER 1 — PROVEN DEAD**: more same-style contrastive hard negatives at
+the current LoRA capacity (r=8, 0.12% trainable params). Probed before any
+GCP-scale mining commitment (per spec-hinglish-research-release.md's own
+risk section: "don't spend GCP credits scaling data that a cheap probe
+shows won't move the metric"). Found 9 other short/rare hi-en words with
+the identical collision signature, no-leakage-verified; discovered they
+ALREADY had one round of mined hard negatives in the shipped model's own
+training data and still failed (so "add a hard negative" was already tried
+and insufficient); built a SECOND, hand-precision-targeted round (each
+word's actual current top confusion, not a rank-band sample); fine-tuned;
+evaluated on the frozen benchmark. **Result: no clean win** — full-34 dim1
+delta +0.0037 (not sig.), dim2 delta -0.0606 (not sig., CI upper bound at
+exactly zero — directionally negative), target words moved inconsistently
+with zero pass/fail flips, 2 unrelated secrets newly regressed. Full
+detail: `generator/evals/finetune/probe_subword_collision.py`,
 `generator/evals/finetune/data/probe_subword_collision.eval_result.json`.
+**Do not re-run this exact lever** — it has already been tested with
+precision targeting and failed.
 
-**Revisit:** a materially different lever, not a bigger version of the same
-one — candidates: iterative multi-round hard-negative mining at real scale
-(dozens-to-hundreds of words, not 9), higher LoRA rank/capacity, or a
-non-fine-tuning mitigation (retrieval-time reranking, subword-aware
-tokenization, model ensembling). Test any of these on the same cheap-probe
-pattern before GCP-scale commitment.
+**LIVE ATTACKS — untested, triaged roughly cheapest/most-promising first**:
+1. **Higher LoRA capacity** (r=16/32, or unfreeze more target modules) —
+   the current r=8 config was chosen for the ORIGINAL data-volume regime
+   (1741 pairs); it was never re-swept at higher rank against a residual
+   this specific. Cheapest lever to test — no new data needed, one sweep.
+2. **Iterative multi-round hard-negative mining at real scale** — the dead
+   lever above tested 9 words with one hand-picked negative each; a proper
+   iterative loop (mine → train → re-mine against the NEW model's current
+   confusions → repeat, dozens-to-hundreds of words) is a materially
+   different experiment, not a bigger version of the same one.
+3. **Retrieval-time reranking (non-fine-tuning mitigation)** — if a small,
+   fixed set of words are structurally hard for this embedding approach, a
+   cheap lexicon/lookup override at query time for known-hard words may be
+   more reliable than chasing them through training data.
+4. **A base model with better romanized-Hindi tokenization** — the
+   collision mechanism is a tokenizer artifact of `l3cube-pune/indic-
+   sentence-bert-nli`'s subword vocabulary specifically; a base model
+   trained with more romanized-Hindi-aware tokenization might not have
+   this failure mode at all. Requires a fresh base-model bake-off (last
+   one, `phase1_benchmark_report.md`, found no newer base beats l3cube
+   OVERALL — but wasn't testing FOR this specific failure class).
+5. **Real player-guess data, post-launch** — the standing, license-free,
+   genuinely in-domain signal no external corpus or synthetic mining can
+   match (flagged repeatedly across this project's history, e.g.
+   `spec-hinglish-benchmark.md`'s Phase 2a note). Not actionable pre-launch,
+   but the eventual strongest lever.
+
+**Revisit:** any of the 5 live attacks, tested on the same cheap-probe
+pattern (small, targeted, frozen-benchmark-measured, CI-checked) before a
+GCP-scale commitment to any of them.
 
 ### 21. FIXED (2026-07-19) — LoRA training's `load_best_model_at_end` was
 silently loading the LAST epoch, not the tracked-best one
