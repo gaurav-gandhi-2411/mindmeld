@@ -158,12 +158,17 @@ TEACHER_MODEL = "llama3.1:8b"  # deviation from spec's qwen3:8b -- see docstring
 # to this probe, fluctuating over multiple hours). A long timeout (240s) +
 # few retries meant ONE stuck call could burn an entire background-task
 # lifetime with nothing to show for it. SHORT timeout + more, cheap retries
-# is the better fit for this bursty-availability environment -- a failed
-# attempt costs seconds, not minutes, so more attempts fit in the same wall
-# clock and the pipeline makes forward progress whenever the GPU is briefly
-# free, per rule 108 (timeout + retry+backoff+jitter + defined failure
-# behavior on every outbound call).
-TIMEOUT_SECONDS = 30
+# was the better fit for the LOCAL machine's bursty-GPU-contention profile,
+# but a GCP CPU-only VM's real failure mode turned out to be different:
+# STEADY, non-bursty CPU inference latency that consistently exceeds 30s
+# (8/8 generation calls timed out on the first GCP run, 2026-07-19 --
+# reproducible, not transient). GG-approved fix (2026-07-19): raise the
+# timeout to match observed CPU-only latency (L4's TIMEOUT_SECONDS=300
+# worked fine on the identical VM type) rather than retry-storm against a
+# ceiling that's simply too low for this environment, per rule 108
+# (timeout + retry+backoff+jitter + defined failure behavior on every
+# outbound call).
+TIMEOUT_SECONDS = 180
 MAX_RETRIES = 2
 RETRY_BACKOFF_BASE_S = 3.0  # exponential backoff + jitter, per rule 108
 

@@ -671,26 +671,41 @@ def _load_jsonl(path: Path) -> list[dict]:
     ]
 
 
-def build_probe_records(teacher_records: list[dict]) -> tuple[list[dict], list[dict]]:
+MIN_CLEAN_CANDIDATES = 3  # below this, training on the survivors is not a meaningful probe
+
+
+def build_probe_records(teacher_records: list[dict]) -> tuple[list[dict], list[dict], dict]:
     """One MNRL triplet (anchor=word, positive=related, negative=
     hard_negative) + two graded pairs (word/related at score_related,
     word/hard_negative at score_hard_negative) per candidate -- graded
     schema matches train_graded_pairs.jsonl exactly (sentence1/sentence2/
     score/source, verified by reading the file directly). Defense-in-depth:
     re-runs `validate_teacher_record` (the same gate `run_teacher_scoring`'s
-    repair loop already enforces) and raises ValueError (never silently
-    trains on a null or inverted target) if ANY candidate still has a null
-    score or a non-strictly-greater related-vs-hard-negative score -- this
-    catches a stale/hand-edited teacher_scores.json that bypassed the
-    repair loop, not just a fresh run's output."""
+    repair loop already enforces).
+
+    GG-approved policy (2026-07-19, after two independent GCP runs
+    reproducibly found qwen3:8b cannot calibrate nariyal/samosa/dudh's
+    sensory-property score even after 3 self-repair attempts each): a
+    candidate that STILL fails validation after the repair loop is DROPPED
+    from training, not fatal to the whole probe -- this is a genuine
+    per-word teacher-calibration gap, not a stale-file/Ollama-outage
+    symptom (those cases were already ruled out: two independent fresh
+    `--teacher` runs reproduced the identical failure). Every dropped
+    candidate is reported by name + reason in the returned `dropped` dict --
+    never silently excluded. Still raises ValueError if fewer than
+    MIN_CLEAN_CANDIDATES survive, since training on 0-2 words is not a
+    meaningful distillation probe."""
     problems_by_word = {r["word"]: validate_teacher_record(r) for r in teacher_records}
     failing = {w: p for w, p in problems_by_word.items() if p}
-    if failing:
+    clean_records = [r for r in teacher_records if not problems_by_word[r["word"]]]
+    if len(clean_records) < MIN_CLEAN_CANDIDATES:
         raise ValueError(
-            "cannot build training records -- teacher score validation FAILED for: "
-            f"{failing} (Ollama blocker, judge-call failure, or stale teacher_scores.json; "
-            "re-run --teacher)"
+            f"cannot build training records -- only {len(clean_records)} of "
+            f"{len(teacher_records)} candidates pass validation (need >= "
+            f"{MIN_CLEAN_CANDIDATES}): {failing}"
         )
+    if failing:
+        print(f"DROPPED {len(failing)} candidate(s) failing teacher-score validation: {failing}")
 
     new_mnrl = [
         {
@@ -699,10 +714,10 @@ def build_probe_records(teacher_records: list[dict]) -> tuple[list[dict], list[d
             "negative": r["hard_negative"],
             "source": RUN_NAME,
         }
-        for r in teacher_records
+        for r in clean_records
     ]
     new_graded: list[dict] = []
-    for r in teacher_records:
+    for r in clean_records:
         new_graded.append(
             {
                 "sentence1": r["word"],
@@ -719,10 +734,18 @@ def build_probe_records(teacher_records: list[dict]) -> tuple[list[dict], list[d
                 "source": RUN_NAME,
             }
         )
-    return new_mnrl, new_graded
+    dropped = {
+        "words": sorted(failing),
+        "reasons": failing,
+        "n_clean": len(clean_records),
+        "n_total": len(teacher_records),
+    }
+    return new_mnrl, new_graded, dropped
 
 
-def build_extended_training_set(teacher_records: list[dict]) -> tuple[list[dict], list[dict]]:
+def build_extended_training_set(
+    teacher_records: list[dict],
+) -> tuple[list[dict], list[dict], dict]:
     """The obj_hard_neg base training set (train_mnrl_pairs_hard_neg.jsonl +
     train_graded_pairs.jsonl -- the exact files the SHIPPED model trained
     on) extended in-memory with this probe's new records. Never writes to
@@ -730,8 +753,8 @@ def build_extended_training_set(teacher_records: list[dict]) -> tuple[list[dict]
     set` pattern exactly."""
     base_mnrl = _load_jsonl(DATA_DIR / "train_mnrl_pairs_hard_neg.jsonl")
     base_graded = _load_jsonl(DATA_DIR / "train_graded_pairs.jsonl")
-    new_mnrl, new_graded = build_probe_records(teacher_records)
-    return base_mnrl + new_mnrl, base_graded + new_graded
+    new_mnrl, new_graded, dropped = build_probe_records(teacher_records)
+    return base_mnrl + new_mnrl, base_graded + new_graded, dropped
 
 
 # ---------------------------------------------------------------------------
@@ -744,14 +767,16 @@ def train_probe(teacher_scores: dict | None = None) -> dict:
         teacher_scores = load_teacher_scores()
     teacher_records = teacher_scores["candidates"]
 
-    extended_mnrl, extended_graded = build_extended_training_set(teacher_records)
+    extended_mnrl, extended_graded, dropped = build_extended_training_set(teacher_records)
+    n_new = dropped["n_clean"]
     print(
         f"extended training set: {len(extended_mnrl)} mnrl "
-        f"(base {len(extended_mnrl) - len(teacher_records)} + {len(teacher_records)} new), "
+        f"(base {len(extended_mnrl) - n_new} + {n_new} new), "
         f"{len(extended_graded)} graded "
-        f"(base {len(extended_graded) - 2 * len(teacher_records)} + "
-        f"{2 * len(teacher_records)} new)"
+        f"(base {len(extended_graded) - 2 * n_new} + {2 * n_new} new)"
     )
+    if dropped["words"]:
+        print(f"dropped from training (teacher-calibration failure): {dropped}")
     print(f"forced_cpu_training={FORCED_CPU_TRAINING} (gpu_free_mib={_free_mib})")
 
     cfg = TrainConfig(
@@ -771,6 +796,14 @@ def train_probe(teacher_scores: dict | None = None) -> dict:
     elapsed = time.monotonic() - t0
     summary["_wall_clock_s"] = elapsed
     summary["_forced_cpu_training"] = FORCED_CPU_TRAINING
+    summary["_dropped_candidates"] = dropped
+    # BUG FIX (found by a GCP-run agent, 2026-07-19): run_training() already wrote
+    # RUNS_DIR/{name}.train_summary.json to disk BEFORE these three keys were added
+    # to the in-memory dict above -- evaluate_probe() reads that on-disk file, so
+    # without re-writing it here, `dropped_candidates`/`trained_on` silently defaulted
+    # to "nothing was dropped" downstream, mismarking dropped candidates as trained_on.
+    summary_path = DATA_DIR / "runs" / f"{RUN_NAME}.train_summary.json"
+    summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in summary.items() if k != "dev_curve"}, indent=2))
     print(f"training wall-clock: {elapsed:.1f}s")
     return summary
@@ -851,22 +884,31 @@ def targeted_rank_check(candidates: list[dict], before_model: str, after_model_p
 # ---------------------------------------------------------------------------
 
 OVERFITTING_CAVEAT = (
-    "This probe trains DIRECTLY on the 8 target words' own (anchor, related, "
-    "hard_negative) triplets/graded pairs -- a large rank improvement on these exact "
-    "8 words is EXPECTED from direct training-set exposure and is NOT strong evidence "
-    "the distillation APPROACH generalizes to held-out commonsense words never seen "
-    "in training. Generalization to unseen commonsense pairs is tested separately by "
-    "lever L6 (a different, held-out-word probe run in parallel by a different agent) "
-    "-- not duplicated or claimed here."
+    "This probe trains DIRECTLY on the CLEAN subset of the 8 target words' own "
+    "(anchor, related, hard_negative) triplets/graded pairs -- a large rank improvement "
+    "on trained words is EXPECTED from direct training-set exposure and is NOT strong "
+    "evidence the distillation APPROACH generalizes to held-out commonsense words never "
+    "seen in training. Generalization to unseen commonsense pairs is tested separately by "
+    "lever L6 (a different, held-out-word probe) -- not duplicated or claimed here. "
+    "Separately: candidates in `dropped_candidates` were EXCLUDED from training entirely "
+    "(reproducible teacher-model calibration failure on qwen3:8b across two independent "
+    "runs, GG-approved policy 2026-07-19) -- their rank movement in "
+    "`targeted_word_rank_movement` (marked trained_on=false) should be near-zero/noise, "
+    "since they were never trained on; a large movement there would indicate an "
+    "unexpected leak or bug, not a real distillation effect."
 )
 
 
 def evaluate_probe(model_path: str | None = None, teacher_scores: dict | None = None) -> dict:
+    summary_path = DATA_DIR / "runs" / f"{RUN_NAME}.train_summary.json"
+    train_summary = json.loads(summary_path.read_text(encoding="utf-8"))
     if model_path is None:
-        summary_path = DATA_DIR / "runs" / f"{RUN_NAME}.train_summary.json"
-        model_path = json.loads(summary_path.read_text(encoding="utf-8"))["output_dir"]
+        model_path = train_summary["output_dir"]
     if teacher_scores is None:
         teacher_scores = load_teacher_scores()
+    dropped_candidates = train_summary.get(
+        "_dropped_candidates", {"words": [], "reasons": {}, "n_clean": None, "n_total": None}
+    )
 
     candidates = load_candidates()
 
@@ -887,12 +929,15 @@ def evaluate_probe(model_path: str | None = None, teacher_scores: dict | None = 
     dim2_floor = dim2_regression_floor(shipped_dim2, probe_dim2["records"])
 
     targeted = targeted_rank_check(candidates, SHIPPED_MODEL, model_path)
+    for word, row in targeted.items():
+        row["trained_on"] = word not in dropped_candidates["words"]
 
     result = {
         "run_name": RUN_NAME,
         "shipped_model": SHIPPED_MODEL,
         "probe_model_path": model_path,
         "forced_cpu_training": FORCED_CPU_TRAINING,
+        "dropped_candidates": dropped_candidates,
         "teacher_scores": teacher_scores,
         "n_dim1_secrets": len({r["secret"] for r in probe_dim1}),
         "n_dim1_scenarios": len(probe_dim1),

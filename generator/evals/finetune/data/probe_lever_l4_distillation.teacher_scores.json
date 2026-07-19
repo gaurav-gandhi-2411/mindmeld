@@ -1,6 +1,6 @@
 {
-  "teacher_model_resolved": "llama3.1:8b",
-  "resolution_reason": "DEVIATION: qwen3:8b not pulled in this environment (verified via /api/tags) -- fell back to llama3.1:8b, same protocol as probe_lever_l2_devanagari_hybrid.py's documented precedent",
+  "teacher_model_resolved": "qwen3:8b",
+  "resolution_reason": "primary model available and responsive",
   "candidates": [
     {
       "word": "tarbooz",
@@ -9,10 +9,11 @@
       "related_gloss": "red",
       "hard_negative": "pyaaz",
       "hard_negative_gloss": "onion",
-      "teacher_model": "llama3.1:8b",
+      "teacher_model": "qwen3:8b",
       "fact_true": true,
-      "score_related": null,
-      "score_hard_negative": null
+      "score_related": 0.9,
+      "score_hard_negative": 0.0,
+      "_validation_problems": []
     },
     {
       "word": "anaar",
@@ -21,10 +22,11 @@
       "related_gloss": "red",
       "hard_negative": "adrak",
       "hard_negative_gloss": "ginger",
-      "teacher_model": "llama3.1:8b",
-      "fact_true": null,
-      "score_related": 0.8,
-      "score_hard_negative": 0.2
+      "teacher_model": "qwen3:8b",
+      "fact_true": true,
+      "score_related": 0.9,
+      "score_hard_negative": 0.0,
+      "_validation_problems": []
     },
     {
       "word": "nariyal",
@@ -33,10 +35,13 @@
       "related_gloss": "white",
       "hard_negative": "peanut",
       "hard_negative_gloss": "peanut",
-      "teacher_model": "llama3.1:8b",
-      "fact_true": null,
-      "score_related": 0.8,
-      "score_hard_negative": 0.2
+      "teacher_model": "qwen3:8b",
+      "fact_true": false,
+      "score_related": 0.0,
+      "score_hard_negative": 0.0,
+      "_validation_problems": [
+        "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+      ]
     },
     {
       "word": "samosa",
@@ -45,10 +50,13 @@
       "related_gloss": "hot",
       "hard_negative": "sauce",
       "hard_negative_gloss": "sauce",
-      "teacher_model": "llama3.1:8b",
+      "teacher_model": "qwen3:8b",
       "fact_true": true,
-      "score_related": 0.6,
-      "score_hard_negative": 0.2
+      "score_related": 0.0,
+      "score_hard_negative": 0.3,
+      "_validation_problems": [
+        "score_related (0.0) <= score_hard_negative (0.3) -- the curated hard negative must score strictly lower than the curated true property"
+      ]
     },
     {
       "word": "mirch",
@@ -57,10 +65,11 @@
       "related_gloss": "red",
       "hard_negative": "dalchini",
       "hard_negative_gloss": "cinnamon",
-      "teacher_model": "llama3.1:8b",
+      "teacher_model": "qwen3:8b",
       "fact_true": true,
-      "score_related": 0.8,
-      "score_hard_negative": 0.2
+      "score_related": 0.9,
+      "score_hard_negative": 0.0,
+      "_validation_problems": []
     },
     {
       "word": "jharna",
@@ -69,10 +78,11 @@
       "related_gloss": "loud",
       "hard_negative": "foliage",
       "hard_negative_gloss": "foliage",
-      "teacher_model": "llama3.1:8b",
+      "teacher_model": "qwen3:8b",
       "fact_true": true,
-      "score_related": 0.2,
-      "score_hard_negative": 0.2
+      "score_related": 1.0,
+      "score_hard_negative": 0.0,
+      "_validation_problems": []
     },
     {
       "word": "til",
@@ -81,10 +91,11 @@
       "related_gloss": "black",
       "hard_negative": "tel",
       "hard_negative_gloss": "oil",
-      "teacher_model": "llama3.1:8b",
-      "fact_true": true,
-      "score_related": 0.5,
-      "score_hard_negative": 0.8
+      "teacher_model": "qwen3:8b",
+      "fact_true": false,
+      "score_related": 0.8,
+      "score_hard_negative": 0.0,
+      "_validation_problems": []
     },
     {
       "word": "dudh",
@@ -93,10 +104,13 @@
       "related_gloss": "white",
       "hard_negative": "syrup",
       "hard_negative_gloss": "syrup",
-      "teacher_model": "llama3.1:8b",
+      "teacher_model": "qwen3:8b",
       "fact_true": true,
-      "score_related": 0.9,
-      "score_hard_negative": 0.2
+      "score_related": 0.0,
+      "score_hard_negative": 0.0,
+      "_validation_problems": [
+        "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+      ]
     }
   ],
   "ollama_blocker": null
