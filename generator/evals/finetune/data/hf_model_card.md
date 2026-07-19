@@ -45,12 +45,26 @@ frozen-layer config stayed within noise of the off-the-shelf baseline; every LoR
 beat it. Layering mined hard negatives onto the best LoRA config (rank 8) pushed held-out
 performance further still. **The bottleneck was optimization capacity, not data.**
 
-## Evaluation (held-out test split, never trained on)
+## Evaluation
 
-Evaluated on a frozen train/dev/test split of the game's secret-word schedule (60 words,
-33/11/16 train/dev/test) plus 5 independently-documented hardest-known cases forced into
-test. All numbers below are on the TEST split only — dev was used purely for checkpoint
-selection during training, never reported as a result.
+**Field-leading claim, on a public, dedicated benchmark**: this model was compared against
+7 off-the-shelf alternatives (including 2 released after this project's original bake-off)
+on a public, scrubbed, 50-secret held-out set — **this model leads all 7 on both metrics,
+CI-significant in all 14 comparisons, zero exceptions** (dim1 semantic-ranking Spearman
+**0.675** [95% CI 0.601, 0.741]; dim2 cross-language pass-rate **0.740** [0.62, 0.86]).
+Full comparison table and methodology:
+[`gauravgandhi2411/hinglish-relatedness-benchmark`](https://huggingface.co/datasets/gauravgandhi2411/hinglish-relatedness-benchmark)
+(a public dataset published alongside this model — the reference romanized-Hinglish
+relatedness benchmark this field didn't previously have). That benchmark's own dev/test
+split achieves dev↔test Pearson r = **0.920** (vs. this earlier ~0.12 problem below),
+so checkpoint-selection decisions built on it are now trustworthy in a way the original
+held-out split wasn't.
+
+**Original held-out generalization claim** (frozen train/dev/test split of the game's
+secret-word schedule, 60 words, 33/11/16 train/dev/test, plus 5 independently-documented
+hardest-known cases forced into test — kept below for historical continuity with this
+model's original ship decision; superseded as the field-leading claim by the public
+benchmark above):
 
 | Metric | Off-the-shelf baseline | This model | Delta (95% paired bootstrap CI) |
 |---|---|---|---|
@@ -63,9 +77,10 @@ selection during training, never reported as a result.
 both models in each draw) rather than comparing two independent confidence intervals —
 this removes shared variance and is the statistically appropriate test for "does the
 candidate beat the baseline on identical items." The marginal (non-paired) confidence
-interval on the baseline alone is considerably wider ([0.223, 0.632]) because the ranking
-metric's independent sample size is only 8 word-clusters — a real limitation of this eval,
-not hidden here (see Limitations).
+interval on the baseline alone is considerably wider ([0.223, 0.632]) because that
+ranking metric's independent sample size is only 8 word-clusters — a real limitation of
+that smaller eval; the public 50-secret benchmark above (42 dim1-eligible secrets) exists
+specifically to fix this.
 
 ## Method
 
@@ -145,10 +160,11 @@ only, matching the base model's training distribution).
   baseline," but readers should not treat 0.7044 as a precise point estimate on a larger
   benchmark.
 - **The training loop's own checkpoint-selection metric barely predicts held-out
-  performance** — across the diagnostic sweep that produced this model, the dev-set metric
-  used for early stopping correlated with the held-out test metric at only Spearman 0.12.
-  Model selection for this release was done by comparing held-out test performance across
-  a controlled sweep of configurations, not by trusting the training-time metric alone.
+  performance on the ORIGINAL small split** — across the diagnostic sweep that produced
+  this model, the dev-set metric used for early stopping correlated with the held-out
+  test metric at only Spearman 0.12 there. **Fixed on the larger public benchmark**
+  (dev↔test Pearson r = 0.920, see Evaluation) — a future re-training run should select
+  checkpoints against that split, not the original one.
 - **The hardest-known cases are improved but not solved.** 5 independently-documented
   hardest word pairs went from a Spearman correlation of ~0 to 0.562 on the ranking metric
   — a large improvement, but still below the 0.7044 full-test-set average, i.e. these
@@ -158,6 +174,20 @@ only, matching the base model's training distribution).
   rising at 100% of available data — more (real, in-domain) training data would likely
   help further; this was not a data-quality ceiling, LoRA's low effective capacity is what
   made the existing data usable without overfitting.
+- **A residual weakness on a specific, characterized (not fully understood) class of
+  short/rare romanized words** — the public benchmark localizes this to the
+  emotion/nature domains specifically (`junoon`/passion, `registan`/desert being the
+  clearest cases). Root cause: these words' own embeddings are dominated by unrelated
+  English words sharing a coincidental subword-tokenization fragment (e.g.
+  `junoon`→afternoon/noon/june) — likely a mix of a base-tokenizer artifact and genuine
+  associative/world-knowledge relatedness this distributional approach doesn't capture
+  for free. **Tested and ruled out**: more of the same style of hard-negative training
+  data at the current LoRA capacity does not reliably fix this (a targeted probe on 9
+  words with the same signature came back statistically null/directionally negative).
+  This is an open, characterized boundary with untested next-attack candidates (higher
+  LoRA capacity, retrieval-time reranking, a base model with better romanized-Hindi
+  tokenization, real player-guess data post-launch) — not a closed, believed-unfixable
+  limitation. Full detail: this project's `docs/known-limitations.md` entry 20.
 
 ## Citation
 
