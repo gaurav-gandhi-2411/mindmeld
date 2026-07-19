@@ -143,6 +143,26 @@ justified; if no -> document as an architectural limitation (retrieval-augmentat
 different-architecture territory), don't spend credits scaling something a cheap probe
 shows won't work. Result pending.
 
+## Probe result: negative, GCP-scale mining NOT recommended on this lever (2026-07-19)
+
+9 no-leakage-verified words with the junoon/registan collision signature already had
+one round of mined hard negatives (shipped model's own training data) and still
+failed. A second, hand-precision-targeted round (fine-tuned via `train_lib.py`'s
+in-memory override, winning LoRA recipe) did NOT move the needle: full-34 dim1 delta
++0.0037 (not sig), dim2 delta -0.0606 (not sig, CI upper bound at exactly zero --
+directionally negative), target words moved inconsistently with zero flips, 2
+unrelated secrets newly regressed. Independently re-verified every number against
+raw JSON before accepting. Documented as known-limitations.md entry 20 (the finding)
+and entry 21 (a real, separate `load_best_model_at_end` bug found as a side effect --
+doesn't affect shipped numbers, flagged for a future fix). Commit `1582a8b`.
+
+**My read**: this satisfies the spec's own stop condition ("don't spend GCP credits
+scaling data a cheap probe shows won't move the metric"). Do not proceed to full
+Phase 2 GCP-scale mining with this same recipe (more contrastive/hard-negative pairs,
+same LoRA capacity) -- awaiting GG's call: accept as a documented limitation and stop
+here, probe a materially different lever first (large-scale iterative mining, higher
+LoRA rank, non-fine-tuning mitigation), or override with reasoning I'm missing.
+
 ## Next
 
 Once the full-suite re-run confirms green, commit the benchmark finalization
