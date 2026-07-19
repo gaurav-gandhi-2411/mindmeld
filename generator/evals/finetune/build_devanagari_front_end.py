@@ -55,9 +55,12 @@ CHECKPOINT_PATH = DATA_DIR / "devanagari_front_end_checkpoint.json"
 OUT_PATH = DATA_DIR / "devanagari_front_end_vocab_table.json"
 
 # Raised from llm_augment.TIMEOUT_SECONDS's default of 90s -- see module
-# docstring. 170s leaves ~80s of margin above the observed 87.8s single-batch
-# time, comfortably clear of the timeout/retry churn the Phase-0 finding hit.
-CALL_TIMEOUT_SECONDS = 170
+# docstring. A live GCP run at 170s still hit the timeout on batch 1's first
+# attempt (337.9s total: 170s timeout + a 167.8s successful retry), so this is
+# raised again to 180s to reduce spurious timeout-then-retry churn -- a
+# timing-calibration session (see PLAN.md) will confirm whether this actually
+# lowers the retry rate.
+CALL_TIMEOUT_SECONDS = 180
 
 # 1 initial attempt + this many retries per batch, applied only to the words
 # still unresolved after the previous attempt (so a batch that resolves
