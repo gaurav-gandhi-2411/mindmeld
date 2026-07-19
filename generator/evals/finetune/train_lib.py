@@ -73,6 +73,7 @@ class TrainConfig:
     lora_r: int = 8
     lora_alpha: int = 16
     lora_dropout: float = 0.1
+    lora_target_modules: list[str] | None = None  # None = LORA_TARGET_MODULES default
     learning_rate: float = 2e-5
     num_epochs: int = 4
     batch_size: int = 16
@@ -145,7 +146,11 @@ def _apply_capacity_control(model: SentenceTransformer, cfg: TrainConfig) -> Sen
             r=cfg.lora_r,
             lora_alpha=cfg.lora_alpha,
             lora_dropout=cfg.lora_dropout,
-            target_modules=LORA_TARGET_MODULES,
+            target_modules=(
+                cfg.lora_target_modules
+                if cfg.lora_target_modules is not None
+                else LORA_TARGET_MODULES
+            ),
             bias="none",
         )
         # `auto_model` is a read-only property aliasing the real backing
