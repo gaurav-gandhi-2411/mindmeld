@@ -512,6 +512,88 @@ sense on top of a better embedding model, not before it.
 **Revisit:** together with the Hinglish fine-tune (entry 1's revisit condition) —
 re-derive band fractions/floors from the improved model's rank distributions.
 
+### 20. Subword-tokenization collision on short/rare romanized Hindi tokens —
+probed with targeted training data, does not reliably move (2026-07-19)
+
+The public 34-secret benchmark (`gauravgandhi2411/hinglish-relatedness-benchmark`,
+v1.1) localized a residual weakness to the emotion/nature domains specifically —
+`junoon`, `registan`, and partially `jheel`/`udaasi` — after two labeling
+artifacts in the benchmark itself (2 degenerate self-identical loanword pairs, 1
+ambiguous EN gloss) were found and fixed and did NOT explain it. Root-caused via
+direct nearest-neighbor inspection: these words' own embeddings are dominated by
+unrelated English words sharing a coincidental subword fragment (`junoon`
+neighbors `afternoon`/`noon`/`june`; `registan` neighbors `register`/`registry`/
+`registration`) — correctly, conventionally spelled romanizations (no better
+spelling exists in vocab), not a transliteration error and not a benchmark-
+editable defect.
+
+**Probed before committing to GCP-scale data mining** (per spec-hinglish-
+research-release.md's own risk section: "don't spend GCP credits scaling data
+that a cheap probe shows won't move the metric"): found 9 other short/rare
+hi-en words (no-leakage-verified against all 60 daily-schedule secrets + every
+pack + the 34 benchmark secrets) with the same collision signature — and
+discovered they ALREADY had one round of mined hard negatives in the shipped
+model's own training data (`hard_negatives.py`'s rank-band-50-500 mining) and
+still failed, meaning "add a hard negative" was already tried and insufficient.
+Built a SECOND, more precisely-targeted round (the literal top confusion word
+per candidate, not a rank-band sample), fine-tuned with the winning LoRA recipe
+(r=8/alpha=16/lr=2e-4/4 epochs) via in-memory data injection (no benchmark or
+training-file leakage), evaluated on the frozen public benchmark.
+
+**Result: no clean win.** Full-34 dim1 Spearman delta +0.0037 [-0.026,+0.033],
+not CI-significant. Dim2 pass-rate delta -0.0606 [-0.152, 0.000], not
+CI-significant but the CI upper bound sits at exactly zero — a directionally
+negative result, not a clean null. The 4 target secrets moved inconsistently
+(registan/jheel modestly closer but still failing; junoon flat; udaasi got
+worse) with zero pass/fail flips. Two previously-passing, unrelated secrets
+(`bhanji`, `judwaa`) newly regressed — not a zero-regression outcome even
+setting the weak headline numbers aside.
+
+**Why accepted (for now):** a second, hand-precision-targeted round of hard
+negatives on a proven-working recipe (0.12% trainable params) failing to move
+9 independently-selected words showing the identical failure signature is
+real evidence against "more of this same kind of data, same LoRA capacity"
+scaling cleanly. Full detail: `generator/evals/finetune/probe_subword_collision.py`,
+`generator/evals/finetune/data/probe_subword_collision.eval_result.json`.
+
+**Revisit:** a materially different lever, not a bigger version of the same
+one — candidates: iterative multi-round hard-negative mining at real scale
+(dozens-to-hundreds of words, not 9), higher LoRA rank/capacity, or a
+non-fine-tuning mitigation (retrieval-time reranking, subword-aware
+tokenization, model ensembling). Test any of these on the same cheap-probe
+pattern before GCP-scale commitment.
+
+### 21. LoRA training's `load_best_model_at_end` silently loads the LAST
+epoch, not the tracked-best one (found 2026-07-19, not yet fixed)
+
+`train_lib.py`'s `SentenceTransformerTrainingArguments(load_best_model_at_end=
+True, metric_for_best_model="eval_dev_spearman_cosine")` does not actually load
+the best-tracked checkpoint for `method="lora"` runs — verified directly
+(reloaded a saved LoRA checkpoint and recomputed its dev Spearman): the saved
+model's dev score exactly matches the LAST epoch's value, not the highest one
+in the run's own dev curve. Root cause not yet isolated (likely a state-dict
+shape mismatch between the live PEFT-wrapped model the trainer holds in memory
+and what gets restored from a saved checkpoint directory, similar in spirit to
+the already-documented `auto_model` read-only-property gotcha in
+`ship_decision_report_v3.md`'s "Gotchas discovered").
+
+**Checked impact on the shipped model**: `obj_hard_neg`'s own dev curve shows
+claimed-best epoch 3 (0.8367) vs actual epoch 4 (0.8353), Δ0.0014 — immaterial,
+and moot regardless: this project's TEST numbers are always computed fresh
+against whatever model artifact was actually saved (never the abstract
+"tracked best" value), and dev is never reported as a result by design (see
+entry 1) — so no previously-shipped or previously-reported number is affected.
+
+**Why not fixed yet:** found as a side effect of the entry-20 probe, out of
+that task's scope. Real risk going forward: any FUTURE LoRA sweep that picks
+between epochs by trusting the trainer's "best" metric (rather than by
+directly re-evaluating the saved artifact, as this project's ship decisions
+already do) could silently ship a worse checkpoint than intended.
+
+**Revisit:** before the next LoRA training sweep — either fix the root cause,
+or at minimum add an assertion that reloads the saved checkpoint and confirms
+its dev score matches the trainer's own claimed best before trusting it.
+
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
 ### 16. Eval baseline report predates the maxGuesses tuning fix
