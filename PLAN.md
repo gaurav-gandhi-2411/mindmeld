@@ -1,3 +1,46 @@
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (STOPPED at Phase 0, 2026-07-19)
+
+GG confirmed L2/L4/L5 GRADUATE from the probe wave below and asked for L2 to be re-tested
+as a candidate NEW BASELINE: a full-vocabulary Devanagari transliteration front-end
+(generalizing L2's existing 4-word hybrid probe to all ~10,495 hi-en vocab words), then
+L4/L5/L6 re-measured STACKED on top of it. GCP session provisioned (`hinglish-rebaseline-
+a1`, n2-standard-8, asia-south1-a, `triageiq-portfolio-495022`), generator/ tree + the
+115MB `aksharantar_hi.jsonl` dict source transferred and MD5-verified, `uv sync` +
+Ollama + qwen3:8b pull all completed clean.
+
+**STOPPED at the task's own explicit mandatory checkpoint**: before committing to the
+full 211-batch LLM fallback pass (5,264/10,495 vocab words have no dict hit and need
+qwen3:8b), one real 25-word batch was timed first, per instruction. Result: 87.8s for a
+successful batch (within 2.2s of the 90s per-call timeout), a second batch timed out at
+90s with 0/25 resolved, and a 4-way-parallel test (`OLLAMA_NUM_PARALLEL=4`) made things
+WORSE (all 4 concurrent batches timed out, 0/100 resolved) — CPU-only 8B-model inference
+on an 8-vCPU VM does not parallelize favorably at this batch size, confirmed empirically,
+not assumed. Extrapolated: 211 batches x ~88-90s = ~309-316 minutes minimum, sequential,
+before any retry overhead — **1.7-1.9x the entire 180-minute session budget, on the LLM
+step alone**, before Phase 2 (L2 scoring), Phase 3 (L4/L6 retrain), Phase 4 (combo
+scoring), or Phase 5 (bake-off) even start. This is exactly the task's own stated stop
+condition, not a judgment call — VM deleted immediately after the finding (uptime ~21
+min, confirmed via `gcloud compute instances list` returning 0 items), estimated spend
+~$0.17-0.18 (compute portion live-queried via Cloud Billing Catalog API: N2 Instance
+Core running in Mumbai $0.03797/vCPU-hr + N2 Instance Ram running in Mumbai
+$0.005088/GB-hr; disk portion is public list price, not live-queried, a minor
+component). Full finding: `generator/evals/finetune/data/
+l2_full_vocab_rebaseline_phase0_finding.json`.
+
+**Zero words resolved via LLM this session** — the dict-primary resolution (5,231/10,495
+direct hits, confirmed matches the prior recon's numbers exactly) is real and cheap
+(<1s, no LLM needed), but a "full vocab" front-end table was deliberately NOT written
+partially, since a dict-only table silently mislabeled as "full vocab" would misrepresent
+what Phase 2 onward actually measured. Phases 1 (LLM half) through 5 are all untouched.
+
+**Awaiting GG's call before any further GCP spend** on one of: (a) a smaller-scope
+DICT-ONLY front-end (~50% vocab coverage, explicitly labeled as such, not "full vocab"),
+(b) a dedicated follow-up session budgeted ~5-6 hours just for the LLM transliteration
+pass, or (c) a different/faster teacher model for this specific bulk task (untested for
+transliteration accuracy, a quality tradeoff needing sign-off, not a unilateral swap).
+
+---
+
 # PLAN — Hinglish residual-attack probe wave (STOP gate reached, 2026-07-19)
 
 Spec: `spec-residual-attack.md`. Probed all 6 non-combination levers (L1-L6)
