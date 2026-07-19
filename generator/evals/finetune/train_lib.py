@@ -160,6 +160,61 @@ def _apply_capacity_control(model: SentenceTransformer, cfg: TrainConfig) -> Sen
     raise ValueError(f"unknown capacity-control method: {cfg.method!r}")
 
 
+def _load_best_lora_checkpoint(
+    model: SentenceTransformer,
+    trainer: SentenceTransformerTrainer,
+    dev_evaluator: EmbeddingSimilarityEvaluator,
+) -> None:
+    """
+    Work around a real bug in transformers.Trainer._load_best_model(): it
+    branches on `_is_peft_model(self.model)`, but for
+    SentenceTransformerTrainer `self.model` is the OUTER SentenceTransformer
+    container, never a PeftModel itself -- the PeftModel lives nested at
+    `model[0].auto_model`. `_is_peft_model` therefore returns False, so the
+    Trainer's load falls through to its non-PEFT branch, which looks for a
+    full `model.safetensors`/`pytorch_model.bin` in the checkpoint dir -- but
+    a LoRA checkpoint only ever contains `adapter_model.safetensors`.
+    `load_best_model_at_end=True` therefore silently keeps whatever weights
+    the LAST epoch left in the live model, never actually restoring the
+    tracked-best epoch. Reproduced directly: reloading a saved LoRA
+    checkpoint and recomputing its dev score exactly matched the last
+    epoch's value, not the best-tracked one (docs/known-limitations.md
+    entry 21).
+
+    Fix: explicitly load the best checkpoint's adapter weights into the live
+    PeftModel via `peft.set_peft_model_state_dict` (the correct low-level
+    restoration API -- bypasses the Trainer's broken auto-detection
+    entirely), then verify the reload actually worked by recomputing the dev
+    score and asserting it matches the tracked best. Fails loudly, not
+    silently, if the checkpoint file is missing or the reload doesn't
+    reproduce the tracked score -- this must never again fail silent.
+    """
+    from peft import set_peft_model_state_dict
+    from safetensors.torch import load_file
+
+    best_checkpoint = Path(trainer.state.best_model_checkpoint)
+    adapter_path = best_checkpoint / "adapter_model.safetensors"
+    if not adapter_path.exists():
+        raise RuntimeError(
+            f"expected LoRA adapter checkpoint at {adapter_path}, not found -- "
+            "cannot restore the trainer's tracked-best checkpoint"
+        )
+
+    peft_model = model[0].auto_model
+    state_dict = load_file(str(adapter_path))
+    set_peft_model_state_dict(peft_model, state_dict)
+
+    reloaded_score = dev_evaluator(model)["dev_spearman_cosine"]
+    expected = trainer.state.best_metric
+    if abs(reloaded_score - expected) > 1e-4:
+        raise RuntimeError(
+            f"best-checkpoint reload verification FAILED: recomputed dev "
+            f"spearman {reloaded_score:.6f} != trainer's tracked best "
+            f"{expected:.6f} (checkpoint {best_checkpoint}) -- the restored "
+            "weights do not match what the trainer claims is the best epoch"
+        )
+
+
 def _merge_lora_if_needed(model: SentenceTransformer, cfg: TrainConfig) -> SentenceTransformer:
     if cfg.method != "lora":
         return model
@@ -248,6 +303,9 @@ def run_training(cfg: TrainConfig) -> dict:
         callbacks=callbacks,
     )
     trainer.train()
+
+    if cfg.method == "lora" and trainer.state.best_model_checkpoint is not None:
+        _load_best_lora_checkpoint(model, trainer, dev_evaluator)
 
     # Snapshot trainable/total param counts BEFORE the LoRA merge -- merging
     # folds adapter weights into plain frozen Linear layers and zeroes out

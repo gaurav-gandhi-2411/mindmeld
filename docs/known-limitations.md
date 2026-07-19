@@ -563,36 +563,48 @@ non-fine-tuning mitigation (retrieval-time reranking, subword-aware
 tokenization, model ensembling). Test any of these on the same cheap-probe
 pattern before GCP-scale commitment.
 
-### 21. LoRA training's `load_best_model_at_end` silently loads the LAST
-epoch, not the tracked-best one (found 2026-07-19, not yet fixed)
+### 21. FIXED (2026-07-19) — LoRA training's `load_best_model_at_end` was
+silently loading the LAST epoch, not the tracked-best one
 
 `train_lib.py`'s `SentenceTransformerTrainingArguments(load_best_model_at_end=
-True, metric_for_best_model="eval_dev_spearman_cosine")` does not actually load
+True, metric_for_best_model="eval_dev_spearman_cosine")` did not actually load
 the best-tracked checkpoint for `method="lora"` runs — verified directly
 (reloaded a saved LoRA checkpoint and recomputed its dev Spearman): the saved
-model's dev score exactly matches the LAST epoch's value, not the highest one
-in the run's own dev curve. Root cause not yet isolated (likely a state-dict
-shape mismatch between the live PEFT-wrapped model the trainer holds in memory
-and what gets restored from a saved checkpoint directory, similar in spirit to
-the already-documented `auto_model` read-only-property gotcha in
-`ship_decision_report_v3.md`'s "Gotchas discovered").
+model's dev score exactly matched the LAST epoch's value, not the highest one
+in the run's own dev curve.
+
+**Root cause, isolated**: `transformers.Trainer._load_best_model()` branches
+on `_is_peft_model(self.model)` — but for `SentenceTransformerTrainer`,
+`self.model` is the OUTER `SentenceTransformer` container, never the nested
+`PeftModel` (which lives at `model[0].auto_model`). `_is_peft_model` therefore
+always returns `False` for a LoRA run, so the Trainer's checkpoint-loading
+logic falls through to its non-PEFT branch, which looks for a full
+`model.safetensors`/`pytorch_model.bin` in the checkpoint directory — but a
+LoRA checkpoint only ever contains `adapter_model.safetensors`. The load
+silently no-ops rather than raising.
+
+**Fixed**: `train_lib._load_best_lora_checkpoint()` explicitly restores the
+best checkpoint's adapter weights via `peft.set_peft_model_state_dict` right
+after `trainer.train()` returns (bypassing the Trainer's broken PEFT
+auto-detection entirely), then verifies the reload by recomputing the dev
+score and asserting it matches the trainer's own tracked-best value — raises
+loudly, not silently, if the checkpoint file is missing or the reload doesn't
+reproduce the expected score. Regression test:
+`tests/test_train_lib_lora_best_checkpoint.py` — runs a real (small, 2-epoch)
+LoRA training loop and asserts the saved model's actual dev score matches the
+tracked best, not merely whatever the last epoch produced; a mock-only test
+would not have caught the original bug, since it's a real interaction between
+`SentenceTransformerTrainer`, PEFT, and the transformers `Trainer`'s
+checkpoint I/O.
 
 **Checked impact on the shipped model**: `obj_hard_neg`'s own dev curve shows
 claimed-best epoch 3 (0.8367) vs actual epoch 4 (0.8353), Δ0.0014 — immaterial,
 and moot regardless: this project's TEST numbers are always computed fresh
 against whatever model artifact was actually saved (never the abstract
 "tracked best" value), and dev is never reported as a result by design (see
-entry 1) — so no previously-shipped or previously-reported number is affected.
-
-**Why not fixed yet:** found as a side effect of the entry-20 probe, out of
-that task's scope. Real risk going forward: any FUTURE LoRA sweep that picks
-between epochs by trusting the trainer's "best" metric (rather than by
-directly re-evaluating the saved artifact, as this project's ship decisions
-already do) could silently ship a worse checkpoint than intended.
-
-**Revisit:** before the next LoRA training sweep — either fix the root cause,
-or at minimum add an assertion that reloads the saved checkpoint and confirms
-its dev score matches the trainer's own claimed best before trusting it.
+entry 1) — so **no previously-shipped or previously-reported number changed**;
+this fix only protects FUTURE training runs, which is why it was worth doing
+immediately despite being found as a side effect of the entry-20 probe.
 
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
