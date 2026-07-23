@@ -1,3 +1,34 @@
+# PLAN — L2-patch + L5 combination (CLEARS ship bar, 2026-07-23)
+
+GG confirmed: L2 ships ONLY as the narrow targeted-word patch (4 words,
+junoon/registan/jheel/udaasi-class), full-vocab front-end is dead, do not
+revisit. Scored the narrow L2-patch COMBINED with L5 (ranking-override, 8
+curated commonsense words) against the frozen benchmark, no GCP needed.
+`probe_l2_patch_l5_combined.py`, committed `38ec4ba`.
+
+**Structural finding (verified by computation, not assumed): L5 is
+mathematically orthogonal to the 34-secret frozen benchmark** -- its
+rank-override only ever touches one of its own 8 candidate secrets' arrays,
+confirmed zero overlap with the benchmark's 34 secrets. So the combination's
+benchmark score == L2-patch-alone's, reproduced fresh (matches the
+2026-07-19 probe exactly): **dim1 0.6568->0.7170 (+0.0602, CI
+[-0.0017,+0.1435], NOT CI-significant -- barely touches zero), dim2
+0.7273->0.8485 (+0.1212, CI [+0.0303,+0.2424], CI-SIGNIFICANT).** Regression
+floor: 10 fixed/0 broken (dim1), 4 fixed/0 broken (dim2) -- STRICT zero
+regression, nothing broke. L5's own effect (run genuinely on the L2-patched
+matrix): all 8 commonsense words forced to correct band, 0 side effects.
+
+**Ship bar (CI-significant dim1 and/or dim2 + zero net regression):
+CLEARED via dim2.** L2-patch+L5 may already be sufficient to ship without
+L4's retrain -- L4 would only add value for a stronger/more-certain dim1
+result or broader commonsense coverage beyond L5's 8 curated words.
+
+**STOPPED here per GG's instruction** -- awaiting the L4-retrain go/no-go
+decision (the one remaining GCP-cost item) now that L2-patch+L5's baseline
+is known.
+
+---
+
 # PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 2 DONE, L2 FAILS ship gate, 2026-07-23)
 
 **Phase 2 (score L2 at scale) complete -- L2-as-front-end does NOT carry
