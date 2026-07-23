@@ -1,3 +1,59 @@
+# PLAN — SHIPPED: L2-patch + L5 in production (2026-07-23)
+
+GG confirmed ship decision: L2-patch + L5, skip L4. Full ship executed:
+
+1. **Production wiring**: L2 (targeted 4-word Devanagari patch,
+   `vocab.apply_devanagari_patch`) + L5 (ranking-time override,
+   `payload._build_payload_core`) wired into all 3 build entry points.
+   Zero runtime cost, no model retrain. `rival.scorching_cutoff` extracted
+   for reuse. Caught + fixed a real production issue the probe couldn't see:
+   L5 must splice `sims[target_idx]` too, not just rank, or the app's
+   displayed similarity % (guess_tile.dart) would contradict the band.
+   Commits `8333513`, `22cfcbd` (verification). 514 tests pass.
+2. **End-to-end re-verification** (not just probe scripts): benchmark parity
+   confirmed via the REAL production embedding path, byte/value-identical to
+   the combined probe's numbers. L5 live-payload check via real
+   `payload.build_payload()`: all 8 words forced to rank 50/scorching band,
+   displayed similarity 84-90% (consistent, not confusing).
+3. **Cards updated + published live**: HF model card gets a new "Production
+   wrapper" section (numbers clearly separated from the unchanged raw-model
+   headline), Limitations section updated (L1/L3/full-vocab-L2 marked PROVEN
+   DEAD, L2-patch+L5 marked shipped, L4/L6 marked open-for-future). Benchmark
+   card notes the downstream mitigation while keeping its own numbers
+   unwrapped (stays a fair ruler). Both verified live via direct fetch.
+   Commits `6fa6847`, `2af0f12` (one scrub-gate reformat fix, caught
+   correctly by the leak-prevention check, not bypassed).
+4. **Payloads regenerated + deployed**: daily hi-en (60 days, 2026-06-12 to
+   2026-08-10 — caught and fixed a real mistake mid-session: an initial
+   30-day run only regenerated the STALE half of the window and would have
+   left manifest.json under-reporting available days) + onboarding + both
+   live packs (bollywood, cricket) for both langs (en byte-differs from old
+   content but is independently deterministic/reproducible — confirmed via
+   double-build sha256 match — so this is pre-existing drift, not new
+   non-determinism). All byte-verified against the live CDN after push.
+5. **GCP confirmed zero billable resources** (0 instances/disks/snapshots/
+   images) — this entire ship phase used no GCP at all, L4 was skipped.
+6. **Live spot-check**: partial. Decoded the actual byte-verified live CDN
+   payload for today with the app's real algorithm — junoon/registan/jheel/
+   udaasi/tarbooz/dudh all process correctly (found, sane rank/band/%,
+   qsim-band consistency holds) as GUESSES against today's (unrelated)
+   secret. A literal in-browser play-test was blocked by an environment
+   issue (chrome-devtools MCP stuck at the server level, not a stale lock,
+   not resolvable from this session) — not something to claim as done.
+   **L5 is verified-correct in production code but currently DORMANT**: none
+   of its 8 trigger words (tarbooz/anaar/nariyal/samosa/mirch/jharna/til/
+   dudh) are in the current scheduled secrets file, so it has never yet
+   fired on a real puzzle. Adding one to the schedule is a content decision
+   for a future session if GG wants to see it live.
+
+**L4/L6 status for future resume**: both remain live, untested-at-scale
+levers, not closed. L4 (distillation) has a bounded, zero-regression result
+on trained words only (checkpoint lost with the deleted VM, needs retrain).
+L6 (commonsense data) is genuinely inconclusive (5/8 held-out improved, 3/8
+regressed, n=8 too small). Full context: `spec-residual-attack.md`.
+
+---
+
 # PLAN — L2-patch + L5 combination (CLEARS ship bar, 2026-07-23)
 
 GG confirmed: L2 ships ONLY as the narrow targeted-word patch (4 words,
