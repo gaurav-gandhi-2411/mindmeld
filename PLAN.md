@@ -1,3 +1,37 @@
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 1 DONE, 2026-07-23)
+
+**Phase 1 (LLM transliteration pass) complete.** Resumed from the 27/210-batch
+checkpoint on a fresh GCP VM (`hinglish-rebaseline-b1`, n2-standard-8,
+asia-south1-a, `triageiq-portfolio-495022`). qwen3:8b ran all 184 remaining
+batches clean (zero errors), avg 100s/batch, ~5h11m wall clock:
+4989/5264 LLM misses resolved, 275 unresolved (dict covered 5231/10495 free).
+
+The 275 misses included **junoon and registan** -- 2 of the 4 flagship
+subword-collision words this whole L2 lever exists to fix -- so the table as
+first built didn't cover its own primary target case. Ran a second fallback
+pass (`resolve_devanagari_llama_fallback.py`) with llama3.1:8b, the same
+secondary-fallback protocol `probe_lever_l2_devanagari_hybrid.py` already used
+and had graduate on those exact 4 words. Closed 192/275 (28 still null after
+both LLMs -- mostly loanwords/compounds: computer, mobile, camera, washing
+machine, etc. -- left null, never fabricated). **Final: 10467/10495 (99.7%)
+resolved; junoon/registan/jheel/udaasi all resolved.** Committed `3050659`.
+
+GCP torn down and verified empty (instances/disks/snapshots/images) after
+each session. Total this session's VM uptime ~6h10m; estimated compute spend
+~$2.90 (public list price basis, same methodology as the Phase-0 finding --
+not live-billing-queried this time). Cumulative program spend to date
+(Phase 0 $0.17-0.18 + probe wave $0.536 + this session ~$2.90) ≈ **~$3.6-3.7**.
+
+**Next: Phase 2** -- score L2-as-full-front-end against the frozen benchmark +
+regression floor (all currently-working pairs must not break). Then Phase 3
+(retrain L4/L6, checkpoints lost with the deleted VM), Phase 4 (combo scoring:
+L2 alone / L2+L4 / L2+L5 / L2+L4+L5), optionally Phase 5 (bake-off). **STOP
+gate unchanged: present the final combined comparison table for GG's review
+before shipping anything** -- ship criteria (CI-significant win + zero net
+regression) also unchanged.
+
+---
+
 # PLAN — L2 full-vocab Devanagari front-end rebaseline (STOPPED at Phase 0, 2026-07-19)
 
 GG confirmed L2/L4/L5 GRADUATE from the probe wave below and asked for L2 to be re-tested
