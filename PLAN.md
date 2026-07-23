@@ -1554,11 +1554,76 @@ orchestrator review), live-verified 2026-07-11.
   `test_topheavy_metrics.py`), confirmed `--report` mode is byte-identical across reruns (seed=42),
   and caught one reporting error (see the Qwen/Granite correction above) that the executor's own
   summary got backwards.
-- [ ] **STOP POINT for GG** (spec-model-excellence.md's own stop point 1): review the re-run
-  comparison above before Workstream B (systematic failure analysis + full-vocab collision scan)
-  starts. Nothing has been committed -- all changes are unstaged/untracked in the working tree
-  pending your review. Open question for you: the new metric suite and its bake-off re-run are
-  additive (nothing deleted, nothing shipped to production/HF), so there's no regression risk in
-  proceeding -- but flag if you want the ECE formulation (rank-percentile proxy, documented in
-  `topheavy.band_calibration_error`'s docstring as one defensible choice among several) reviewed
-  before it becomes a standing headline number.
+- [x] **STOP POINT for GG cleared** (spec-model-excellence.md's own stop point 1): GG reviewed,
+  approved committing (`00b0bfd`), and confirmed the ECE formulation stands as-is. Workstream B
+  started immediately after.
+
+## Model Excellence Program -- Workstream B COMPLETE (`ac6f41d`), STOP POINT for GG (sharm patch)
+
+- [x] **Item 8, full-vocab collision scan**: `evals/finetune/collision_scan.py` scans all 544
+  hinglish-sourced words (reconstructed origin split: 544 hinglish-sourced / 9,951 english-sourced
+  out of 10,495 total) for the subword-collision signature (top-15 neighbors dominated by
+  orthographically-similar english-sourced tokens). Calibrated against the 4 already-shipped L2
+  words + `probe_subword_collision.py`'s 9 hand-picked candidates at threshold=0.2, K=15 -- catches
+  junoon (0.467)/registan (0.400) cleanly, misses naukri/udaasi (0.000, zero-bigram-overlap/only
+  "partially confirmed" in the source probe respectively, a documented signature limitation, not a
+  bug). **211/544 (38.8%) flagged collision-prone.**
+- [x] **Item 8, gated extension attempt** (`evals/finetune/probe_l2_collision_scan_extension.py`,
+  staging-only -- `vocab/hi-en-devanagari-patch.txt` verified byte-identical throughout, confirmed
+  independently by the verifier): the full 58-word dict-coverable candidate batch (154 of 211
+  flagged words excluded for lacking an Aksharantar entry) **FAILS** the repo's strict
+  zero-broken-pairs gate (4 broken dim1 pairs, 1 broken dim2 pair) via the same collateral-noise
+  mechanism that killed the earlier full-vocab attempt (`probe_l2_dict_only_front_end`) -- one break
+  is a genuine Aksharantar mapping bug (chinta/worry -> छींटा "splash", wrong word), the rest are
+  whole-embedding-manifold noise from inserting new vocabulary text. Bisection (40/20/10/5-word
+  prefixes) found **no safe subset** at any of those sizes. **A minimal +1 word extension (`sharm`
+  -> शरम, the single most-severe flagged word) DOES clear both gates cleanly**: 0 broken pairs
+  dim1/dim2, CI-significant improvement on every Workstream A topheavy submetric (MRR delta +0.050
+  CI [0.012, 0.098], NDCG/Recall similarly positive, zero regressions anywhere).
+  **STOP POINT for GG**: should `sharm: शरम` be added to the LIVE `vocab/hi-en-devanagari-patch.txt`
+  (5th entry)? Fully gated and verified safe, but this is live game-content, not committed
+  pending your go/no-go -- same production-blast-radius caution as any daily-secret-affecting
+  change. `apply_devanagari_patch` is invoked from `build.py:137` and `build_packs.py:302`, both
+  in the live payload-generation path (`publish.py` imports `build.py`), confirmed by direct grep.
+- [x] **Items 5-7, failure taxonomy**: local-Ollama-judge ($0 cost) classification of all 124
+  failing shipped-model pairs -- genuine_semantic_difficulty 99/124 (79.8%), transliteration_artifact
+  14 (11.3%), polysemy/commonsense/label_error/vocab_resolution_gap the remainder. 4/4 agreement
+  with hand-labeled calibration examples. Cross-referenced against the collision scan: 57/124 (46%)
+  of failing pairs have an independently collision-flagged secret -- real, computed evidence
+  (verified) that the raw per-pair taxonomy undercounts subword-collision as a cause, since the
+  judge never sees the secret's full neighbor list when classifying one pair at a time.
+- [x] **Item 6, frequency buckets**: self-caught and fixed a real bug mid-task (initial version
+  ranked english-sourced words against the full 55k-word `en.txt` instead of the ~9,951 actually
+  in the hi-en vocab, forcing 365/379 records into "head" by construction; post-fix code
+  independently confirmed by the verifier to correctly scope to the in-vocab subset). Final result:
+  **no clean head/tail penalty** -- tail scores *better* than head (-22.8%, inverted from the
+  expected direction), flagged honestly as a likely tier-composition confound (far-tier decoys
+  concentrate in "tail") rather than overclaimed as a genuine frequency effect. 57.2% of
+  hinglish-sourced words have unresolved frequency (garbage-transliteration vs. genuine-rarity is
+  not automatically distinguishable) -- reported as its own bucket, not silently folded into tail.
+- [x] **Item 7, domain/POS**: domain breakdown covers only the 34 benchmark-supplement secrets
+  (original 25 production secrets have no domain field, explicitly left unlabeled rather than
+  guessed) -- weakest domain: emotion (61.4% in-expected-band rate). POS/concreteness via the same
+  local judge (no new spaCy/nltk dependency, code-mixed English+romanized-Hindi words don't suit an
+  English-only tagger anyway) -- weakest POS: noun (63.0%). Both flagged as AI-derived, unverified
+  labels, same epistemic status as the benchmark's own near/mid/far tiers.
+- [x] **Biggest single finding, independently corroborates Workstream A**: 83/84 resolved mid-tier
+  records fail because the mid-tier's only accepted band (`warm`, band 3) is a **24-rank window out
+  of 10,495 (0.23% of vocab)** -- vs near-tier's 499-rank window and far-tier's 9,971-rank window.
+  Arithmetic independently re-verified by the verifier from `rival.band_for_rank` directly
+  (hot_max=max(500,104)=500, warm_max=int(10495*0.05)=524, so warm=ranks 501-524). This is very
+  likely a **benchmark band-width design artifact**, not primarily a model defect, and directly
+  matches Workstream A's band-confusion-matrix finding that Warm is nearly never predicted
+  (2 predictions vs 84 expected). **Top recommended target for Workstream F** (widen mid-tier's
+  accepted bands and re-measure, or otherwise address the Warm-band-width issue
+  `docs/known-limitations.md` already flagged from the width-arithmetic side).
+- [x] **Verification**: independent verifier subagent confirmed (1) live patch file empty diff,
+  (2) +1-word gate numbers match the raw eval_result JSON exactly (not just prose), (3) calibration
+  threshold reasoning is defensible not post-hoc-rationalized, (4) band-width arithmetic is correct,
+  (5) frequency-bucket fix is real in the post-fix code, (6) 63 new tests pass, (7) nothing
+  committed by either executor, (8) the 57/124 cross-reference is a real computed join not an
+  invented number. Overall verdict: PASS, trustworthy to report and commit.
+- [ ] **STOP POINT for GG**: (1) go/no-go on adding `sharm: शरम` to the live L2 patch (see above);
+  (2) go/no-go on proceeding to Workstream C (robustness suite + spelling-invariance USP) next,
+  per spec-model-excellence.md's ordering. Nothing else blocking -- all analysis code/reports are
+  committed (`ac6f41d`).
