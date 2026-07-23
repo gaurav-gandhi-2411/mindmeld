@@ -98,8 +98,14 @@ applied automatically.
    the word's **Devanagari** spelling to this model's encoder instead of the romanized form —
    the base tokenizer handles Devanagari script far better. Every other layer (secret
    matching, hints, on-screen text) still uses the romanized spelling; only the embedding
-   input changes, for exactly 4 words (`junoon`, `registan`, `jheel`, `udaasi`). **This is
-   deliberately narrow, not a general front-end**: applying the same substitution to the
+   input changes, for a short, fixed list of confirmed collision words (one per line, so
+   as not to imply any relatedness pairing between them):
+   - `junoon`
+   - `registan`
+   - `jheel`
+   - `udaasi`
+
+   **This is deliberately narrow, not a general front-end**: applying the same substitution to the
    ~5,200 other Aksharantar-dictionary-coverable vocabulary words was tested at full scale and
    found to CI-significantly *regress* dim1 (0.6568 → 0.4731, 19 previously-correct pairs
    broken) — this model is fine-tuned on romanized text, so broad Devanagari substitution
