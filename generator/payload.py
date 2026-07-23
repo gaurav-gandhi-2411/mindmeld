@@ -40,7 +40,8 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
-from rival import generate_rival_data, max_guesses_for_par
+from rival import generate_rival_data, max_guesses_for_par, scorching_cutoff
+from vocab import load_commonsense_overrides
 
 
 def levenshtein(a: str, b: str) -> int:
@@ -198,6 +199,30 @@ def _build_payload_core(
     ranks = np.empty(len(vocab), dtype=np.int32)
     for rank_minus1, idx in enumerate(order):
         ranks[idx] = rank_minus1 + 1
+
+    # L5 lever (spec-residual-attack.md): ranking-time knowledge override for
+    # the associative-commonsense residual. If this puzzle's secret has a
+    # curated commonsense-related word, force that ONE word's rank to the
+    # scorching cutoff -- a single-array-element splice (verified zero side
+    # effects on every other word: generator/evals/finetune/
+    # probe_lever_l5_rank_override.py). Non-fine-tuning, hi-en only, no-op
+    # on any day whose secret isn't one of the 8 curated words.
+    #
+    # sims[target_idx] is spliced too, not just ranks[target_idx]: the app
+    # displays a similarity PERCENTAGE straight from qsim, independent of
+    # band (guess_tile.dart's simPct) -- forcing only the rank would show
+    # "SCORCHING" next to a low true-cosine percentage, an inconsistent,
+    # confusing player-facing result the probe never had to consider (it
+    # only measured rank/band in isolation, not a real payload). Borrows the
+    # REAL similarity already held by whichever word naturally sits at the
+    # forced rank, rather than inventing a number.
+    if lang == "hi-en":
+        related = load_commonsense_overrides().get(secret_lower)
+        if related is not None and related in vocab:
+            target_idx = vocab.index(related)
+            forced_rank = scorching_cutoff(len(vocab))
+            sims[target_idx] = sims[order[forced_rank - 1]]
+            ranks[target_idx] = forced_rank
 
     # Build words dict: {hash12: [rank, qsim]}
     words_map: dict[str, list[int]] = {}

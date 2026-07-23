@@ -19,6 +19,11 @@ def _rival_seed(secret: str, puzzle_date_iso: str) -> bytes:
     return hashlib.sha1(raw.encode()).digest()  # noqa: S324
 
 
+def scorching_cutoff(n: int) -> int:
+    """The tightest 'near' threshold: rank <= max(50, n * 0.001) is 'scorching'."""
+    return max(50, int(n * 0.001))
+
+
 def band_for_rank(rank: int, n: int) -> int:
     """
     Python mirror of Dart's bandForRank().
@@ -35,8 +40,7 @@ def band_for_rank(rank: int, n: int) -> int:
     """
     if rank == 1:
         return 0
-    scorching_max = max(50, int(n * 0.001))
-    if rank <= scorching_max:
+    if rank <= scorching_cutoff(n):
         return 1
     hot_max = max(500, int(n * 0.01))
     if rank <= hot_max:
@@ -74,13 +78,13 @@ _TIER_PARAMS: dict[str, tuple[float, float, float, float]] = {
     # even tier) can violate the sharp_spread upper bound deterministically. The
     # Gaussian noise on early/late factors already provides enough path variety.
     "sharp": (0.20, 0.00, 0.90, 0.84),
-    "even":  (0.40, 0.00, 0.85, 0.62),
+    "even": (0.40, 0.00, 0.85, 0.62),
     "chill": (0.60, 0.00, 0.75, 0.42),
 }
 
 # Independent per-tier seed offsets so tiers don't share correlated RNG state.
 _TIER_OFFSETS: dict[str, int] = {
-    "even":  0x0000_0000,
+    "even": 0x0000_0000,
     "chill": 0xCAFE_BABE,
     "sharp": 0xDEAD_BEEF,
 }

@@ -55,7 +55,7 @@ from packs import (  # noqa: E402
     validate_pack_content,
 )
 from payload import _is_morphological_variant, build_pack_payload, write_pack_payload  # noqa: E402
-from vocab import load_en_vocab, load_hien_vocab  # noqa: E402
+from vocab import apply_devanagari_patch, load_en_vocab, load_hien_vocab  # noqa: E402
 
 LANG_LOADERS = {
     "en": load_en_vocab,
@@ -288,13 +288,7 @@ def main(argv: list[str] | None = None) -> None:
     # Only load vocab/embeddings for langs actually needed by a live, selected pack —
     # avoids a model load entirely when building only coming-soon packs.
     needed_langs = sorted(
-        {
-            lang
-            for pack in selected
-            if pack.status == "live"
-            for lang in pack.langs
-            if lang in langs
-        }
+        {lang for pack in selected if pack.status == "live" for lang in pack.langs if lang in langs}
     )
 
     vocab_by_lang: dict[str, list[str]] = {}
@@ -303,7 +297,11 @@ def main(argv: list[str] | None = None) -> None:
         print(f"[{lang}] Loading vocab...")
         vocab_by_lang[lang] = LANG_LOADERS[lang]()
         print(f"[{lang}] Embedding vocab (may load model on first run)...")
-        matrix_by_lang[lang] = embed_vocab(vocab_by_lang[lang], lang, show_progress=True)
+        # L2 lever (spec-residual-attack.md): see build.py's identical comment.
+        embed_input = (
+            apply_devanagari_patch(vocab_by_lang[lang]) if lang == "hi-en" else vocab_by_lang[lang]
+        )
+        matrix_by_lang[lang] = embed_vocab(embed_input, lang, show_progress=True)
 
     processed: dict[str, int] = {}
     any_size_violation = False

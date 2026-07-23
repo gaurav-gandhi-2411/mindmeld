@@ -15,6 +15,7 @@ Hinglish vocab:
 """
 
 import re
+from functools import lru_cache
 from pathlib import Path
 
 from config import EN_MAX_LEN, EN_MIN_LEN, EN_TOP_N, EN_VOCAB_MAX, HIEN_EN_TOP_N, VOCAB_DIR
@@ -179,3 +180,66 @@ def load_hien_vocab() -> list[str]:
             combined.append(w)
             seen.add(w)
     return combined
+
+
+# ---------------------------------------------------------------------------
+# Residual-attack production levers (spec-residual-attack.md): L2's targeted
+# Devanagari-embedding patch and L5's ranking-time commonsense overrides.
+# Both are small, curated, build-time-only data files -- same
+# "key: value  # comment" format as hi-en-aliases.txt.
+# ---------------------------------------------------------------------------
+
+_DEVANAGARI_PATCH_FILE = VOCAB_DIR / "hi-en-devanagari-patch.txt"
+_COMMONSENSE_OVERRIDES_FILE = VOCAB_DIR / "hi-en-commonsense-overrides.txt"
+
+
+def _parse_kv_file(path: Path) -> dict[str, str]:
+    """Parse a 'key: value  # comment' file into {key: value}, both
+    lowercased/stripped. Blank lines and full-line comments skipped. Empty
+    dict if the file doesn't exist -- these levers are opt-in, never
+    required for a build to succeed."""
+    result: dict[str, str] = {}
+    if not path.exists():
+        return result
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "#" in line:
+            line = line[: line.index("#")].strip()
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip().lower()
+        value = value.strip()
+        if key and value:
+            result[key] = value
+    return result
+
+
+@lru_cache(maxsize=1)
+def load_devanagari_patch() -> dict[str, str]:
+    """{romanized_word: devanagari_spelling} for lever L2's narrow, confirmed
+    subword-collision word list (vocab/hi-en-devanagari-patch.txt)."""
+    return _parse_kv_file(_DEVANAGARI_PATCH_FILE)
+
+
+def apply_devanagari_patch(vocab: list[str]) -> list[str]:
+    """
+    Return a NEW list positionally aligned to `vocab`, with each patched
+    word's TEXT replaced by its Devanagari spelling -- for feeding to
+    embed_vocab ONLY. `vocab` itself must stay unchanged so every downstream
+    consumer (word_to_idx, secret matching, hints, display) keeps using the
+    romanized spelling; only the embedding input differs at patched
+    positions. A no-op copy when the patch file is empty/absent.
+    """
+    patch = load_devanagari_patch()
+    return [patch.get(w, w) for w in vocab]
+
+
+@lru_cache(maxsize=1)
+def load_commonsense_overrides() -> dict[str, str]:
+    """{secret: related_word} for lever L5's ranking-time knowledge
+    overrides (vocab/hi-en-commonsense-overrides.txt) -- see
+    payload._build_payload_core for where the override is applied."""
+    return _parse_kv_file(_COMMONSENSE_OVERRIDES_FILE)

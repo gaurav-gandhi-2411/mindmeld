@@ -50,7 +50,7 @@ from config import (  # noqa: E402
 from embeddings import embed_vocab  # noqa: E402
 from payload import _gzip_json, build_pack_payload  # noqa: E402
 from profanity import is_profane, load_en_profanity, load_hi_profanity  # noqa: E402
-from vocab import load_en_vocab, load_hien_vocab  # noqa: E402
+from vocab import apply_devanagari_patch, load_en_vocab, load_hien_vocab  # noqa: E402
 
 LANG_LOADERS = {
     "en": load_en_vocab,
@@ -223,7 +223,9 @@ def main(argv: list[str] | None = None) -> None:
         vocab = LANG_LOADERS[lang]()
         print(f"[onboarding/{lang}] Vocab size: {len(vocab):,}")
         print(f"[onboarding/{lang}] Embedding vocab (may load model on first run)...")
-        matrix = embed_vocab(vocab, lang, show_progress=True)
+        # L2 lever (spec-residual-attack.md): see build.py's identical comment.
+        embed_input = apply_devanagari_patch(vocab) if lang == "hi-en" else vocab
+        matrix = embed_vocab(embed_input, lang, show_progress=True)
 
         try:
             build_and_write_onboarding(lang, vocab, matrix, out_dir)

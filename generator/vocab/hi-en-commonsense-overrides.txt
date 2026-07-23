@@ -1,0 +1,23 @@
+# Ranking-time knowledge overrides for the associative-commonsense residual
+# (spec-residual-attack.md lever L5). Whenever `secret` is the puzzle's
+# actual secret word, `related`'s rank is forced to rival.scorching_cutoff(n)
+# -- a single-array-element splice into the ranks array, verified (full-
+# array diff) to have zero side effects on any other word's rank for that
+# secret, and mathematically unable to affect any OTHER secret's ranking
+# (see generator/evals/finetune/probe_lever_l5_rank_override.py and payload.
+# _build_payload_core's wiring).
+#
+# These 8 words are curated + no-leakage-verified disjoint from the frozen
+# public benchmark's 34 secrets (generator/evals/finetune/data/
+# commonsense_residual_candidates.json is the source this file mirrors).
+# Non-fine-tuning, build-time only, zero runtime cost.
+#
+# Format: secret: related_word
+tarbooz: lal
+anaar: lal
+nariyal: safed
+samosa: garm
+mirch: lal
+jharna: loud
+til: kala
+dudh: safed

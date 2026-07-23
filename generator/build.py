@@ -39,7 +39,7 @@ from embeddings import embed_vocab  # noqa: E402
 from manifest import build_manifest, write_manifest  # noqa: E402
 from payload import build_payload, write_payload  # noqa: E402
 from schedule import load_schedule, secret_for_date, validate_schedule  # noqa: E402
-from vocab import load_en_vocab, load_hien_vocab  # noqa: E402
+from vocab import apply_devanagari_patch, load_en_vocab, load_hien_vocab  # noqa: E402
 
 LANG_LOADERS = {
     "en": load_en_vocab,
@@ -130,7 +130,12 @@ def main() -> None:
             sys.exit(1)
 
         print(f"[{lang}] Embedding vocab (may load model on first run)...")
-        matrix = embed_vocab(vocab, lang, show_progress=True)
+        # L2 lever (spec-residual-attack.md): substitute Devanagari spelling
+        # for the confirmed collision word list at embedding INPUT only --
+        # vocab itself (used below for word_to_idx/secret matching) is
+        # untouched. No-op for lang="en" and when the patch file is empty.
+        embed_input = apply_devanagari_patch(vocab) if lang == "hi-en" else vocab
+        matrix = embed_vocab(embed_input, lang, show_progress=True)
         print(f"[{lang}] Embedding matrix shape: {matrix.shape}")
 
         day_records: list[dict] = []
@@ -178,9 +183,7 @@ def main() -> None:
         mg_min = mg_sorted[0]
         mg_median = mg_sorted[len(mg_sorted) // 2]
         mg_max = mg_sorted[-1]
-        print(
-            f"[{lang}] maxGuesses distribution: min={mg_min} median={mg_median} max={mg_max}"
-        )
+        print(f"[{lang}] maxGuesses distribution: min={mg_min} median={mg_median} max={mg_max}")
 
         lang_days[lang] = day_records
         print(
