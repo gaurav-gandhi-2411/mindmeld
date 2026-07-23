@@ -1,3 +1,42 @@
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 2 DONE, L2 FAILS ship gate, 2026-07-23)
+
+**Phase 2 (score L2 at scale) complete -- L2-as-front-end does NOT carry
+forward.** A random 40-word audit of the raw LLM-resolved half of the Phase-1
+table found a 20% quality-issue rate (5% garbage, 15% translations-not-
+transliterations -- including all 4 flagship words corrupted despite the
+earlier 4-word probe resolving them correctly via the same protocol). Scored
+the DICT-ONLY subset instead (5231 words, zero corruption risk) + the 4
+flagship words patched from the already-graduated probe's validated spellings
+(जुनून/रेगिस्तान/झील/उदासी, confirmed correct) -- 5235/10495 (49.9%) coverage,
+no GCP spend needed. `probe_l2_dict_only_front_end.py`, committed `b1c05f9`.
+
+**Result: dim1 0.6568 -> 0.4731, delta -0.1837 CI [-0.3046,-0.0539] --
+CI-SIGNIFICANT REGRESSION.** dim2 0.7273 -> 0.6061, delta -0.1212 (not
+CI-significant, still negative). Regression floor FAILS both dimensions:
+dim1 12 fixed/19 broken (net -7), dim2 5 fixed/9 broken (net -4). The 4
+flagship words themselves DID improve (consistent with the graduated probe),
+but broad dict-vocab substitution regresses ~19 other previously-correct
+pairs. Mechanism: the shipped model is fine-tuned on ROMANIZED text; most
+dict-covered words aren't tokenization-pathological the way the 4 flagship
+words are, so swapping them to Devanagari discards the fine-tuned
+representation with no offsetting benefit.
+
+**Conclusion: L2 as any kind of broad front-end (dict-only or full) fails
+ship criteria decisively -- does not clear CI-significance, violates
+zero-net-regression.** L2's only evidenced form remains the narrow,
+already-graduated one: substitution applied ONLY to specifically identified
+collision words (the original 4), not a general front-end. That's a much
+smaller/cheaper intervention than what "full-vocab front-end" implied, worth
+remembering if L2 factors into a future combination lever.
+
+**STOPPED here per GG's explicit instruction** -- no L4/L6 retraining, no
+further GCP spend this session. Awaiting GG's call on whether the narrow-L2 +
+combination-lever path (L2-targeted + L4 + L5) is still worth pursuing given
+full-front-end-L2 failed, or whether to close this branch of the residual-
+attack program.
+
+---
+
 # PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 1 DONE, 2026-07-23)
 
 **Phase 1 (LLM transliteration pass) complete.** Resumed from the 27/210-batch
