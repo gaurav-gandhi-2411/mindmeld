@@ -29,6 +29,204 @@
     "far": 0.9428571428571428
   },
   "near_far_separation": 0.33235663415510963,
+  "topheavy_ci": {
+    "ndcg": {
+      "10": {
+        "point": 0.13160515121586436,
+        "ci_95": [
+          0.0688265685117031,
+          0.2027789474605008
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "50": {
+        "point": 0.14001588467897239,
+        "ci_95": [
+          0.0756653349928519,
+          0.21289227258086887
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "100": {
+        "point": 0.1511602086735005,
+        "ci_95": [
+          0.0854739816072304,
+          0.22521701747900963
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      }
+    },
+    "recall": {
+      "10": {
+        "point": 0.13690476190476192,
+        "ci_95": [
+          0.06547619047619048,
+          0.21428571428571427
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "50": {
+        "point": 0.17857142857142858,
+        "ci_95": [
+          0.09523809523809523,
+          0.27380952380952384
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "100": {
+        "point": 0.22023809523809523,
+        "ci_95": [
+          0.125,
+          0.3273809523809524
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      }
+    },
+    "precision": {
+      "10": {
+        "point": 1.0,
+        "ci_95": [
+          1.0,
+          1.0
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 12
+      },
+      "50": {
+        "point": 0.9761904761904762,
+        "ci_95": [
+          0.9230769230769229,
+          1.0
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 14
+      },
+      "100": {
+        "point": 0.980392156862745,
+        "ci_95": [
+          0.9333333333333333,
+          1.0
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 17
+      }
+    },
+    "mrr": {
+      "point": 0.14762578656724357,
+      "ci_95": [
+        0.0743136614222048,
+        0.2330533321147607
+      ],
+      "n_valid_bootstrap_draws": 10000,
+      "n_secrets_point_estimate": 42
+    },
+    "n_secrets": 42
+  },
+  "top_weighted_correlation_ci": {
+    "point": 0.6328700692294034,
+    "ci_95": [
+      0.5279082130056004,
+      0.7134399801198126
+    ],
+    "n_clusters": 42,
+    "n_scenarios": 376,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.04707139839339994
+  },
+  "band_confusion": {
+    "tiers": [
+      "near",
+      "mid",
+      "far"
+    ],
+    "bands": [
+      "win",
+      "scorching",
+      "hot",
+      "warm",
+      "cold",
+      "freezing"
+    ],
+    "matrix": [
+      [
+        2,
+        18,
+        15,
+        0,
+        28,
+        21
+      ],
+      [
+        0,
+        10,
+        10,
+        0,
+        29,
+        35
+      ],
+      [
+        0,
+        1,
+        8,
+        1,
+        47,
+        151
+      ]
+    ]
+  },
+  "per_band_pr": {
+    "win": {
+      "precision": 0.0,
+      "recall": null,
+      "n_predicted": 2,
+      "n_expected": 0
+    },
+    "scorching": {
+      "precision": 0.6206896551724138,
+      "recall": 0.21428571428571427,
+      "n_predicted": 29,
+      "n_expected": 84
+    },
+    "hot": {
+      "precision": 0.45454545454545453,
+      "recall": 0.17857142857142858,
+      "n_predicted": 33,
+      "n_expected": 84
+    },
+    "warm": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "n_predicted": 1,
+      "n_expected": 84
+    },
+    "cold": {
+      "precision": 0.4519230769230769,
+      "recall": 0.22596153846153846,
+      "n_predicted": 104,
+      "n_expected": 208
+    },
+    "freezing": {
+      "precision": 0.7294685990338164,
+      "recall": 0.7259615384615384,
+      "n_predicted": 207,
+      "n_expected": 208
+    }
+  },
+  "band_ece_ci": {
+    "point": 0.21334627431502337,
+    "ci_95": [
+      0.18173610930101486,
+      0.25667752776450514
+    ],
+    "n_clusters": 42,
+    "n_valid_bootstrap_draws": 10000
+  },
   "dim1_records": [
     {
       "secret": "bachpan",
@@ -6083,5 +6281,5 @@
       "resolution_error": null
     }
   ],
-  "wall_clock_seconds": 51.7
+  "wall_clock_seconds": 38.5
 }

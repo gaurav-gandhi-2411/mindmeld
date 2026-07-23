@@ -68,14 +68,18 @@ from pathlib import Path
 import numpy as np
 
 from evals.finetune.bootstrap_ci import (
+    bootstrap_band_ece_ci,
     bootstrap_dim1_spearman_ci,
     bootstrap_dim2_pass_rate_ci,
+    bootstrap_top_weighted_correlation_ci,
+    bootstrap_topheavy_ci,
     paired_bootstrap_dim1_delta,
     paired_bootstrap_dim2_delta,
 )
 from evals.finetune.eval_model import _model_override, dim2_for_pairs
 from evals.finetune.split import load_split
 from evals.gen_dim1_benchmark_supplement import BENCHMARK_SUPPLEMENT_PAIRS
+from evals.harness import topheavy
 from evals.harness.dimension1_ranking import _band_accuracy, _resolve_actuals
 from evals.harness.pairs import load_daily_pairs
 from vocab import load_hien_vocab
@@ -117,6 +121,15 @@ REQUIRED_CHECKPOINT_KEYS = {
     "n_dim1_secrets",
     "n_dim1_scenarios",
     "n_dim2_pairs",
+    # spec-model-excellence.md WORKSTREAM A — task-appropriate top-heavy
+    # ranking + band-calibration metrics. Adding these keys correctly
+    # invalidates every pre-existing checkpoint (they predate this change),
+    # forcing a full recompute rather than silently reusing incomplete data.
+    "topheavy_ci",
+    "top_weighted_correlation_ci",
+    "band_confusion",
+    "per_band_pr",
+    "band_ece_ci",
 }
 
 
@@ -129,6 +142,26 @@ def _slug(model_name: str) -> str:
 def checkpoint_path(model_name: str) -> Path:
     """Path to the on-disk checkpoint for one model's bake-off results."""
     return RAW_DIR / f"{_slug(model_name)}.json"
+
+
+def _denormalize_topheavy_k_keys(data: dict) -> None:
+    """JSON object keys are always strings, so `topheavy_ci`'s per-k
+    sub-dicts (topheavy.K_VALUES = (10, 50, 100), used as dict keys
+    in-memory) round-trip through a checkpoint file as {"10": ..., "50":
+    ..., "100": ...} instead of {10: ..., 50: ..., 100: ...}. Mutates
+    `data["topheavy_ci"]` in place back to int keys so every downstream
+    consumer (build_comparison, callers) can rely on int keys regardless
+    of whether the result came from a fresh evaluate_one_model() call or a
+    reloaded checkpoint. No-op if topheavy_ci is absent (older/invalid
+    checkpoint, already rejected by the required-keys check) or already
+    int-keyed."""
+    th = data.get("topheavy_ci")
+    if not isinstance(th, dict):
+        return
+    for metric in ("ndcg", "recall", "precision"):
+        section = th.get(metric)
+        if isinstance(section, dict):
+            th[metric] = {int(k): v for k, v in section.items()}
 
 
 def _load_valid_checkpoint(model_name: str) -> dict | None:
@@ -144,6 +177,7 @@ def _load_valid_checkpoint(model_name: str) -> dict | None:
         return None
     if not REQUIRED_CHECKPOINT_KEYS.issubset(data.keys()):
         return None
+    _denormalize_topheavy_k_keys(data)
     return data
 
 
@@ -237,6 +271,16 @@ def evaluate_one_model(model_name: str, test_secrets: set[str], vocab_size: int)
         "far": _band_accuracy(by_tier["far"]),
     }
 
+    # spec-model-excellence.md WORKSTREAM A — task-appropriate top-heavy
+    # ranking metrics (NDCG/MRR/Recall/Precision@k, top-emphasising
+    # correlation) and band-calibration metrics (confusion matrix, per-band
+    # P/R, ECE), all bootstrap-CI'd where applicable. See evals/harness/topheavy.py.
+    topheavy_ci = bootstrap_topheavy_ci(dim1_records)
+    top_weighted_correlation_ci = bootstrap_top_weighted_correlation_ci(dim1_records)
+    band_confusion = topheavy.band_confusion_matrix(dim1_records)
+    per_band_pr = topheavy.per_band_precision_recall(dim1_records)
+    band_ece_ci = bootstrap_band_ece_ci(dim1_records, vocab_size)
+
     return {
         "model": model_name,
         "n_dim1_secrets": len({r["secret"] for r in dim1_records}),
@@ -246,6 +290,11 @@ def evaluate_one_model(model_name: str, test_secrets: set[str], vocab_size: int)
         "dim2_pass_rate_ci": dim2_ci,
         "band_accuracy": band_accuracy,
         "near_far_separation": near_far_separation(dim1_records, vocab_size),
+        "topheavy_ci": topheavy_ci,
+        "top_weighted_correlation_ci": top_weighted_correlation_ci,
+        "band_confusion": band_confusion,
+        "per_band_pr": per_band_pr,
+        "band_ece_ci": band_ece_ci,
         "dim1_records": dim1_records,
         "dim2_records": dim2_result["records"],
     }
@@ -293,6 +342,43 @@ def _verdict(delta: dict) -> str:
     return "not sig."
 
 
+def _fmt_leaf(leaf: dict | None) -> str:
+    """Format a bootstrap_topheavy_ci-style leaf {"point", "ci_95",
+    "n_valid_bootstrap_draws", "n_secrets_point_estimate"} (or the
+    n_clusters-keyed shape used by bootstrap_top_weighted_correlation_ci /
+    bootstrap_band_ece_ci) as "point [lo, hi] (n=k)"."""
+    if leaf is None:
+        return "n/a"
+    base = _fmt_ci(leaf["point"], leaf["ci_95"])
+    n = leaf.get("n_secrets_point_estimate", leaf.get("n_clusters"))
+    if base == "n/a" or n is None:
+        return base
+    return f"{base} (n={n})"
+
+
+def _fmt_band_confusion(confusion: dict) -> str:
+    """Render a 3x6 band-confusion matrix as a compact markdown table."""
+    header = "| tier | " + " | ".join(confusion["bands"]) + " |"
+    sep = "|---|" + "---|" * len(confusion["bands"])
+    rows = [header, sep]
+    for tier, row in zip(confusion["tiers"], confusion["matrix"], strict=True):
+        rows.append(f"| {tier} | " + " | ".join(str(c) for c in row) + " |")
+    return "\n".join(rows) + "\n"
+
+
+def _fmt_per_band_pr(per_band: dict) -> str:
+    """Render per-band precision/recall as a compact markdown table."""
+    lines = [
+        "| band | precision | recall | n_predicted | n_expected |",
+        "|---|---|---|---|---|",
+    ]
+    for band, stats in per_band.items():
+        p = f"{stats['precision']:.3f}" if stats["precision"] is not None else "n/a"
+        r = f"{stats['recall']:.3f}" if stats["recall"] is not None else "n/a"
+        lines.append(f"| {band} | {p} | {r} | {stats['n_predicted']} | {stats['n_expected']} |")
+    return "\n".join(lines) + "\n"
+
+
 def build_comparison(results: dict[str, dict]) -> tuple[str, dict]:
     """Build the final markdown table + raw JSON summary from all models'
     (possibly-failed) results. Computes paired dim1/dim2 deltas of the
@@ -338,7 +424,59 @@ def build_comparison(results: dict[str, dict]) -> tuple[str, dict]:
             delta_str = "n/a (shipped model failed)"
         lines.append(f"| {name} | {dim1_str} | {dim2_str} | {band_str} | {sep_str} | {delta_str} |")
 
-    table_md = "\n".join(lines) + "\n"
+    # ------------------------------------------------------------------
+    # spec-model-excellence.md WORKSTREAM A — second table: top-heavy
+    # ranking + calibration metrics. Kept as its own table rather than
+    # widening the table above (8 models x ~15 metric columns is
+    # unreadable as one flat table); same row order/model names as above.
+    # ------------------------------------------------------------------
+    topheavy_lines = [
+        "| model | NDCG@10 | NDCG@50 | NDCG@100 | MRR | Recall@10 | Recall@50 | Recall@100 | "
+        "Precision@10 | Precision@50 | Precision@100 | top-weighted corr | band ECE |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for name in CANDIDATE_MODELS:
+        res = results.get(name)
+        if res is None or res.get("error") is not None:
+            err = res.get("error") if res else "not run"
+            topheavy_lines.append(f"| {name} | " + " FAILED |" * 11 + f" {err} |")
+            continue
+        th = res["topheavy_ci"]
+        row = [
+            _fmt_leaf(th["ndcg"][10]),
+            _fmt_leaf(th["ndcg"][50]),
+            _fmt_leaf(th["ndcg"][100]),
+            _fmt_leaf(th["mrr"]),
+            _fmt_leaf(th["recall"][10]),
+            _fmt_leaf(th["recall"][50]),
+            _fmt_leaf(th["recall"][100]),
+            _fmt_leaf(th["precision"][10]),
+            _fmt_leaf(th["precision"][50]),
+            _fmt_leaf(th["precision"][100]),
+            _fmt_leaf(res["top_weighted_correlation_ci"]),
+            _fmt_leaf(res["band_ece_ci"]),
+        ]
+        topheavy_lines.append(f"| {name} | " + " | ".join(row) + " |")
+    topheavy_table_md = "\n".join(topheavy_lines) + "\n"
+
+    # ------------------------------------------------------------------
+    # Band confusion matrix + per-band precision/recall: SHIPPED model only
+    # (rendering all 8 models' full confusion matrices would be excessive
+    # for this deliverable -- explicitly scoped per spec-model-excellence.md
+    # WORKSTREAM A, item 2/4).
+    # ------------------------------------------------------------------
+    shipped_calibration_md = ""
+    if shipped is not None and shipped.get("error") is None:
+        shipped_calibration_md = (
+            f"\n### Band calibration -- shipped model ({SHIPPED_MODEL}) only\n\n"
+            "Band-confusion matrix (rows = human-authored tier, cols = model-predicted band, "
+            "cell = record count):\n\n"
+            f"{_fmt_band_confusion(shipped['band_confusion'])}\n"
+            "Per-band precision/recall (does the model say Warm when a human meant Warm?):\n\n"
+            f"{_fmt_per_band_pr(shipped['per_band_pr'])}"
+        )
+
+    table_md = "\n".join(lines) + "\n\n" + topheavy_table_md + shipped_calibration_md
     summary = {
         "models": CANDIDATE_MODELS,
         "shipped_model": SHIPPED_MODEL,

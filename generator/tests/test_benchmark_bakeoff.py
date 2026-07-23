@@ -25,6 +25,14 @@ from evals.finetune.benchmark_bakeoff import (
     load_combined_dim1_scenarios,
     near_far_separation,
 )
+from evals.finetune.bootstrap_ci import (
+    bootstrap_band_ece_ci,
+    bootstrap_top_weighted_correlation_ci,
+    bootstrap_topheavy_ci,
+)
+from evals.harness import topheavy
+
+_FAKE_VOCAB_SIZE = 100
 
 
 def test_near_far_separation_perfect_ordering():
@@ -163,10 +171,32 @@ def test_load_valid_checkpoint_well_formed_round_trips(tmp_path, monkeypatch):
 
 def _fake_result(model: str, spearman: float, pass_rate: float, sep: float) -> dict:
     """Minimal synthetic per-model result shaped like evaluate_one_model's
-    output, enough to drive build_comparison() without any real model call."""
+    output, enough to drive build_comparison() without any real model call.
+
+    Includes real (not stubbed) topheavy_ci/top_weighted_correlation_ci/
+    band_confusion/per_band_pr/band_ece_ci computed via the actual
+    evals.harness.topheavy / evals.finetune.bootstrap_ci functions on a tiny
+    fixture (n_boot kept small for test speed) -- this doubles as a light
+    integration check that build_comparison's new columns render real
+    output shapes, not just that they don't crash on a hand-stubbed dict.
+    """
     dim1_records = [
-        {"secret": "s1", "tier": "near", "actual_rank": 1},
-        {"secret": "s1", "tier": "far", "actual_rank": 90},
+        {
+            "secret": "s1",
+            "tier": "near",
+            "actual_rank": 1,
+            "actual_band": 0,
+            "expected_bands": [0, 1],
+            "in_expected_band": True,
+        },
+        {
+            "secret": "s1",
+            "tier": "far",
+            "actual_rank": 90,
+            "actual_band": 4,
+            "expected_bands": [4, 5],
+            "in_expected_band": True,
+        },
     ]
     dim2_records = [
         {"en_secret": "en1", "hien_secret": "hi1", "consistent": True, "resolution_error": None},
@@ -181,6 +211,13 @@ def _fake_result(model: str, spearman: float, pass_rate: float, sep: float) -> d
         "dim2_pass_rate_ci": {"point": pass_rate, "ci_95": [pass_rate - 0.1, pass_rate + 0.1]},
         "band_accuracy": {"overall": 0.8, "near": 0.9, "mid": 0.7, "far": 0.85},
         "near_far_separation": sep,
+        "topheavy_ci": bootstrap_topheavy_ci(dim1_records, n_boot=50),
+        "top_weighted_correlation_ci": bootstrap_top_weighted_correlation_ci(
+            dim1_records, n_boot=50
+        ),
+        "band_confusion": topheavy.band_confusion_matrix(dim1_records),
+        "per_band_pr": topheavy.per_band_precision_recall(dim1_records),
+        "band_ece_ci": bootstrap_band_ece_ci(dim1_records, _FAKE_VOCAB_SIZE, n_boot=50),
         "dim1_records": dim1_records,
         "dim2_records": dim2_records,
     }

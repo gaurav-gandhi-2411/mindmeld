@@ -1510,3 +1510,55 @@ orchestrator review), live-verified 2026-07-11.
   counts (RNG fix + new 50-secret comparator) -- republish now or bundle with Phase 2?; (3) public
   benchmark proposal (spec 1c) -- recommend publishing only the 34 new supplement secrets (the
   original 16 are live game secrets, would need scrubbing; the 34 new ones never were).
+
+## Model Excellence Program (spec-model-excellence.md) -- Workstream A COMPLETE, STOP POINT for GG
+
+- [x] **New task-appropriate metric suite**, additive (old Spearman/band-accuracy/near-far-separation
+  columns kept, not removed): `evals/harness/metrics.py` gained `dcg_gain`, `ndcg_from_judged`,
+  `mean_reciprocal_rank`, `expected_calibration_error`, `top_weighted_correlation` (all NaN/None-safe,
+  no scipy, matching the file's existing convention). New `evals/harness/topheavy.py`: per-secret
+  NDCG@{10,50,100}/Recall@{10,50,100}/Precision@{10,50,100}/MRR (macro-averaged across secrets, `n`
+  reported honestly per submetric since precision@10 is sparse by construction -- most secrets have
+  only 2-6 judged words), plus band-confusion matrix, per-band precision/recall, and a documented
+  rank-percentile-proxy ECE for band calibration. New bootstrap CI wrappers in `bootstrap_ci.py`
+  (cluster-by-secret, `N_BOOT=10000`/`seed=42`, matching existing pattern) -- critically,
+  `bootstrap_topheavy_ci` passes per-draw secret groups directly into `compute_topheavy_metrics`
+  (never re-groups by name), so a secret drawn twice in a resample correctly counts twice in that
+  draw's macro-average instead of silently collapsing -- this was the single highest-risk correctness
+  property in the design and was independently verified by a separate verifier subagent (explicit
+  test: same secret passed twice -> n=2, not n=1).
+- [x] **8-model bake-off re-run under the new suite** (`evals/finetune/benchmark_bakeoff.py --all`,
+  all 8 checkpoints re-embedded from HF cache, none failed, ~6m13s wall clock; `REQUIRED_CHECKPOINT_KEYS`
+  grew to force the recompute rather than silently reuse stale checkpoints). Full table:
+  `generator/evals/finetune/data/bakeoff_comparison.md`.
+  **Verdict: leadership re-established under task-appropriate metrics.** Shipped model
+  (`gauravgandhi2411/hinglish-relatedness-sbert`) leads all 7 comparators on NDCG@{10,50,100}, MRR,
+  Recall@{10,50,100}, and top-weighted correlation (0.7740 vs next-best l3cube-pune 0.6329) -- this is
+  NOT the same ranking question the old Spearman-only table answered, and the model wins it anyway.
+  **Honest exception, not smoothed over:** on band-calibration ECE (lower=better), shipped scores
+  0.2020; `ibm-granite/granite-embedding-311m-multilingual-r2` scores 0.1947 -- Granite calibrates
+  band placement slightly better than the shipped model, even though Granite loses badly on every
+  ranking-quality metric. (Correction to an earlier verbal misstatement during this work: Qwen3-0.6B
+  does NOT beat shipped on ECE -- Qwen scores 0.2137, worse than shipped's 0.2020. Only Granite beats
+  shipped on this one metric, confirmed directly from `bakeoff_comparison.json`.)
+- [x] **Band-confusion matrix + per-band P/R for the shipped model** (shipped-model-only, not all 8,
+  by explicit scope limit -- rendering 8 full 3x6 matrices was judged not worth the table bloat for
+  this deliverable): reveals the "warm" band is nearly never predicted (`n_predicted=2` vs 84
+  human-expected warm records) -- the production floor logic (`max(500,...)`/`max(50,...)` in
+  `rival.band_for_rank`) that `docs/known-limitations.md` already flagged as making hi-en's Warm band
+  only ~19 ranks wide is now independently confirmed from the outcome side, not just the width
+  arithmetic. Candidate target for Workstream B/F follow-up.
+- [x] **Verification**: independent verifier subagent re-derived NDCG@10/@50 by hand, confirmed the
+  bootstrap-dedup property structurally and via test, ran the full suite itself rather than trusting
+  the executor's reported counts (541 passed / 4 skipped, zero failures; 29/29 new
+  `test_topheavy_metrics.py`), confirmed `--report` mode is byte-identical across reruns (seed=42),
+  and caught one reporting error (see the Qwen/Granite correction above) that the executor's own
+  summary got backwards.
+- [ ] **STOP POINT for GG** (spec-model-excellence.md's own stop point 1): review the re-run
+  comparison above before Workstream B (systematic failure analysis + full-vocab collision scan)
+  starts. Nothing has been committed -- all changes are unstaged/untracked in the working tree
+  pending your review. Open question for you: the new metric suite and its bake-off re-run are
+  additive (nothing deleted, nothing shipped to production/HF), so there's no regression risk in
+  proceeding -- but flag if you want the ECE formulation (rank-percentile proxy, documented in
+  `topheavy.band_calibration_error`'s docstring as one defensible choice among several) reviewed
+  before it becomes a standing headline number.
