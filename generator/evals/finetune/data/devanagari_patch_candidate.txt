@@ -1,0 +1,64 @@
+# STAGING candidate patch (evals.finetune.probe_l2_collision_scan_extension) --
+# NOT the live patch. Generated for gated-extension evaluation only; see
+# this module's docstring. Words ordered by collision_score descending
+# (flagship 4 first, unchanged from the live file).
+#
+# Format: romanized_word: devanagari_spelling
+junoon: जुनून
+registan: रेगिस्तान
+jheel: झील
+udaasi: उदासी
+sharm: शरम
+tinda: टिंडा
+baingan: बैंगन
+comb: कॉम्ब
+darr: डर
+toaster: टोस्टर
+akela: अकेल
+laung: लोंग
+seb: सेब
+sem: एसईएम
+ac: अक
+airport: एरपोर्ट
+baigan: बैंगन
+besan: बेसन
+papad: पापड
+santara: संतरा
+haddi: हादी
+mombatti: मोमबत्ती
+patthi: पट्ठी
+samunder: समुंदर
+saunf: सॉनफ
+anaar: अनार
+badbu: बदबू
+birthday: बर्थड
+chinta: छींटा
+finalist: फाइनलिस्ट
+ghagra: घाघरा
+honth: होंठ
+imli: इमली
+lehnga: लहंगे
+machli: मचली
+mixer: मिक्सर
+nata: नत
+rainbow: रेनबो
+seena: सीना
+sharminda: शरमिंदा
+sunehra: सुनहरा
+accha: अच्चा
+almirah: अलमारी
+chutney: चटनी
+daraa: डरा
+dhania: धनिया
+fanoos: फानोस
+katora: कटोरा
+methi: मेठी
+mohalla: मुहल्ला
+nahin: नहिन
+pocha: पोचा
+rasoi: रसोई
+saree: सारी
+tadap: तडप
+tawa: तवा
+tez: तेज़
+urad: उरद

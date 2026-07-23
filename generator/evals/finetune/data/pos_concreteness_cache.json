@@ -1,0 +1,1466 @@
+{
+  "acquired": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "administrative": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "advise": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "affection": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "algebra": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "amounts": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "amusement": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "answer": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "answering": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "anticipated": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "antonio": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "apple": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "atomic": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "attending": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "auntie": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "bagicha": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "banner": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "basket": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "beach": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "beloved": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "block": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "bloom": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "blush": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "border": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "boulder": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "boundary": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "breakfast": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "breasts": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "brightness": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "browser": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "bucket": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "came": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "candy": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "casting": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "catalyst": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "cease": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "checkpoint": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "cheer": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "childhood": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "chilled": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "chimney": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "claiming": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "cliff": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "climb": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "comfort": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "commenced": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "commitments": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "comparing": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "connecting": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "consequences": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "conservation": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "convey": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "cooking": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "cooper": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "countryside": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "court": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "crashed": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "crime": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "cube": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "curd": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "curry": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "customers": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "cutlery": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "deeds": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "define": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "definitely": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "denial": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "desert": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "despair": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "dessert": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "dhanyawaad": {
+    "part_of_speech": "other",
+    "concreteness": "abstract"
+  },
+  "discover": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "dish": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "doctors": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "doubles": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "doubt": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "drawer": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "drive": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "drought": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "duct": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "due": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "dune": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "duplicate": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "duration": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "eclipse": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "eggs": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "elaichi": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "elder": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "embraced": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "enjoyment": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "era": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "estimates": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "eternity": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "euros": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "everybody": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "exile": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "exports": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "fail": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "fairness": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "family": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "farmers": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "favorites": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "fellows": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "feminist": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "fence": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "finish": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "fishing": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "flower": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "flue": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "foliage": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "fork": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "frank": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "freedom": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "frequently": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "fried": {
+    "part_of_speech": "adjective",
+    "concreteness": "concrete"
+  },
+  "garcia": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "garden": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "garlic": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "gem": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "ghar": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "gifts": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "gold": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "gora": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "governments": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "gram": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "gut": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "halo": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "hamlet": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "hamper": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "happily": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "has": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "hawks": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "healthier": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "hearty": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "helmet": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "honor": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "household": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "housing": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "houston": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "idaho": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "identical": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "ill": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "improves": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "infinite": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "info": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "infrastructure": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "initial": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "innocence": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "internet": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "interval": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "introvert": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "jackson": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "jelly": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "jersey": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "johnston": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "joined": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "jointly": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "judge": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "judgement": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "julian": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "justice": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "kane": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "key": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "khichdi": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "khushbu": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "kin": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "kissed": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "knew": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "knives": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "labels": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "laboratory": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "lagoon": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "lake": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "latino": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "law": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "lawn": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "leaf": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "legend": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "legislation": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "legume": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "leisure": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "lock": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "logic": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "lord": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "loss": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "luggage": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "magazines": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "malcolm": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "margins": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "masks": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "meadow": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "melancholy": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "migrant": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "mill": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "mineral": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "mines": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "misery": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "mistress": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "modesty": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "moon": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "mountain": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "mph": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "murderer": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "nationalist": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "natural": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "nauka": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "neighbor": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "neighborhood": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "nephew": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "nervous": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "newsletter": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "nickel": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "niece": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "notch": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "obsession": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "opened": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "opposing": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "orders": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "owns": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "paani": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "pace": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "packet": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "packing": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "padlock": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "paneer": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "panthers": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "parents": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "passion": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "past": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "pastoral": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "pavement": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "peak": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "peoples": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "persuade": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "phillips": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "phool": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "picnic": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "pigs": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "plant": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "platform": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "platter": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "playful": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "pleasing": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "popping": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "popularity": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "porridge": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "possible": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "posted": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "practically": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "prescribed": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "prestigious": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "probability": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "promotion": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "protein": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "proved": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "publications": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "real": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "received": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "recommendations": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "recreational": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "reflect": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "refuses": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "regional": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "relationship": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "relative": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "relatives": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "relaxing": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "release": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "renaissance": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "reservation": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "retailer": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "retaining": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "rhetoric": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "rights": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "road": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "rock": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "roller": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "rule": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "rural": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "russia": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "sadness": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "sailor": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "sapna": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "satellite": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "schedule": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "sea": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "securities": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "security": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "serving": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "settlement": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "shepherd": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "shore": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "shores": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "shyness": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "signature": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "singh": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "soot": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "spinal": {
+    "part_of_speech": "adjective",
+    "concreteness": "concrete"
+  },
+  "stand": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "starts": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "steal": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "steam": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "stem": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "storage": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "strain": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "street": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "stress": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "subject": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "suddenly": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "sufficient": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "sunlight": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "sunshine": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "supplied": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "survived": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "sweetness": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "take": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "tenth": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "theoretical": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "throw": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "tightly": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "tory": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "traffic": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "traits": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "travelled": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "treasure": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "treat": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "trunk": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "twig": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "twin": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "liberty": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "limitations": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "locality": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "organizations": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "outcome": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "oven": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "pushed": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "query": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "question": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "quote": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "rahat": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "ray": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "sky": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "slopes": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "smile": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "snow": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "unease": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "unions": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "vault": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "verdict": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "villain": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "volleyball": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "volunteers": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "wagon": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "warmth": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "wasteland": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "wave": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "ways": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "wealth": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "weave": {
+    "part_of_speech": "verb",
+    "concreteness": "concrete"
+  },
+  "well": {
+    "part_of_speech": "adjective",
+    "concreteness": "abstract"
+  },
+  "worry": {
+    "part_of_speech": "verb",
+    "concreteness": "abstract"
+  },
+  "yard": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "yogurt": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  },
+  "youth": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "zeal": {
+    "part_of_speech": "noun",
+    "concreteness": "abstract"
+  },
+  "zombies": {
+    "part_of_speech": "noun",
+    "concreteness": "concrete"
+  }
+}
