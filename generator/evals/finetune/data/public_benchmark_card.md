@@ -144,6 +144,17 @@ tokenizer fragmenting short/rare romanized tokens into pieces that collide with 
 English morphemes. This is a genuine model/tokenizer characteristic, not something
 further benchmark editing can fix.
 
+**Downstream mitigation exists, deliberately not reflected in the numbers above.** The
+reference model's deploying application (Warmer) now ships a build-time, non-fine-tuning
+generator mitigation for exactly these words (Devanagari-embedding substitution for
+`junoon`/`registan`/`jheel`/`udaasi` specifically, not a general fix) — see the model
+card's "Production wrapper" section. This benchmark intentionally continues to measure
+the **raw, unwrapped model** so it stays a fair, stable ruler for comparing models —
+applying a generator-side patch here would make this benchmark measure a moving,
+non-reproducible target instead of the model itself. Anyone comparing models against
+this benchmark should do the same: evaluate raw model output, not an application-level
+wrapper.
+
 ## Scrub / safety notice (for anyone extending this benchmark)
 
 Every secret and associate word was checked against this project's live game content

@@ -43,10 +43,8 @@ from evals.finetune.bootstrap_ci import (
 from evals.finetune.eval_model import _model_override
 from evals.finetune.probe_lever_l2_devanagari_hybrid import (
     SHIPPED_MODEL,
-    _dim2_for_pairs_hybrid,
     _public_benchmark_dim1_records_hybrid,
     _public_benchmark_dim2_result_hybrid,
-    _resolve_actuals_hybrid,
     _shipped_model_dim1_records_34,
     _shipped_model_dim2_records_34,
 )
@@ -86,13 +84,9 @@ def verify_benchmark_parity() -> dict:
 
     prior = json.loads(COMBINED_RESULT_PATH.read_text(encoding="utf-8"))
     checks = {
-        "dim1_point_matches": abs(
-            dim1_ci["point"] - prior["benchmark_dim1_spearman_ci"]["point"]
-        )
+        "dim1_point_matches": abs(dim1_ci["point"] - prior["benchmark_dim1_spearman_ci"]["point"])
         < _TOL,
-        "dim2_point_matches": abs(
-            dim2_ci["point"] - prior["benchmark_dim2_pass_rate_ci"]["point"]
-        )
+        "dim2_point_matches": abs(dim2_ci["point"] - prior["benchmark_dim2_pass_rate_ci"]["point"])
         < _TOL,
         "dim1_delta_matches": abs(
             dim1_delta["delta_point"] - prior["dim1_delta_vs_shipped"]["delta_point"]
@@ -199,7 +193,8 @@ def main() -> None:
     out_path = DATA_DIR / f"{RUN_NAME}.json"
     out_path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"\nwrote {out_path}")
-    print(f"\nOVERALL SHIP VERIFICATION: {'PASS' if out['overall_ship_verification_pass'] else 'FAIL'}")
+    overall = "PASS" if out["overall_ship_verification_pass"] else "FAIL"
+    print(f"\nOVERALL SHIP VERIFICATION: {overall}")
 
 
 if __name__ == "__main__":

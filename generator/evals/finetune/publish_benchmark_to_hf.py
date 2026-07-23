@@ -76,6 +76,32 @@ def _run_gates() -> None:
     )
 
 
+def publish_card_only(repo_id: str) -> str:
+    """Update just the dataset card (README.md) -- for documentation-only
+    changes where the underlying benchmark data files are unchanged, so
+    re-running the scrub gates + data re-upload would be redundant."""
+    import os
+
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        raise SystemExit("HF_TOKEN not set in the environment.")
+    if not CARD_PATH.exists():
+        raise SystemExit(f"{CARD_PATH} not found.")
+
+    from huggingface_hub import HfApi
+
+    api = HfApi(token=token)
+    commit_info = api.upload_file(
+        repo_id=repo_id,
+        repo_type="dataset",
+        path_or_fileobj=str(CARD_PATH),
+        path_in_repo="README.md",
+        commit_message="dataset card: note downstream L2+L5 mitigation (data unchanged)",
+    )
+    print(f"pushed card -> https://huggingface.co/datasets/{repo_id} ({commit_info.oid[:8]})")
+    return commit_info.oid
+
+
 def publish(repo_id: str) -> str:
     import os
 
@@ -131,9 +157,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-id", default=DEFAULT_REPO_ID)
     parser.add_argument("--skip-verify", action="store_true")
+    parser.add_argument(
+        "--card-only", action="store_true", help="Update README.md only, skip data re-upload"
+    )
     args = parser.parse_args()
 
-    publish(args.repo_id)
-    if not args.skip_verify:
-        verify_loadable(args.repo_id)
+    if args.card_only:
+        publish_card_only(args.repo_id)
+    else:
+        publish(args.repo_id)
+        if not args.skip_verify:
+            verify_loadable(args.repo_id)
     sys.exit(0)

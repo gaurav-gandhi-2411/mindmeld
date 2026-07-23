@@ -85,6 +85,36 @@ def _scrub_scan(extra_files: list[Path]) -> None:
     print(f"scrub scan OK: {len(extra_files)} authored file(s) checked, 0 relational leaks")
 
 
+def publish_card_only(repo_id: str, model_card_path: Path) -> str:
+    """Update just the model card (README.md) without touching checkpoint
+    files -- for documentation-only changes (e.g. a generator-side wrapper
+    that doesn't change these weights) where re-uploading the full,
+    byte-identical checkpoint folder would be wasteful and misleading
+    (implies a new model version when none exists)."""
+    import os
+
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        raise SystemExit(
+            "HF_TOKEN not set in the environment. See ship_decision_report_v3.md "
+            "'Production hosting' section for how to generate one."
+        )
+    _scrub_scan(extra_files=[model_card_path])
+
+    from huggingface_hub import HfApi
+
+    api = HfApi(token=token)
+    commit_info = api.upload_file(
+        repo_id=repo_id,
+        repo_type="model",
+        path_or_fileobj=str(model_card_path),
+        path_in_repo="README.md",
+        commit_message="model card: document the L2+L5 production wrapper (no weight change)",
+    )
+    print(f"pushed card -> https://huggingface.co/{repo_id} ({commit_info.oid[:8]})")
+    return commit_info.oid
+
+
 def publish(repo_id: str, checkpoint_dir: Path, model_card_path: Path) -> str:
     import os
 
@@ -143,9 +173,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-id", default=DEFAULT_REPO_ID)
     parser.add_argument("--skip-verify", action="store_true")
+    parser.add_argument(
+        "--card-only", action="store_true", help="Update README.md only, skip checkpoint upload"
+    )
     args = parser.parse_args()
 
-    publish(args.repo_id, CHECKPOINT_DIR, MODEL_CARD_PATH)
-    if not args.skip_verify:
-        verify_loadable(args.repo_id)
+    if args.card_only:
+        publish_card_only(args.repo_id, MODEL_CARD_PATH)
+    else:
+        publish(args.repo_id, CHECKPOINT_DIR, MODEL_CARD_PATH)
+        if not args.skip_verify:
+            verify_loadable(args.repo_id)
     sys.exit(0)
