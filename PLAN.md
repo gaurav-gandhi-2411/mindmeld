@@ -1718,6 +1718,51 @@ orchestrator review), live-verified 2026-07-11.
   supplement content (306 records) and the actually-published `public_benchmark_staging/
   dim1_hien.json` (302 records) differ by 24 words -- staging used as canonical throughout,
   documented rather than silently assumed identical.
-- [ ] **STOP POINT for GG**: (1) fill in the label-ceiling CSV when convenient (no rush -- scoring
-  script is ready and waiting); (2) go/no-go on Workstream E (efficiency: size/latency/quantization/
-  distillation) and Workstream F (L5 dormancy fix, L4/L6 status confirmation) next.
+- [x] **STOP POINT cleared**: GG approved continuing to E and F.
+
+## Model Excellence Program -- Workstreams E + F COMPLETE, program CLOSED pending GG label-ceiling annotation
+
+- [x] **Workstream E, efficiency** (`bf4744a`): shipped model 956.7MB (dominated by a
+  197,285-token embedding table, ~606MB), 2.99ms/word warm latency -- but production has NO live
+  per-user embedding inference today (payload precomputes once per secret at build time), so this
+  is offline-build/local-run cost, not a live bottleneck, stated honestly rather than framed as a
+  bigger problem than it is. Binary quantization of the precomputed vocab embedding cache: **32x
+  storage reduction, zero net regression -- a real, gated partial win.** int8 embedding
+  quantization, torch dynamic weight quantization, and a MiniLM-L12 distillation candidate all
+  **failed** the zero-regression gate decisively (weight quant only shrinks the small transformer
+  body since dynamic quantization doesn't touch the dominant embedding table; MiniLM already scored
+  near-random on hi-en off-the-shelf pre-fine-tune, per the ORIGINAL 9-candidate bake-off, and 4
+  epochs can't teach romanized-Hindi understanding from scratch). Self-caught a real bug mid-probe
+  (a read-only `.auto_model` property silently no-op'd a model swap, same bug class `train_lib.py`
+  already documents for LoRA) before trusting the weight-quantization result. Verdict: the
+  "same-quality, materially smaller MODEL" USP is NOT achieved -- honest NO-GO on that axis, one
+  genuine win on the embedding-cache-storage axis.
+- [x] **Workstream F, L5 dormancy + L4/L6 confirmation** (`2f4dd15`): scheduled all 8 L5 trigger
+  words into the live cyclic schedule (`vocab/secrets_hi-en.txt`/`secrets_en.txt`, 60->68 entries) --
+  each will fire on a confirmed future date (2026-08-11 through 2026-08-18). Caught a real
+  dependency not in the original task scope: `clues.py` indexes by the same cyclic modulus and
+  `test_clue_spoiler_gate.py` asserts `len(clues)==len(schedule)`, so matching clues had to be
+  authored too (8 per language, 2 near-miss leaks caught and fixed) or the whole 72-day cycle's
+  clue/secret pairing would have desynced, not just the 8 new days. Confirmed the frozen
+  train/dev/test split is unaffected (reads the already-committed `split.json`, not the live
+  schedule). L4/L6: found `docs/known-limitations.md` entry 20 never actually carried the L4/L6
+  labels its own probe scripts pointed readers to -- added a dated, cross-checked addendum
+  confirming both remain live, untested-at-scale levers (not a new investigation, a genuine doc
+  gap fixed).
+- [x] **Program capstone deliverable**: `docs/model-excellence-final-report.md` (`4d861c0`) --
+  every finding across Workstreams A-F, ranked by prevalence and user impact, each with its
+  evidenced next attack. Top-ranked, not yet attempted: the mid-tier Warm band's ~24-rank width is
+  a game-CALIBRATION artifact (not a model defect) that two independent analyses converged on from
+  opposite directions -- widening the band formula and re-measuring is the cheapest, highest-
+  leverage next step, no retraining required. Second-ranked: spelling-variance non-invariance
+  remains open after a failed retraining attempt; the report flags a lower-risk alternative never
+  tried this program (extend `vocab/hi-en-aliases.txt` directly with Aksharantar-derived variants,
+  sidestepping model-regression risk entirely).
+- [ ] **Program status**: A-F substantially complete. The shipped model is unchanged except two
+  small, fully-gated production patches (L2 patch 4->5 words, L5 trigger words now reachable). No
+  retraining was promoted -- both attempts this program produced honest, evidenced NO-GOs, and "the
+  current published model stands until beaten" held throughout. **The one open action item
+  requires GG specifically**: fill in `evals/finetune/data/label_ceiling_sample_for_gg.csv` (75
+  pairs, single sitting, no rush) to establish the benchmark's own label ceiling -- everything else
+  in the original spec is either complete, gated-and-shipped, or a documented/evidenced finding
+  with its next attack identified.
