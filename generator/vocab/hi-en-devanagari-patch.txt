@@ -19,8 +19,17 @@
 # dim1 directionally positive +0.0602 not independently significant, zero
 # net regression on both floors).
 #
+# 5th entry (sharm) graduated via the gated collision-scan extension
+# (probe_l2_collision_scan_extension.py): generator/evals/finetune/data/
+# probe_l2_collision_scan_extension_n1.eval_result.json (zero broken pairs
+# on both regression floors, CI-significant topheavy improvement across
+# NDCG/Recall/MRR@{10,50,100}, e.g. MRR +0.050 CI [0.012, 0.098]). A wider
+# 58-word batch from the same collision scan FAILED the gate and was never
+# added -- see that probe's bisection output.
+#
 # Format: romanized_word: devanagari_spelling
 junoon: जुनून
 registan: रेगिस्तान
 jheel: झील
 udaasi: उदासी
+sharm: शरम
