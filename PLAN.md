@@ -1623,7 +1623,46 @@ orchestrator review), live-verified 2026-07-11.
   (5) frequency-bucket fix is real in the post-fix code, (6) 63 new tests pass, (7) nothing
   committed by either executor, (8) the 57/124 cross-reference is a real computed join not an
   invented number. Overall verdict: PASS, trustworthy to report and commit.
-- [ ] **STOP POINT for GG**: (1) go/no-go on adding `sharm: शरम` to the live L2 patch (see above);
-  (2) go/no-go on proceeding to Workstream C (robustness suite + spelling-invariance USP) next,
-  per spec-model-excellence.md's ordering. Nothing else blocking -- all analysis code/reports are
-  committed (`ac6f41d`).
+- [x] **STOP POINT cleared**: GG approved both -- sharm shipped to the live patch (`80cf3ad`,
+  re-verified through the real production path, numbers matched staged to 1e-9); Workstream C
+  approved to proceed.
+
+## Model Excellence Program -- Workstream C measurement phase COMPLETE (`4eb6386`), STOP POINT for GG (retraining decision)
+
+- [x] **Items 9+11, spelling/casing/whitespace/typo robustness eval** (`evals/finetune/
+  spelling_robustness.py`): embeds variant spellings DIRECTLY through the shipped model, bypassing
+  `normalize.py`/`canonical_for()`'s string-fold layer entirely -- that layer only guarantees
+  gameplay-lookup consistency for the 29 alias-file words (confirmed via `payload.py:150-283`: the
+  embedding matrix is built once for canonical vocab only, variant-spelling payload entries are
+  copied rank/qsim, never a fresh embedding) and had never been measured at the embedding level for
+  any other word before this. Reused the existing 42-secret bakeoff test set as baseline, no new
+  scenario authoring.
+- [x] **Headline finding: NOT spelling-invariant outside the 3 alias-covered test secrets.** On 267
+  genuinely held-out real-world spelling variants (Aksharantar-corpus-derived, n=13 test secrets
+  with coverage), band-agreement rate is only **67.4% [95% CI 0.538, 0.801]** -- a different valid
+  spelling of the same secret changes which temperature band a test word lands in roughly a third
+  of the time. Worst case: `azaadi`/`rights` rank 16 (scorching) -> `azaaadi`/`rights` rank 9753
+  (freezing), drift 9737 ranks -- confirmed by the verifier as a real Aksharantar entry (source=
+  "Existing", Levenshtein-distance-verified clean, not filter noise), not a synthetic artifact.
+  Genuine good catch during the build: the 3 alias-file-covered test secrets (bagicha/chaand/pahad)
+  turned out to have ZERO training exposure to their own aliases (`assemble_data.alias_source()`
+  already excludes held-out secrets from training data, confirmed via direct grep of
+  `train_mnrl_pairs.jsonl`) -- so even that smaller `alias_file_untrained_heldout` category (37
+  pairs, 43.2% band-agreement) is honest held-out evidence, not training-contaminated.
+  Whitespace-only variants show perfect 1.000 agreement -- confirmed via direct embedding
+  comparison (byte-identical vectors) that sentence-transformers strips whitespace before
+  tokenization, not a measurement bug.
+- [x] **Verification**: independent verifier subagent hand-recomputed the band-agreement rate from
+  raw per-record data (180/267, matches to float precision), independently replicated the
+  cluster-by-secret bootstrap CI, confirmed the worst-case example against the raw Aksharantar
+  corpus file directly, confirmed the alias-training-exclusion claim via direct grep, and confirmed
+  the whitespace perfect-agreement result via a direct embedding comparison rather than trusting
+  the code. Overall verdict: PASS. 45 new tests pass; full suite clean (pre-existing
+  Ollama-contention-related `test_harness_judge.py` failures unrelated, confirmed untouched).
+- [ ] **STOP POINT for GG**: this measurement finding directly supports Workstream C item 10
+  (variant-augmented contrastive retraining) as the next step -- surfaced as a decision, not acted
+  on, since training a candidate replacement model is a materially bigger commitment (compute time,
+  a new model artifact to gate through the FULL Workstream A suite + zero regression before it could
+  ever replace the shipped model per the program's own gates) than anything shipped so far this
+  program. Go/no-go needed: proceed with variant-augmented retraining now, or treat this as a
+  documented finding for a later session?
