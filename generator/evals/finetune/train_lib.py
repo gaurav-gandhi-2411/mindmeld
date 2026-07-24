@@ -68,6 +68,12 @@ LORA_TARGET_MODULES = ["query", "value"]
 @dataclass
 class TrainConfig:
     name: str
+    base_model: str = OFF_THE_SHELF_MODEL  # spec-model-excellence.md WORKSTREAM E:
+    # override to fine-tune a DIFFERENT base (e.g. a smaller distillation-student
+    # candidate) with the exact same recipe/data. Defaulting to OFF_THE_SHELF_MODEL
+    # preserves every existing caller's behavior byte-for-byte (train.py, the
+    # step1*.py sweeps, and every probe_lever_*.py module construct TrainConfig
+    # without this field).
     method: str = "full"  # "full" | "freeze" | "lora" | "head_only"
     freeze_n_layers: int = 0
     lora_r: int = 8
@@ -257,7 +263,7 @@ def run_training(cfg: TrainConfig) -> dict:
         }
     )
 
-    model = SentenceTransformer(OFF_THE_SHELF_MODEL)
+    model = SentenceTransformer(cfg.base_model)
     model = _apply_capacity_control(model, cfg)
 
     losses = {
@@ -345,6 +351,7 @@ def run_training(cfg: TrainConfig) -> dict:
         "trainable_fraction": n_trainable / n_total if n_total else None,
         "output_dir": str(model_dir),
         "hyperparams": {
+            "base_model": cfg.base_model,
             "method": cfg.method,
             "freeze_n_layers": cfg.freeze_n_layers,
             "lora_r": cfg.lora_r,

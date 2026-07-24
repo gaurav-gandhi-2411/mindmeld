@@ -1,0 +1,305 @@
+{
+  "precision": "binary",
+  "storage": {
+    "float32_bytes": 32240640,
+    "quantized_bytes": 1007520,
+    "reduction_factor": 32.0
+  },
+  "similarity_speed": {
+    "n_secrets_scored": 42,
+    "float32_cosine_seconds": 0.02853740000864491,
+    "quantized_seconds": 0.1901244000182487,
+    "speedup_factor": 0.15009856707453542
+  },
+  "metrics": {
+    "dim1_spearman_ci": {
+      "point": 0.6533763463849795,
+      "ci_95": [
+        0.5790360428392013,
+        0.7231872168012505
+      ],
+      "n_clusters": 42,
+      "n_scenarios": 376,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.0369143438310578
+    },
+    "dim2_pass_rate_ci": {
+      "point": 0.76,
+      "ci_95": [
+        0.64,
+        0.88
+      ],
+      "n_pairs": 50
+    },
+    "band_accuracy": {
+      "overall": 0.6754617414248021,
+      "near": 0.6666666666666666,
+      "mid": 0.011764705882352941,
+      "far": 0.9476190476190476
+    },
+    "topheavy_ci": {
+      "ndcg": {
+        "10": {
+          "point": 0.15806383010663302,
+          "ci_95": [
+            0.0935255666590263,
+            0.22728230462514765
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "50": {
+          "point": 0.20260287195171936,
+          "ci_95": [
+            0.13143152765818666,
+            0.27690486306112805
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "100": {
+          "point": 0.213914452461989,
+          "ci_95": [
+            0.14408440037604403,
+            0.2884143442162393
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        }
+      },
+      "recall": {
+        "10": {
+          "point": 0.16468253968253968,
+          "ci_95": [
+            0.09523809523809523,
+            0.23809523809523808
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "50": {
+          "point": 0.30952380952380953,
+          "ci_95": [
+            0.20238095238095238,
+            0.4226190476190476
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "100": {
+          "point": 0.35119047619047616,
+          "ci_95": [
+            0.24404761904761904,
+            0.4642857142857143
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        }
+      },
+      "precision": {
+        "10": {
+          "point": 1.0,
+          "ci_95": [
+            1.0,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 16
+        },
+        "50": {
+          "point": 0.9583333333333334,
+          "ci_95": [
+            0.8636363636363636,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 24
+        },
+        "100": {
+          "point": 0.9642857142857143,
+          "ci_95": [
+            0.8846153846153846,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 28
+        }
+      },
+      "mrr": {
+        "point": 0.1880340638038757,
+        "ci_95": [
+          0.11213405025582913,
+          0.27428426013423907
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "n_secrets": 42
+    },
+    "top_weighted_correlation_ci": {
+      "point": 0.7565494880685194,
+      "ci_95": [
+        0.6892654449514017,
+        0.8099074258286617
+      ],
+      "n_clusters": 42,
+      "n_scenarios": 376,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.030649210593931435
+    },
+    "band_confusion": {
+      "tiers": [
+        "near",
+        "mid",
+        "far"
+      ],
+      "bands": [
+        "win",
+        "scorching",
+        "hot",
+        "warm",
+        "cold",
+        "freezing"
+      ],
+      "matrix": [
+        [
+          2,
+          33,
+          23,
+          1,
+          13,
+          12
+        ],
+        [
+          0,
+          16,
+          15,
+          1,
+          29,
+          23
+        ],
+        [
+          0,
+          1,
+          8,
+          0,
+          36,
+          163
+        ]
+      ]
+    },
+    "per_band_pr": {
+      "win": {
+        "precision": 0.0,
+        "recall": null,
+        "n_predicted": 2,
+        "n_expected": 0
+      },
+      "scorching": {
+        "precision": 0.66,
+        "recall": 0.39285714285714285,
+        "n_predicted": 50,
+        "n_expected": 84
+      },
+      "hot": {
+        "precision": 0.5,
+        "recall": 0.27380952380952384,
+        "n_predicted": 46,
+        "n_expected": 84
+      },
+      "warm": {
+        "precision": 0.5,
+        "recall": 0.011904761904761904,
+        "n_predicted": 2,
+        "n_expected": 84
+      },
+      "cold": {
+        "precision": 0.46153846153846156,
+        "recall": 0.17307692307692307,
+        "n_predicted": 78,
+        "n_expected": 208
+      },
+      "freezing": {
+        "precision": 0.8232323232323232,
+        "recall": 0.7836538461538461,
+        "n_predicted": 198,
+        "n_expected": 208
+      }
+    },
+    "band_ece_ci": {
+      "point": 0.19719141840592783,
+      "ci_95": [
+        0.16967766408522802,
+        0.23083108988659254
+      ],
+      "n_clusters": 42,
+      "n_valid_bootstrap_draws": 10000
+    }
+  },
+  "gate_vs_shipped": {
+    "dim1_delta_vs_shipped": {
+      "baseline_point": 0.6748987706342632,
+      "candidate_point": 0.6533763463849795,
+      "delta_point": -0.021522424249283634,
+      "delta_ci_95": [
+        -0.049488311588989024,
+        0.005979873900815901
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_clusters": 42,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim2_delta_vs_shipped": {
+      "baseline_point": 0.74,
+      "candidate_point": 0.76,
+      "delta_point": 0.020000000000000018,
+      "delta_ci_95": [
+        0.0,
+        0.06000000000000005
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_pairs": 50
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 379,
+      "n_fixed": 6,
+      "n_broken": 5,
+      "net": 1,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "besan/cooking",
+        "besan/gram",
+        "besan/legume",
+        "khichdi/mill",
+        "udaasi/melancholy",
+        "udaasi/rahat"
+      ],
+      "broken_pairs": [
+        "bachpan/youth",
+        "bhanji/bucket",
+        "chinta/unease",
+        "patta/tory",
+        "phool/bagicha"
+      ]
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 50,
+      "n_fixed": 1,
+      "n_broken": 0,
+      "net": 1,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [
+        "gram->besan"
+      ],
+      "broken_pairs": []
+    },
+    "gate_verdict": "PASS"
+  },
+  "n_dim1_scenarios": 379,
+  "n_dim2_pairs": 50
+}

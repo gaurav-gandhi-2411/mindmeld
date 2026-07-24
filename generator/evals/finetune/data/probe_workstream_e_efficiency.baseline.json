@@ -1,0 +1,33 @@
+{
+  "run": "baseline",
+  "shipped_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+  "n_vocab_words": 10495,
+  "model_dir_size": {
+    "model_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\model",
+    "total_bytes": 956658247,
+    "total_mb": 956.658247,
+    "total_mib": 912.3403997421265,
+    "n_files": 8,
+    "largest_file": "model.safetensors",
+    "largest_file_bytes": 950247272
+  },
+  "embed_vocab_wallclock": {
+    "model": "gauravgandhi2411/hinglish-relatedness-sbert",
+    "n_words": 10495,
+    "cache_pre_existed_before_this_measurement": true,
+    "cold_seconds": 48.49545460002264,
+    "cold_ms_per_word": 4.6208151119602325,
+    "warm_seconds": 0.03913810005178675,
+    "warm_ms_per_word": 0.0037292139163207956,
+    "note": "warm here is a disk-cache HIT (np.load), not inference speed -- see measure_inference_latency for the comparable pure-inference number"
+  },
+  "inference_latency": {
+    "model": "gauravgandhi2411/hinglish-relatedness-sbert",
+    "n_words": 10495,
+    "embedding_dim": 768,
+    "cold_seconds": 41.12325210002018,
+    "cold_ms_per_word": 3.9183660886155485,
+    "warm_seconds": 31.332172200025525,
+    "warm_ms_per_word": 2.985438037162985
+  }
+}
