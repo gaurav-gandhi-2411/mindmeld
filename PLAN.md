@@ -1766,3 +1766,173 @@ orchestrator review), live-verified 2026-07-11.
   pairs, single sitting, no rush) to establish the benchmark's own label ceiling -- everything else
   in the original spec is either complete, gated-and-shipped, or a documented/evidenced finding
   with its next attack identified.
+
+## Spelling-variance fix -- deterministic alias-lookup extension (finding #2 closed, NOT via retraining)
+
+- [x] **Mechanism**: `docs/model-excellence-final-report.md` finding #2 named a lower-risk
+  alternative to the failed `bc4b25a` retraining attempt -- extend `vocab/hi-en-aliases.txt`
+  directly (the same LOOKUP-FOLDING mechanism `normalize.py`/`payload.py` already use to resolve a
+  typed variant to its canonical spelling BEFORE any embedding lookup). This session implemented
+  that alternative. **Zero model/training-data changes** -- `evals/finetune/train_mnrl_pairs.jsonl`
+  and every other `*_pairs*.jsonl` file, plus the shipped checkpoint, are untouched.
+- [x] **Candidate generation** (`generator/evals/finetune/extend_hien_aliases.py`, new file):
+  reuses `spelling_robustness.py`'s `build_aksharantar_maps`/`aksharantar_variants_for_secret`/
+  `is_clean_variant` verbatim (the SAME machinery `assemble_data.variant_source()` used for the
+  rejected retraining candidate), across the FULL ~544-word hinglish-sourced vocab -- 226 candidate
+  (canonical, variant) pairs generated (vs 189/193 for the train-split-only retraining attempt;
+  more here because held-out secrets are correctly INCLUDED -- alias-folding is a deterministic
+  lookup, not a statistically-generalizing model, so there's no leakage concern the way there was
+  for retraining).
+- [x] **False-merge quality gate** (the task's single named biggest risk): every candidate checked
+  against (a) the full vocab list for a DIFFERENT-word collision, (b) the pre-extension alias file
+  for a DIFFERENT-canonical collision, (c) internal consistency within the new batch itself. **12 of
+  226 candidates excluded as genuine false-merge risks** (8 vocab collisions, 4 internal-batch
+  conflicts) -- real near-misses caught, not hypothetical: `honth` (lips) mined a variant that
+  normalizes to `hunt`, another to `hut` (both pre-existing unrelated English vocab words);
+  `neeche` mined a variant that normalizes to `niche`; `kitne` mined a variant colliding with the
+  distinct vocab word `kitna`. A further 51 candidates were excluded as harmless no-ops (5 already
+  literal duplicates of existing aliases, 31 whose normalized form already equals their own
+  canonical -- i.e. already resolve correctly with zero file changes -- 15 redundant duplicate
+  normalized forms within the new batch itself, which still resolve correctly via their kept
+  sibling spelling). **163 candidates survived the automated gate** -- full accounting (every
+  exclusion + reason) in `generator/evals/finetune/data/extend_hien_aliases_report.json`.
+- [x] **A 2nd, orthogonal collision found by the FULL test suite, not the automated gate**: `(pyaar,
+  paayar)` passed all 3 automated false-merge checks but broke
+  `test_clue_spoiler_gate.py::test_spoiler_gate_pack_content[bollywood-hi-en]` -- `paayar`
+  normalizes to `payar`, which is edit-distance-2 from `palat` (an unrelated word meaning "turn
+  around") in the bollywood pack's own P01 hi-en clue, false-tripping the spoiler gate's
+  morphological-variant check. This is exactly why the task specified running the FULL suite, not
+  just alias/payload-specific tests -- caught real cross-system content risk the alias-file's own
+  gate has no visibility into (it doesn't read clue/pack content, by design -- that's out of this
+  task's scope to add). Excluded manually with an inline comment, same pattern as the file's
+  pre-existing `vaada: waada` exclusion. **162 final survivors added.**
+- [x] **`vocab/hi-en-aliases.txt` extended**: 29 -> 121 canonicals, 39 -> 201 aliases. All 29
+  original entries preserved byte-for-byte except 6 that gained additional aliases appended in
+  place (`khushbu`, `gyaan`, `pyaar`, `qurbani`, `kahani`, `izzat`); new canonicals appended under a
+  dated section header. Header comment updated to reflect the new scale.
+- [x] **Verified through the REAL production path** (precedent: `verify_ship_l2_extension_e2e.py` --
+  call the actual shipped functions, not a reimplementation): `normalize.canonical_for()` and
+  `payload.py`'s real `_build_payload_core`/alt-map builder, run against the full 10,495-word
+  production `load_hien_vocab()` (synthetic embeddings -- this verifies the LOOKUP mechanism's
+  correctness, not ranking quality, which the mechanism deliberately never touches), for a 17-secret
+  representative sample (all 13 `aksharantar_heldout`-covered secrets + 5 others): **26/26 new
+  (secret, alias) pairs resolve correctly** via both `canonical_for()` and the real alt-map's
+  `[rank, qsim]` (verified equal to the canonical word's own entry, not just present).
+- [x] **Re-measured the actual success criterion**: of the original 267-record `aksharantar_heldout`
+  eval set (30 unique secret/variant pairs, 13 secrets, 67.4% embedding-level band-agreement
+  baseline), lookup-based resolution via the extended alias file is **267/267 (100%)**, up from
+  63/267 (23.6%) pre-fix -- 100% BY CONSTRUCTION for every covered pair, since a resolved lookup
+  inherits the canonical spelling's exact rank (this is the correct re-measurement per the task's
+  framing: alias-folding happens before embedding, so "does it resolve" is the right question, not
+  "does directly embedding the variant produce the same rank", which is what the ORIGINAL
+  `aksharantar_heldout` measurement deliberately tests and is UNCHANGED by this fix -- the embedding
+  itself was never touched). 23 of the 30 unique pairs were newly fixed by this session's alias
+  additions; 7 already resolved correctly before this task (via normalize()'s fold rules alone or
+  pre-existing alias entries). None of the 30 eval pairs involve `pyaar` (the one spoiler-gate
+  exclusion above), so that exclusion does not affect this 267/267 number. Broader
+  full-candidate-set coverage: 213/226 (94.2%) of ALL mined candidates (not just the 267-record eval
+  sample) now resolve correctly; the remaining 5.8% are exactly the 12 automated-gate false-merge
+  exclusions plus the 1 spoiler-gate exclusion, not a residual gap.
+- [x] **Zero-regression check**: full `uv run pytest` from `generator/`. Before the spoiler-gate
+  fix above, `test_clue_spoiler_gate.py::test_spoiler_gate_pack_content[bollywood-hi-en]` was the
+  ONE failure in the entire 718-test suite (713 passed, 1 failed, 4 skipped) -- a real regression
+  this change introduced and the full-suite run caught, as intended. **After the fix: 714 passed, 0
+  failed, 4 skipped** (608s wall clock) -- confirmed clean on a run where the file was not touched
+  mid-execution (the first post-edit run read a stale in-process `lru_cache`d alias map from before
+  the fix landed, giving a misleading still-failing result; re-run confirmed the fix, not a cache
+  artifact).
+- [x] **Docs**: `docs/model-excellence-final-report.md` finding #2 updated in place (FIXED
+  (2026-07-24) heading, full before/after numbers, "why this worked where retraining didn't"
+  section) -- not a new numbered entry, per the task's own framing that finding #2 was already the
+  right home for this.
+- [ ] **NOT committed**: everything in this checkpoint is staged/unstaged on disk only, per explicit
+  instruction -- an orchestrator-level commit follows after combined review with a parallel
+  band-calibration (finding #1) change. Nothing pushed/published anywhere; no payloads republished
+  to the live payloads repo (that remains a separate, later, human-confirmed step).
+
+## Band-calibration fix -- hi-en Warm band widened via a floor, not a fraction change (finding #1 closed)
+
+- [x] **Mechanism**: `docs/model-excellence-final-report.md` finding #1 (hi-en's Warm band was only
+  24 ranks / 0.23% of vocab wide, vs EN's 2,200 ranks / 4.0%) named `warm_max = int(n * 0.08)` as an
+  untested next attack. That exact hypothesis was tested and **rejected**: raising `warmFraction`
+  globally also inflates EN's Warm band from 4.0% to 7.0% of vocab (2,200 -> 3,850 ranks), eating
+  into EN's Cold band -- directly contradicting the goal of leaving EN's already-shipped, presumably
+  well-tuned band feel untouched. Root cause, actually isolated: unlike Scorching (`max(50, n*
+  0.001)`) and Hot (`max(500, n*0.01)`), Warm had no floor of its own -- so at hi-en's vocab scale,
+  Hot's floor eating into the un-floored Warm ceiling had nothing to counteract it. **Fix shipped**:
+  added a 900-rank floor to Warm (`warm_max = max(900, int(n * 0.05))`), the same `max(floor,
+  n*fraction)` shape the other two bands already use -- `warmFraction` itself is UNCHANGED at 0.05.
+  900 was chosen empirically (not a round-number guess): it produces a hi-en Warm width of 400 ranks
+  / 3.81% of vocab, closely matching EN's existing 4.0% feel, while being mathematically guaranteed
+  not to bind at EN's scale (55,000 * 0.05 = 2,750 >> 900).
+- [x] **Kept in sync, all sites found and fixed**: `rival.band_for_rank` (Python source of truth) and
+  `bandForRank`/`AppConfig.warmFloor` (Dart, `models.dart`/`config.dart`) both carry the floor.
+  Audited for every OTHER inline `n * 0.05` re-derivation that could silently drift: `rival.
+  _generate_path`'s own `warm_threshold` (adaptive-convergence cold/warm transition -- was already
+  duplicating band_for_rank's formula pre-fix, now carries the same floor);
+  `dimension5_winrate._simulate_one`'s own `warm_threshold` (win-rate player-model reduction
+  schedule, same fix); `test_onboarding_build.py`'s EN teaching-ladder boundary check (doesn't
+  change EN's numeric outcome since the floor never binds there, but kept honest). `failure_taxonomy.
+  band_rank_range` needed NO code change -- it already derives its window by scanning
+  `band_for_rank` directly rather than duplicating the formula, exactly the pattern the other sites
+  should have followed; its own tests still needed updating since they hardcoded the OLD scanned
+  result (24-rank window -> 400-rank window).
+- [x] **Tests updated, not just widened**: every hardcoded boundary value in `generator/tests/
+  test_rival.py` (new `test_hien_warm_floor_fix` at the real n=10,495; `test_small_vocab_hot_floor`
+  at the pathological n=1,000 explicitly documented as an ACCEPTED edge case -- Warm is now
+  reachable there but Cold becomes fully swallowed instead, since n=1,000 is not a real vocab this
+  game uses, both real langs are >=10,495) and `app/test/temperature_bands_test.dart` (n=10,439
+  fixture group's 501-524 Warm window recomputed to 501-900) recomputed to the exact new numbers,
+  plus `test_failure_taxonomy.py`'s two hardcoded-window tests (24 -> 400 ranks).
+- [x] **Empirical validation, not just a formula check**:
+  - **Band-confusion matrix** (bake-off checkpoint `gauravgandhi2411/hinglish-relatedness-sbert`,
+    379 dim1 records, real n=10,495): Warm's predicted-count rose 2 -> 17, recall 1.2% -> 8.3% of the
+    84 expected-Warm records, precision held ~0.41-0.50 (the newly-captured records aren't noise).
+    **EN confirmed byte-identical**: re-ran `dimension1_ranking._resolve_actuals` for all 227 EN
+    dim1 scenario records against both formulas -- **0 records changed `actual_band`**.
+  - **ECE unaffected by construction, not by luck**: `band_calibration_error` derives its confidence
+    signal from `1 - actual_rank/vocab_size` directly, never from `actual_band` -- so it's
+    mathematically invariant to any band-boundary change; reported (0.202, identical both formulas)
+    for completeness, not claimed as fix evidence.
+  - **Guess-distribution simulation** (adapted `dimension5_winrate`'s exact RNG/reduction-model
+    machinery, 118 real hi-en puzzles x 100 simulated noisy-guesser trajectories each, scratch script
+    not committed): fraction of simulated guess-steps landing in Warm rose from **0.37% -> 4.44%**
+    (477/130,036 -> 5,846/131,716 steps) -- the actual "will players encounter this band" proof, not
+    just a static width calculation.
+  - **Rival-path calibration gate** (`dimension4_rival`, real production `generate_rival_data`, 236
+    real daily+pack puzzles both langs): re-ran against both the OLD formula (loaded via `git show
+    HEAD:generator/rival.py` into an isolated module, zero working-tree changes) and the NEW --
+    **identical results, 0/236 flagged both before and after**, median par 8.0 / chill_spread 5.0 /
+    sharp_spread 3.0 unchanged. Confirms Hot's floor (unchanged), not Warm's, dominates rival-path
+    pacing -- this fix doesn't touch it.
+- [x] **Dart UI/UX read-only review** (`win_screen.dart` share-card + best-band label, `puzzle_
+  screen.dart` live rival indicator + best-guess pill + onboarding example tile, `guess_tile.dart`
+  hint/guess rendering, `rival_state.dart`): confirmed every site consumes only the `TemperatureBand`
+  enum/label/emoji/color, never a raw rank number or an assumed band width. No threshold-adjacent
+  hardcoding found -- no changes needed.
+- [x] **Local payload regen, NOT published** (`generator/build.py`, 21 days both langs starting
+  2026-07-24, output to a scratch dir outside both this repo and the sibling payloads repo): all 42
+  payloads within their gzip size targets, par distributions sane (EN median 9, hi-en median 8, both
+  within the [4,16]/median-[8,12] calibration targets). Spot-checked rival paths by eye across
+  several dates -- band sequences non-degenerate, and one real generated payload (hi-en 2026-08-05,
+  chill tier, rank 820) directly exercises the new Warm band in production-shaped output, confirming
+  the fix is live end-to-end, not just formula-correct in isolation.
+- [x] **Test suite**: Dart (`flutter test`, full suite, 524 tests) -- 523 passed, 1 pre-existing
+  flake (`puzzle_completed_analytics_test.dart`'s win-outcome test, unrelated to band logic --
+  confirmed by rerunning in isolation, where it passes cleanly every time) confirmed NOT caused by
+  this change. Python: every file this change touched passes in a targeted run (`test_rival.py`,
+  `test_failure_taxonomy.py`, `test_onboarding_build.py`, `test_payload.py`, `test_vocab.py` --
+  208/208 passed); the full `uv run pytest` from `generator/` (all of `tests/`, including the slow
+  real-LoRA-training regression test) was still running at the time this checkpoint was written --
+  see the next checkpoint entry or session notes for its final count.
+- [x] **Docs**: `docs/known-limitations.md` entry #18 updated in place to FIXED (2026-07-24) status
+  (root cause, fix, and the same before/after numbers as above) following entry #21's established
+  FIXED-entry style; `docs/model-excellence-final-report.md` finding #1 updated in place to FIXED
+  (development-complete, pending deploy) status, explicitly naming and rejecting the
+  originally-hypothesized fraction-only fix.
+- [ ] **NOT committed**: everything in this checkpoint is staged/unstaged on disk only, per explicit
+  instruction -- an orchestrator-level commit follows after combined review with the parallel
+  alias-lookup change (finding #2, above). Nothing pushed/published anywhere; no payloads
+  republished to the live payloads repo or the sibling `mindmeld-payloads` directory (that remains a
+  separate, later, human-confirmed step). Local payload regen output lives entirely under this
+  session's scratch directory, never inside the actual payloads repo, and was not committed.

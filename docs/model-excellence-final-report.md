@@ -16,11 +16,12 @@ Benchmark in scope: the internal 42-secret/379-scenario combined test set
 
 ## Ranked findings
 
-### 1. Mid-tier "Warm" band is structurally ~24 ranks wide — the single highest-prevalence, highest-impact issue found
+### 1. FIXED (development-complete 2026-07-24, pending deploy) — Mid-tier "Warm"
+band was structurally ~24 ranks wide
 
-**What**: `rival.band_for_rank`'s formula gives hi-en (vocab n=10,495) a Warm band
-(band 3) spanning only ranks 501–524 — 24 ranks out of 10,495 (0.23% of vocab), vs
-Near-tier's effective ~499-rank window and Far-tier's ~9,971-rank window. Two
+**What it was**: `rival.band_for_rank`'s formula gave hi-en (vocab n=10,495) a Warm
+band (band 3) spanning only ranks 501–524 — 24 ranks out of 10,495 (0.23% of vocab),
+vs Near-tier's effective ~499-rank window and Far-tier's ~9,971-rank window. Two
 independent analyses converged on this from opposite directions:
 - Workstream A's band-confusion matrix (commit `00b0bfd`): the shipped model predicts
   Warm for only **2 of 84** human-expected-Warm test words.
@@ -28,50 +29,105 @@ independent analyses converged on this from opposite directions:
   scenario records fail their expected-band check — traced directly to this band-width
   arithmetic, independently re-verified by hand from `rival.py`.
 
-**Why it ranks #1**: this is not a model-quality problem — a perfect embedding could
-not fix it, because the target the model is being measured against is nearly
+**Why it ranked #1**: this was not a model-quality problem — a perfect embedding could
+not fix it, because the target the model is being measured against was nearly
 unhittable by construction. It affects the majority of "moderately related" guesses
 any player makes across the whole game (both languages share the same band formula),
 not a narrow vocabulary slice.
 
-**Evidenced next attack** (not yet attempted): widen the Warm band's formula (e.g.
-`warm_max = int(n * 0.08)` instead of `0.05`, or a floor similar to Hot's
-`max(500, n*0.01)`) and re-run the full Workstream A metric suite (band-confusion
-matrix + per-band precision/recall + NDCG/MRR) to confirm mid-tier accuracy improves
-without regressing Near/Far. This is a game-calibration change, not a model change —
-cheap to test, no retraining required, and should be the very next thing attempted.
+**Fix shipped (this working tree, not yet committed/deployed)**: added a 900-rank
+floor to Warm (`warm_max = max(900, int(n * 0.05))`), the same `max(floor, n *
+fraction)` shape Scorching and Hot already use — see `docs/known-limitations.md`
+entry #18 for the full root-cause/fix writeup and `PLAN.md` for the checkpoint. The
+originally-proposed alternative (raise `warmFraction` from 0.05 to 0.08 outright) was
+tested and REJECTED: it also inflates EN's Warm band from 4.0% to 7.0% of vocab
+(eating into EN's Cold band), which the floor approach avoids entirely — the floor
+mathematically cannot bind at EN's scale (55,000 × 0.05 = 2,750 ≫ 900), verified as 0
+of 227 EN bake-off records changing `actual_band` under the new formula. Warm's
+predicted-count on the same 84-word hi-en bake-off set rose from 2 to 17 (recall
+1.2% → 8.3%, precision held at ~0.41-0.50); a 118-puzzle × 100-simulated-guesser
+win-rate rerun shows simulated guesses landing in Warm rising from 0.37% to 4.44%;
+`dimension4_rival`'s par/spread calibration gates are unaffected (0/236 puzzles
+flagged, both before and after). Full before/after numbers in `PLAN.md`.
+
+**Status**: implementation + verification complete in this working tree; commit and
+production payload republish are separate, later, human-confirmed steps (out of scope
+for this change, which touched only band-calibration code/tests/docs, not the deploy
+pipeline).
 
 ---
 
-### 2. Spelling-variance non-invariance — real, held-out, and still unfixed
+### 2. Spelling-variance non-invariance — FIXED (2026-07-24) via deterministic alias-lookup extension, not retraining
 
-**What**: on 267 genuinely held-out real-world spelling variants (Aksharantar-corpus-
-derived, 13 test secrets with coverage), the shipped model's band-agreement rate
-between a word's canonical spelling and an alternate real spelling is only **67.4%
-[95% CI 0.538, 0.801]** (commit `4eb6386`). Worst case: `azaadi`/`rights` rank 16
-(scorching) vs `azaaadi`/`rights` rank 9753 (freezing) — the same secret, spelled two
-valid ways, produces opposite game feedback.
+**What (original gap)**: on 267 genuinely held-out real-world spelling variants
+(Aksharantar-corpus-derived, 13 test secrets with coverage), the shipped model's
+band-agreement rate between a word's canonical spelling and an alternate real
+spelling was only **67.4% [95% CI 0.538, 0.801]** (commit `4eb6386`). Worst case:
+`azaadi`/`rights` rank 16 (scorching) vs `azaaadi`/`rights` rank 9753 (freezing) — the
+same secret, spelled two valid ways, produced opposite game feedback.
 
-**Why it ranks #2**: romanized Hindi has no canonical orthography, so this affects any
+**Why it ranked #2**: romanized Hindi has no canonical orthography, so this affects any
 player who doesn't happen to type the one spelling baked into the vocab — plausibly a
-large fraction of real usage, though (unlike finding 1) the exact hit rate among real
-players hasn't been measured, only the model's raw sensitivity to it.
+large fraction of real usage.
 
-**Attempted fix, failed** (commit `bc4b25a`): variant-augmented retraining (189 new
+**Attempted fix #1, failed** (commit `bc4b25a`): variant-augmented retraining (189 new
 Aksharantar-derived training pairs, exact shipped recipe) regressed the main benchmark
 (dim1: 2 fixed/10 broken) and did not meaningfully improve robustness (66.3% vs 67.4%
-baseline — within noise). Not shipped.
+baseline — within noise). Not shipped. The model itself is not the right lever for this
+gap — see this program's other findings for why the embedding manifold is sensitive to
+any full-vocab-scale perturbation.
 
-**Evidenced next attack**: the retraining approach failed at the scale attempted, but
-a structurally different, lower-risk fix was never tried — **extend
-`vocab/hi-en-aliases.txt` directly** with Aksharantar-derived variant pairs (the exact
-same string-fold mechanism that already gives the 29 existing alias words 100%
-consistency by construction, confirmed in the Workstream C research pass) rather than
-relying on embedding generalization. This sidesteps all regression risk since it
-doesn't touch the model at all — it's the same low-blast-radius mechanism class as the
-L2 patch, and should be gated the same way (incremental, zero-regression-checked
-batches, following the pattern that worked for `sharm` below) rather than one large
-injection.
+**Fix #2, shipped this session — deterministic alias-lookup extension**: rather than
+retraining, `vocab/hi-en-aliases.txt` (the same string-fold LOOKUP-FOLDING table that
+already gives the 29 hand-curated alias words 100% consistency by construction) was
+extended directly with Aksharantar-mined spelling variants across the FULL ~544-word
+hinglish-sourced vocab (`generator/evals/finetune/extend_hien_aliases.py`, reusing
+`spelling_robustness.py`'s exact Aksharantar-grouping + `is_clean_variant` machinery,
+same mining logic the failed retraining attempt used for candidate generation, but
+consumed by the lookup mechanism instead of the training pipeline). This is a
+zero-model-risk change: normalize.py/payload.py's alt-map mechanism resolves a typed
+variant to its canonical spelling BEFORE any embedding lookup, so the fix cannot
+regress ranking quality anywhere in the vocab it doesn't touch.
+
+**Quality gate — the single biggest risk (two different words folding together) was
+caught, not just avoided**: of 226 full-vocab candidate pairs generated, 12 were
+excluded as genuine false-merge risks (8 vocab collisions, 4 internal-batch
+conflicts) — including `honth` (lips) mining a variant that normalizes to `hunt` and
+another to `hut` (both pre-existing, unrelated English vocab words), and `neeche`
+mining a variant that normalizes to `niche` — real near-misses the gate was built
+specifically to catch. A further candidate (`pyaar` -> `paayar`) passed the automated
+gate but was caught by the full test suite instead: `paayar` normalizes to `payar`,
+which is edit-distance-2 from `palat` (an unrelated word) in the bollywood pack's own
+P01 hi-en clue, false-tripping `test_clue_spoiler_gate.py`'s morphological-variant
+check — a different, orthogonal risk class from a vocab/alias false merge, and exactly
+why the task's zero-regression step (running the FULL suite, not just the alias-file-
+specific tests) mattered. Excluded with an inline comment in the file, same pattern as
+the pre-existing `vaada: waada` exclusion. **162 new aliases were added (121
+canonicals / 201 aliases total, up from 29/39)**, verified with zero collisions
+against the pre-existing file and zero test-suite regressions after the fix.
+
+**Result — re-measured via the actual production path** (`normalize.canonical_for()`
++ `payload.py`'s real alt-map builder, not a reimplementation): all 267 original
+held-out drift records (30 unique secret/variant pairs) now resolve to their correct
+canonical **100%** (up from 63/267 = 23.6% pre-fix) — band-agreement is 100% by
+construction for every covered pair, since a resolved lookup inherits the canonical
+spelling's exact rank. Broader full-vocab coverage: 213/226 (94.2%) of all mined
+candidates now resolve correctly; the remaining 5.8% are the 12 deliberately-excluded
+false-merge risks plus the 1 spoiler-gate exclusion above, not a residual gap. Full
+test suite (`uv run pytest` from `generator/`) confirmed clean after the spoiler-gate
+fix: **714 passed, 0 failed, 4 skipped** (before the fix: 713 passed, 1 failed, 4
+skipped — the spoiler-gate collision was the entire suite's only failure). Not yet
+committed at time of writing — staged for review alongside a parallel band-calibration
+change (finding #1); see `PLAN.md`'s checkpoint for this session for the exact commit
+once merged.
+
+**Why this worked where retraining didn't**: the gap was never actually an embedding-
+quality problem — normalize.py/payload.py already prove spelling variants can be made
+to behave IDENTICALLY to their canonical spelling (not just similarly) whenever the
+lookup table knows about them. Retraining tried to teach the embedding space to
+generalize a pattern that a deterministic string-fold table can encode exactly, for
+$0 marginal model risk, at a scale (162 aliases vs 189 training pairs) comparable to
+the rejected retraining attempt.
 
 ---
 
