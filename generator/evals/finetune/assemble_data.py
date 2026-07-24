@@ -33,14 +33,31 @@ Output (evals/finetune/data/):
   counts.json               per-source counts + no-leakage proof
   sample_for_review.json    ~25-pair cross-source sample for GG spot-check
 
+A 6th source, `variant_source` (spec-model-excellence.md WORKSTREAM C, item
+10), is available but OFF by default: `build(variant_augmented=True)` (or
+`--variant-augmented` on the CLI) layers Aksharantar-mined real-world
+spelling-variant pairs on top of the 5 sources above and writes to
+train_mnrl_pairs_variant_augmented.jsonl / train_graded_pairs_variant_
+augmented.jsonl / counts_variant_augmented.json / sample_for_review_variant_
+augmented.json instead — the production train_*_pairs.jsonl files (which
+produced the currently-shipped model) are NEVER touched by this path.
+
 Run: uv run python -m evals.finetune.assemble_data
+     uv run python -m evals.finetune.assemble_data --variant-augmented
 """
 
 import json
 import random
 from pathlib import Path
 
+from evals.finetune.collision_scan import hinglish_sourced_words
 from evals.finetune.llm_augment import generate_and_filter
+from evals.finetune.spelling_robustness import (
+    AKSHARANTAR_PATH,
+    K_AKSHARANTAR_MAX_PER_SECRET,
+    aksharantar_variants_for_secret,
+    build_aksharantar_maps,
+)
 from evals.finetune.split import load_split
 from profanity import load_en_profanity, load_hi_profanity
 from vocab import parse_hinglish_file
@@ -216,6 +233,60 @@ def alias_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
     return mnrl, graded
 
 
+def variant_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
+    """Returns (mnrl_pairs, graded_pairs) of real-world spelling-variant
+    pairs mined from the Aksharantar transliteration corpus across the FULL
+    ~544-word hinglish-sourced vocab (vocab/hinglish.txt) — spec-model-
+    excellence.md WORKSTREAM C, item 10 ("if robustness is weak, TRAIN for
+    it"). This is the exact same grouping-by-devanagari + is_clean_variant
+    (normalized Levenshtein <= 0.4, length ratio in [0.6, 1.6]) machinery
+    already built and validated in spelling_robustness.py for its
+    aksharantar_heldout eval category — reused verbatim via
+    build_aksharantar_maps/aksharantar_variants_for_secret rather than
+    reimplemented, capped at K_AKSHARANTAR_MAX_PER_SECRET variants per word
+    (same cap the eval module uses).
+
+    Same ALIAS_SCORE (0.95) as alias_source — a spelling variant is the same
+    epistemic status as a curated alias (semantically identical, different
+    surface form), not a weaker positive.
+
+    Leakage guard: excludes any pair (word OR variant) touching a held-out
+    (dev+test) secret/EN-translation — the SAME exclusion alias_source
+    applies. Since the 267-pair aksharantar_heldout EVAL category (spec's
+    "just measured" gap) is itself mined from TEST secrets only, this
+    guarantees the eval's secrets can never appear here. A coincidental
+    WORD-level collision (an eval variant spelling happening to also be a
+    distinct training pair for some other, non-held-out word) is separately
+    verified by probe_variant_augmented_retrain.py's leakage check, not by
+    this function — this function's only contract is the held-out-secret
+    exclusion every other source function in this module applies.
+    """
+    hi_words = sorted(hinglish_sourced_words())
+    rom_to_deva, deva_to_rom = build_aksharantar_maps(AKSHARANTAR_PATH)
+
+    mnrl: list[dict] = []
+    graded: list[dict] = []
+    for word in hi_words:
+        if word in held_out:
+            continue
+        variants = aksharantar_variants_for_secret(
+            word, rom_to_deva, deva_to_rom, max_variants=K_AKSHARANTAR_MAX_PER_SECRET
+        )
+        for variant in variants:
+            if variant in held_out:
+                continue
+            mnrl.append({"anchor": word, "positive": variant, "source": "variant"})
+            graded.append(
+                {
+                    "sentence1": word,
+                    "sentence2": variant,
+                    "score": ALIAS_SCORE,
+                    "source": "variant",
+                }
+            )
+    return mnrl, graded
+
+
 def corpus_pmi_source(held_out: set[str]) -> tuple[list[dict], list[dict]]:
     """
     Corpus PMI-mined relatedness pairs (pmi_mine.py + pmi_quality_filter.py's
@@ -290,7 +361,13 @@ def _assert_no_leakage(mnrl: list[dict], graded: list[dict], held_out: set[str])
             assert rec[field].lower() not in held_out, f"LEAKAGE in graded: {rec}"
 
 
-def build() -> dict:
+def build(*, variant_augmented: bool = False) -> dict:
+    """Assemble training data from the 5 production sources, plus a 6th
+    (`variant_source`) when `variant_augmented=True` — spec-model-
+    excellence.md WORKSTREAM C, item 10. When True, output is written to
+    *_variant_augmented.jsonl/.json filenames instead of the production
+    train_*_pairs.jsonl/counts.json/sample_for_review.json files, which stay
+    byte-identical to their current (pre-this-change) contents."""
     split = load_split()
     held_out = _held_out(split)
 
@@ -300,8 +377,13 @@ def build() -> dict:
     al_mnrl, al_graded = alias_source(held_out)
     pmi_mnrl, pmi_graded = corpus_pmi_source(held_out)
 
-    all_mnrl = d1_mnrl + llm_mnrl + cl_mnrl + al_mnrl + pmi_mnrl
-    all_graded = d1_graded + llm_graded + al_graded + cl_graded + pmi_graded
+    var_mnrl: list[dict] = []
+    var_graded: list[dict] = []
+    if variant_augmented:
+        var_mnrl, var_graded = variant_source(held_out)
+
+    all_mnrl = d1_mnrl + llm_mnrl + cl_mnrl + al_mnrl + pmi_mnrl + var_mnrl
+    all_graded = d1_graded + llm_graded + al_graded + cl_graded + pmi_graded + var_graded
 
     # Dedup exact (anchor, positive) / (sentence1, sentence2, score) duplicates
     # that can arise across sources (e.g. dim1 and crosslingual both proposing
@@ -324,11 +406,12 @@ def build() -> dict:
 
     _assert_no_leakage(deduped_mnrl, deduped_graded, held_out)
 
+    suffix = "_variant_augmented" if variant_augmented else ""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    with (DATA_DIR / "train_mnrl_pairs.jsonl").open("w", encoding="utf-8") as f:
+    with (DATA_DIR / f"train_mnrl_pairs{suffix}.jsonl").open("w", encoding="utf-8") as f:
         for r in deduped_mnrl:
             f.write(json.dumps(r) + "\n")
-    with (DATA_DIR / "train_graded_pairs.jsonl").open("w", encoding="utf-8") as f:
+    with (DATA_DIR / f"train_graded_pairs{suffix}.jsonl").open("w", encoding="utf-8") as f:
         for r in deduped_graded:
             f.write(json.dumps(r) + "\n")
 
@@ -339,6 +422,7 @@ def build() -> dict:
             "crosslingual": len(cl_mnrl),
             "alias": len(al_mnrl),
             "corpus_pmi": len(pmi_mnrl),
+            "variant": len(var_mnrl),
             "total_before_dedup": len(all_mnrl),
             "total_after_dedup": len(deduped_mnrl),
         },
@@ -348,6 +432,7 @@ def build() -> dict:
             "crosslingual": len(cl_graded),
             "alias": len(al_graded),
             "corpus_pmi": len(pmi_graded),
+            "variant": len(var_graded),
             "total_before_dedup": len(all_graded),
             "total_after_dedup": len(deduped_graded),
         },
@@ -359,14 +444,17 @@ def build() -> dict:
         ),
         "no_leakage_assertion": "passed — no training record contains a held-out "
         "secret or its EN translation (see _assert_no_leakage)",
+        "variant_augmented": variant_augmented,
     }
-    (DATA_DIR / "counts.json").write_text(json.dumps(counts, indent=2) + "\n", encoding="utf-8")
+    (DATA_DIR / f"counts{suffix}.json").write_text(
+        json.dumps(counts, indent=2) + "\n", encoding="utf-8"
+    )
 
     rng = random.Random(SAMPLE_SEED)
     sample_mnrl = rng.sample(deduped_mnrl, k=min(15, len(deduped_mnrl)))
     sample_graded = rng.sample(deduped_graded, k=min(10, len(deduped_graded)))
     sample = {"mnrl_sample": sample_mnrl, "graded_sample": sample_graded}
-    (DATA_DIR / "sample_for_review.json").write_text(
+    (DATA_DIR / f"sample_for_review{suffix}.json").write_text(
         json.dumps(sample, indent=2) + "\n", encoding="utf-8"
     )
 
@@ -374,5 +462,16 @@ def build() -> dict:
 
 
 if __name__ == "__main__":
-    counts = build()
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--variant-augmented",
+        action="store_true",
+        help="Also assemble the Aksharantar variant-pair source (writes to "
+        "*_variant_augmented.jsonl/.json, never touches the production files)",
+    )
+    args = parser.parse_args()
+
+    counts = build(variant_augmented=args.variant_augmented)
     print(json.dumps(counts, indent=2))

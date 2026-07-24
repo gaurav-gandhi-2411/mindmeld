@@ -1,0 +1,141 @@
+{
+  "mnrl_sample": [
+    {
+      "anchor": "chhat",
+      "positive": "anand",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "zindagi",
+      "positive": "life",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "bhai",
+      "positive": "brother",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "accha",
+      "positive": "achchhaa",
+      "source": "variant"
+    },
+    {
+      "anchor": "jharna",
+      "positive": "waterfall",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "andar",
+      "positive": "inside",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "lamba",
+      "positive": "tall",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "chawal",
+      "positive": "rice",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "fielder",
+      "positive": "covers",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "god",
+      "positive": "bhagwan",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "gilas",
+      "positive": "doosra",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "accha",
+      "positive": "achchaa",
+      "source": "variant"
+    },
+    {
+      "anchor": "shampoo",
+      "positive": "shampoos",
+      "source": "variant"
+    },
+    {
+      "anchor": "naach",
+      "positive": "gaana",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "shak",
+      "positive": "symptom",
+      "source": "llm_augmented"
+    }
+  ],
+  "graded_sample": [
+    {
+      "sentence1": "ummeed",
+      "sentence2": "ummiid",
+      "score": 0.95,
+      "source": "variant"
+    },
+    {
+      "sentence1": "railway",
+      "sentence2": "underbridge",
+      "score": 0.633011260225222,
+      "source": "corpus_pmi"
+    },
+    {
+      "sentence1": "jungle",
+      "sentence2": "wildlife",
+      "score": 0.55,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "jeet",
+      "sentence2": "hathor",
+      "score": 0.05,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "match",
+      "sentence2": "sky",
+      "score": 0.05,
+      "source": "llm_augmented"
+    },
+    {
+      "sentence1": "ulta",
+      "sentence2": "opposite",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "maidan",
+      "sentence2": "field",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "airport",
+      "sentence2": "aiyarport",
+      "score": 0.95,
+      "source": "variant"
+    },
+    {
+      "sentence1": "jeet",
+      "sentence2": "win",
+      "score": 0.85,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "nata",
+      "sentence2": "natt",
+      "score": 0.95,
+      "source": "variant"
+    }
+  ]
+}

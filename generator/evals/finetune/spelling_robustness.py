@@ -98,8 +98,10 @@ from numpy.typing import NDArray
 
 from config import VOCAB_DIR
 from embeddings import cosine_similarities, embed_vocab
+from evals.finetune.benchmark_bakeoff import load_combined_dim1_scenarios
 from evals.finetune.collision_scan import hinglish_anchor_glosses, hinglish_sourced_words
 from evals.finetune.eval_model import _model_override
+from evals.harness.dimension1_ranking import _resolve_actuals
 from evals.harness.metrics import top_weighted_correlation
 from payload import levenshtein
 from rival import band_for_rank
@@ -687,16 +689,43 @@ def _load_checkpoint() -> dict:
     return json.loads(CHECKPOINT_PATH.read_text(encoding="utf-8"))
 
 
-def build_report(include_llm: bool = True) -> tuple[str, dict]:
+def build_report(include_llm: bool = True, model_override: str | None = None) -> tuple[str, dict]:
     """Full I/O-driving pipeline: load the canonical checkpoint, generate
     every category's variant spellings, embed them all in one batch, compute
     per-(secret, word, variant) drift + per-(secret, variant) holistic
     correlation, aggregate with bootstrap CIs, render markdown + JSON.
+
+    `model_override` (spec-model-excellence.md WORKSTREAM C, item 10 --
+    gating a variant-augmented retraining candidate): when given, the SAME
+    test-secret set + variant-generation logic runs, but BOTH the canonical
+    (unperturbed) ranks/bands AND every variant's ranks/bands are freshly
+    computed under `model_override` instead of reusing the shipped
+    checkpoint's canonical_records -- comparing a candidate model's variant
+    embedding against the SHIPPED model's canonical embedding would conflate
+    "candidate behaves differently" with "candidate is more spelling-
+    invariant". `model_override=None` (default) preserves the original
+    behaviour exactly: canonical ranks/bands reused as-is from the shipped
+    checkpoint, matching this module's original design note (module
+    docstring, "Baseline reuse"). The fresh-computation path uses
+    benchmark_bakeoff.load_combined_dim1_scenarios + dimension1_ranking.
+    _resolve_actuals -- the SAME combined 42-secret (8 production + 34
+    benchmark-supplement) resolution benchmark_bakeoff.evaluate_one_model
+    used to build the shipped checkpoint in the first place; eval_model.
+    dim1_for_secrets alone only covers the 8 production-fixture test
+    secrets and silently omits the 34 supplement secrets (e.g. "azaadi"),
+    which would leave canonical_by_secret missing entries the rest of this
+    function's test_secrets loop expects.
     """
     checkpoint = _load_checkpoint()
-    model_name = checkpoint["model"]
-    canonical_records_all = checkpoint["dim1_records"]
-    test_secrets = sorted({r["secret"] for r in canonical_records_all})
+    test_secrets = sorted({r["secret"] for r in checkpoint["dim1_records"]})
+    if model_override is not None:
+        model_name = model_override
+        with _model_override(model_name):
+            raw_scenarios = load_combined_dim1_scenarios(set(test_secrets))
+            canonical_records_all = _resolve_actuals(raw_scenarios, "hi-en")
+    else:
+        model_name = checkpoint["model"]
+        canonical_records_all = checkpoint["dim1_records"]
     canonical_by_secret = _by_secret(canonical_records_all)
 
     vocab = load_hien_vocab()
