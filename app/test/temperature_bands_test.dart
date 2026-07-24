@@ -7,7 +7,9 @@ void main() {
     // Thresholds:
     //   scorching ≤ max(50, floor(55000 * 0.001)) = max(50, 55) = 55
     //   hot       ≤ max(500, floor(55000 * 0.01))  = max(500, 550) = 550
-    //   warm      ≤ floor(55000 * 0.05)             = 2750
+    //   warm      ≤ max(900, floor(55000 * 0.05))  = max(900, 2750) = 2750
+    //     (the 900-rank warm floor added to fix hi-en's dead Warm band does
+    //     not bind at this scale: 2750 >> 900, so this boundary is unchanged)
     //   cold      ≤ floor(55000 * 0.25)             = 13750
     //   else      freezing
 
@@ -58,10 +60,12 @@ void main() {
 
   group('bandForRank — n=10439 (Hinglish vocab size)', () {
     const n = 10439;
-    // Thresholds:
+    // Thresholds (post warm-floor-fix, see docs/known-limitations.md #18):
     //   scorching ≤ max(50, floor(10439 * 0.001)) = max(50, 10) = 50
     //   hot       ≤ max(500, floor(10439 * 0.01))  = max(500, 104) = 500
-    //   warm      ≤ floor(10439 * 0.05)             = 521
+    //   warm      ≤ max(900, floor(10439 * 0.05))  = max(900, 521) = 900
+    //     (pre-fix this was 521 -- a 21-rank Warm band; the 900-rank floor
+    //     widens it to a 400-rank band, matching EN's proportional feel)
     //   cold      ≤ floor(10439 * 0.25)             = 2609
     //   else      freezing
 
@@ -85,12 +89,12 @@ void main() {
       expect(bandForRank(501, n), equals(TemperatureBand.warm));
     });
 
-    test('rank 521 → warm (at warm threshold)', () {
-      expect(bandForRank(521, n), equals(TemperatureBand.warm));
+    test('rank 900 → warm (at new warm-floor threshold)', () {
+      expect(bandForRank(900, n), equals(TemperatureBand.warm));
     });
 
-    test('rank 522 → cold', () {
-      expect(bandForRank(522, n), equals(TemperatureBand.cold));
+    test('rank 901 → cold', () {
+      expect(bandForRank(901, n), equals(TemperatureBand.cold));
     });
 
     test('rank 2609 → cold (at cold threshold)', () {

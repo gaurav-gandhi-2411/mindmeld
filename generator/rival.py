@@ -34,9 +34,20 @@ def band_for_rank(rank: int, n: int) -> int:
       win:       rank == 1
       scorching: rank <= max(50, n * 0.001)
       hot:       rank <= max(500, n * 0.01)
-      warm:      rank <= n * 0.05
+      warm:      rank <= max(900, n * 0.05)
       cold:      rank <= n * 0.25
       freezing:  else
+
+    warm's 900-rank floor (added alongside scorching's/hot's existing floors,
+    same max(floor, fraction) shape) fixes a band-calibration bug: for small
+    vocabs (e.g. hi-en, n~10,495) hot's 500-rank floor already consumes most
+    of the un-floored n*0.05=525 warm ceiling, squeezing Warm down to a
+    24-rank sliver (0.23% of vocab) versus EN's healthy 2,200-rank/4.0% Warm
+    band at n=55,000. A floor of 900 leaves EN's own thresholds byte-for-byte
+    unchanged (55,000 * 0.05 = 2,750 >> 900, so the floor never binds there)
+    while giving hi-en a ~400-rank/3.8% Warm band -- matching EN's existing
+    proportional feel. See docs/known-limitations.md #18 and PLAN.md for the
+    full before/after calibration data.
     """
     if rank == 1:
         return 0
@@ -45,7 +56,7 @@ def band_for_rank(rank: int, n: int) -> int:
     hot_max = max(500, int(n * 0.01))
     if rank <= hot_max:
         return 2
-    warm_max = int(n * 0.05)
+    warm_max = max(900, int(n * 0.05))
     if rank <= warm_max:
         return 3
     cold_max = int(n * 0.25)
@@ -109,9 +120,12 @@ def _generate_path(n: int, rng: random.Random, tier: str) -> list[dict]:
     path: list[dict] = [{"rank": start_rank, "band": band_for_rank(start_rank, n)}]
     best_rank = start_rank
 
-    # Band boundary ranks for adaptive convergence (mirror band_for_rank thresholds).
+    # Band boundary ranks for adaptive convergence (mirror band_for_rank thresholds
+    # -- warm_threshold must carry the same 900-rank floor as band_for_rank's
+    # warm_max, or this path's cold/warm transition would drift out of sync with
+    # the band the player actually sees at that rank).
     hot_threshold = max(500, int(n * 0.01))
-    warm_threshold = int(n * 0.05)
+    warm_threshold = max(900, int(n * 0.05))
 
     for _ in range(_MAX_PATH_STEPS - 1):
         if best_rank == 1:

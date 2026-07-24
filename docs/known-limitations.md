@@ -491,26 +491,60 @@ by design (real WASM-init failures on exotic browsers degrade gracefully);
 `wasm_storage_check.js` distinguishes the two, so a silent regression to the
 fallback now fails CI.
 
-### 18. hi-en Warm band is structurally ~23 ranks wide (coarser gradient than EN)
+### 18. FIXED (2026-07-24) — hi-en Warm band was structurally ~24 ranks wide
+(coarser gradient than EN)
 
 The temperature bands are computed as `max(floor, n × fraction)` of vocab size
-(`bandForRank` in `app/lib/core/models.dart`, constants in `core/config.dart`):
-Scorching ≤ max(50, 0.1%·n), Hot ≤ max(500, 1%·n), Warm ≤ 5%·n. For the hi-en
-vocab (n ≈ 10.5k) the Hot floor of 500 nearly swallows the Warm ceiling of
-`0.05·n ≈ 523`, leaving Warm only ~23 ranks wide — so Hinglish play effectively
-has a 4-band gradient (Scorching/Hot/Cold/Freezing) where EN (n = 55k) has all
-five. Found while authoring the first-session onboarding puzzle: the hi-en
-pre-seeded example guess targets **Hot** as its "mid" teaching band because Warm
-is not reliably targetable at this vocab size.
+(`bandForRank` in `app/lib/core/models.dart` / `band_for_rank` in
+`generator/rival.py`, constants in `core/config.dart`): Scorching ≤ max(50,
+0.1%·n), Hot ≤ max(500, 1%·n), Warm ≤ 5%·n (no floor, pre-fix). For the hi-en
+vocab (n = 10,495) the Hot floor of 500 nearly swallowed the un-floored Warm
+ceiling of `int(n×0.05) = 524`, leaving Warm only 24 ranks wide (0.23% of
+vocab) — so Hinglish play effectively had a 4-band gradient
+(Scorching/Hot/Cold/Freezing) where EN (n = 55,000, Warm = 2,200 ranks / 4.0%
+of vocab) had all five. Found while authoring the first-session onboarding
+puzzle: the hi-en pre-seeded example guess had to target **Hot** as its "mid"
+teaching band because Warm was not reliably targetable at this vocab size.
 
-**Why accepted:** the floors exist to keep bands meaningful under the current
-model's neighborhood structure — hi-en similarity is noisy enough (entry 1) that
-a proportional-only Hot band (~105 ranks) would misclassify genuinely-close
-guesses as Warm. Narrowing the floors is a band-tuning exercise that only makes
-sense on top of a better embedding model, not before it.
+**Root cause, isolated**: unlike Scorching and Hot, Warm's ceiling had no
+floor of its own (`warm_max = int(n × 0.05)`, vs. Hot's
+`max(500, int(n × 0.01))`) — so at small vocab sizes, Hot's floor eating into
+the un-floored Warm ceiling had nothing to counteract it.
 
-**Revisit:** together with the Hinglish fine-tune (entry 1's revisit condition) —
-re-derive band fractions/floors from the improved model's rank distributions.
+**Fixed**: added a 900-rank floor to Warm, the same `max(floor, n × fraction)`
+shape Scorching and Hot already use — `warm_max = max(900, int(n × 0.05))` in
+both `rival.band_for_rank` (Python) and `bandForRank` (Dart,
+`AppConfig.warmFloor`). 900 was chosen empirically (not the initially
+hypothesized "just raise `warmFraction` to 0.08" — that alternative was
+rejected because it also inflates EN's Warm band from 4.0% to 7.0%, eating
+into EN's Cold band, contradicting the goal of leaving EN untouched) to give
+hi-en a ~400-rank / 3.8% Warm band — matching EN's existing proportional feel
+— while the floor mathematically cannot bind for EN (55,000 × 0.05 = 2,750 ≫
+900), leaving EN's band boundaries byte-for-byte unchanged (verified: 0 of 227
+EN bake-off scenario records changed `actual_band` under the new formula).
+Every other duplicated `n × 0.05` re-derivation in the codebase
+(`rival._generate_path`'s adaptive-convergence threshold,
+`dimension5_winrate._simulate_one`'s player-model threshold,
+`test_onboarding_build.py`'s teaching-ladder boundary check) was updated to
+carry the same floor so none of them silently drift out of sync with the real
+scoring boundary.
+
+**Verified impact**: hi-en's band-confusion matrix (bake-off checkpoint
+`gauravgandhi2411/hinglish-relatedness-sbert`, 379 dim1 records) shows Warm's
+predicted count rising from 2 to 17 records and recall rising from 1.2% to
+8.3% of expected-Warm records (precision holds at ~0.41-0.50, i.e. the newly
+captured records aren't noise); a 118-puzzle × 100-simulated-guesser
+win-rate-model rerun shows the fraction of simulated guesses landing in Warm
+rising from 0.37% to 4.44%; `dimension4_rival`'s rival-path calibration gates
+(par ∈ [4,16], chill/sharp spreads) are unaffected (0 flagged puzzles, both
+before and after, across 236 real daily+pack puzzles, both langs) since Hot's
+floor — not Warm's — dominates path pacing. `docs/model-excellence-final-
+report.md` finding #1 and `PLAN.md` carry the full before/after numbers.
+
+**Revisit:** together with the Hinglish fine-tune (entry 1's revisit
+condition) — re-derive band fractions/floors from the improved model's rank
+distributions if a future embedding upgrade changes hi-en's neighborhood
+structure enough to warrant it.
 
 ### 20. CHARACTERIZED BOUNDARY, NOT CLOSED — subword-collision + associative-
 commonsense relatedness on a handful of words; one lever proven dead, four

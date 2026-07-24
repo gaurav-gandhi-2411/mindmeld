@@ -327,7 +327,9 @@ class TestOnboardingBandQuality:
 
         scorching_max = max(50, int(n * 0.001))
         warm_lo = max(500, int(n * 0.01))
-        warm_hi = int(n * 0.05)
+        # 900-rank floor, mirroring rival.band_for_rank's warm_max -- doesn't
+        # bind for EN (n*0.05=2750 >> 900) but kept in sync for correctness.
+        warm_hi = max(900, int(n * 0.05))
 
         bone_rank = int(ranks[vocab.index("bone")])
         assert warm_lo < bone_rank <= warm_hi, (

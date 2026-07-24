@@ -164,6 +164,16 @@ class AppConfig {
   static const int hotFloor = 500;
   static const double hotFraction = 0.01;
 
+  /// Floor added alongside scorching's/hot's existing floors (same max(floor,
+  /// fraction) shape) to fix a band-calibration bug: for small vocabs (e.g.
+  /// hi-en, n~10,495) hot's 500-rank floor already consumes most of the
+  /// un-floored n*0.05=525 warm ceiling, squeezing Warm down to a 24-rank
+  /// sliver (0.23% of vocab) versus EN's healthy 2,200-rank/4.0% Warm band at
+  /// n=55,000. A floor of 900 leaves EN's own thresholds byte-for-byte
+  /// unchanged (55,000 * 0.05 = 2,750 >> 900, so the floor never binds there)
+  /// while giving hi-en a ~400-rank/3.8% Warm band -- matching EN's existing
+  /// proportional feel. See docs/known-limitations.md #18 and PLAN.md.
+  static const int warmFloor = 900;
   static const double warmFraction = 0.05;
   static const double coldFraction = 0.25;
 }
