@@ -1659,10 +1659,65 @@ orchestrator review), live-verified 2026-07-11.
   the whitespace perfect-agreement result via a direct embedding comparison rather than trusting
   the code. Overall verdict: PASS. 45 new tests pass; full suite clean (pre-existing
   Ollama-contention-related `test_harness_judge.py` failures unrelated, confirmed untouched).
-- [ ] **STOP POINT for GG**: this measurement finding directly supports Workstream C item 10
-  (variant-augmented contrastive retraining) as the next step -- surfaced as a decision, not acted
-  on, since training a candidate replacement model is a materially bigger commitment (compute time,
-  a new model artifact to gate through the FULL Workstream A suite + zero regression before it could
-  ever replace the shipped model per the program's own gates) than anything shipped so far this
-  program. Go/no-go needed: proceed with variant-augmented retraining now, or treat this as a
-  documented finding for a later session?
+- [x] **STOP POINT cleared**: GG approved proceeding with retraining now.
+
+## Model Excellence Program -- Workstream C item 10 COMPLETE (`bc4b25a`): NO-GO, honest negative
+
+- [x] **Variant-augmented retraining attempted, rejected.** `variant_source()` added to
+  `assemble_data.py` (mirrors `alias_source()`'s exact pattern), 189 new Aksharantar-derived
+  training pairs across the full hinglish vocab, zero leakage into held-out secrets, zero overlap
+  with the 267-pair spelling-robustness eval set. Trained with the shipped model's EXACT recipe
+  (LoRA r=8/lr=2e-4/4 epochs, seed=42) -- data-only change, isolating the effect. **Result: FAILS
+  zero-net-regression** on the 42-secret suite (dim1: 2 fixed/10 broken, net -8; dim2: 1 fixed/4
+  broken, net -3) and shows **no CI-meaningful spelling-robustness improvement** (band-agreement
+  67.4% baseline -> 66.3% candidate, heavily overlapping CIs, if anything slightly worse). Same
+  failure signature as the earlier full-vocab Devanagari-patch and 58-word collision-batch attempts
+  -- a large injection of new vocabulary/pairs perturbs the whole embedding manifold faster than it
+  fixes the targeted gap. Spot-verified directly from the raw eval_result.json (not just executor
+  prose): shipped checkpoint (`checkpoints/obj_hard_neg/model/`, `evals/finetune/model/`) confirmed
+  byte-identical throughout. Not published, not promoted. The rejected candidate LoRA checkpoint
+  (`checkpoints/variant_augmented/`) intentionally left untracked -- no reason to carry a rejected
+  experiment's binary weights in git history.
+- [x] **Program status on the USP claim**: the spelling-invariance gap (67.4% band-agreement on
+  held-out variants) remains OPEN and unresolved -- the naive fix didn't work. This is now a
+  documented, evidenced limitation rather than an aspirational claim, consistent with this project's
+  "honest documentation" standard. Future attempts would need a different mechanism (e.g. a
+  smaller/more targeted variant set gated incrementally like the L2 collision-scan extension was,
+  rather than one large batch) -- flagged as a candidate follow-up, not attempted this session.
+
+## Model Excellence Program -- Workstream D COMPLETE (`7526c93`, `4152473`), STOP POINT for GG
+
+- [x] **Item 14, external comparability search** (`docs/known-limitations.md` entry 22): live web
+  search found no existing public resource matching this project's task shape (word-level
+  relatedness ranking over romanized, code-mixed Hindi-English). GLUECoS/LinCE (real Hindi-English
+  code-mixed benchmarks) have no relatedness task at all; SemRel2024 (real Hindi relatedness
+  dataset) is sentence-level and monolingual, not word-level/code-mixed. Evidences rather than
+  merely asserts the "no comparable public benchmark existed" position.
+- [x] **Item 12, statistical power analysis** (`evals/finetune/power_analysis.py`): measured CI
+  width shrinking from 0.201 (n=20 secrets) to 0.138 (n=42) by subsampling the internal pool.
+  Real-effect MDE simulation (using the actual historical L2+L5 delta) shows only 23-32% detection
+  rate even at the current 34-secret public benchmark size -- consistent with that change's
+  historical near-miss CI. A synthetic-injection MDE curve claims much higher detection but
+  disagrees sharply with the real-effect curve at the one overlapping point (100% vs 27% at n=34) --
+  reported as an optimistic lower bound, not averaged away or hidden. Extrapolation: roughly 56
+  secrets (~22 more than current) would be needed for a ~0.06-magnitude effect to reliably clear
+  significance -- a rough heuristic, not a precise target. No new secrets authored (that's a
+  separate content-authoring decision for GG, given each one needs curation + scrub-script passes +
+  review of any new advisory hits).
+- [x] **Item 13, label-ceiling sample prepared, NOT annotated** (`evals/finetune/data/
+  label_ceiling_sample_for_gg.csv`, 75 rows, stratified near/mid/far x 7 domains, blind -- AI tier
+  withheld, row order shuffled after catching a real leakage bug where tier-grouped ordering
+  would have let the withheld label be inferred from position alone). Scorer
+  (`score_label_ceiling.py`, weighted Cohen's kappa + CI) written and validated against textbook
+  golden values, NOT run against real data.
+  **STOP POINT for GG**: `evals/finetune/data/label_ceiling_sample_for_gg.csv` +
+  `..._INSTRUCTIONS.txt` are ready for you to fill in the blank `gg_tier_judgment` column (75
+  pairs, single sitting). Once returned, `uv run python -m evals.finetune.score_label_ceiling`
+  computes the benchmark's own label ceiling.
+- [x] Self-caught data-provenance discrepancy: `evals/scenarios/dim1_hien.json`'s benchmark-
+  supplement content (306 records) and the actually-published `public_benchmark_staging/
+  dim1_hien.json` (302 records) differ by 24 words -- staging used as canonical throughout,
+  documented rather than silently assumed identical.
+- [ ] **STOP POINT for GG**: (1) fill in the label-ceiling CSV when convenient (no rush -- scoring
+  script is ready and waiting); (2) go/no-go on Workstream E (efficiency: size/latency/quantization/
+  distillation) and Workstream F (L5 dormancy fix, L4/L6 status confirmation) next.
