@@ -1930,9 +1930,37 @@ orchestrator review), live-verified 2026-07-11.
   FIXED-entry style; `docs/model-excellence-final-report.md` finding #1 updated in place to FIXED
   (development-complete, pending deploy) status, explicitly naming and rejecting the
   originally-hypothesized fraction-only fix.
-- [ ] **NOT committed**: everything in this checkpoint is staged/unstaged on disk only, per explicit
-  instruction -- an orchestrator-level commit follows after combined review with the parallel
-  alias-lookup change (finding #2, above). Nothing pushed/published anywhere; no payloads
-  republished to the live payloads repo or the sibling `mindmeld-payloads` directory (that remains a
-  separate, later, human-confirmed step). Local payload regen output lives entirely under this
-  session's scratch directory, never inside the actual payloads repo, and was not committed.
+- [x] **Committed** (`894f63e` band fix, `d205a19` alias extension, `6243bab` shared docs) after an
+  independent verifier subagent re-derived the band math live, re-confirmed all 8 false-merge
+  exclusions and 15 spot-checked inclusions against the real vocab, and re-ran the full combined
+  suite fresh (712 passed/4 skipped/0 failed Python, 523/524 Dart with 1 confirmed-unrelated
+  pre-existing flake). Overall verdict: PASS, safe to deploy.
+- [x] **DEPLOYED (2026-07-24), both systems, byte-verified live**:
+  - Payloads: `uv run python publish_all.py --days 68 --langs en,hi-en` from `generator/` (68 =
+    exactly one full post-L5-fix schedule cycle, covering 2026-06-12 through 2026-08-18 so the
+    pending L5 trigger-word dates get the new formula/alias data too, not just today-forward).
+    Pushed to `mindmeld-payloads` (`6e4bfd9`, "payload drop 2026-06-12..2026-08-18 (en,hi-en) +
+    packs", 189 files). Byte-verified against the live GitHub Pages CDN at three independent points
+    (SHA-256 match, not just HTTP 200, per this project's own "never trust a green push" lesson):
+    a regular day (2026-06-12), the manifest (`generated_at` confirmed fresh, last day 2026-08-18),
+    and the first L5 trigger-word date (2026-08-11, tarbooz) -- all three matched the pushed content
+    exactly. Pre-push content spot-check confirmed the diff was real and expected, not a trivial
+    metadata-only change: alt_map grew 476->624 entries on the sampled day (the alias extension
+    taking effect), ~2,605/10,495 word ranks shifted by 1-3 positions (the known, previously-seen
+    "vocab injection" collateral-noise pattern from adding new embedded strings, harmless).
+  - App: `./deploy-warmer.ps1` (Flutter/JDK added to PATH for the session --
+    `C:\Users\gaura\sdks\flutter\bin`/`jdk17\bin`, not on PATH by default in this environment) --
+    every guard passed (web-plugin registrant, Firebase authorized-domains, web-dist/ project-link
+    check, the byte-size live-wasm-match check that exists specifically because `vercel deploy`
+    silently drifted the `playwarmer.vercel.app` alias once before), deployed to Vercel production,
+    aliased, and the post-deploy smoke check passed (HTTP 200, booted true, 0 page/request errors).
+    Live wasm confirmed byte-matching this exact build (2,803,437 bytes).
+  - Final live check: navigated to `https://playwarmer.vercel.app/` in a real browser, confirmed
+    today's actual puzzle (2026-07-24, hi-en) renders correctly with no visual breakage and zero
+    console errors/warnings. Full interactive gameplay verification (typing a guess and checking
+    band-color output) hit a Flutter-CanvasKit browser-automation limitation (the rendered UI isn't
+    a real DOM input the keyboard-event simulation could reliably drive) -- not itself evidence of
+    an app problem, since `deploy-warmer.ps1`'s own automated smoke check already exercises real
+    boot behavior separately and passed cleanly.
+- [x] Both this checkpoint and the sibling alias-extension checkpoint's payload-regen scratch output
+  were cleaned up; nothing left behind outside the two repos.
