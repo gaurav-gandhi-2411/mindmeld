@@ -634,6 +634,60 @@ entry 1) — so **no previously-shipped or previously-reported number changed**;
 this fix only protects FUTURE training runs, which is why it was worth doing
 immediately despite being found as a side effect of the entry-20 probe.
 
+### 22. No suitable external public benchmark exists for this project's specific
+task shape (romanized code-mixed word-relatedness) -- searched, documented, none found
+
+spec-model-excellence.md Workstream D item 14 asks for a search of existing public
+code-mixed or Hindi semantic-similarity resources, to establish external
+comparability or, failing that, to evidence the "no public benchmark existed" claim
+this project's own published benchmark (`gauravgandhi2411/hinglish-relatedness-benchmark`)
+implicitly makes. This entry documents a live web search (2026-07-24) distinct from
+and extending entry 20's/`ship_decision_report_v2.md`'s earlier licensing search --
+that one covered candidate *training-data* sources (Hindi WordSim-353, Multi-SimLex
+Hindi, IndoWordNet, IndicCorp, HingCorpus, Aksharantar); this one specifically targets
+existing *evaluation benchmarks* for the code-switched/romanized-Hindi NLP space,
+ground that search never covered.
+
+Checked, with findings:
+- **GLUECoS** (Khanuja et al. 2020, Microsoft Research) -- a real, actively-cited
+  Hindi-English code-mixed evaluation benchmark. Task mismatch, not a licence issue:
+  its six tasks are Language ID, POS tagging, NER, Sentiment Analysis, QA, and NLI --
+  no semantic similarity/relatedness task of any kind.
+- **LinCE** (Aguilar et al. 2020) -- similar code-switching benchmark suite
+  (LID/NER/POS across 4 language pairs including Hindi-English). Same mismatch: no
+  relatedness/similarity task.
+- **SemRel2024** (Ousidhoum et al., ACL Findings 2024) -- does cover Hindi semantic
+  *relatedness*, native-speaker-annotated. Two-dimensional mismatch on inspection: (1)
+  it is **sentence-pair** relatedness, not word-level (this project's task is ranking
+  ~10,495 individual words by relatedness to a secret word); (2) it is monolingual
+  Hindi, not romanized/code-mixed Hinglish (script/code-mixing status not confirmed
+  via the dataset card itself, but the task framing and annotation methodology --
+  paid native-speaker sentence comparison -- match a standard monolingual STR setup,
+  not this project's code-switched, single-word regime).
+- **IIIT-Hyderabad Indian-language word-similarity sets** (~100-200 pairs across 7
+  Indian languages, WordSim-353-style) -- word-level, closer in shape, but
+  monolingual (Devanagari) and in the same IndoWordNet-adjacent
+  research-only-licence family entry 20/`ship_decision_report_v2.md` already ruled
+  out for training-data use; not re-verified for eval-only use (a looser bar than
+  training/commercial redistribution) but not pursued further given the shape
+  mismatch (monolingual, not romanized code-mixed) already disqualifies it as an
+  external comparability point for THIS benchmark's specific claim.
+- **HinglishEval** (Srivastava & Singh 2022) -- a real Hinglish-specific resource,
+  but evaluates generated-text *quality* (fluency/appropriateness of code-mixed
+  text), not word or sentence relatedness -- unrelated task.
+
+**Conclusion**: no existing public resource matches this project's specific task
+shape (word-level relatedness ranking over romanized, code-mixed Hindi-English text).
+This is a genuine gap, not merely an unsearched one -- the closest resource by task
+type (GLUECoS/LinCE) lacks a relatedness task entirely; the closest by task
+(SemRel2024) lacks both the word-level grain and the romanized/code-mixed property.
+This evidences, rather than merely asserts, this project's benchmark's "no directly
+comparable public dataset existed" position. Re-check periodically -- this is an
+active research area (e.g. arXiv:2606.30790 "Indi-RomCoM", 2026, and
+arXiv:2503.21670 "COMI-LINGUA", 2025, both post-date this project's original 2026-07
+training-data search and show the space is still moving) and a suitable resource
+could emerge later.
+
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
 ### 16. Eval baseline report predates the maxGuesses tuning fix
