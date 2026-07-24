@@ -591,6 +591,25 @@ precision targeting and failed.
 pattern (small, targeted, frozen-benchmark-measured, CI-checked) before a
 GCP-scale commitment to any of them.
 
+**UPDATE (2026-07-23) — L4/L5/L6 status since this entry was written**:
+attack #3 above (retrieval-time reranking, non-fine-tuning) was subsequently
+implemented as **L5** (`spec-residual-attack.md`) and SHIPPED to production
+combined with the narrow L2 Devanagari patch (`payload.py`'s
+`_build_payload_core`; PLAN.md's 2026-07-23 ship decision — see entry 1's
+production-wrapper note). **L4 (knowledge distillation)** and **L6
+(commonsense-shaped training data)** were both since probed at small scale
+(`generator/evals/finetune/probe_lever_l4_distillation.py` /
+`probe_lever_l6_commonsense_data.py`, result JSONs alongside): L4 shows a
+bounded, zero-net-regression result on the 5 (of 8) curated candidates whose
+teacher-verified property survived calibration — the large rank gains
+observed are on TRAINED words only (not generalization evidence, per the
+probe's own overfitting caveat), and its GCP checkpoint was lost with the
+deleted VM, so reproducing/scaling it needs a retrain. L6 is genuinely
+inconclusive on its held-out generalization check (5/8 words' related-word
+rank improved, 3/8 regressed, n=8 too small to call). **Both L4 and L6
+remain live, untested-at-scale levers, not closed** — full detail:
+`PLAN.md`'s "L4/L6 status for future resume" section.
+
 ### 21. FIXED (2026-07-19) — LoRA training's `load_best_model_at_end` was
 silently loading the LAST epoch, not the tracked-best one
 
