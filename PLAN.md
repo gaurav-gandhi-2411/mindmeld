@@ -1,3 +1,135 @@
+# PLAN — spec-metrics-ceiling-calibration.md CLOSED (2026-07-25)
+
+Follow-up to the checkpoint below: WS3 shipped to production, WS2 concluded
+as a final honest negative. Full detail:
+`generator/evals/finetune/data/spec_metrics_ceiling_calibration_consolidated.md`.
+
+**WS3 shipped end-to-end.** `warm_max` floor 900->1050 (`rival.py` +
+`dimension5_winrate.py` + Dart mirror `app/lib/core/config.dart`, all synced)
+-- +4 fixed/0 broken, Near/Far confusion rows byte-identical (unlike the
+prior 900-floor fix, which cost Far 95.7%->93.3%). Commits `0d9efb3`
+(Python), `566f5f6` (Dart). hi-en payloads regenerated + byte-verified live
+(18 files), EN spot-checked byte-identical. Flutter web app rebuilt and
+redeployed to playwarmer.vercel.app (byte-verified WASM, smoke check green)
+-- rival-displayed and player-guess bands consistent again. Honest scope
+documented: addresses only ~25% of the Warm-recall gap (threshold-
+placement-fixable share); the other ~75% is genuine ranking error, a
+documented model/data limitation, not fixed here.
+
+**Side quest: `deploy-warmer.ps1` had a real, separate bug**, found while
+proving the app deploy -- any native command's stderr (not just vercel's)
+crashed the script under Windows PowerShell 5.1's
+`$ErrorActionPreference='Stop'`, on every run, including successful ones
+(confirmed with two unrelated tools: vercel, then uv). Fixed with an
+`Invoke-NativeCommand` helper (EAP scoped per-call via try/finally, decides
+success/failure from the real exit code) applied to all 7 native call sites,
+plus an unrelated encoding bug (8 em-dashes, no BOM, misdecoding into a
+smart-quote under this environment's codepage and corrupting two `throw`
+literals) fixed alongside it. Proven with a clean, fully unattended real
+deploy. Commit `b922a18`.
+
+**WS2 (LLM-consensus ceiling) CLOSED as a final honest negative, not an open
+blocker.** Local GPU contention was chronic (a recurring `aetherart` job,
+not a one-off) and never cleared, so the job moved to GCP (`aetherart-497918`
+-- verified live unused GPU quota there, unlike this repo's usual precedent
+project `triageiq-portfolio-495022` which has 0). Two real full-scale runs,
+`g2-standard-8` + 1x NVIDIA L4, `asia-south1-c`:
+- Attempt 1 (qwen3:8b + llama3.1:8b, ~$0.16): qwen3:8b PASSED calibration
+  (96.7%: 100% near/93.3% far). llama3.1:8b FAILED (83.3%: 100%/66.7%, bar
+  90%).
+- Attempt 2, GG's bounded retry (qwen3:8b + gemma2:9b, gate-only-first,
+  ~$0.41): gemma2:9b also FAILED (86.7%: 100%/73.3%).
+Both failing judges share the identical failure mode -- over-predicting
+relatedness ("mid" not "far") on unambiguous domain-disjoint far-tier
+controls; near-tier was 100% for all three judges tested. Per GG's explicit
+stop condition (no third model, no bar softening, no temperature-shopping):
+**the LLM-consensus label ceiling cannot currently be established with
+locally-available ~7-9B models.** qwen3:8b documented as the one passing
+judge for any future attempt with a genuinely different (bigger/paid) third
+judge. Total GCP spend ~$0.57 across both attempts, both sessions torn down
+and verified zero billable resources.
+
+**What's left, ranked**: (1) decide whether model/benchmark cards should be
+updated with the corrected MAP-win/narrower-tie framing from WS1; (2) the
+ECE gap (0.202 vs granite 0.195) remains open, now provably not closeable
+via thresholds; (3) label ceiling is closed, not open -- next lever would be
+a materially different judge, a real cost/quality call, not a retry; (4) the
+~75% genuine-ranking-error share of Warm-recall is now the clearly-isolated
+remaining piece, same documented-limitation status as junoon/registan.
+
+---
+
+# PLAN — Metric re-specification + label ceiling + calibration frontier (2026-07-25)
+
+Spec: `spec-metrics-ceiling-calibration.md`. Three parallel executor workstreams,
+autonomous end-to-end per standing policy (no manual labeling requested at any
+point). Full consolidated findings:
+`generator/evals/finetune/data/spec_metrics_ceiling_calibration_consolidated.md`.
+Combined full test suite after all three: 777 passed / 4 skipped / 2
+pre-existing-unrelated Ollama-timeout errors (same GPU contention as WS2
+below), zero regressions. Nothing applied to production — `rival.py` and the
+shipped model are unchanged.
+
+**WS1 (retrieval metrics, DONE)** — corrected the mis-specified Precision@10=
+1.000/Recall@10=0.169 saturation. Real finding, not the spec's own working
+hypothesis: |R| (relevance-set size) is 3-5/mean 4.0 per secret, not ~59-60 as
+assumed — the classical `k/|R|` ceiling doesn't literally bind; the real
+mechanism is sparse judgment (~9 judged words per secret out of 10,495-word
+vocab). NDCG@10 was ALREADY graded (`_RELEVANCE_GRADE`, no bug) — documented,
+not "fixed." Added R-precision/MAP/|R|-scaled recall + surfaced |R| everywhere,
+all bootstrap-CI'd. **l3cube tie verdict, correctly scoped**: NDCG@10/Recall@10/
+R-precision ties SURVIVE (genuine n=42 statistical-power limits, not artifacts)
+but **MAP does not tie — shipped leads significantly** (+0.0254, CI
+[+0.0044,+0.0460]). Precision@10's tie WAS a pure saturation artifact (delta=0
+across all 10k draws) — retired, kept in report as superseded.
+`generator/evals/finetune/data/corrected_retrieval_metrics_report.md`.
+
+**WS3 (calibration, DONE)** — diagnosed Warm-band recall 8.3%: 75.3% of the 77
+misses are genuine ranking error (unrecoverable by any threshold), only 24.7%
+threshold-placement-fixable. Joint grid search found ONE candidate clearing a
+strict zero-broken gate: `warm_max` floor 900->1050 (+4 fixed/0 broken, Near
+and Far confusion rows byte-identical -- unlike the prior 900-floor fix which
+cost Far 95.7%->93.3%). Mid recall 8.3%->13.1% (real, zero-cost, not
+CI-significant at n=84). A more aggressive candidate (+6 net) was found and
+explicitly REJECTED for breaking 5 near-tier records -- same one-band-tradeoff
+trap this workstream exists to catch. **Hard limit found**: band ECE (0.202) is
+mathematically independent of band thresholds (`band_calibration_error` never
+reads `actual_band`) -- no threshold search can close the ECE-vs-granite gap;
+confirmed byte-identical (0.2020108359603864) before/after. Realistic-guess
+simulation (118 real puzzles) confirms all 6 bands stay reachable. **Diff
+proposed, NOT applied** -- `generator/evals/finetune/data/
+calibration_threshold_report.md`. Needs GG's go-ahead to ship + a follow-up
+Dart-side change (`app/lib/core/config.dart:176` `warmFloor`,
+`app/test/temperature_bands_test.dart`) not done this session (Flutter/Dart
+explicitly out of scope for the executor).
+
+**WS2 (LLM-consensus label ceiling, BLOCKED)** — `generator/evals/finetune/
+llm_consensus_ceiling.py` fully implements all 10 spec steps (qwen3:8b +
+llama3.1:8b, blind + order-randomised, k=3 self-consistency, mandatory 90%
+calibration gate, Cohen's weighted kappa trust gate, contested-item handling,
+3-way sensitivity analysis, % of ceiling) -- `generator/tests/
+test_llm_consensus_ceiling.py` 42/42 passing against a stubbed Ollama layer.
+The real 75-item/30-control/k=3 run (~630 Ollama calls) is blocked by local
+GPU contention: an unrelated `aetherart` process
+(`_pattachitra_ab_base_comparison.py`) holds 7.7-7.9GB/8GB VRAM at 100%
+utilization -- confirmed live via `nvidia-smi` and an isolated single-call
+probe that still timed out at 302s, checked twice 45 minutes apart with zero
+improvement. Per rule 46a, did not touch the other process, did not
+idle-wait -- escalated instead. Report artifacts on disk are a 6-item smoke
+test only, explicitly not real numbers. **Awaiting GG's choice**: (a) wait for
+`aetherart` to finish, retry later, $0; (b) approve a small capped GCP Ollama
+VM (likely <$1); (c) accept a smaller-than-spec sample now, clearly labeled.
+
+**Ranked what's left** (full detail in the consolidated report): (1) ship the
+Warm-threshold fix -- zero-risk, ready, highest leverage/effort; (2) resolve
+the label-ceiling blocker -- needed before any "% of achievable ceiling" claim
+can be made; (3) decide whether model/benchmark cards should be updated with
+the corrected MAP-win / narrower-tie framing; (4) the ECE gap itself (0.202 vs
+0.195) remains open, now provably NOT closeable via thresholds -- a real,
+scoped follow-up (rank->confidence recalibration) if GG wants to pursue it.
+
+---
+
 # PLAN — SHIPPED: L2-patch + L5 in production (2026-07-23)
 
 GG confirmed ship decision: L2-patch + L5, skip L4. Full ship executed:
