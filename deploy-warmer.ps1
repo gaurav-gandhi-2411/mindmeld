@@ -6,12 +6,12 @@
 .DESCRIPTION
     Formalizes the manual command sequence documented in README.md's "Web / PWA"
     section into a single reusable script (referenced by spec.md's launch-1 wave
-    and docs/runbook.md). Fails fast and loud at every gate — a deploy that fails
+    and docs/runbook.md). Fails fast and loud at every gate -- a deploy that fails
     a guard script or the post-deploy smoke check leaves production UNCHANGED
     (Vercel only promotes a deployment to production once `vercel deploy --prod`
     completes; a script failure before that point means nothing was deployed).
 
-    Mirrors README.md exactly — if you change one, change the other.
+    Mirrors README.md exactly -- if you change one, change the other.
 
 .PARAMETER SkipSmokeCheck
     Skip the post-deploy smoke check. Only use this for the rollback exercise's
@@ -37,10 +37,77 @@ function Invoke-Step {
     }
 }
 
+function Invoke-NativeCommand {
+    <#
+    .SYNOPSIS
+        Runs an external executable robustly against this script's global
+        $ErrorActionPreference = 'Stop'.
+
+    .DESCRIPTION
+        Real incident (confirmed TWICE, with two unrelated tools): any
+        native command's routine STDERR output -- not just genuine errors --
+        gets treated as a script-terminating NativeCommandError the instant
+        $ErrorActionPreference = 'Stop' is in effect. First seen with the
+        vercel CLI (writes ordinary progress text like "Retrieving
+        project..." to STDERR -- the deploy step failed on every run, even
+        fully successful ones). Then seen AGAIN with a completely different
+        tool once the vercel call was fixed: `uv run ...`'s own benign
+        "warning: No `requires-python` value found" line crashed the very
+        next step the same way. Two independent tools hitting the identical
+        failure mode confirms this is a property of this script's global EAP
+        setting, not something specific to vercel -- so every native-command
+        call site in this script needs the same treatment, not just vercel's.
+
+        Fix: capture combined stdout+stderr with $ErrorActionPreference
+        temporarily set to 'Continue' -- scoped to ONLY this function's call
+        (saved and restored via try/finally, never touching the caller's or
+        the script's global value) -- then decide success/failure from
+        $LASTEXITCODE, which is what actually reflects whether the command
+        failed. Real PowerShell-level errors elsewhere in the script
+        (cmdlet failures, thrown exceptions) are unaffected and still stop
+        it immediately, since $ErrorActionPreference reverts the instant
+        this function returns.
+
+    .OUTPUTS
+        The command's combined stdout+stderr lines (string array) -- callers
+        that need to parse output (e.g. the deploy step's JSON "url" field)
+        get it back; callers that just need success/failure can discard it.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$FilePath,
+        [string[]]$ArgumentList = @(),
+        [string]$Description = $FilePath
+    )
+    $previousEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & $FilePath @ArgumentList 2>&1
+        $exitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previousEap
+    }
+    $output | ForEach-Object { Write-Host $_ }
+    if ($exitCode -ne 0) {
+        throw "$Description failed (exit code $exitCode) -- see output above."
+    }
+    return $output
+}
+
+function Invoke-VercelCommand {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [string]$Description = "vercel $($Arguments -join ' ')"
+    )
+    return Invoke-NativeCommand -FilePath 'npx' -ArgumentList (@('vercel') + $Arguments) -Description $Description
+}
+
 Invoke-Step "flutter build web (--wasm, ANALYTICS_ENABLED=true)" {
     Push-Location (Join-Path $repoRoot 'app')
     try {
-        flutter build web --release --no-web-resources-cdn --wasm --dart-define=ANALYTICS_ENABLED=true
+        Invoke-NativeCommand -FilePath 'flutter' -Description "flutter build web" -ArgumentList @(
+            'build', 'web', '--release', '--no-web-resources-cdn', '--wasm',
+            '--dart-define=ANALYTICS_ENABLED=true'
+        ) | Out-Null
     } finally {
         Pop-Location
     }
@@ -49,7 +116,9 @@ Invoke-Step "flutter build web (--wasm, ANALYTICS_ENABLED=true)" {
 Invoke-Step "Guard: web plugin registrant check" {
     Push-Location $repoRoot
     try {
-        uv run python scripts/check_web_plugin_registrant.py --project-dir app
+        Invoke-NativeCommand -FilePath 'uv' -Description "web plugin registrant check" -ArgumentList @(
+            'run', 'python', 'scripts/check_web_plugin_registrant.py', '--project-dir', 'app'
+        ) | Out-Null
     } finally {
         Pop-Location
     }
@@ -58,7 +127,10 @@ Invoke-Step "Guard: web plugin registrant check" {
 Invoke-Step "Guard: Firebase Auth authorized-domains check" {
     Push-Location $repoRoot
     try {
-        uv run python scripts/check_authorized_domains.py --project-id mindmeld-c4bba --domain playwarmer.vercel.app
+        Invoke-NativeCommand -FilePath 'uv' -Description "Firebase Auth authorized-domains check" -ArgumentList @(
+            'run', 'python', 'scripts/check_authorized_domains.py',
+            '--project-id', 'mindmeld-c4bba', '--domain', 'playwarmer.vercel.app'
+        ) | Out-Null
     } finally {
         Pop-Location
     }
@@ -67,7 +139,9 @@ Invoke-Step "Guard: Firebase Auth authorized-domains check" {
 Invoke-Step "Generate caching service worker + copy vercel.json/FCM sw" {
     Push-Location $repoRoot
     try {
-        uv run python scripts/make_web_sw.py --build-dir app/build/web
+        Invoke-NativeCommand -FilePath 'uv' -Description "make_web_sw.py" -ArgumentList @(
+            'run', 'python', 'scripts/make_web_sw.py', '--build-dir', 'app/build/web'
+        ) | Out-Null
     } finally {
         Pop-Location
     }
@@ -77,22 +151,22 @@ Invoke-Step "Guard: web-dist/ must already be linked to the real playwarmer proj
     # web-dist/.vercel/ is gitignored (staging dir only) so this link never
     # survives a fresh clone or a deleted web-dist/ directory. A real incident
     # (documented in PLAN.md, recurred once already during this wave): running
-    # `vercel deploy --prod` from an UNLINKED directory does NOT error — it
+    # `vercel deploy --prod` from an UNLINKED directory does NOT error -- it
     # silently auto-creates and deploys to a brand-new stray project named
     # after the directory, leaving the real "playwarmer" project completely
     # untouched while every guard/smoke-check downstream still reports success
     # (they check the static playwarmer.vercel.app domain, which just keeps
     # serving the previous, unrelated deployment). Fail loudly here instead of
-    # letting `vercel deploy` silently improvise — one-time fix if this trips:
+    # letting `vercel deploy` silently improvise -- one-time fix if this trips:
     # `cd web-dist && npx vercel link --yes --project=playwarmer`.
     $projectFile = Join-Path $repoRoot 'web-dist/.vercel/project.json'
     if (-not (Test-Path $projectFile)) {
-        throw "web-dist/.vercel/project.json missing — web-dist/ is not linked to any Vercel " +
+        throw "web-dist/.vercel/project.json missing -- web-dist/ is not linked to any Vercel " +
             "project. Run: cd web-dist && npx vercel link --yes --project=playwarmer"
     }
     $linked = Get-Content $projectFile | ConvertFrom-Json
     if ($linked.projectName -ne 'playwarmer') {
-        throw "web-dist/ is linked to '$($linked.projectName)', not 'playwarmer' — " +
+        throw "web-dist/ is linked to '$($linked.projectName)', not 'playwarmer' -- " +
             "deploying now would silently update the WRONG project. Fix: " +
             "rm -rf web-dist/.vercel && cd web-dist && npx vercel link --yes --project=playwarmer"
     }
@@ -102,7 +176,7 @@ Invoke-Step "Guard: web-dist/ must already be linked to the real playwarmer proj
 Invoke-Step "Stage build into web-dist/" {
     $webDist = Join-Path $repoRoot 'web-dist'
     if (Test-Path $webDist) {
-        # Exclude .vercel/ — a bare `*` + -Force wipes hidden dirs too (verified
+        # Exclude .vercel/ -- a bare `*` + -Force wipes hidden dirs too (verified
         # empirically), which would silently delete the project link the guard
         # step above just checked, forcing a re-link on every single deploy.
         Get-ChildItem -Path $webDist -Force |
@@ -118,12 +192,14 @@ $global:deploymentUrl = $null
 Invoke-Step "Deploy to Vercel production" {
     Push-Location (Join-Path $repoRoot 'web-dist')
     try {
-        $deployLines = npx vercel deploy --prod --yes 2>&1
-        $deployLines | ForEach-Object { Write-Host $_ }
+        # See Invoke-VercelCommand's docstring: vercel's own progress text on
+        # STDERR must not be treated as a script-terminating error.
+        $deployLines = Invoke-VercelCommand -Arguments @('deploy', '--prod', '--yes') `
+            -Description "Vercel production deploy"
         # The JSON block is pretty-printed across multiple lines, so grab it by
         # matching the "url" key directly rather than trying to isolate/parse
         # a single JSON line (a prior version of this script tried the latter
-        # and always failed to find it — caught by this step's own throw,
+        # and always failed to find it -- caught by this step's own throw,
         # not silently, but fixing the root cause here).
         $urlLine = $deployLines | Where-Object { $_ -match '^\s*"url":\s*"(https://[^"]+)"' } | Select-Object -First 1
         if ($urlLine -and $urlLine -match '"url":\s*"(https://[^"]+)"') {
@@ -148,10 +224,8 @@ Invoke-Step "Guard: explicitly re-point playwarmer.vercel.app at THIS deployment
         throw "Could not parse the deployment URL from 'vercel deploy' output -- " +
             "cannot verify playwarmer.vercel.app points at what was just deployed."
     }
-    npx vercel alias set $global:deploymentUrl playwarmer.vercel.app
-    if ($LASTEXITCODE -ne 0) {
-        throw "vercel alias set failed (exit $LASTEXITCODE) -- playwarmer.vercel.app may not point at this deployment."
-    }
+    Invoke-VercelCommand -Arguments @('alias', 'set', $global:deploymentUrl, 'playwarmer.vercel.app') `
+        -Description "Aliasing playwarmer.vercel.app to this deployment" | Out-Null
 }
 
 Invoke-Step "Guard: verify playwarmer.vercel.app actually serves THIS build" {
@@ -167,7 +241,9 @@ Invoke-Step "Guard: verify playwarmer.vercel.app actually serves THIS build" {
     if ($remoteSize -ne $localSize) {
         Write-Host "  Mismatch (local $localSize vs live $remoteSize) -- purging CDN cache and re-checking once..." -ForegroundColor Yellow
         Push-Location (Join-Path $repoRoot 'web-dist')
-        try { npx vercel cache purge --yes } finally { Pop-Location }
+        try {
+            Invoke-VercelCommand -Arguments @('cache', 'purge', '--yes') -Description "CDN cache purge" | Out-Null
+        } finally { Pop-Location }
         Start-Sleep -Seconds 3
         $remoteSize = (Invoke-WebRequest -Uri 'https://playwarmer.vercel.app/main.dart.wasm' -UseBasicParsing).RawContentLength
     }
@@ -183,7 +259,9 @@ if (-not $SkipSmokeCheck) {
     Invoke-Step "Post-deploy smoke check (required)" {
         Push-Location $repoRoot
         try {
-            node firebase-tests/smoke_check.js https://playwarmer.vercel.app/
+            Invoke-NativeCommand -FilePath 'node' -Description "post-deploy smoke check" -ArgumentList @(
+                'firebase-tests/smoke_check.js', 'https://playwarmer.vercel.app/'
+            ) | Out-Null
         } finally {
             Pop-Location
         }
