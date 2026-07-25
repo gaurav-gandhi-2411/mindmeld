@@ -314,11 +314,12 @@ class TestBandRankRange:
 
     def test_warm_band_matches_known_window(self) -> None:
         # Hand-verified against rival.band_for_rank for vocab_size=10495 AFTER
-        # the warm-floor fix (PLAN.md checkpoint, docs/known-limitations.md
-        # #18): warm = rank <= max(900, n*0.05) = max(900, 524) = 900,
-        # hot = rank <= max(500, n*0.01) = 500 -> warm band is ranks 501-900,
-        # a 400-rank window (was a 24-rank window pre-fix).
-        assert band_rank_range(3, 10495) == (501, 900)
+        # the warm-floor widening (PLAN.md checkpoint,
+        # docs/known-limitations.md #18): warm = rank <= max(1050, n*0.05) =
+        # max(1050, 524) = 1050, hot = rank <= max(500, n*0.01) = 500 -> warm
+        # band is ranks 501-1050, a 550-rank window (was a 24-rank window
+        # pre-fix, 400-rank window at the original 900 floor).
+        assert band_rank_range(3, 10495) == (501, 1050)
 
     def test_unreachable_band_raises(self) -> None:
         with pytest.raises(ValueError, match="never reached"):
@@ -335,10 +336,15 @@ class TestTierBandWidthReport:
         }
 
     def test_mid_tier_target_window(self) -> None:
-        # Post warm-floor-fix (PLAN.md checkpoint, docs/known-limitations.md
+        # Post warm-floor-widening (PLAN.md checkpoint, docs/known-limitations.md
         # #18): mid's warm-band (3) window at vocab_size=10495 is now
-        # ranks 501-900 (400 ranks), up from a pre-fix 24-rank sliver --
-        # still narrower than near's, but no longer a near-dead band.
+        # ranks 501-1050 (550 ranks), up from a pre-fix 24-rank sliver (and a
+        # 400-rank window at the original 900 floor) -- no longer a near-dead
+        # band. Near's window (bands scorching+hot, ranks 2-500, rank 1 is
+        # its own win band -- 499 ranks) is now the NARROWER of the two,
+        # which flips the pre-widening relationship (near used to be wider
+        # than mid at the 900 floor); this is an accepted, intended
+        # consequence of the 1050 floor, not a regression.
         records = [
             self._record("mid", [3], 600, False),
             self._record("mid", [3], 700, False),
@@ -347,10 +353,10 @@ class TestTierBandWidthReport:
         report = tier_band_width_report(records, vocab_size=10495)
         assert report["mid"]["n"] == 2
         assert report["mid"]["in_expected_band_rate"] == 0.0
-        assert report["mid"]["target_window_ranks"] == 400
-        assert report["mid"]["target_window_pct_of_vocab"] == pytest.approx(400 / 10495)
-        # near tier (bands scorching+hot, ranks 1-500) still has a wider window.
-        assert report["near"]["target_window_ranks"] > report["mid"]["target_window_ranks"]
+        assert report["mid"]["target_window_ranks"] == 550
+        assert report["mid"]["target_window_pct_of_vocab"] == pytest.approx(550 / 10495)
+        # mid's window is now wider than near's (550 vs 499) -- see comment above.
+        assert report["mid"]["target_window_ranks"] > report["near"]["target_window_ranks"]
 
     def test_skips_unresolved_actual_rank_in_rate(self) -> None:
         records = [self._record("mid", [3], None, False)]

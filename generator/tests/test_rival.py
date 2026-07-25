@@ -61,9 +61,10 @@ class TestBandForRank:
 
     def test_warm_boundary(self) -> None:
         n = 55000
-        # max(900, n*0.05) = max(900, 2750) = 2750 -- the 900-rank warm floor
-        # (added to fix hi-en's dead Warm band, see test_hien_warm_floor_fix
-        # below) does NOT bind at EN's scale, so this boundary is unchanged.
+        # max(1050, n*0.05) = max(1050, 2750) = 2750 -- the 1050-rank warm
+        # floor (added to fix hi-en's dead Warm band, see
+        # test_hien_warm_floor_fix below) does NOT bind at EN's scale, so this
+        # boundary is unchanged.
         assert band_for_rank(2750, n) == 3
         assert band_for_rank(2751, n) == 4
 
@@ -80,27 +81,34 @@ class TestBandForRank:
 
     def test_hien_warm_floor_fix(self) -> None:
         # Real hi-en vocab size (n=10,495, see generator/vocab.py). Before the
-        # 900-rank warm floor, hot's floor (500) ate into the un-floored
-        # warm_max (int(10495*0.05)=524), leaving only a 24-rank/0.23% Warm
-        # band. With the floor: warm_max = max(900, 524) = 900, a
-        # 400-rank/3.8% Warm band -- matching EN's proportional feel
-        # (2200/55000 = 4.0%) instead of being a near-dead band.
+        # original 900-rank warm floor, hot's floor (500) ate into the
+        # un-floored warm_max (int(10495*0.05)=524), leaving only a
+        # 24-rank/0.23% Warm band. The floor was later widened 900 -> 1050
+        # after a threshold-boundary grid search against the shipped model's
+        # bake-off checkpoint found this the only candidate that clears a
+        # strict zero-regression gate (see
+        # evals/finetune/data/calibration_threshold_report.md). With the
+        # current floor: warm_max = max(1050, 524) = 1050, a
+        # 550-rank/5.2% Warm band -- still comfortably below cold_max
+        # (int(10495*0.25)=2623), so Cold remains fully reachable.
         n = 10495
         assert band_for_rank(500, n) == 2  # hot, at the (unchanged) floor
         assert band_for_rank(501, n) == 3  # warm begins
-        assert band_for_rank(900, n) == 3  # warm, at the new floor threshold
-        assert band_for_rank(901, n) == 4  # cold begins
+        assert band_for_rank(1050, n) == 3  # warm, at the current floor threshold
+        assert band_for_rank(1051, n) == 4  # cold begins
         assert band_for_rank(2623, n) == 4  # cold, at threshold (int(10495*0.25))
         assert band_for_rank(2624, n) == 5  # freezing
 
     def test_small_vocab_hot_floor(self) -> None:
         # For n=1000: hot_max = max(500, 1000*0.01) = 500; rank 500 = hot.
-        # warm_max = max(900, int(1000*0.05)) = max(900, 50) = 900 -- the
-        # 900-rank warm floor (see test_hien_warm_floor_fix) now makes Warm
-        # reachable even at this tiny n, unlike before this fix.
-        # cold_max = int(1000*0.25) = 250 < warm_max(900), so Cold is now
-        # the band that's fully swallowed instead: ranks 501-900 land in
-        # Warm, and there is no rank at which Cold is ever returned.
+        # warm_max = max(1050, int(1000*0.05)) = max(1050, 50) = 1050 -- the
+        # warm floor (see test_hien_warm_floor_fix) now makes Warm reachable
+        # even at this tiny n, unlike before either fix.
+        # cold_max = int(1000*0.25) = 250 < warm_max(1050), so Cold is fully
+        # swallowed: ranks 501-1050 land in Warm, and there is no rank at
+        # which Cold is ever returned. This is the same qualitative
+        # pathology as the original 900-floor case, just with the
+        # warm/freezing boundary rank shifted from 900/901 to 1050/1051.
         # ACCEPTED EDGE CASE: n=1000 is not a real vocab this game uses --
         # both real langs are >=10,495, where neither floor comes close to
         # swallowing a whole neighboring band (see test_hien_warm_floor_fix
@@ -109,8 +117,8 @@ class TestBandForRank:
         # vocab sizes far below production scale, not a regression target.
         assert band_for_rank(500, 1000) == 2  # hot (unchanged)
         assert band_for_rank(501, 1000) == 3  # now warm (was freezing pre-fix)
-        assert band_for_rank(900, 1000) == 3  # warm, at the new floor threshold
-        assert band_for_rank(901, 1000) == 5  # freezing -- Cold is unreachable
+        assert band_for_rank(1050, 1000) == 3  # warm, at the current floor threshold
+        assert band_for_rank(1051, 1000) == 5  # freezing -- Cold is unreachable
 
 
 class TestRivalSeed:

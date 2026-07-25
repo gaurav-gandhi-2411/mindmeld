@@ -78,10 +78,10 @@ def _simulate_one(n: int, max_guesses: int, rng: random.Random) -> int | None:
     which only guards against a pathological infinite loop for unreasonably
     large max_guesses values)."""
     # Mirrors rival.py's own _generate_path threshold, which in turn mirrors
-    # rival.band_for_rank's real scoring boundary -- the 900-rank warm floor
+    # rival.band_for_rank's real scoring boundary -- the 1050-rank warm floor
     # must stay in sync across all three or this simulation's cold/warm
     # transition would no longer correspond to the band the player actually sees.
-    warm_threshold = max(900, int(n * 0.05))
+    warm_threshold = max(1050, int(n * 0.05))
     hot_threshold = max(500, int(n * 0.01))
 
     start_noise = rng.uniform(-0.05, 0.05)
