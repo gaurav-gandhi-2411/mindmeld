@@ -63,7 +63,7 @@ enum TemperatureBand {
 ///   - rank == 1                          → win
 ///   - rank ≤ max(50, n × 0.001)         → scorching
 ///   - rank ≤ max(500, n × 0.01)         → hot
-///   - rank ≤ max(900, n × 0.05)         → warm
+///   - rank ≤ max(1050, n × 0.05)        → warm
 ///   - rank ≤ n × 0.25                   → cold
 ///   - else                               → freezing
 ///
