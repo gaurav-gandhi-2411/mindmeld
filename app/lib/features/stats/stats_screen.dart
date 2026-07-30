@@ -113,7 +113,10 @@ class _StatsScreenState extends State<StatsScreen> {
                 padding: const EdgeInsets.all(WarmerSpacing.md),
                 decoration: BoxDecoration(
                   color: tokens.win.tintBg,
-                  borderRadius: BorderRadius.circular(WarmerRadius.xs),
+                  // WarmerRadius.sm, not .xs: matches every other message-
+                  // banner in the app (win_screen.dart's win/par-rival/
+                  // best-guess banners) — .xs is reserved for small chips.
+                  borderRadius: BorderRadius.circular(WarmerRadius.sm),
                 ),
                 child: Row(
                   children: [
@@ -176,11 +179,20 @@ class _StatsScreenState extends State<StatsScreen> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 2, left: 26),
+                // Left-indent aligns the caption under the label text above,
+                // past the 18px icon + WarmerSpacing.sm gap it sits beside —
+                // computed from those same values, not a bare magic number.
+                padding: const EdgeInsets.only(
+                  top: WarmerSpacing.xs,
+                  left: 18 + WarmerSpacing.sm,
+                ),
                 child: Text(
                   'Earned every $streakFreezeMilestoneDays-day streak — covers one '
                   'missed day automatically.',
-                  style: TextStyle(color: tokens.text2, fontSize: 12),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: tokens.text2),
                 ),
               ),
             ],

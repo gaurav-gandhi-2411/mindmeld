@@ -48,8 +48,11 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   List<String> _availableDates() {
     final start = DateTime.parse(ArchiveScreen.startDate);
     final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 1));
+    final yesterday = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 1));
 
     if (yesterday.isBefore(start)) return [];
 
@@ -73,7 +76,9 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     // lifetime, and awaiting one query at a time would make this screen's
     // load time scale linearly with how long the game has been live.
     final loaded = await Future.wait(
-      dates.map((date) => AppPersistence.instance.loadDayState(date, widget.lang)),
+      dates.map(
+        (date) => AppPersistence.instance.loadDayState(date, widget.lang),
+      ),
     );
     if (!mounted) return;
     setState(() => _solvedStates = Map.fromIterables(dates, loaded));
@@ -99,7 +104,9 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   void _openPacks(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (_) => PackSelectorScreen(lang: widget.lang)),
+      MaterialPageRoute<void>(
+        builder: (_) => PackSelectorScreen(lang: widget.lang),
+      ),
     );
   }
 
@@ -107,7 +114,8 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   Widget build(BuildContext context) {
     final dates = _availableDates();
     final colorScheme = Theme.of(context).colorScheme;
-    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
+    final tokens =
+        Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
     return Scaffold(
       appBar: AppBar(title: const Text('Practice')),
       body: Column(
@@ -115,11 +123,29 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
           PacksEntryBanner(onTap: () => _openPacks(context)),
           Expanded(
             child: dates.isEmpty
-                ? const Center(
-                    child: Text(
-                        'No past puzzles available yet.\nCheck back tomorrow!',
-                        textAlign: TextAlign.center),
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(WarmerSpacing.xl),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.history_outlined,
+                            size: 48,
+                            color: tokens.text3,
+                          ),
+                          const SizedBox(height: WarmerSpacing.md),
+                          Text(
+                            'No past puzzles available yet.\nCheck back tomorrow!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: tokens.text2),
+                          ),
+                        ],
+                      ),
+                    ),
                   )
+                : _solvedStates == null
+                ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     itemCount: dates.length,
                     itemBuilder: (ctx, i) {
@@ -127,31 +153,39 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       final dt = DateTime.parse(date);
                       final formatted = DateFormat('EEEE, MMM d').format(dt);
                       final puzzleNum =
-                          dt.difference(DateTime.parse(ArchiveScreen.startDate)).inDays +
-                              1;
+                          dt
+                              .difference(
+                                DateTime.parse(ArchiveScreen.startDate),
+                              )
+                              .inDays +
+                          1;
                       final state = _solvedStates?[date];
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: colorScheme.surfaceContainerHighest,
-                          child: Text('#$puzzleNum',
-                              style:
-                                  TextStyle(fontSize: 12, color: tokens.text2)),
+                          child: Text(
+                            '#$puzzleNum',
+                            style: TextStyle(fontSize: 12, color: tokens.text2),
+                          ),
                         ),
                         title: Text('Puzzle #$puzzleNum'),
                         subtitle: Text(
                           state == null
                               ? formatted
                               : state.won
-                                  ? '$formatted · Solved in ${state.guesses.length}'
-                                  : state.gaveUp
-                                      ? '$formatted · Not solved'
-                                      : '$formatted · In progress',
+                              ? '$formatted · Solved in ${state.guesses.length}'
+                              : state.gaveUp
+                              ? '$formatted · Not solved'
+                              : '$formatted · In progress',
                         ),
                         trailing: state != null && state.won
                             ? Icon(Icons.check_circle, color: tokens.win.text)
                             : state != null && state.gaveUp
-                                ? Icon(Icons.circle_outlined, color: tokens.text2)
-                                : const Icon(Icons.chevron_right),
+                            ? Icon(
+                                Icons.remove_circle_outline,
+                                color: tokens.text3,
+                              )
+                            : const Icon(Icons.chevron_right),
                         onTap: () => _playDate(ctx, date),
                       );
                     },
