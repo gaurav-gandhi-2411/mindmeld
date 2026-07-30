@@ -1,3 +1,28 @@
 # Indian Food pack — English clues, one per line, keyed line-by-line to secrets_en.txt
 # ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
-# Status: coming_soon, content pending authorship — do not add clues here (Phase 6c)
+# Pending GG review
+A small spoonful that hijacks the whole plate with heat and tang
+Ground fine, it turns plain rice into something unforgettable
+Table groaning under more dishes than anyone can finish
+Handed down in a grandmother's handwriting, never quite followed exactly
+Shouts orders across a room full of clattering pans, never satisfied
+Churned thin and sour, poured over rice on the hottest afternoons
+Pulls the whole house to the kitchen before anyone's called
+A small room where every jar is labeled and none of them agree
+The small bowl nobody orders but everybody finishes first
+Booked out on a Friday night, three weeks in advance
+A whole region's history, written entirely in what's on the stove
+Grows the moment the smell reaches the front door
+Never quite as small as the person serving it promised
+Poured last, and somehow the part everyone remembers most
+A stranger fed before they've even said their name
+One curled brown stick that perfumes the whole pot
+Crushed first, and the whole kitchen knows dinner has started
+A single twist and the whole dish wakes up
+Hidden in the rice, and one bite says you found it the hard way
+The plainest bowl on the table, and somehow never leftover
+Boiled, spiced, and sold from a cart before anyone asks its name
+Told to treat the house like their own, and almost never does
+Held over the flame until the smell changes completely
+Shut in the heat and trusted to come out right
+Sets up the same cart on the same corner every single evening

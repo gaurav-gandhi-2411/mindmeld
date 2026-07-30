@@ -1,3 +1,29 @@
 # Indian Food pack — Hinglish clues, one per line, keyed line-by-line to secrets_hi-en.txt
 # ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
-# Status: coming_soon, content pending authorship — do not add clues here (Phase 6c)
+# Written for an Indian player — culturally native, not translated
+# Pending GG review
+Ek chammach itna tez, poori thali ka mood badal de
+Dabbe mein saat rang, har ek ka apna kaam
+Itni thaaliyan ki mez neeche se chatakne lagti hai
+Nani ke haath ki likhai, kabhi hoobahoo copy nahi hoti
+Rasoi mein hukum chalata hai, jo kabhi poori tarah shaant nahi hoti
+Chaas banaya jaata hai garmi ke sabse tez dopeher ke liye
+Bulaaya kisi ne nahi, phir bhi sab rasoi ki taraf khinche chale aate
+Chhota sa kamra, har dabba bhara, kisi mein bhi jagah khaali nahi
+Side mein rakhi, phir bhi sabse pehle khatam hoti hai
+Shukrawar raat ke liye teen hafte pehle hi jagah nahi milti
+Poore ilaake ka itihaas, chulhe par likha hua
+Khushboo dahleez tak pahunchte hi jaag jaati hai
+Jitna bola gaya utna kabhi nahi hota, hamesha zyada
+Akhir mein daala jaata hai, poore khaane ka mizaaj badal deta hai
+Naam poochne se pehle hi khaana samne rakh diya jaata hai
+Ek murra hua bhoora tinka, poore patile ko mehka deta hai
+Sabse pehle kadkadaya jaata hai, poori rasoi ko khabar ho jaati hai
+Ek chutki se poora khaana chauk jaata hai
+Chawal mein chhupa hua, ek kadak dant se pata chal jaata hai
+Mez ka sabse simple katora, phir bhi kabhi bachta nahi
+Ubla, masaledaar, thele se bikta hai naam poochhe bina
+Kaha jaata hai apna hi ghar samjho, phir bhi sankoch nahi jaata
+Aanch ke upar tab tak, jab tak khushboo badal na jaaye
+Garmi mein band kar diya jaata hai, bharosa karke ki sahi niklega
+Roz shaam usi kone pe wahi thela laga deta hai

@@ -529,6 +529,18 @@ bowler	bowler
 fielder	fielder
 finalist	finalist
 chant	chant
+# Indian Food pack additions (eval-gated): code-mixed English food terms
+# missing from the auto-included top-10k English words. All 8 embedding-
+# validated dense and food-relevant before addition — see
+# secrets_hi-en.txt header for the full log.
+pickle	pickle
+buttermilk	buttermilk
+aroma	aroma
+pantry	pantry
+cinnamon	cinnamon
+clove	clove
+lentil	lentil
+chickpea	chickpea
 # Phase 1a (spec-hinglish-benchmark.md) — held-out benchmark-supplement
 # secrets ONLY (evals/gen_dim1_benchmark_supplement.py). These 34 words are
 # NEVER part of the daily-schedule 60-secret pool (vocab/secrets_hi-en.txt) —

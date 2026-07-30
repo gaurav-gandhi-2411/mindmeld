@@ -2250,4 +2250,74 @@ orchestrator review), live-verified 2026-07-11.
   for a purely cosmetic text change already covered by analyze + the full suite's non-regression;
   visual read-quality ("does the copy land right") added to the manual QA checklist instead, where
   a human eye is the right tool anyway.
-- **Not yet committed** — commit follows this checkpoint entry.
+- **Committed** (`719c1b7`) and pushed.
+
+## WORKSTREAM 2d -- Indian Food pack: DRAFTED, VALIDATED, awaiting GG review (STOP POINT)
+
+- [x] **Recipe followed exactly** (spec-cricket-pack.md, retargetable per its own text): ~25
+  common-noun secrets, no proper nouns, theme in the clue not the secret, embedding-validated
+  every secret, semantic-neighbor audit on all clues, EN + natively-written Hinglish, no
+  duplicates vs daily/Bollywood/Cricket, distinct accent (packs.json already had one assigned:
+  `#9C5E20`/`#6B3F14`, brown/spice-toned).
+- [x] **Embedding validation was the load-bearing step, run against the REAL models** (all-MiniLM-
+  L6-v2 for en, the shipped fine-tuned checkpoint for hi-en) — not assumed. Two full candidate
+  rounds (~35 EN words total), top-10 nearest-neighbor inspection per word, mirroring Cricket's own
+  methodology. **Rejected for real collision reasons, not guesses**: `curry` (dominant sense in
+  this EN model is NBA player Stephen Curry — shah/warriors/kobe/lebron neighbors), `ginger`
+  (dominant "redhead" sense), `cumin` (vulgar collision), `curd` (vulgar collision), `mortar`
+  (construction sense), `turmeric`/`cardamom`/`saffron`/`coriander` (phonetic-noise, no food
+  semantics survive), and — the single biggest finding — **most romanized Indian dish names embed
+  by surface-form phonetics rather than meaning in the English-only model**, landing on unrelated
+  or actively risky proper-noun clusters: `idli` neighbors "akali" (an Indian political party),
+  `khichdi` neighbors "khamenei"/"khomeini" (Iranian political figures), `pakora` neighbors
+  "pakistani"/a slur-adjacent term. This is the same loanword-embeds-by-phonetics failure mode
+  prior sessions documented for hi-en (dil->Turkish, dua->Italian) — found here on the reverse
+  (EN) side. Consequence: the EN secret list leans generic-but-food-clued (spice, feast, recipe,
+  cuisine...) rather than dish-name-heavy, which is exactly what the spec's own design constraint
+  #2 asks for ("theme lives in the clue, not the secret").
+- [x] **Two real defects caught before GG ever saw a draft, not after**:
+  1. **Near-duplicate against the DAILY secret list**: initial candidates `kitchen`/`hunger`/
+     `snack` (EN) and `samosa`/`chai` (hi-en) are already daily secrets (`vocab/secrets_en.txt`/
+     `secrets_hi-en.txt`) — caught by direct grep before drafting clues, not after.
+  2. **Collision with the PUBLISHED PUBLIC BENCHMARK dataset**: `platter`, `dessert`, `yogurt`,
+     `dough` are already used as secrets/near-far judgment words in the externally-published
+     benchmark (`test_scrub_public_benchmark.py::test_public_benchmark_staging_scrubs_clean`
+     caught this on a routine full-suite run — 70 blocking collisions reported). This is a genuine
+     content-integrity issue (a held-out eval set overlapping with live game content), not a false
+     positive. Replaced with `chef`/`restaurant`/`guest`/`hospitality` — re-validated clean against
+     vocab, embeddings, AND the benchmark word set before finalizing.
+  3. **Semantic-neighbor self-audit** (manual, cross-referencing every clue against its secret's
+     own top-10 embedding neighbors gathered during validation): caught `garlic`'s clue almost
+     including "cloves" (garlic's #1 EN neighbor, and `clove` is a separate secret in this same
+     pack) and `pantry`'s draft almost including "kitchen" — both reworded before finalizing.
+     `feast`/`banquet` dropped as a near-duplicate pair (0.86 cosine) for puzzle-variety reasons,
+     not a spoiler-gate failure.
+  4. **Spoiler gate found one false-positive-shaped-but-real issue**: `sabse` (a common Hindi word
+     meaning "the most") was flagged as a morphological variant of `sauce` — reworded that one
+     clue; the automated gate is correct to be sensitive here even though this particular hit read
+     as a coincidence.
+- [x] **Vocab additions**: zero for EN (all 25 final secrets were already in `vocab/en.txt`). 8 for
+  hi-en (`pickle`, `buttermilk`, `aroma`, `pantry`, `cinnamon`, `clove`, `lentil`, `chickpea`,
+  added to `vocab/hinglish.txt` in the same `word<TAB>english_anchor` code-mixed-loanword format
+  Cricket's own 6 additions used) — every one embedding-validated dense and food-relevant BEFORE
+  being added, not after.
+- [x] **One asymmetric EN/hi-en pair** (line 9): EN's `condiment` embeds toward "compliment" (0.96
+  cosine — near-homophone collision) in the hi-en model, so that line uses `chutney` instead
+  (validated clean). Same asymmetric-pairing pattern the daily list already uses (EN "snack" /
+  hi-en "samosa", EN "coffee" / hi-en "chai") — not a new pattern invented for this pack.
+  Every OTHER line is the identical code-mixed word both languages (deliberate — see
+  secrets_hi-en.txt header for why native-Hindi alternatives were not attempted this time, given
+  Cricket already exhaustively tested and rejected that path for food-adjacent romanized terms).
+- [x] **Gates run and passing**: `validate_pack_content` (count match, vocab membership, profanity)
+  PASS both langs; `test_spoiler_gate_pack_content[indian-food-en/hi-en]` PASS (0 leaks);
+  `test_public_benchmark_staging_scrubs_clean` PASS (0 blocking collisions, re-run after the
+  4-word swap); `test_semantic_scrub_public_benchmark` PASS; full generator suite 781 passed / 2
+  skipped / 0 failed.
+- [x] **Dedup confirmed** against daily (EN + hi-en), Bollywood, and Cricket secret lists — zero
+  overlap, checked by direct comparison, not assumed.
+- **NOT YET DONE, deliberately — STOP POINT per the task instruction**: payloads not generated
+  (`build_packs.py` not run), pack not published, `packs.json` status still `coming_soon`,
+  Nature/Space stub deletion not yet done (bundled with this pack's launch per the task's own
+  sequencing). Committed to `main` as reviewable draft content only — committing is not shipping;
+  baking/publishing/flipping-live are the actual ship actions being held for GG's explicit review
+  of the secrets + clues below.
