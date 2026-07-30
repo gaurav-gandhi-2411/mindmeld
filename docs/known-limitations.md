@@ -491,6 +491,50 @@ by design (real WASM-init failures on exotic browsers degrade gracefully);
 `wasm_storage_check.js` distinguishes the two, so a silent regression to the
 fallback now fails CI.
 
+### 23. FIXED SAME-SESSION (2026-07-30) — eager-boot SQLite query storm caused a real production boot hang
+
+Incident record. Deploying the archive/streak-freeze/rival feature set caused
+production to serve a genuine blank white screen: `ArchiveScreen` is mounted
+eagerly at app boot (`IndexedStack` builds every tab regardless of the
+selected index), and its `_loadSolvedStates()` fired one SQLite query per
+available date (dozens, via `Future.wait`) **unconditionally in `initState`**
+— racing Firebase/Analytics initialization on the same boot frame. The
+post-deploy smoke check (`firebase-tests/smoke_check.js`) caught it
+immediately (`app did not boot within 30000ms`, zero page/request errors —
+a silent hang, not a crash); confirmed visually via `cold_repro_reload.js`
+(a real blank screenshot after 17.5s).
+
+**Caught and fixed within the same deploy session, before real users were
+meaningfully exposed:** rolled back to the prior known-good deployment first
+(production must not stay broken while debugging — `vercel rollback` itself
+doesn't support this project's custom-alias deploy flow, worked around by
+re-running the same `vercel alias set` step `deploy-warmer.ps1` uses), then
+root-caused by reproducing the exact `--wasm` production build locally
+(`python -m http.server` + `smoke_check.js` against `localhost` hung
+identically — confirmed, not guessed). Fixed with an `active` flag on
+`ArchiveScreen` (`main.dart` passes `active: _navIndex == 1`) deferring the
+query batch until the player actually opens the Practice tab. Verified the
+SAME local build boots cleanly with the fix applied BEFORE redeploying.
+
+**Why this slipped through**: `flutter test`/`flutter analyze` run on the
+native VM target and gave zero signal — the failure was specific to the real
+`--wasm` boot sequence under real eager-widget-tree concurrency, a gap no
+unit/widget test in this suite covers. Also newly understood while fixing
+this: `StatsScreen`'s existing `active` flag (the precedent `ArchiveScreen`
+was modeled on) only gates *re*-loads on tab-switch, not its own initial
+boot-time load either — it just does one cheap query, so it never surfaced
+this failure mode, but the same eager-boot-load pattern exists there too.
+
+**Residual, not yet closed**: no automated pre-deploy check runs the actual
+production `--wasm` build's smoke test before promoting to production —
+today's catch relied on the POST-deploy smoke check plus a human (session)
+noticing and stopping to investigate rather than declaring the deploy done.
+Revisit: add a pre-promotion local-wasm-boot check to `deploy-warmer.ps1`
+itself (build → serve locally → smoke-check → only then promote), so a
+future regression of this class fails before touching production at all,
+not after. Not built under this session's own time pressure — recorded here
+so it isn't forgotten instead.
+
 ### 18. FIXED (2026-07-24) — hi-en Warm band was structurally ~24 ranks wide
 (coarser gradient than EN)
 
