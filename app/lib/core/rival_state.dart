@@ -1,5 +1,13 @@
 import 'package:mindmeld/core/models.dart';
 
+/// The rival's display name — light personality only (spec-warmer-closeout.md
+/// WORKSTREAM 2c: a name + a few reaction lines, deliberately NOT a
+/// leaderboard/persona/progression system, since the rival is unvalidated).
+/// Used only in live in-app UI (the rival strip, the win-screen badge) —
+/// NOT in buildShareCard's external, tested share-text format, which stays
+/// "the bot" to avoid touching a stable externally-visible string.
+const String kRivalName = 'Ember';
+
 /// Race outcome between player and rival.
 enum RivalOutcome {
   racing,    // Game in progress — neither has solved yet (or rival solved, player continuing)

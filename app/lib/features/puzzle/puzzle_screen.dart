@@ -686,14 +686,19 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     String rivalLabel;
     TemperatureBand? rivalBand;
     if (rivalState.rivalSolved) {
-      rivalLabel = 'Rival finished in $solveAt ${solveAt == 1 ? 'guess' : 'guesses'}';
+      // "Overtaken" reaction: the rival has already solved but the player's
+      // turn is still ongoing (_buildRivalStrip is only shown pre-isFinished,
+      // so rivalSolved here always means "ahead of you right now", not a
+      // stale final result).
+      rivalLabel = '$kRivalName found it in $solveAt '
+          '${solveAt == 1 ? 'guess' : 'guesses'} — catch up!';
     } else if (guessCount == 0) {
-      rivalLabel = 'Rival ready…';
+      rivalLabel = '$kRivalName ready…';
     } else {
       final step = rivalState.rivalCurrentStep;
       final label = step?.temperatureBand.label ?? '';
       rivalBand = step?.temperatureBand;
-      rivalLabel = 'Rival: $label (best #${rivalState.rivalBestRank})';
+      rivalLabel = '$kRivalName: $label (best #${rivalState.rivalBestRank})';
     }
 
     final outcomeEmoji = switch (rivalState.outcome) {

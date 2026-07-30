@@ -2211,4 +2211,43 @@ orchestrator review), live-verified 2026-07-11.
   standalone or on a clean re-run of the full suite -- confirmed a one-off resource-contention flake
   from several parallel background `flutter test` invocations during this session's own debugging,
   not a real regression.
+- **Committed** (`0e80bb3`) and pushed.
+
+## WORKSTREAM 2c -- Rival light polish (name + reaction lines, no persona/progression)
+
+- [x] **Explored before writing anything**: confirmed the rival was genuinely anonymous (zero name
+  anywhere, grepped) and that `RivalState`/`RivalOutcome` (rival_state.dart) already compute
+  everything needed (rank, band, solved, outcome) without persisting anything -- no new state layer
+  needed, matching the spec's explicit "keep it cheap and cuttable."
+- [x] **Name**: `kRivalName = 'Ember'` (rival_state.dart), thematically tied to the game's own
+  heat/temperature-band metaphor. Scoped deliberately to LIVE in-app UI only (the mid-game rival
+  strip in `puzzle_screen.dart`, the inline win-screen badge in `win_screen.dart`) -- NOT
+  `buildShareCard`'s external, tested, copy-pasted share-text format (still says "the bot"), to
+  avoid touching a stable externally-visible string for a "light polish" task. Confirmed via grep
+  that only `share_card_test.dart` asserts on the old "Bot"/"Rival:" strings; the live-UI strings
+  had zero test coverage to preserve.
+- [x] **Three reaction moments, each mapped to an existing, already-computed signal** (no new
+  tracking/state):
+  - **Overtaken** (mid-game): `_buildRivalStrip` only renders pre-`isFinished`, so
+    `rivalState.rivalSolved == true` there always means "ahead of you right now" by construction --
+    label becomes "Ember found it in N guesses — catch up!" (previously a neutral "Rival finished
+    in N guesses").
+  - **Close finish** (win, margin of exactly 1 guess): `_buildParRivalBadge` (WinScreen) gains a
+    small subtitle "Neck and neck — just edged out Ember!" under the existing par/rival badge.
+  - **Loss**: `LossScreen.build()` gains "Ember got there first this time." next to the existing
+    "Your best: ... so close!" box, gated on `rivalSolveAt != null`. Verified this claim is always
+    accurate even though the rival's `solveAt` isn't explicitly bounded by the player's own
+    `maxGuesses` budget (`generator/rival.py`'s tier-width comment shows `chill.solveAt` can exceed
+    `par` by up to 8): the rival's path is a fully deterministic sequence that always terminates at
+    rank 1 by construction (`"solveAt": len(path)`), so "the rival got there and the player (on
+    LossScreen) didn't" holds regardless of budget -- same comparison basis the pre-existing
+    win-screen "Bot won" branch already relied on.
+- [x] **Explicitly did NOT build**: rival leaderboards, a persona/backstory, or any
+  progression/unlock system -- per the spec's own unvalidated-feature caution.
+- [x] **Verification**: `flutter analyze` clean on all 3 changed files; full `flutter test` 531
+  passed / 0 failed (no existing test touched the live-UI strings that changed). No new dedicated
+  test file added for this feature -- weighed against the spec's own "keep it cheap" instruction
+  for a purely cosmetic text change already covered by analyze + the full suite's non-regression;
+  visual read-quality ("does the copy land right") added to the manual QA checklist instead, where
+  a human eye is the right tool anyway.
 - **Not yet committed** — commit follows this checkpoint entry.

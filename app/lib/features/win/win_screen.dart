@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:mindmeld/analytics/firebase_exporter.dart';
 import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
+import 'package:mindmeld/core/rival_state.dart' show kRivalName;
 import 'package:mindmeld/features/branding/heat_rings_mark.dart';
 import 'package:mindmeld/features/notifications/notification_opt_in_card.dart';
 import 'package:mindmeld/features/packs/pack_selector_screen.dart';
@@ -308,31 +309,53 @@ class _WinScreenState extends State<WinScreen> {
         delta == 0 ? 'Par' : (delta > 0 ? '+$delta vs par' : '$delta vs par');
 
     String rivalStr = '';
+    // "Close finish" reaction: player won by exactly one guess. Light-only,
+    // per spec-warmer-closeout.md WORKSTREAM 2c — no persona/progression.
+    String? closeFinishReaction;
     final rivalSolveAt = widget.rivalSolveAt;
     if (rivalSolveAt != null) {
-      if (widget.guesses.length < rivalSolveAt) {
-        rivalStr = '  Beat the bot 🤖✓';
-      } else if (widget.guesses.length == rivalSolveAt) {
-        rivalStr = '  Tied the bot 🤖=';
+      final margin = rivalSolveAt - widget.guesses.length;
+      if (margin > 0) {
+        rivalStr = '  Beat $kRivalName 🤖✓';
+        if (margin == 1) closeFinishReaction = 'Neck and neck — just edged out $kRivalName!';
+      } else if (margin == 0) {
+        rivalStr = '  Tied $kRivalName 🤖=';
       } else {
-        rivalStr = '  Bot won 🤖✗';
+        rivalStr = '  $kRivalName won 🤖✗';
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(WarmerRadius.sm),
-      ),
-      child: Text(
-        '$parStr$rivalStr',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-            ),
-        textAlign: TextAlign.center,
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(
+              horizontal: WarmerSpacing.lg, vertical: WarmerSpacing.sm),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(WarmerRadius.sm),
+          ),
+          child: Text(
+            '$parStr$rivalStr',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (closeFinishReaction != null) ...[
+          const SizedBox(height: WarmerSpacing.xs),
+          Text(
+            closeFinishReaction,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: (Theme.of(context).extension<WarmerTokens>() ??
+                          WarmerTokens.light)
+                      .text2,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
     );
   }
 
@@ -752,6 +775,20 @@ class _LossScreenState extends State<LossScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
+            ],
+            // "Loss" reaction: rival solved this puzzle and the player didn't.
+            // Light-only, per spec-warmer-closeout.md WORKSTREAM 2c.
+            if (widget.rivalSolveAt != null) ...[
+              const SizedBox(height: WarmerSpacing.sm),
+              Builder(builder: (ctx) {
+                final tokens =
+                    Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+                return Text(
+                  '$kRivalName got there first this time.',
+                  style: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: tokens.text2),
+                  textAlign: TextAlign.center,
+                );
+              }),
             ],
             const SizedBox(height: WarmerSpacing.xl),
             RepaintBoundary(
