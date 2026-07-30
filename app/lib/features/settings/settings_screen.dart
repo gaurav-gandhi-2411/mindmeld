@@ -377,28 +377,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // (see AppPersistence.recordWin/rescueStreakOrReset, surfaced on
           // the Stats tab), neither as a purchase — both excluded from the
           // generic products loop below, same as themedPacks.
-          ...IapProduct.values
-              .where((p) =>
-                  p != IapProduct.themedPacks &&
-                  p != IapProduct.archive &&
-                  p != IapProduct.streakFreeze)
-              .map(
-            (p) {
-              final available = IapStub.isAvailable(p);
-              final subtitle = available ? 'Coming soon' : 'Coming in a future update';
-              return ListTile(
-                title: Text(IapStub.productNames[p] ?? p.name),
-                subtitle: Text(subtitle),
-                trailing: available
-                    ? (_entitlements.removeAds && p == IapProduct.removeAds
-                        ? Icon(Icons.check_circle, color: tokens.accentText)
-                        : const Icon(Icons.chevron_right))
-                    : const Chip(label: Text('Soon')),
-                enabled: available,
-                onTap: available ? () => _purchase(p) : null,
-              );
-            },
-          ),
+          //
+          // The remaining product (removeAds) is real, unimplemented-but-
+          // planned native functionality — genuinely "coming soon" is an
+          // honest label there, but ONLY on a platform where ads exist to
+          // remove. On web (the only shipped platform), adsEnabledEffective
+          // and iapEnabledEffective are both hard-false (native-only plugins,
+          // stubbed on web) — there is no ad to remove and no purchase path
+          // to reach, so showing this row there is dead UI, not an honest
+          // "not yet available" state. Gated the same way "Restore purchases"
+          // below already is.
+          if (AppConfig.iapEnabledEffective)
+            ...IapProduct.values
+                .where((p) =>
+                    p != IapProduct.themedPacks &&
+                    p != IapProduct.archive &&
+                    p != IapProduct.streakFreeze)
+                .map(
+              (p) {
+                final available = IapStub.isAvailable(p);
+                final subtitle = available ? 'Coming soon' : 'Coming in a future update';
+                return ListTile(
+                  title: Text(IapStub.productNames[p] ?? p.name),
+                  subtitle: Text(subtitle),
+                  trailing: available
+                      ? (_entitlements.removeAds && p == IapProduct.removeAds
+                          ? Icon(Icons.check_circle, color: tokens.accentText)
+                          : const Icon(Icons.chevron_right))
+                      : const Chip(label: Text('Soon')),
+                  enabled: available,
+                  onTap: available ? () => _purchase(p) : null,
+                );
+              },
+            ),
           ListTile(
             title: Text(IapStub.productNames[IapProduct.themedPacks] ?? 'Themed Packs'),
             subtitle: const Text('Bollywood, Cricket, Food & more'),

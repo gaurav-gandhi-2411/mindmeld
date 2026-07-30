@@ -2,20 +2,25 @@
 /// "IAP screens render via stub."
 ///
 /// These tests verify:
-///   1. Remove Ads and Streak Freeze are rendered as purchasable rows in the
-///      settings screen. Puzzle Archive is NOT rendered there — it shipped
-///      free via the "Practice" tab (see ArchiveScreen) rather than as an
-///      IAP, so it must never surface a "coming soon" purchase row again.
+///   1. Puzzle Archive and Streak Freeze are NOT rendered as purchasable rows
+///      — both shipped free/earned (ArchiveScreen's "Practice" tab;
+///      AppPersistence.recordWin/rescueStreakOrReset) rather than as an IAP,
+///      so neither may ever surface a "coming soon" purchase row. Remove Ads
+///      is also NOT rendered, for a different reason: AppConfig.
+///      iapEnabledEffective/adsEnabledEffective are hard-false on web (the
+///      only shipped platform) — there is no ad to remove and no purchase
+///      path to reach there, so the row would be dead UI. All three
+///      IapProduct enum values are retained (harmless, unused by this
+///      screen's UI) rather than ripped out, to avoid churning the
+///      RevenueCat product-mapping/entitlements plumbing for products that
+///      were never actually sold on this platform.
 ///   2. Themed Packs (phase 6c) is a navigation row into the pack selector —
-///      not a purchase row — and is enabled/tappable.
-///   3. Tapping a purchasable product surfaces the stub "coming soon" result
-///      without crashing (snackbar appears).
-///   4. IapStub.isAvailable(themedPacks) stays false — it is no longer part
+///      not a purchase row — and is enabled/tappable regardless of
+///      iapEnabledEffective, since it's a real, working feature (Bollywood
+///      is free; other packs default-unlock when IAP is disabled — see
+///      packUnlocked in core/packs.dart).
+///   3. IapStub.isAvailable(themedPacks) stays false — it is no longer part
 ///      of the generic purchase() flow (packs use IapGateway.purchasePack).
-///   5. IapProduct.archive itself is retained as an enum/entitlements value
-///      (harmless, unused by any UI) rather than ripped out, to avoid
-///      churning the RevenueCat product-mapping/entitlements plumbing for a
-///      product that was never actually sold.
 library;
 
 import 'package:flutter/material.dart';
@@ -66,15 +71,19 @@ void main() {
   // -------------------------------------------------------------------------
 
   group('SettingsScreen IAP section', () {
-    testWidgets('Remove Ads product is visible', (tester) async {
-      await tester.pumpWidget(_buildSettingsScreen());
-      await tester.pump();
+    testWidgets(
+      'Remove Ads is NOT rendered on web (ads/IAP hard-disabled there — dead '
+      'UI otherwise, per AppConfig.iapEnabledEffective)',
+      (tester) async {
+        await tester.pumpWidget(_buildSettingsScreen());
+        await tester.pump();
 
-      expect(
-        find.text(IapStub.productNames[IapProduct.removeAds]!),
-        findsOneWidget,
-      );
-    });
+        expect(
+          find.text(IapStub.productNames[IapProduct.removeAds]!),
+          findsNothing,
+        );
+      },
+    );
 
     testWidgets(
       'Puzzle Archive is NOT rendered as a purchasable IAP row (ships free)',
@@ -190,31 +199,12 @@ void main() {
   // Purchasable products show stub snackbar on tap
   // -------------------------------------------------------------------------
 
-  group('Tapping a purchasable product shows the stub result without crashing',
-      () {
-    testWidgets(
-      'tapping Remove Ads shows coming-soon snackbar',
-      (tester) async {
-        await tester.pumpWidget(_buildSettingsScreen());
-        await tester.pump();
-
-        await tester.tap(
-          find.text(IapStub.productNames[IapProduct.removeAds]!),
-        );
-
-        // The IapStub.purchase() is async; let it resolve.
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text(
-            'Coming soon! In-app purchases will be available in the next update.',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
-
-  });
+  // Note: no purchasable-product-tap coverage remains here — removeAds is
+  // the only generic product left after archive/streakFreeze shipped free/
+  // earned, and it's gated off entirely on web (see the "NOT rendered on
+  // web" test above), so there is no purchasable row to tap in this test
+  // environment. IapStub.purchase()'s coming-soon behavior itself is still
+  // covered directly below (IapStub contract group).
 
   // -------------------------------------------------------------------------
   // IapStub contract
