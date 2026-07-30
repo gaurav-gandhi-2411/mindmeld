@@ -1,0 +1,1269 @@
+{
+  "shipped_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+  "vocab_size": 10495,
+  "n_records": 376,
+  "en_scope_note": "The bake-off checkpoint this analysis replays contains ONLY hi-en secrets (42 secrets, union of evals/scenarios/dim1_hien.json + dim1_benchmark_supplement_hien.json) -- confirmed by set-membership check against dim1_en.json/dim1_benchmark_supplement_en.json's secret lists (zero overlap). No EN-language actual_rank data exists in any bakeoff_raw checkpoint, so per-language optimisation is hi-en-only with this data (no re-embedding was run, per the task's determinism/no-retraining constraint). EN's own thresholds are algebraically unaffected by any warm_floor change explored here as long as the floor stays below EN's un-floored warm_max (55000*0.05=2750) -- true for every candidate in this report.",
+  "diagnosis": {
+    "n_mid_total": 84,
+    "n_mid_not_in_warm": 77,
+    "hot_max": 500,
+    "warm_max": 900,
+    "near_miss_ceiling": 2400,
+    "buckets": {
+      "too_close": {
+        "n": 31,
+        "fraction_of_missed": 0.4025974025974026
+      },
+      "near_miss": {
+        "n": 19,
+        "fraction_of_missed": 0.24675324675324675
+      },
+      "deep_tail": {
+        "n": 27,
+        "fraction_of_missed": 0.35064935064935066
+      }
+    },
+    "histogram": [
+      {
+        "lo": 0,
+        "hi": 50,
+        "count": 16
+      },
+      {
+        "lo": 50,
+        "hi": 500,
+        "count": 15
+      },
+      {
+        "lo": 500,
+        "hi": 900,
+        "count": 0
+      },
+      {
+        "lo": 900,
+        "hi": 2400,
+        "count": 19
+      },
+      {
+        "lo": 2400,
+        "hi": 5000,
+        "count": 16
+      },
+      {
+        "lo": 5000,
+        "hi": 10495,
+        "count": 11
+      }
+    ],
+    "sorted_missed_ranks": [
+      3,
+      3,
+      6,
+      11,
+      11,
+      16,
+      19,
+      19,
+      20,
+      22,
+      22,
+      25,
+      26,
+      33,
+      35,
+      36,
+      67,
+      67,
+      128,
+      174,
+      188,
+      197,
+      205,
+      236,
+      265,
+      267,
+      269,
+      321,
+      323,
+      346,
+      357,
+      961,
+      964,
+      966,
+      1002,
+      1097,
+      1258,
+      1270,
+      1280,
+      1340,
+      1340,
+      1506,
+      1517,
+      1535,
+      1631,
+      1665,
+      1678,
+      1693,
+      1705,
+      2097,
+      2740,
+      2740,
+      3006,
+      3182,
+      3182,
+      3723,
+      3739,
+      3849,
+      3874,
+      3921,
+      3991,
+      4083,
+      4165,
+      4175,
+      4240,
+      4315,
+      5072,
+      5151,
+      5781,
+      5917,
+      6021,
+      6615,
+      7302,
+      7897,
+      8337,
+      9025,
+      9170
+    ],
+    "verdict": "predominantly genuine ranking error (too-close near-tier confound + deep-tail misses), NOT threshold placement -- only a minority is recoverable by widening warm_max"
+  },
+  "grid_search": {
+    "hot_floors_searched": [
+      200,
+      225,
+      250,
+      275,
+      300,
+      325,
+      350,
+      375,
+      400,
+      425,
+      450,
+      475,
+      500,
+      525,
+      550,
+      575,
+      600,
+      625,
+      650,
+      675,
+      700,
+      725,
+      750,
+      775,
+      800,
+      825,
+      850,
+      875,
+      900
+    ],
+    "warm_floors_searched": [
+      900,
+      3500,
+      "step=10"
+    ],
+    "top_15_by_net": [
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1010,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1020,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1030,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1040,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1050,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1060,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 11,
+        "broken": 5,
+        "net": 6,
+        "macro_tier_accuracy": 0.5807387057387058
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1700,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 24,
+        "broken": 18,
+        "net": 6,
+        "macro_tier_accuracy": 0.6114926739926739
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1710,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1720,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1730,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1740,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1750,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 250,
+          "hot_frac": 0.01,
+          "warm_floor": 1760,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 25,
+        "broken": 19,
+        "net": 6,
+        "macro_tier_accuracy": 0.6138583638583639
+      },
+      {
+        "params": {
+          "hot_floor": 300,
+          "hot_frac": 0.01,
+          "warm_floor": 1010,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 8,
+        "broken": 3,
+        "net": 5,
+        "macro_tier_accuracy": 0.5767704517704518
+      },
+      {
+        "params": {
+          "hot_floor": 300,
+          "hot_frac": 0.01,
+          "warm_floor": 1020,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 8,
+        "broken": 3,
+        "net": 5,
+        "macro_tier_accuracy": 0.5767704517704518
+      }
+    ],
+    "zero_broken_candidates_by_fixed_desc": [
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1010,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1020,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1030,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1040,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1050,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1060,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 4,
+        "broken": 0,
+        "net": 4,
+        "macro_tier_accuracy": 0.5728021978021979
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 970,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 3,
+        "broken": 0,
+        "net": 3,
+        "macro_tier_accuracy": 0.5688339438339438
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 980,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 3,
+        "broken": 0,
+        "net": 3,
+        "macro_tier_accuracy": 0.5688339438339438
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 990,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 3,
+        "broken": 0,
+        "net": 3,
+        "macro_tier_accuracy": 0.5688339438339438
+      },
+      {
+        "params": {
+          "hot_floor": 500,
+          "hot_frac": 0.01,
+          "warm_floor": 1000,
+          "warm_frac": 0.05,
+          "cold_floor": 0,
+          "cold_frac": 0.25
+        },
+        "fixed": 3,
+        "broken": 0,
+        "net": 3,
+        "macro_tier_accuracy": 0.5688339438339438
+      }
+    ]
+  },
+  "baseline": {
+    "params": {
+      "hot_floor": 500,
+      "hot_frac": 0.01,
+      "warm_floor": 900,
+      "warm_frac": 0.05,
+      "cold_floor": 0,
+      "cold_frac": 0.25
+    },
+    "tier_accuracy": {
+      "near": 0.6547619047619048,
+      "mid": 0.08333333333333333,
+      "far": 0.9326923076923077
+    },
+    "macro_tier_accuracy": 0.556929181929182,
+    "band_confusion": {
+      "tiers": [
+        "near",
+        "mid",
+        "far"
+      ],
+      "bands": [
+        "win",
+        "scorching",
+        "hot",
+        "warm",
+        "cold",
+        "freezing"
+      ],
+      "matrix": [
+        [
+          2,
+          35,
+          20,
+          5,
+          12,
+          10
+        ],
+        [
+          0,
+          16,
+          15,
+          7,
+          19,
+          27
+        ],
+        [
+          0,
+          0,
+          9,
+          5,
+          36,
+          158
+        ]
+      ]
+    },
+    "per_band_pr_bootstrap": {
+      "win": {
+        "precision_point": 0.0,
+        "precision_ci_95": [
+          0.0,
+          0.0
+        ],
+        "recall_point": null,
+        "recall_ci_95": null,
+        "n_predicted": 2,
+        "n_expected": 0
+      },
+      "scorching": {
+        "precision_point": 0.6862745098039216,
+        "precision_ci_95": [
+          0.6101694915254238,
+          0.7907218992248058
+        ],
+        "recall_point": 0.4166666666666667,
+        "recall_ci_95": [
+          0.2857142857142857,
+          0.5476190476190477
+        ],
+        "n_predicted": 51,
+        "n_expected": 84
+      },
+      "hot": {
+        "precision_point": 0.45454545454545453,
+        "precision_ci_95": [
+          0.32498310810810815,
+          0.5789473684210527
+        ],
+        "recall_point": 0.23809523809523808,
+        "recall_ci_95": [
+          0.14285714285714285,
+          0.34523809523809523
+        ],
+        "n_predicted": 44,
+        "n_expected": 84
+      },
+      "warm": {
+        "precision_point": 0.4117647058823529,
+        "precision_ci_95": [
+          0.17647058823529413,
+          0.6666666666666666
+        ],
+        "recall_point": 0.08333333333333333,
+        "recall_ci_95": [
+          0.023809523809523808,
+          0.15476190476190477
+        ],
+        "n_predicted": 17,
+        "n_expected": 84
+      },
+      "cold": {
+        "precision_point": 0.5373134328358209,
+        "precision_ci_95": [
+          0.42028985507246375,
+          0.66
+        ],
+        "recall_point": 0.17307692307692307,
+        "recall_ci_95": [
+          0.1201923076923077,
+          0.22705314009661837
+        ],
+        "n_predicted": 67,
+        "n_expected": 208
+      },
+      "freezing": {
+        "precision_point": 0.8102564102564103,
+        "precision_ci_95": [
+          0.7522304763326862,
+          0.8729281767955801
+        ],
+        "recall_point": 0.7596153846153846,
+        "recall_ci_95": [
+          0.6908212560386473,
+          0.8229665071770335
+        ],
+        "n_predicted": 195,
+        "n_expected": 208
+      }
+    },
+    "ece": 0.2020108359603864,
+    "band_reachability": {
+      "n_puzzles": 118,
+      "n_sims_per_puzzle": 100,
+      "total_steps": 139772,
+      "per_band": {
+        "win": {
+          "count": 11800,
+          "fraction": 0.08442320350284749
+        },
+        "scorching": {
+          "count": 58529,
+          "fraction": 0.418746243882895
+        },
+        "hot": {
+          "count": 39104,
+          "fraction": 0.2797699109979109
+        },
+        "warm": {
+          "count": 5785,
+          "fraction": 0.041388833242709554
+        },
+        "cold": {
+          "count": 10420,
+          "fraction": 0.07454998139827719
+        },
+        "freezing": {
+          "count": 14134,
+          "fraction": 0.10112182697535987
+        }
+      },
+      "unreached_bands": [],
+      "all_bands_reachable": true
+    }
+  },
+  "winning_candidate": {
+    "params": {
+      "hot_floor": 500,
+      "hot_frac": 0.01,
+      "warm_floor": 1050,
+      "warm_frac": 0.05,
+      "cold_floor": 0,
+      "cold_frac": 0.25
+    },
+    "tier_accuracy": {
+      "near": 0.6547619047619048,
+      "mid": 0.13095238095238096,
+      "far": 0.9326923076923077
+    },
+    "macro_tier_accuracy": 0.5728021978021979,
+    "band_confusion": {
+      "tiers": [
+        "near",
+        "mid",
+        "far"
+      ],
+      "bands": [
+        "win",
+        "scorching",
+        "hot",
+        "warm",
+        "cold",
+        "freezing"
+      ],
+      "matrix": [
+        [
+          2,
+          35,
+          20,
+          5,
+          12,
+          10
+        ],
+        [
+          0,
+          16,
+          15,
+          11,
+          15,
+          27
+        ],
+        [
+          0,
+          0,
+          9,
+          5,
+          36,
+          158
+        ]
+      ]
+    },
+    "per_band_pr_bootstrap": {
+      "win": {
+        "precision_point": 0.0,
+        "precision_ci_95": [
+          0.0,
+          0.0
+        ],
+        "recall_point": null,
+        "recall_ci_95": null,
+        "n_predicted": 2,
+        "n_expected": 0
+      },
+      "scorching": {
+        "precision_point": 0.6862745098039216,
+        "precision_ci_95": [
+          0.6101694915254238,
+          0.7907218992248058
+        ],
+        "recall_point": 0.4166666666666667,
+        "recall_ci_95": [
+          0.2857142857142857,
+          0.5476190476190477
+        ],
+        "n_predicted": 51,
+        "n_expected": 84
+      },
+      "hot": {
+        "precision_point": 0.45454545454545453,
+        "precision_ci_95": [
+          0.32498310810810815,
+          0.5789473684210527
+        ],
+        "recall_point": 0.23809523809523808,
+        "recall_ci_95": [
+          0.14285714285714285,
+          0.34523809523809523
+        ],
+        "n_predicted": 44,
+        "n_expected": 84
+      },
+      "warm": {
+        "precision_point": 0.5238095238095238,
+        "precision_ci_95": [
+          0.30434782608695654,
+          0.75
+        ],
+        "recall_point": 0.13095238095238096,
+        "recall_ci_95": [
+          0.05952380952380952,
+          0.21686746987951808
+        ],
+        "n_predicted": 21,
+        "n_expected": 84
+      },
+      "cold": {
+        "precision_point": 0.5714285714285714,
+        "precision_ci_95": [
+          0.4528301886792453,
+          0.6896551724137931
+        ],
+        "recall_point": 0.17307692307692307,
+        "recall_ci_95": [
+          0.1201923076923077,
+          0.22705314009661837
+        ],
+        "n_predicted": 63,
+        "n_expected": 208
+      },
+      "freezing": {
+        "precision_point": 0.8102564102564103,
+        "precision_ci_95": [
+          0.7522304763326862,
+          0.8729281767955801
+        ],
+        "recall_point": 0.7596153846153846,
+        "recall_ci_95": [
+          0.6908212560386473,
+          0.8229665071770335
+        ],
+        "n_predicted": 195,
+        "n_expected": 208
+      }
+    },
+    "ece": 0.2020108359603864,
+    "ece_identical_to_baseline": true,
+    "regression_floor": {
+      "fixed": 4,
+      "broken": 0,
+      "net": 4,
+      "fixed_by_tier": {
+        "near": 0,
+        "mid": 4,
+        "far": 0
+      },
+      "broken_by_tier": {
+        "near": 0,
+        "mid": 0,
+        "far": 0
+      },
+      "detail": [
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "bagicha",
+          "word": "lawn",
+          "actual_rank": 1002,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "chimni",
+          "word": "duct",
+          "actual_rank": 966,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "mazaa",
+          "word": "playful",
+          "actual_rank": 961,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "tokri",
+          "word": "picnic",
+          "actual_rank": 964,
+          "baseline_band": 4,
+          "candidate_band": 3
+        }
+      ]
+    },
+    "band_reachability": {
+      "n_puzzles": 118,
+      "n_sims_per_puzzle": 100,
+      "total_steps": 139772,
+      "per_band": {
+        "win": {
+          "count": 11800,
+          "fraction": 0.08442320350284749
+        },
+        "scorching": {
+          "count": 58529,
+          "fraction": 0.418746243882895
+        },
+        "hot": {
+          "count": 39104,
+          "fraction": 0.2797699109979109
+        },
+        "warm": {
+          "count": 7361,
+          "fraction": 0.052664339066479694
+        },
+        "cold": {
+          "count": 8844,
+          "fraction": 0.06327447557450705
+        },
+        "freezing": {
+          "count": 14134,
+          "fraction": 0.10112182697535987
+        }
+      },
+      "unreached_bands": [],
+      "all_bands_reachable": true
+    }
+  },
+  "rejected_aggressive_candidate": {
+    "params": {
+      "hot_floor": 250,
+      "hot_frac": 0.01,
+      "warm_floor": 1050,
+      "warm_frac": 0.05,
+      "cold_floor": 0,
+      "cold_frac": 0.25
+    },
+    "tier_accuracy": {
+      "near": 0.5952380952380952,
+      "mid": 0.21428571428571427,
+      "far": 0.9326923076923077
+    },
+    "macro_tier_accuracy": 0.5807387057387058,
+    "band_confusion": {
+      "tiers": [
+        "near",
+        "mid",
+        "far"
+      ],
+      "bands": [
+        "win",
+        "scorching",
+        "hot",
+        "warm",
+        "cold",
+        "freezing"
+      ],
+      "matrix": [
+        [
+          2,
+          35,
+          15,
+          10,
+          12,
+          10
+        ],
+        [
+          0,
+          16,
+          8,
+          18,
+          15,
+          27
+        ],
+        [
+          0,
+          0,
+          3,
+          11,
+          36,
+          158
+        ]
+      ]
+    },
+    "per_band_pr_bootstrap": {
+      "win": {
+        "precision_point": 0.0,
+        "precision_ci_95": [
+          0.0,
+          0.0
+        ],
+        "recall_point": null,
+        "recall_ci_95": null,
+        "n_predicted": 2,
+        "n_expected": 0
+      },
+      "scorching": {
+        "precision_point": 0.6862745098039216,
+        "precision_ci_95": [
+          0.6101694915254238,
+          0.7907218992248058
+        ],
+        "recall_point": 0.4166666666666667,
+        "recall_ci_95": [
+          0.2857142857142857,
+          0.5476190476190477
+        ],
+        "n_predicted": 51,
+        "n_expected": 84
+      },
+      "hot": {
+        "precision_point": 0.5769230769230769,
+        "precision_ci_95": [
+          0.391304347826087,
+          0.7407407407407407
+        ],
+        "recall_point": 0.17857142857142858,
+        "recall_ci_95": [
+          0.09523809523809523,
+          0.27380952380952384
+        ],
+        "n_predicted": 26,
+        "n_expected": 84
+      },
+      "warm": {
+        "precision_point": 0.46153846153846156,
+        "precision_ci_95": [
+          0.3225806451612903,
+          0.6
+        ],
+        "recall_point": 0.21428571428571427,
+        "recall_ci_95": [
+          0.12345679012345678,
+          0.3068181818181818
+        ],
+        "n_predicted": 39,
+        "n_expected": 84
+      },
+      "cold": {
+        "precision_point": 0.5714285714285714,
+        "precision_ci_95": [
+          0.4528301886792453,
+          0.6896551724137931
+        ],
+        "recall_point": 0.17307692307692307,
+        "recall_ci_95": [
+          0.1201923076923077,
+          0.22705314009661837
+        ],
+        "n_predicted": 63,
+        "n_expected": 208
+      },
+      "freezing": {
+        "precision_point": 0.8102564102564103,
+        "precision_ci_95": [
+          0.7522304763326862,
+          0.8729281767955801
+        ],
+        "recall_point": 0.7596153846153846,
+        "recall_ci_95": [
+          0.6908212560386473,
+          0.8229665071770335
+        ],
+        "n_predicted": 195,
+        "n_expected": 208
+      }
+    },
+    "ece": 0.2020108359603864,
+    "ece_identical_to_baseline": true,
+    "regression_floor": {
+      "fixed": 11,
+      "broken": 5,
+      "net": 6,
+      "fixed_by_tier": {
+        "near": 0,
+        "mid": 11,
+        "far": 0
+      },
+      "broken_by_tier": {
+        "near": 5,
+        "mid": 0,
+        "far": 0
+      },
+      "detail": [
+        {
+          "outcome": "broken",
+          "tier": "near",
+          "secret": "bagicha",
+          "word": "garden",
+          "actual_rank": 482,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "bagicha",
+          "word": "phool",
+          "actual_rank": 357,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "bagicha",
+          "word": "lawn",
+          "actual_rank": 1002,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "broken",
+          "tier": "near",
+          "secret": "pahad",
+          "word": "peak",
+          "actual_rank": 423,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "bhanji",
+          "word": "auntie",
+          "actual_rank": 323,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "chimni",
+          "word": "duct",
+          "actual_rank": 966,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "chinta",
+          "word": "stress",
+          "actual_rank": 269,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "dahi",
+          "word": "breakfast",
+          "actual_rank": 346,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "broken",
+          "tier": "near",
+          "secret": "dhoop",
+          "word": "brightness",
+          "actual_rank": 277,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "mazaa",
+          "word": "playful",
+          "actual_rank": 961,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "broken",
+          "tier": "near",
+          "secret": "sarhad",
+          "word": "boundary",
+          "actual_rank": 275,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "sarhad",
+          "word": "fence",
+          "actual_rank": 321,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "broken",
+          "tier": "near",
+          "secret": "sharm",
+          "word": "shyness",
+          "actual_rank": 311,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "thaali",
+          "word": "cutlery",
+          "actual_rank": 267,
+          "baseline_band": 2,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "tokri",
+          "word": "picnic",
+          "actual_rank": 964,
+          "baseline_band": 4,
+          "candidate_band": 3
+        },
+        {
+          "outcome": "fixed",
+          "tier": "mid",
+          "secret": "udaasi",
+          "word": "despair",
+          "actual_rank": 265,
+          "baseline_band": 2,
+          "candidate_band": 3
+        }
+      ]
+    },
+    "band_reachability": {
+      "n_puzzles": 118,
+      "n_sims_per_puzzle": 100,
+      "total_steps": 139772,
+      "per_band": {
+        "win": {
+          "count": 11800,
+          "fraction": 0.08442320350284749
+        },
+        "scorching": {
+          "count": 58529,
+          "fraction": 0.418746243882895
+        },
+        "hot": {
+          "count": 30165,
+          "fraction": 0.2158157570901182
+        },
+        "warm": {
+          "count": 16300,
+          "fraction": 0.11661849297427239
+        },
+        "cold": {
+          "count": 8844,
+          "fraction": 0.06327447557450705
+        },
+        "freezing": {
+          "count": 14134,
+          "fraction": 0.10112182697535987
+        }
+      },
+      "unreached_bands": [],
+      "all_bands_reachable": true
+    }
+  }
+}
