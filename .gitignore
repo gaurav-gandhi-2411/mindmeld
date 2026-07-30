@@ -72,3 +72,4 @@ ui-debug.log
 firebase-tests/node_modules/
 firebase-tests/shot_*.png
 
+.vercel

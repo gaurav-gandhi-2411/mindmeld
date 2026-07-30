@@ -17,9 +17,27 @@ import 'package:mindmeld/features/puzzle/puzzle_screen.dart';
 /// `flow_hardening_test.dart`'s "S24: practice mode does not affect daily
 /// stats" for the proof this isolation holds.
 class ArchiveScreen extends StatefulWidget {
-  const ArchiveScreen({super.key, required this.lang});
+  const ArchiveScreen({super.key, required this.lang, this.active = true});
 
   final String lang;
+
+  /// Whether this tab is the currently-selected destination in the app
+  /// shell's `IndexedStack`.
+  ///
+  /// [ArchiveScreen] is mounted eagerly at boot (all `IndexedStack` children
+  /// build regardless of which index is selected) — but unlike a cheap
+  /// single-row read, its own `_loadSolvedStates()` fires one SQLite query
+  /// per available date (dozens once the game has been live a while, via
+  /// `Future.wait`). Firing all of those unconditionally in `initState`
+  /// means every app boot pays that cost immediately, racing Firebase/
+  /// Analytics initialization on the SAME boot frame, real Vercel-production
+  /// incident: this caused the app to hang before its first frame ever
+  /// painted (`<flt-glass-pane>` never appeared) — see PLAN.md's
+  /// spec-warmer-closeout.md WORKSTREAM 3/4 entry for the full incident.
+  /// [active] defers the query until the player actually opens this tab;
+  /// defaults to `true` so direct usages (tests, any non-tabbed embedding)
+  /// still load immediately as before.
+  final bool active;
 
   static const startDate = '2026-06-12';
 
@@ -33,7 +51,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   @override
   void initState() {
     super.initState();
-    unawaited(_loadSolvedStates());
+    if (widget.active) unawaited(_loadSolvedStates());
   }
 
   @override
@@ -41,6 +59,15 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.lang != widget.lang) {
       _solvedStates = null;
+      if (widget.active) unawaited(_loadSolvedStates());
+      return;
+    }
+    // Lazy first load: this screen mounts (and this callback can fire)
+    // before the player ever opens the tab, so only load once it actually
+    // becomes the visible destination (or was already active on mount, via
+    // initState above) — never on an inactive rebuild.
+    final becameActive = widget.active && !oldWidget.active;
+    if (becameActive && _solvedStates == null) {
       unawaited(_loadSolvedStates());
     }
   }
