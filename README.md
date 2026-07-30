@@ -109,6 +109,16 @@ uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --
 # the real Firebase web config values.
 uv run python scripts\make_web_sw.py --build-dir app\build\web
 Copy-Item app\build\web\* web-dist\ -Recurse -Force
+
+# Guard: local pre-promotion boot check (required — see the 2026-07-30 incident
+# in docs/known-limitations.md entry 23). Serves the exact freshly-staged
+# web-dist/ locally and requires a clean boot BEFORE anything is uploaded to
+# Vercel, let alone promoted — reuses smoke_check.js's own boot detection
+# against a local URL instead of production, so there's one implementation.
+uv run python -m http.server 8322 --directory web-dist
+# (in a second terminal, or after backgrounding the server above)
+node firebase-tests\smoke_check.js http://localhost:8322/
+
 cd web-dist
 npx vercel deploy --prod --yes
 cd ..

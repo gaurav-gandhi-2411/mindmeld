@@ -188,6 +188,77 @@ Invoke-Step "Stage build into web-dist/" {
     Copy-Item (Join-Path $repoRoot 'app/build/web/*') $webDist -Recurse -Force
 }
 
+Invoke-Step "Guard: local wasm boot check (before ANY Vercel upload or promotion)" {
+    # Real incident (2026-07-30, docs/known-limitations.md entry 23): a deploy
+    # built successfully, byte-verified successfully, and PROMOTED to
+    # production before anything checked that the app actually boots -- it
+    # didn't (a silent eager-init hang), and production served a blank white
+    # screen until the POST-deploy smoke check caught it, several minutes
+    # after real users could have hit it. This step closes that gap: serve
+    # the exact freshly-staged web-dist/ locally and require a clean boot
+    # BEFORE web-dist/ is ever uploaded to Vercel, let alone promoted.
+    #
+    # Reuses smoke_check.js's own boot-detection (flt-glass-pane + sized
+    # canvas, zero pageerror/requestfailed) against a local URL instead of
+    # production -- one implementation, not a second copy of the same
+    # Puppeteer logic. smoke_check.js already accepts an arbitrary target URL
+    # as argv[1]; no changes to that script were needed.
+    $localPort = 8322
+    $webDist = Join-Path $repoRoot 'web-dist'
+    $localUrl = "http://localhost:$localPort/"
+    $serverOutLog = Join-Path $repoRoot 'web-dist-local-server.out.log'
+    $serverErrLog = Join-Path $repoRoot 'web-dist-local-server.err.log'
+    $serverProcess = $null
+    try {
+        $serverProcess = Start-Process -FilePath 'uv' `
+            -ArgumentList @('run', 'python', '-m', 'http.server', $localPort, '--directory', $webDist) `
+            -WorkingDirectory $repoRoot `
+            -WindowStyle Hidden `
+            -RedirectStandardOutput $serverOutLog `
+            -RedirectStandardError $serverErrLog `
+            -PassThru
+
+        $ready = $false
+        for ($i = 0; $i -lt 30; $i++) {
+            try {
+                $resp = Invoke-WebRequest -Uri $localUrl -UseBasicParsing -TimeoutSec 2
+                if ($resp.StatusCode -eq 200) { $ready = $true; break }
+            } catch {
+                Start-Sleep -Seconds 1
+            }
+        }
+        if (-not $ready) {
+            throw "Local server on port $localPort never became ready -- see $serverOutLog / $serverErrLog"
+        }
+
+        Invoke-NativeCommand -FilePath 'node' -Description "local pre-promotion boot check" -ArgumentList @(
+            'firebase-tests/smoke_check.js', $localUrl
+        ) | Out-Null
+        Write-Host "  OK: freshly-built web-dist/ boots cleanly (local, pre-upload)"
+    } finally {
+        if ($serverProcess -and -not $serverProcess.HasExited) {
+            # `Stop-Process` on $serverProcess.Id only kills the `uv` launcher
+            # -- `uv run python -m http.server` spawns python as a CHILD
+            # process on Windows (no exec-replace), which Stop-Process does
+            # not cascade to, orphaning a live server still bound to the
+            # port on every single deploy run (found while testing this gate
+            # -- 4 leaked listeners on port 8322 after 4 deploy runs).
+            # taskkill /T kills the whole process tree, not just the parent.
+            & taskkill /PID $serverProcess.Id /T /F 2>&1 | Out-Null
+        }
+        Remove-Item $serverOutLog, $serverErrLog -ErrorAction SilentlyContinue
+        # Unconditional, at the very end of finally, regardless of which
+        # cleanup path ran above: taskkill's exit code (e.g. 128 if the
+        # process already exited on its own before we got here) must NOT
+        # leak out as this scriptblock's $LASTEXITCODE -- Invoke-Step checks
+        # it AFTER this finally block runs and would otherwise fail an
+        # already-successful boot check on pure cleanup noise (found while
+        # testing this gate: the boot check printed PASS, then the step
+        # still threw "exit 128" from taskkill's own code bleeding through).
+        $global:LASTEXITCODE = 0
+    }
+}
+
 $global:deploymentUrl = $null
 Invoke-Step "Deploy to Vercel production" {
     Push-Location (Join-Path $repoRoot 'web-dist')

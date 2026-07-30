@@ -831,15 +831,47 @@ under/over-ranks in practice) — doesn't exist yet at any real N since the game
 had real traffic. Revisit once usage data accumulates; building either lever ahead of
 that data would be guessing at what to fix.
 
-### R5. Pre-promotion local-wasm-boot check in the deploy script
+### R5. BUILT SAME-SESSION (2026-07-30) — pre-promotion local-wasm-boot check
 
-Carried forward from known-limitations entry 23 (today's boot-hang incident): no
-automated check currently runs the actual production `--wasm` build's smoke test
-BEFORE promoting to production — today's catch relied on the POST-deploy smoke check
-plus a human noticing and stopping to investigate. Add a pre-promotion local-build +
-serve + smoke-check step to `deploy-warmer.ps1` itself, so this failure class is
-caught before touching production, not after. Small, concrete, and worth doing soon —
-listed here rather than built under this session's own time pressure.
+Was carried forward from known-limitations entry 23 (today's boot-hang incident);
+promoted out of the deferred backlog and built the same session, not left for later.
+`deploy-warmer.ps1` now has a "Guard: local wasm boot check" step immediately after
+staging `web-dist/` and BEFORE any Vercel upload or the production alias is touched:
+serves the freshly-built bundle via `uv run python -m http.server`, then runs
+`firebase-tests/smoke_check.js` against that local URL — reusing its existing boot
+detection (flt-glass-pane + sized canvas, zero pageerror/requestfailed) rather than
+a second implementation. A failed local boot throws immediately, before Vercel is
+ever contacted.
+
+**Proven, not just written**: ran a deliberately-broken build (a synchronous throw
+at the top of `main()`) through the patched script twice (once before, once after
+a cleanup-logic fix found along the way) — both times it correctly threw at the new
+guard step and the script never reached "Deploy to Vercel production," confirmed by
+the absence of that step's output and a nonzero script exit. Then ran a real good
+build through the same patched script and confirmed it promotes cleanly end to end
+(local check passes → Vercel deploy → alias → byte-verify → post-deploy smoke check,
+all green).
+
+**Two real bugs found and fixed while proving it, not from theory**:
+1. `Start-Process -RedirectStandardOutput`/`-RedirectStandardError` pointed at the
+   same file — PowerShell rejects this outright. Fixed by using two separate log files.
+2. `Stop-Process` on the launched process's PID only killed the `uv` launcher, not
+   the `python -m http.server` child it spawns (no exec-replace on Windows) — leaked
+   4 orphaned servers still LISTENING on the test port across 4 runs before this was
+   caught. Fixed with `taskkill /T /F` (kills the whole process tree). That fix's own
+   `taskkill` exit code then leaked into the step's `$LASTEXITCODE` and made an
+   already-successful boot check fail the step anyway — fixed by resetting
+   `$LASTEXITCODE` unconditionally at the end of the cleanup block.
+
+**Honest caveat**: a local test against a fresh, empty browser profile (Puppeteer
+launches with no persistent `userDataDir`) could NOT reproduce entry 23's original
+production hang by reverting entry 23's own code fix — the reverted code booted
+fine locally. This suggests the original hang may have been sensitive to a
+populated production IndexedDB (real accumulated user data) in a way an empty local
+profile never exercises, not purely the eager-query pattern in isolation — recorded
+here rather than overstating certainty about the exact mechanism. This gate still
+closes the general failure CLASS (any build that doesn't boot, for any reason, is
+now caught before promotion) regardless of the precise original mechanism.
 
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
