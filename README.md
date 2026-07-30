@@ -160,22 +160,25 @@ Phase 4 item (`docs/web-monetization.md`).
 
 ### Performance budgets (playwarmer.vercel.app)
 
-Per-product numeric performance budgets (rule 15e) — measured baseline and artifact in
-`reports/performance-baseline-2026-07-12.md` (Lighthouse 13.4.0, desktop preset, 2026-07-12).
+Per-product numeric performance budgets (rule 15e). Re-measured 2026-07-30 against the live,
+`--wasm`-primary production build — the 2026-07-12 baseline this section previously cited
+(`reports/performance-baseline-2026-07-12.md`) predates WASM adoption and no longer describes
+what's actually served; kept for historical reference only, not as the current budget basis.
 
-| Budget | Value | Measured baseline |
+| Budget | Value | Measured (2026-07-30, live) |
 |---|---|---|
-| Initial JS bundle (own-domain: `main.dart.js` + `flutter_bootstrap.js`) | ≤ 1000 KB | ~932 KB |
-| LCP — tracked | ≤ 3000 ms | 2864 ms |
-| LCP — target, post-aesthetic-pass | ≤ 2500 ms | — |
-| TBT | ≤ 200 ms | 221 ms |
+| Initial download (own-domain: `main.dart.wasm` + `flutter_bootstrap.js`) | ≤ 3000 KB | ~2745 KB (2,803,451 + 10,248 bytes, uncompressed — `content-encoding` absent on the wasm response) |
+| FCP | ≤ 1800 ms | 992 ms |
+| TBT | ≤ 200 ms | 26 ms (`reports/lighthouse-playwarmer-launch1-verified.report.json`, latest reliable reading) |
 | CLS | ≤ 0.1 | 0 |
 
-The tracked-vs-target LCP split is deliberate: 2864 ms was measured via Lighthouse's Lantern
-simulator, which threw `NO_LCP` on this run — a known weak spot against CanvasKit (canvas-rendered,
-not DOM) apps. Gating below the current baseline on a directional metric would be instant noise;
-the 3000 ms number is the real near-term gate, 2500 ms is the aspirational post-aesthetic-pass
-target. CanvasKit/RevenueCat CDN assets (~1.6 MB, gstatic/jsdelivr, likely cross-site cached) are
+**LCP is intentionally not budgeted.** Confirmed empirically (2026-07-30, live
+`PerformanceObserver`/`performance.getEntriesByType('largest-contentful-paint')` against
+production): zero LCP entries ever fire on this page. This isn't a measurement gap — a
+CanvasKit-rendered app has no traditional "largest contentful DOM element" for the Paint Timing
+API to key off (matches Lighthouse's own `NO_LCP` Lantern error on this app, previously
+documented here). FCP is the tracked load-speed proxy instead. CanvasKit/RevenueCat CDN assets
+(~1.6 MB, gstatic/jsdelivr, likely cross-site cached) are
 tracked separately, not counted against the own-domain bundle budget.
 
 ## Results (honest numbers)
