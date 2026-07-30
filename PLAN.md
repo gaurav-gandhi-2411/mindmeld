@@ -2321,3 +2321,93 @@ orchestrator review), live-verified 2026-07-11.
   sequencing). Committed to `main` as reviewable draft content only — committing is not shipping;
   baking/publishing/flipping-live are the actual ship actions being held for GG's explicit review
   of the secrets + clues below.
+
+## WORKSTREAM 3/4 -- Final launch readiness (`/launch-check` run against mindmeld/Warmer, T2)
+
+- [x] **Gate 1 (product review)**: PASS — `spec.md` has all 4 required headers.
+- [x] **Gate 2 (design sign-off)**: dispatched `design-reviewer` against the 3 features shipped
+  today with no prior review (archive, streak-freeze, rival). Returned **blocked** on 2 concrete
+  token-audit defects — magic spacing/font values in `stats_screen.dart` not traceable to any
+  `WarmerSpacing`/text-style token, and a `WarmerRadius.xs`-vs-`.sm` inconsistency between the
+  new rescue banner and every structurally identical banner in `win_screen.dart`. **Both fixed**
+  (commit `22e868e`), plus the review's non-blocking suggestions (archive empty state was a bare
+  unstyled `Text`, now matches the app's established icon+`WarmerSpacing` empty-state pattern;
+  solved-state list flashed "unplayed" for every row while loading, now shows a spinner instead;
+  gave-up rows got a clearer icon). Rival-icon (generic 🤖 vs. the "Ember" name) and Settings
+  header-wording suggestions left open as genuinely low-priority polish, not blocking.
+- [x] **Gate 3 (security)**: PASS — `docs/stride-launch-1.md`, a real, recent, evidence-cited
+  rule-98 STRIDE pass across all 6 categories, already exists; not redone, cited. One documented
+  low-severity residual (unbounded group/code creation by a scripted client), correctly scoped
+  with App Check enforcement as the right-sized fix once its manual prerequisite lands.
+- [x] **Gate 4 (performance budgets)**: **found stale, fixed**. README's cited 2026-07-12 baseline
+  (LCP 2864ms) was superseded same-day by its own later report (3082ms, already over the stated
+  3000ms budget) and never restated for `--wasm`-primary production (budget was written against
+  `main.dart.js`+bootstrap; production actually ships `main.dart.wasm`, a different artifact
+  entirely). Re-measured live today: LCP confirmed empirically UNMEASURABLE for this CanvasKit app
+  (zero `largest-contentful-paint` entries fire via the real `PerformanceObserver` API against
+  production — not a tooling gap, matches Lighthouse's own prior `NO_LCP` finding) — dropped as a
+  budget, replaced with FCP (992ms, healthy). Bundle budget restated against the real wasm+
+  bootstrap payload (~2745KB). README fixed (commit `e8d03c7`).
+- [x] **Gate 5 (rollback tested)**: PASS pre-existing (`docs/runbook.md`'s 2026-07-12 live-verified
+  rollback) — **and re-proven for real today**, see incident below.
+- [x] **Gate 6 (monitoring/alerts)**: PASS — `uptime-check.yml` 5/5 recent runs green (`gh run
+  list`), opens/closes a GitHub Issue on fail/recovery. Crashlytics wired for Flutter + platform
+  errors, gated on `analyticsEnabled` (true in production). GA4 DebugView itself needs GG's own
+  console access — on the manual checklist, not a gap closeable from here.
+- [x] **Gate 7 (docs)**: PASS — README has working quick-starts (generator + app), `docs/
+  runbook.md` covers on-call/rollback/7 gotchas.
+- [x] **Gate 8 (critical-path E2E)**: PASS — `e2e-web.yml` (DDC + WASM lanes) both green on latest.
+
+### Incident: today's deploy caused a real production outage, caught and fixed within the session
+
+- [x] **What happened**: deployed today's full feature set (archive, streak-freeze, rival, IAP
+  cleanup, design fixes) via `./deploy-warmer.ps1`. Build succeeded, byte-verify passed (live wasm
+  matched the build), but the **post-deploy smoke check failed**: `app did not boot within
+  30000ms`, zero page/request errors — a silent hang, not a crash. Re-ran the smoke check
+  independently to rule out a flake: failed identically. Confirmed visually via `firebase-tests/
+  cold_repro_reload.js`: a genuine blank white screen after 17.5s, not a rendering delay.
+- [x] **Immediate action: rolled back before investigating root cause** — production must not stay
+  broken while debugging. `vercel rollback <url> --yes` refused ("upgrade to pro") for anything but
+  the literal immediately-previous deployment, incompatible with this project's custom-alias
+  deploy flow (`deploy-warmer.ps1` explicitly re-points the alias itself rather than relying on
+  Vercel's own promotion tracking) — worked around by directly re-running the SAME `vercel alias
+  set <old-known-good-url> playwarmer.vercel.app` step the deploy script itself uses. Verified via
+  `smoke_check.js` (booted: true) AND a real screenshot (onboarding screen rendering correctly)
+  before considering the rollback done.
+- [x] **Root cause, confirmed not guessed**: `ArchiveScreen` is mounted eagerly at app boot
+  (`IndexedStack` builds every tab regardless of the selected index — same pattern already
+  documented for `StatsScreen`) but, unlike `StatsScreen`'s single cheap read, its
+  `_loadSolvedStates()` fires one SQLite query per available date (dozens, via `Future.wait`)
+  **unconditionally in `initState`** — racing Firebase/Analytics initialization on the very same
+  boot frame. (Also newly understood: `StatsScreen`'s own existing `active` flag only gates
+  *re*-loads on tab-switch, not its initial boot-time load either — this workstream's fix pattern
+  is stricter than the precedent it's modeled on, deliberately.)
+- [x] **Fix, verified locally BEFORE touching production again**: added an `active` flag to
+  `ArchiveScreen` (`main.dart` now passes `active: _navIndex == 1`) that defers the query batch
+  until the player actually opens the Practice tab; `initState` only loads if already active,
+  `didUpdateWidget` loads once on the first false→true transition. Rebuilt the exact same `--wasm`
+  production build locally, served it via `python -m http.server`, ran `smoke_check.js` against
+  `localhost` — booted cleanly. Only then redeployed to production; smoke check passed
+  (`booted: true`), byte-verified, live.
+- [x] **Secondary cleanup**: the first (mistaken) `vercel rollback` attempt was run from the repo
+  root instead of `web-dist/` and auto-created+linked a stray "mindmeld" Vercel project (exactly
+  `docs/runbook.md`'s documented Gotcha #1) — removed (`vercel remove mindmeld --yes`) and
+  `.gitignore` updated so a bare `.vercel/` at repo root can't be silently committed again.
+- **Lesson, worth stating plainly**: `flutter test`/`flutter analyze` run on the native VM target
+  and gave zero signal here — the failure was specific to the real `--wasm` boot sequence under
+  real eager-widget-tree concurrency, a gap no unit/widget test in this suite currently covers.
+  Testing the actual production build locally before EVERY deploy (not just after a failure) is
+  the durable fix; not yet automated into `deploy-warmer.ps1` itself — worth a follow-up, noted in
+  the deferred-roadmap section rather than built under launch-day time pressure.
+- [x] **Full verification post-fix**: `flutter test` 530 passed / 0 failed; local wasm build +
+  `smoke_check.js` against it booted cleanly with 0 errors; production redeploy byte-verified +
+  smoke-checked green.
+
+### Screenshot evidence (rule 15c) — partially closed, documented gap
+
+Attempted post-deploy: capturing the Practice tab / Stats streak-freeze / rival-strip states
+requires driving the app past onboarding to the bottom-nav tabs, which needs real interaction
+with the CanvasKit canvas (no readable DOM to click through) — the same automation limitation
+this project has hit and documented before (browser automation cannot reliably drive Flutter/
+CanvasKit interactively). Not forced with fragile coordinate-clicking under launch-day time
+pressure; added to the manual checklist for GG's real-device pass instead (see closeout report).
