@@ -1,0 +1,427 @@
+{
+  "base_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "trained_checkpoint": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\minilm_student\\model",
+  "train_summary": {
+    "name": "minilm_student",
+    "method": "lora",
+    "n_mnrl_pairs": 756,
+    "n_graded_pairs": 1028,
+    "n_dev_scenarios": 46,
+    "best_dev_spearman_cosine": 0.23370526719984153,
+    "n_trainable_params": 147456,
+    "n_total_params": 117801216,
+    "trainable_fraction": 0.0012517358055115493,
+    "output_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\minilm_student\\model",
+    "hyperparams": {
+      "base_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "lora",
+      "freeze_n_layers": 0,
+      "lora_r": 8,
+      "lora_alpha": 16,
+      "learning_rate": 0.0002,
+      "num_epochs": 4,
+      "batch_size": 16,
+      "warmup_ratio": 0.1,
+      "early_stopping_patience": 2,
+      "seed": 42
+    },
+    "_wall_clock_s": 124.58236570004374
+  },
+  "model_dir_size": {
+    "model_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\minilm_student\\model",
+    "total_bytes": 487739963,
+    "total_mb": 487.739963,
+    "total_mib": 465.14507579803467,
+    "n_files": 9,
+    "largest_file": "model.safetensors",
+    "largest_file_bytes": 470637416
+  },
+  "inference_latency": {
+    "model": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\minilm_student\\model",
+    "n_words": 10495,
+    "embedding_dim": 384,
+    "cold_seconds": 11.393582200049423,
+    "cold_ms_per_word": 1.0856200285897497,
+    "warm_seconds": 9.234730200027116,
+    "warm_ms_per_word": 0.8799171224418405
+  },
+  "metrics": {
+    "dim1_spearman_ci": {
+      "point": 0.23271841246782568,
+      "ci_95": [
+        0.11979275863501881,
+        0.3510219363730573
+      ],
+      "n_clusters": 42,
+      "n_scenarios": 376,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.05823901645994369
+    },
+    "dim2_pass_rate_ci": {
+      "point": 0.06,
+      "ci_95": [
+        0.0,
+        0.14
+      ],
+      "n_pairs": 50
+    },
+    "band_accuracy": {
+      "overall": 0.5567282321899736,
+      "near": 0.09523809523809523,
+      "mid": 0.0,
+      "far": 0.9666666666666667
+    },
+    "topheavy_ci": {
+      "ndcg": {
+        "10": {
+          "point": 0.024531292412888334,
+          "ci_95": [
+            0.0,
+            0.061328231032220834
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "50": {
+          "point": 0.024531292412888334,
+          "ci_95": [
+            0.0,
+            0.061328231032220834
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "100": {
+          "point": 0.025165870185938136,
+          "ci_95": [
+            0.0,
+            0.06196280880527063
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        }
+      },
+      "recall": {
+        "10": {
+          "point": 0.011904761904761904,
+          "ci_95": [
+            0.0,
+            0.02976190476190476
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "50": {
+          "point": 0.011904761904761904,
+          "ci_95": [
+            0.0,
+            0.02976190476190476
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        },
+        "100": {
+          "point": 0.017857142857142856,
+          "ci_95": [
+            0.0,
+            0.041666666666666664
+          ],
+          "n_valid_bootstrap_draws": 10000,
+          "n_secrets_point_estimate": 42
+        }
+      },
+      "precision": {
+        "10": {
+          "point": 1.0,
+          "ci_95": [
+            1.0,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 8693,
+          "n_secrets_point_estimate": 2
+        },
+        "50": {
+          "point": 1.0,
+          "ci_95": [
+            1.0,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 8693,
+          "n_secrets_point_estimate": 2
+        },
+        "100": {
+          "point": 1.0,
+          "ci_95": [
+            1.0,
+            1.0
+          ],
+          "n_valid_bootstrap_draws": 9584,
+          "n_secrets_point_estimate": 3
+        }
+      },
+      "mrr": {
+        "point": 0.048582646790974154,
+        "ci_95": [
+          0.0008213644751640898,
+          0.12002161057416331
+        ],
+        "n_valid_bootstrap_draws": 10000,
+        "n_secrets_point_estimate": 42
+      },
+      "n_secrets": 42
+    },
+    "top_weighted_correlation_ci": {
+      "point": 0.3265558162893618,
+      "ci_95": [
+        0.15996807845840058,
+        0.47401283179851816
+      ],
+      "n_clusters": 42,
+      "n_scenarios": 376,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.07968226253958012
+    },
+    "band_confusion": {
+      "tiers": [
+        "near",
+        "mid",
+        "far"
+      ],
+      "bands": [
+        "win",
+        "scorching",
+        "hot",
+        "warm",
+        "cold",
+        "freezing"
+      ],
+      "matrix": [
+        [
+          2,
+          0,
+          8,
+          0,
+          27,
+          47
+        ],
+        [
+          0,
+          0,
+          2,
+          0,
+          17,
+          65
+        ],
+        [
+          0,
+          0,
+          5,
+          0,
+          30,
+          173
+        ]
+      ]
+    },
+    "per_band_pr": {
+      "win": {
+        "precision": 0.0,
+        "recall": null,
+        "n_predicted": 2,
+        "n_expected": 0
+      },
+      "scorching": {
+        "precision": null,
+        "recall": 0.0,
+        "n_predicted": 0,
+        "n_expected": 84
+      },
+      "hot": {
+        "precision": 0.5333333333333333,
+        "recall": 0.09523809523809523,
+        "n_predicted": 15,
+        "n_expected": 84
+      },
+      "warm": {
+        "precision": null,
+        "recall": 0.0,
+        "n_predicted": 0,
+        "n_expected": 84
+      },
+      "cold": {
+        "precision": 0.40540540540540543,
+        "recall": 0.14423076923076922,
+        "n_predicted": 74,
+        "n_expected": 208
+      },
+      "freezing": {
+        "precision": 0.6070175438596491,
+        "recall": 0.8317307692307693,
+        "n_predicted": 285,
+        "n_expected": 208
+      }
+    },
+    "band_ece_ci": {
+      "point": 0.1805956230423809,
+      "ci_95": [
+        0.13658812389875755,
+        0.2414901810157947
+      ],
+      "n_clusters": 42,
+      "n_valid_bootstrap_draws": 10000
+    }
+  },
+  "gate_vs_shipped": {
+    "dim1_delta_vs_shipped": {
+      "baseline_point": 0.6748987706342632,
+      "candidate_point": 0.23271841246782568,
+      "delta_point": -0.4421803581664375,
+      "delta_ci_95": [
+        -0.5577520508704191,
+        -0.3244905974979005
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": true,
+      "n_clusters": 42,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim2_delta_vs_shipped": {
+      "baseline_point": 0.74,
+      "candidate_point": 0.06,
+      "delta_point": -0.6799999999999999,
+      "delta_ci_95": [
+        -0.8,
+        -0.54
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": true,
+      "n_pairs": 50
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 379,
+      "n_fixed": 11,
+      "n_broken": 55,
+      "net": -44,
+      "zero_net_regression": false,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "chattan/breasts",
+        "chimni/flue",
+        "dhoop/apple",
+        "junoon/sunshine",
+        "khichdi/mill",
+        "mazaa/kissed",
+        "pahad/strain",
+        "sandook/vault",
+        "sarhad/jersey",
+        "udaasi/rahat",
+        "waqt/newsletter"
+      ],
+      "broken_pairs": [
+        "azaadi/freedom",
+        "azaadi/liberty",
+        "bachpan/childhood",
+        "bachpan/youth",
+        "bagicha/garden",
+        "bagicha/passion",
+        "basti/hamlet",
+        "basti/settlement",
+        "bhanji/antonio",
+        "bhanji/niece",
+        "chaand/moon",
+        "chattan/boulder",
+        "chattan/rock",
+        "chinta/worry",
+        "dahi/curd",
+        "dahi/yogurt",
+        "dhoop/brightness",
+        "dhoop/sunlight",
+        "insaaf/fairness",
+        "insaaf/justice",
+        "judwaa/garcia",
+        "judwaa/twin",
+        "kanoon/law",
+        "kanoon/rule",
+        "khazana/malcolm",
+        "khazana/treasure",
+        "khichdi/porridge",
+        "mausi/auntie",
+        "mazaa/amusement",
+        "mazaa/enjoyment",
+        "mithai/candy",
+        "mithai/dessert",
+        "mohalla/locality",
+        "mohalla/neighborhood",
+        "pahad/mountain",
+        "pahad/peak",
+        "paneer/curd",
+        "parivar/family",
+        "parivar/relatives",
+        "patta/leaf",
+        "phool/bagicha",
+        "phool/flower",
+        "sadak/road",
+        "sadak/street",
+        "sandook/trunk",
+        "sarhad/border",
+        "sarhad/boundary",
+        "sawaal/query",
+        "sawaal/question",
+        "sharm/modesty",
+        "sharm/shyness",
+        "thaali/platter",
+        "tokri/basket",
+        "udaasi/kane",
+        "waqt/interval"
+      ]
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 50,
+      "n_fixed": 0,
+      "n_broken": 34,
+      "net": -34,
+      "zero_net_regression": false,
+      "zero_regression_strict": false,
+      "fixed_pairs": [],
+      "broken_pairs": [
+        "auntie->mausi",
+        "basket->tokri",
+        "border->sarhad",
+        "butterfly->titli",
+        "childhood->bachpan",
+        "dessert->mithai",
+        "enjoyment->mazaa",
+        "family->parivar",
+        "festival->tyohar",
+        "flower->phool",
+        "freedom->azaadi",
+        "garden->bagicha",
+        "justice->insaaf",
+        "kitchen->rasoi",
+        "law->kanoon",
+        "leaf->patta",
+        "moon->chaand",
+        "mountain->pahad",
+        "neighborhood->mohalla",
+        "niece->bhanji",
+        "ocean->samunder",
+        "palace->mahal",
+        "platter->thaali",
+        "question->sawaal",
+        "road->sadak",
+        "rock->chattan",
+        "settlement->basti",
+        "shyness->sharm",
+        "sunlight->dhoop",
+        "treasure->khazana",
+        "trunk->sandook",
+        "twin->judwaa",
+        "worry->chinta",
+        "yogurt->dahi"
+      ]
+    },
+    "gate_verdict": "FAIL"
+  },
+  "n_dim1_scenarios": 379,
+  "n_dim2_pairs": 50
+}

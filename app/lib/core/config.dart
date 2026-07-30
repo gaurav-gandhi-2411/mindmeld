@@ -164,6 +164,25 @@ class AppConfig {
   static const int hotFloor = 500;
   static const double hotFraction = 0.01;
 
+  /// Floor added alongside scorching's/hot's existing floors (same max(floor,
+  /// fraction) shape) to fix a band-calibration bug: for small vocabs (e.g.
+  /// hi-en, n~10,495) hot's 500-rank floor already consumes most of the
+  /// un-floored n*0.05=525 warm ceiling, squeezing Warm down to a 24-rank
+  /// sliver (0.23% of vocab) versus EN's healthy 2,200-rank/4.0% Warm band at
+  /// n=55,000. A floor of 900 (original fix, commit 894f63e) left EN's own
+  /// thresholds byte-for-byte unchanged (55,000 * 0.05 = 2,750 >> 900, so the
+  /// floor never binds there) while giving hi-en a ~400-rank/3.8% Warm band.
+  /// The floor was later widened 900 -> 1050 after a threshold-boundary grid
+  /// search (generator/evals/finetune/optimize_band_thresholds.py) against
+  /// the shipped model's bake-off checkpoint found this the only candidate
+  /// that clears a strict zero-regression gate: +4 fixed / 0 broken, Near/Far
+  /// confusion-matrix rows byte-identical before/after, Warm recall 8.3% ->
+  /// 13.1% (directionally real, not CI-significant at n=84 mid-tier
+  /// records). EN remains untouched by the same margin (2,750 >> 1050). See
+  /// docs/known-limitations.md #18,
+  /// generator/evals/finetune/data/calibration_threshold_report.md, and
+  /// PLAN.md.
+  static const int warmFloor = 1050;
   static const double warmFraction = 0.05;
   static const double coldFraction = 0.25;
 }

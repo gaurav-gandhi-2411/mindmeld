@@ -1,0 +1,1175 @@
+{
+  "n_candidates_generated": 226,
+  "final_survivors": [
+    {
+      "word": "aadmi",
+      "variant": "admi",
+      "norm_variant": "admi"
+    },
+    {
+      "word": "accha",
+      "variant": "achcha",
+      "norm_variant": "achcha"
+    },
+    {
+      "word": "achaar",
+      "variant": "achaara",
+      "norm_variant": "achara"
+    },
+    {
+      "word": "airport",
+      "variant": "aiyarport",
+      "norm_variant": "aiyarport"
+    },
+    {
+      "word": "airport",
+      "variant": "ayaraport",
+      "norm_variant": "ayaraport"
+    },
+    {
+      "word": "almirah",
+      "variant": "almirahs",
+      "norm_variant": "almirahs"
+    },
+    {
+      "word": "alvida",
+      "variant": "alavida",
+      "norm_variant": "alavida"
+    },
+    {
+      "word": "alvida",
+      "variant": "alawida",
+      "norm_variant": "alawida"
+    },
+    {
+      "word": "anaar",
+      "variant": "anaara",
+      "norm_variant": "anara"
+    },
+    {
+      "word": "angoothi",
+      "variant": "angooti",
+      "norm_variant": "anguti"
+    },
+    {
+      "word": "angoothi",
+      "variant": "anguthi",
+      "norm_variant": "anguthi"
+    },
+    {
+      "word": "angoothi",
+      "variant": "anguuthi",
+      "norm_variant": "anguuthi"
+    },
+    {
+      "word": "angutha",
+      "variant": "anguuthaa",
+      "norm_variant": "anguutha"
+    },
+    {
+      "word": "azaadi",
+      "variant": "aazaadi",
+      "norm_variant": "azadi"
+    },
+    {
+      "word": "badbu",
+      "variant": "badabu",
+      "norm_variant": "badabu"
+    },
+    {
+      "word": "badla",
+      "variant": "badala",
+      "norm_variant": "badala"
+    },
+    {
+      "word": "badla",
+      "variant": "vadla",
+      "norm_variant": "vadla"
+    },
+    {
+      "word": "barfi",
+      "variant": "barphi",
+      "norm_variant": "barphi"
+    },
+    {
+      "word": "barfi",
+      "variant": "burfi",
+      "norm_variant": "burfi"
+    },
+    {
+      "word": "beizzati",
+      "variant": "beijjati",
+      "norm_variant": "beijjati"
+    },
+    {
+      "word": "besan",
+      "variant": "besson",
+      "norm_variant": "besson"
+    },
+    {
+      "word": "bhanja",
+      "variant": "bhanj",
+      "norm_variant": "bhanj"
+    },
+    {
+      "word": "bhanji",
+      "variant": "bhanajee",
+      "norm_variant": "bhanaji"
+    },
+    {
+      "word": "bhindi",
+      "variant": "bhendi",
+      "norm_variant": "bhendi"
+    },
+    {
+      "word": "birthday",
+      "variant": "birthed",
+      "norm_variant": "birthed"
+    },
+    {
+      "word": "biryani",
+      "variant": "biriani",
+      "norm_variant": "biriani"
+    },
+    {
+      "word": "biryani",
+      "variant": "biriyani",
+      "norm_variant": "biriyani"
+    },
+    {
+      "word": "bowler",
+      "variant": "baller",
+      "norm_variant": "baller"
+    },
+    {
+      "word": "bowler",
+      "variant": "boller",
+      "norm_variant": "boller"
+    },
+    {
+      "word": "bura",
+      "variant": "bhura",
+      "norm_variant": "bhura"
+    },
+    {
+      "word": "chutney",
+      "variant": "chatnee",
+      "norm_variant": "chatni"
+    },
+    {
+      "word": "chutney",
+      "variant": "chutneys",
+      "norm_variant": "chutneys"
+    },
+    {
+      "word": "daraa",
+      "variant": "darah",
+      "norm_variant": "darah"
+    },
+    {
+      "word": "darwaza",
+      "variant": "daravaaza",
+      "norm_variant": "daravaza"
+    },
+    {
+      "word": "darwaza",
+      "variant": "darwaaze",
+      "norm_variant": "darwaze"
+    },
+    {
+      "word": "darwaza",
+      "variant": "darwaje",
+      "norm_variant": "darwaje"
+    },
+    {
+      "word": "dehat",
+      "variant": "dohat",
+      "norm_variant": "dohat"
+    },
+    {
+      "word": "dheere",
+      "variant": "deere",
+      "norm_variant": "dire"
+    },
+    {
+      "word": "dheere",
+      "variant": "dheerein",
+      "norm_variant": "dhirein"
+    },
+    {
+      "word": "dheere",
+      "variant": "dheeren",
+      "norm_variant": "dhiren"
+    },
+    {
+      "word": "dudh",
+      "variant": "dudha",
+      "norm_variant": "dudha"
+    },
+    {
+      "word": "finalist",
+      "variant": "finalists",
+      "norm_variant": "finalists"
+    },
+    {
+      "word": "gehoon",
+      "variant": "gehoo",
+      "norm_variant": "gehu"
+    },
+    {
+      "word": "gehoon",
+      "variant": "gehun",
+      "norm_variant": "gehun"
+    },
+    {
+      "word": "gehoon",
+      "variant": "gehuun",
+      "norm_variant": "gehuun"
+    },
+    {
+      "word": "ghabrana",
+      "variant": "gabrana",
+      "norm_variant": "gabrana"
+    },
+    {
+      "word": "ghabrana",
+      "variant": "ghabaraana",
+      "norm_variant": "ghabarana"
+    },
+    {
+      "word": "ghadi",
+      "variant": "gharhi",
+      "norm_variant": "gharhi"
+    },
+    {
+      "word": "ghagra",
+      "variant": "gagra",
+      "norm_variant": "gagra"
+    },
+    {
+      "word": "ghagra",
+      "variant": "ghaaghara",
+      "norm_variant": "ghaghara"
+    },
+    {
+      "word": "ghagra",
+      "variant": "ghaaghra",
+      "norm_variant": "ghaghra"
+    },
+    {
+      "word": "ghutna",
+      "variant": "ghutana",
+      "norm_variant": "ghutana"
+    },
+    {
+      "word": "gurudwara",
+      "variant": "gurdwara",
+      "norm_variant": "gurdwara"
+    },
+    {
+      "word": "gurudwara",
+      "variant": "gurudwar",
+      "norm_variant": "gurudwar"
+    },
+    {
+      "word": "gurudwara",
+      "variant": "gurudwaras",
+      "norm_variant": "gurudwaras"
+    },
+    {
+      "word": "gyaan",
+      "variant": "gyana",
+      "norm_variant": "gyana"
+    },
+    {
+      "word": "haddi",
+      "variant": "hadee",
+      "norm_variant": "hadi"
+    },
+    {
+      "word": "haddi",
+      "variant": "hady",
+      "norm_variant": "hady"
+    },
+    {
+      "word": "hazaar",
+      "variant": "hezar",
+      "norm_variant": "hezar"
+    },
+    {
+      "word": "honth",
+      "variant": "hont",
+      "norm_variant": "hont"
+    },
+    {
+      "word": "hospital",
+      "variant": "aspital",
+      "norm_variant": "aspital"
+    },
+    {
+      "word": "hospital",
+      "variant": "asputal",
+      "norm_variant": "asputal"
+    },
+    {
+      "word": "imli",
+      "variant": "imali",
+      "norm_variant": "imali"
+    },
+    {
+      "word": "izzat",
+      "variant": "ijjat",
+      "norm_variant": "ijjat"
+    },
+    {
+      "word": "izzat",
+      "variant": "ijzat",
+      "norm_variant": "ijzat"
+    },
+    {
+      "word": "jaiphal",
+      "variant": "jaayphala",
+      "norm_variant": "jayphala"
+    },
+    {
+      "word": "jaiphal",
+      "variant": "jaifal",
+      "norm_variant": "jaifal"
+    },
+    {
+      "word": "jaiphal",
+      "variant": "jaiphala",
+      "norm_variant": "jaiphala"
+    },
+    {
+      "word": "judwaa",
+      "variant": "judva",
+      "norm_variant": "judva"
+    },
+    {
+      "word": "judwaa",
+      "variant": "judwa",
+      "norm_variant": "judwa"
+    },
+    {
+      "word": "kabhi",
+      "variant": "kabhie",
+      "norm_variant": "kabhie"
+    },
+    {
+      "word": "kabhi",
+      "variant": "kahbi",
+      "norm_variant": "kahbi"
+    },
+    {
+      "word": "kadhai",
+      "variant": "kadaai",
+      "norm_variant": "kadai"
+    },
+    {
+      "word": "kadhai",
+      "variant": "kadayi",
+      "norm_variant": "kadayi"
+    },
+    {
+      "word": "kahani",
+      "variant": "kehani",
+      "norm_variant": "kehani"
+    },
+    {
+      "word": "kahani",
+      "variant": "kehni",
+      "norm_variant": "kehni"
+    },
+    {
+      "word": "kharbooze",
+      "variant": "kharbooje",
+      "norm_variant": "kharbuje"
+    },
+    {
+      "word": "kharbooze",
+      "variant": "kharboojey",
+      "norm_variant": "kharbujey"
+    },
+    {
+      "word": "khichdi",
+      "variant": "khichadi",
+      "norm_variant": "khichadi"
+    },
+    {
+      "word": "khichdi",
+      "variant": "khichari",
+      "norm_variant": "khichari"
+    },
+    {
+      "word": "khichdi",
+      "variant": "khichidi",
+      "norm_variant": "khichidi"
+    },
+    {
+      "word": "khushbu",
+      "variant": "khushbuu",
+      "norm_variant": "khushbuu"
+    },
+    {
+      "word": "khushbu",
+      "variant": "kushbu",
+      "norm_variant": "kushbu"
+    },
+    {
+      "word": "kitne",
+      "variant": "kitana",
+      "norm_variant": "kitana"
+    },
+    {
+      "word": "kitne",
+      "variant": "kitane",
+      "norm_variant": "kitane"
+    },
+    {
+      "word": "ladoo",
+      "variant": "laado",
+      "norm_variant": "lado"
+    },
+    {
+      "word": "laung",
+      "variant": "launga",
+      "norm_variant": "launga"
+    },
+    {
+      "word": "laung",
+      "variant": "llong",
+      "norm_variant": "llong"
+    },
+    {
+      "word": "machli",
+      "variant": "machalii",
+      "norm_variant": "machalii"
+    },
+    {
+      "word": "machli",
+      "variant": "machhali",
+      "norm_variant": "machali"
+    },
+    {
+      "word": "mazaa",
+      "variant": "maanaa",
+      "norm_variant": "mana"
+    },
+    {
+      "word": "mazaa",
+      "variant": "maaza",
+      "norm_variant": "maza"
+    },
+    {
+      "word": "mazaa",
+      "variant": "mansa",
+      "norm_variant": "mansa"
+    },
+    {
+      "word": "mehandi",
+      "variant": "mehandii",
+      "norm_variant": "mehandii"
+    },
+    {
+      "word": "mehandi",
+      "variant": "mehendi",
+      "norm_variant": "mehendi"
+    },
+    {
+      "word": "mehandi",
+      "variant": "mehndi",
+      "norm_variant": "mehndi"
+    },
+    {
+      "word": "methi",
+      "variant": "maithi",
+      "norm_variant": "maithi"
+    },
+    {
+      "word": "mirch",
+      "variant": "merach",
+      "norm_variant": "merach"
+    },
+    {
+      "word": "mirch",
+      "variant": "mirach",
+      "norm_variant": "mirach"
+    },
+    {
+      "word": "mirch",
+      "variant": "mirachon",
+      "norm_variant": "mirachon"
+    },
+    {
+      "word": "mohalla",
+      "variant": "mauhalla",
+      "norm_variant": "mauhalla"
+    },
+    {
+      "word": "mohalla",
+      "variant": "mauhalle",
+      "norm_variant": "mauhalle"
+    },
+    {
+      "word": "nakhoon",
+      "variant": "naakhoon",
+      "norm_variant": "nakhun"
+    },
+    {
+      "word": "nata",
+      "variant": "natt",
+      "norm_variant": "natt"
+    },
+    {
+      "word": "neeche",
+      "variant": "neechen",
+      "norm_variant": "nichen"
+    },
+    {
+      "word": "neeche",
+      "variant": "niiche",
+      "norm_variant": "niiche"
+    },
+    {
+      "word": "nimboo",
+      "variant": "neemboo",
+      "norm_variant": "nimbu"
+    },
+    {
+      "word": "nimboo",
+      "variant": "nimbo",
+      "norm_variant": "nimbo"
+    },
+    {
+      "word": "papad",
+      "variant": "papads",
+      "norm_variant": "papads"
+    },
+    {
+      "word": "papad",
+      "variant": "papadum",
+      "norm_variant": "papadum"
+    },
+    {
+      "word": "peeche",
+      "variant": "peachey",
+      "norm_variant": "peachey"
+    },
+    {
+      "word": "peeche",
+      "variant": "piche",
+      "norm_variant": "piche"
+    },
+    {
+      "word": "perfume",
+      "variant": "perfumes",
+      "norm_variant": "perfumes"
+    },
+    {
+      "word": "pocha",
+      "variant": "poncha",
+      "norm_variant": "poncha"
+    },
+    {
+      "word": "pyaar",
+      "variant": "piar",
+      "norm_variant": "piar"
+    },
+    {
+      "word": "pyaaz",
+      "variant": "pyaz",
+      "norm_variant": "pyaz"
+    },
+    {
+      "word": "qurbani",
+      "variant": "qurabaani",
+      "norm_variant": "qurabani"
+    },
+    {
+      "word": "rasoi",
+      "variant": "rsoi",
+      "norm_variant": "rsoi"
+    },
+    {
+      "word": "rickshaw",
+      "variant": "riksho",
+      "norm_variant": "riksho"
+    },
+    {
+      "word": "rickshaw",
+      "variant": "rikshon",
+      "norm_variant": "rikshon"
+    },
+    {
+      "word": "rishtedaar",
+      "variant": "rishtedar",
+      "norm_variant": "rishtedar"
+    },
+    {
+      "word": "sabzi",
+      "variant": "sabji",
+      "norm_variant": "sabji"
+    },
+    {
+      "word": "sabzi",
+      "variant": "subzi",
+      "norm_variant": "subzi"
+    },
+    {
+      "word": "samunder",
+      "variant": "samudra",
+      "norm_variant": "samudra"
+    },
+    {
+      "word": "samunder",
+      "variant": "samundra",
+      "norm_variant": "samundra"
+    },
+    {
+      "word": "santara",
+      "variant": "suntaraa",
+      "norm_variant": "suntara"
+    },
+    {
+      "word": "santara",
+      "variant": "suntra",
+      "norm_variant": "suntra"
+    },
+    {
+      "word": "saree",
+      "variant": "sarhi",
+      "norm_variant": "sarhi"
+    },
+    {
+      "word": "saree",
+      "variant": "sarri",
+      "norm_variant": "sarri"
+    },
+    {
+      "word": "saunf",
+      "variant": "sounf",
+      "norm_variant": "sounf"
+    },
+    {
+      "word": "seb",
+      "variant": "seib",
+      "norm_variant": "seib"
+    },
+    {
+      "word": "seena",
+      "variant": "seenaa",
+      "norm_variant": "sina"
+    },
+    {
+      "word": "seena",
+      "variant": "seine",
+      "norm_variant": "seine"
+    },
+    {
+      "word": "seena",
+      "variant": "senna",
+      "norm_variant": "senna"
+    },
+    {
+      "word": "sehat",
+      "variant": "seht",
+      "norm_variant": "seht"
+    },
+    {
+      "word": "shampoo",
+      "variant": "shampoos",
+      "norm_variant": "shampus"
+    },
+    {
+      "word": "sharm",
+      "variant": "sharum",
+      "norm_variant": "sharum"
+    },
+    {
+      "word": "sharm",
+      "variant": "shrm",
+      "norm_variant": "shrm"
+    },
+    {
+      "word": "sharminda",
+      "variant": "sahrminda",
+      "norm_variant": "sahrminda"
+    },
+    {
+      "word": "sharminda",
+      "variant": "sharaminda",
+      "norm_variant": "sharaminda"
+    },
+    {
+      "word": "sunehra",
+      "variant": "sunahara",
+      "norm_variant": "sunahara"
+    },
+    {
+      "word": "sunehra",
+      "variant": "sunehara",
+      "norm_variant": "sunehara"
+    },
+    {
+      "word": "tarbooz",
+      "variant": "tarabooj",
+      "norm_variant": "tarabuj"
+    },
+    {
+      "word": "tarbooz",
+      "variant": "tarabooz",
+      "norm_variant": "tarabuz"
+    },
+    {
+      "word": "tarbooz",
+      "variant": "tarbooj",
+      "norm_variant": "tarbuj"
+    },
+    {
+      "word": "tawa",
+      "variant": "tava",
+      "norm_variant": "tava"
+    },
+    {
+      "word": "teekha",
+      "variant": "tikha",
+      "norm_variant": "tikha"
+    },
+    {
+      "word": "tez",
+      "variant": "tezz",
+      "norm_variant": "tezz"
+    },
+    {
+      "word": "thakan",
+      "variant": "thkaan",
+      "norm_variant": "thkan"
+    },
+    {
+      "word": "thakan",
+      "variant": "thukan",
+      "norm_variant": "thukan"
+    },
+    {
+      "word": "toaster",
+      "variant": "toasters",
+      "norm_variant": "toasters"
+    },
+    {
+      "word": "toaster",
+      "variant": "toster",
+      "norm_variant": "toster"
+    },
+    {
+      "word": "toothbrush",
+      "variant": "toothbrushes",
+      "norm_variant": "tuthbrushes"
+    },
+    {
+      "word": "toothpaste",
+      "variant": "toothpastes",
+      "norm_variant": "tuthpastes"
+    },
+    {
+      "word": "ummeed",
+      "variant": "ummed",
+      "norm_variant": "ummed"
+    },
+    {
+      "word": "ummeed",
+      "variant": "ummid",
+      "norm_variant": "ummid"
+    },
+    {
+      "word": "ummeed",
+      "variant": "ummiid",
+      "norm_variant": "ummiid"
+    },
+    {
+      "word": "urad",
+      "variant": "udad",
+      "norm_variant": "udad"
+    },
+    {
+      "word": "wafadaar",
+      "variant": "vafaadaar",
+      "norm_variant": "vafadar"
+    },
+    {
+      "word": "wafadaar",
+      "variant": "vaphaadaar",
+      "norm_variant": "vaphadar"
+    },
+    {
+      "word": "waqt",
+      "variant": "vaqt",
+      "norm_variant": "vaqt"
+    },
+    {
+      "word": "zyada",
+      "variant": "ziada",
+      "norm_variant": "ziada"
+    }
+  ],
+  "n_final_added": 162,
+  "excluded": {
+    "vocab_collisions": [
+      {
+        "word": "airport",
+        "variant": "airports",
+        "norm_variant": "airports",
+        "collides_with_vocab_word": "airports"
+      },
+      {
+        "word": "baigan",
+        "variant": "baingan",
+        "norm_variant": "baingan",
+        "collides_with_vocab_word": "baingan"
+      },
+      {
+        "word": "baingan",
+        "variant": "baigan",
+        "norm_variant": "baigan",
+        "collides_with_vocab_word": "baigan"
+      },
+      {
+        "word": "honth",
+        "variant": "hoont",
+        "norm_variant": "hunt",
+        "collides_with_vocab_word": "hunt"
+      },
+      {
+        "word": "honth",
+        "variant": "hoot",
+        "norm_variant": "hut",
+        "collides_with_vocab_word": "hut"
+      },
+      {
+        "word": "hospital",
+        "variant": "hospitals",
+        "norm_variant": "hospitals",
+        "collides_with_vocab_word": "hospitals"
+      },
+      {
+        "word": "kitne",
+        "variant": "kitnaa",
+        "norm_variant": "kitna",
+        "collides_with_vocab_word": "kitna"
+      },
+      {
+        "word": "neeche",
+        "variant": "niche",
+        "norm_variant": "niche",
+        "collides_with_vocab_word": "niche"
+      }
+    ],
+    "existing_alias_collisions": [],
+    "internal_batch_conflicts": [
+      {
+        "word": "baigan",
+        "variant": "baigana",
+        "norm_variant": "baigana"
+      },
+      {
+        "word": "baigan",
+        "variant": "baingana",
+        "norm_variant": "baingana"
+      },
+      {
+        "word": "baingan",
+        "variant": "baigana",
+        "norm_variant": "baigana"
+      },
+      {
+        "word": "baingan",
+        "variant": "baingana",
+        "norm_variant": "baingana"
+      }
+    ]
+  },
+  "excluded_counts": {
+    "vocab_collisions": 8,
+    "existing_alias_collisions": 0,
+    "internal_batch_conflicts": 4
+  },
+  "harmless_noop_excluded": {
+    "duplicate_of_existing_alias": [
+      {
+        "word": "gyaan",
+        "variant": "gyan",
+        "norm_variant": "gyan"
+      },
+      {
+        "word": "izzat",
+        "variant": "eezat",
+        "norm_variant": "izat"
+      },
+      {
+        "word": "khushbu",
+        "variant": "khushboo",
+        "norm_variant": "khushbu"
+      },
+      {
+        "word": "pyaar",
+        "variant": "pyar",
+        "norm_variant": "pyar"
+      },
+      {
+        "word": "qurbani",
+        "variant": "kurbani",
+        "norm_variant": "kurbani"
+      }
+    ],
+    "redundant_self_resolving": [
+      {
+        "word": "akela",
+        "variant": "akelaa",
+        "norm_variant": "akela"
+      },
+      {
+        "word": "alvida",
+        "variant": "alveeda",
+        "norm_variant": "alvida"
+      },
+      {
+        "word": "azaadi",
+        "variant": "azaaadi",
+        "norm_variant": "azaadi"
+      },
+      {
+        "word": "badbu",
+        "variant": "badboo",
+        "norm_variant": "badbu"
+      },
+      {
+        "word": "badla",
+        "variant": "badlaa",
+        "norm_variant": "badla"
+      },
+      {
+        "word": "barfi",
+        "variant": "barfee",
+        "norm_variant": "barfi"
+      },
+      {
+        "word": "beizzati",
+        "variant": "beizzatee",
+        "norm_variant": "beizzati"
+      },
+      {
+        "word": "bhanja",
+        "variant": "bhaanja",
+        "norm_variant": "bhanja"
+      },
+      {
+        "word": "bhindi",
+        "variant": "bhindee",
+        "norm_variant": "bhindi"
+      },
+      {
+        "word": "biryani",
+        "variant": "biryaani",
+        "norm_variant": "biryani"
+      },
+      {
+        "word": "bura",
+        "variant": "buraa",
+        "norm_variant": "bura"
+      },
+      {
+        "word": "chinta",
+        "variant": "cheenta",
+        "norm_variant": "chinta"
+      },
+      {
+        "word": "chinta",
+        "variant": "chheenta",
+        "norm_variant": "chinta"
+      },
+      {
+        "word": "chinta",
+        "variant": "chhinta",
+        "norm_variant": "chinta"
+      },
+      {
+        "word": "dehat",
+        "variant": "dehaat",
+        "norm_variant": "dehat"
+      },
+      {
+        "word": "dhimi",
+        "variant": "dheemi",
+        "norm_variant": "dhimi"
+      },
+      {
+        "word": "ghadi",
+        "variant": "ghaadi",
+        "norm_variant": "ghadi"
+      },
+      {
+        "word": "gussa",
+        "variant": "gussaa",
+        "norm_variant": "gussa"
+      },
+      {
+        "word": "haddi",
+        "variant": "haddee",
+        "norm_variant": "haddi"
+      },
+      {
+        "word": "katora",
+        "variant": "katoraa",
+        "norm_variant": "katora"
+      },
+      {
+        "word": "mohalla",
+        "variant": "mohallaa",
+        "norm_variant": "mohalla"
+      },
+      {
+        "word": "nata",
+        "variant": "naataa",
+        "norm_variant": "nata"
+      },
+      {
+        "word": "papad",
+        "variant": "paapad",
+        "norm_variant": "papad"
+      },
+      {
+        "word": "qurbani",
+        "variant": "qurbaani",
+        "norm_variant": "qurbani"
+      },
+      {
+        "word": "rasoi",
+        "variant": "rasoee",
+        "norm_variant": "rasoi"
+      },
+      {
+        "word": "santara",
+        "variant": "santaraa",
+        "norm_variant": "santara"
+      },
+      {
+        "word": "sharminda",
+        "variant": "sharmeenda",
+        "norm_variant": "sharminda"
+      },
+      {
+        "word": "tawa",
+        "variant": "tawaa",
+        "norm_variant": "tawa"
+      },
+      {
+        "word": "thakan",
+        "variant": "thakaan",
+        "norm_variant": "thakan"
+      },
+      {
+        "word": "zyada",
+        "variant": "zyaada",
+        "norm_variant": "zyada"
+      },
+      {
+        "word": "zyada",
+        "variant": "zyaadaa",
+        "norm_variant": "zyada"
+      }
+    ],
+    "redundant_duplicate_normalized_form_within_new_batch": [
+      {
+        "word": "accha",
+        "variant": "achchaa",
+        "norm_variant": "achcha"
+      },
+      {
+        "word": "accha",
+        "variant": "achchhaa",
+        "norm_variant": "achcha"
+      },
+      {
+        "word": "azaadi",
+        "variant": "aazadi",
+        "norm_variant": "azadi"
+      },
+      {
+        "word": "bhanji",
+        "variant": "bhanaji",
+        "norm_variant": "bhanaji"
+      },
+      {
+        "word": "bura",
+        "variant": "bhuraa",
+        "norm_variant": "bhura"
+      },
+      {
+        "word": "ghabrana",
+        "variant": "ghabaraanaa",
+        "norm_variant": "ghabarana"
+      },
+      {
+        "word": "judwaa",
+        "variant": "judvaa",
+        "norm_variant": "judva"
+      },
+      {
+        "word": "kadhai",
+        "variant": "kadai",
+        "norm_variant": "kadai"
+      },
+      {
+        "word": "kharbooze",
+        "variant": "kharbuje",
+        "norm_variant": "kharbuje"
+      },
+      {
+        "word": "nakhoon",
+        "variant": "nakhun",
+        "norm_variant": "nakhun"
+      },
+      {
+        "word": "pocha",
+        "variant": "ponchaa",
+        "norm_variant": "poncha"
+      },
+      {
+        "word": "pocha",
+        "variant": "ponchha",
+        "norm_variant": "poncha"
+      },
+      {
+        "word": "sunehra",
+        "variant": "sunaharaa",
+        "norm_variant": "sunahara"
+      },
+      {
+        "word": "tawa",
+        "variant": "tavaa",
+        "norm_variant": "tava"
+      },
+      {
+        "word": "wafadaar",
+        "variant": "vafadar",
+        "norm_variant": "vafadar"
+      }
+    ]
+  },
+  "harmless_noop_counts": {
+    "duplicate_of_existing_alias": 5,
+    "redundant_self_resolving": 31,
+    "redundant_duplicate_normalized_form_within_new_batch": 15
+  },
+  "post_gate_manual_exclusions": {
+    "note": "Not caught by gate_candidates() (which only checks vocab/alias-file/internal-batch collisions) -- caught by the full test suite (tests/test_clue_spoiler_gate.py), which is exactly why the task requires running it. 1 candidate manually excluded after the automated gate: (pyaar, paayar) normalizes to \"payar\", which is edit-distance-2 from \"palat\" (an unrelated word) in the bollywood pack P01 hi-en clue -- would have made test_spoiler_gate_pack_content[bollywood-hi-en] flag a false-positive spoiler leak.",
+    "excluded": [
+      {
+        "word": "pyaar",
+        "variant": "paayar",
+        "norm_variant": "payar",
+        "reason": "collides with bollywood pack P01 hi-en clue token \"palat\" (edit-distance 2), test_clue_spoiler_gate.py"
+      }
+    ]
+  }
+}

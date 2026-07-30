@@ -1,5 +1,8 @@
 {
-  "generated_notes": [],
+  "generated_notes": [
+    "2026-07-18: hi-en model swapped to gauravgandhi2411/hinglish-relatedness-sbert (spec-hinglish-diagnostic-sweep.md / ship_decision_report_v3.md). Only legacy_fixtures/dimension1_ranking/dimension2_crosslang recomputed -- dimension3_judge/4_rival/5_winrate are model-independent (verified: neither references embed_vocab or config.MODELS) and are carried forward unchanged from the prior report rather than re-run for zero new information.",
+    "2026-07-18: dim1_en.json/dim1_hien.json regenerated after fixing gen_dim1_scenarios.py's far-tier word sampling from a single RNG shared sequentially across all secrets (order/count-dependent) to a per-secret hash-seeded RNG (order/count-independent) -- see evals/finetune/data/ship_decision_report_v3.md Step 0 and spec-hinglish-benchmark.md Phase 1. No model swap this run; hi-en model unchanged (gauravgandhi2411/hinglish-relatedness-sbert). Full-set numbers shift only because far-tier words changed: EN dim1 Spearman 0.837->0.842, hi-en dim1 Spearman 0.800->0.813 (this note replaces the incorrectly-duplicated model-swap note that regen_baseline_report.py unconditionally appends)."
+  ],
   "legacy_fixtures": {
     "passed": 70,
     "total": 70
@@ -9,17 +12,17 @@
       "lang": "en",
       "n_scenarios": 227,
       "band_accuracy": {
-        "overall": 0.748898678414097,
+        "overall": 0.7797356828193832,
         "near": 0.96,
         "mid": 0.07692307692307693,
-        "far": 0.944
+        "far": 1.0
       },
       "band_accuracy_hien_near_split": null,
-      "spearman_correlation": 0.8369394623806077,
+      "spearman_correlation": 0.8417295932578888,
       "monotonicity": {
         "total_pairs": 614,
-        "violations": 38,
-        "violation_rate": 0.06188925081433225,
+        "violations": 36,
+        "violation_rate": 0.05863192182410423,
         "examples": [
           {
             "secret": "courage",
@@ -82,11 +85,6 @@
             "farther": "trust (mid, rank 4107)"
           },
           {
-            "secret": "friend",
-            "closer": "companion (near, rank 10086)",
-            "farther": "thinking (far, rank 6401)"
-          },
-          {
             "secret": "garden",
             "closer": "yard (near, rank 29)",
             "farther": "flower (mid, rank 27)"
@@ -119,7 +117,12 @@
           {
             "secret": "letter",
             "closer": "post (mid, rank 9979)",
-            "farther": "toasting (far, rank 7775)"
+            "farther": "warning (far, rank 6964)"
+          },
+          {
+            "secret": "market",
+            "closer": "shop (near, rank 236)",
+            "farther": "vendor (mid, rank 136)"
           }
         ]
       },
@@ -209,19 +212,6 @@
           "note": null
         },
         {
-          "secret": "family",
-          "word": "troops",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 993,
-          "note": null
-        },
-        {
           "secret": "fire",
           "word": "smoke",
           "tier": "mid",
@@ -243,19 +233,6 @@
           ],
           "actual_band": 2,
           "actual_rank": 57,
-          "note": null
-        },
-        {
-          "secret": "fire",
-          "word": "strike",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1180,
           "note": null
         },
         {
@@ -453,19 +430,6 @@
           "note": null
         },
         {
-          "secret": "market",
-          "word": "confused",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 673,
-          "note": null
-        },
-        {
           "secret": "memory",
           "word": "nostalgia",
           "tier": "mid",
@@ -634,19 +598,6 @@
           "note": null
         },
         {
-          "secret": "rain",
-          "word": "siren",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 667,
-          "note": null
-        },
-        {
           "secret": "river",
           "word": "bank",
           "tier": "mid",
@@ -668,19 +619,6 @@
           ],
           "actual_band": 2,
           "actual_rank": 87,
-          "note": null
-        },
-        {
-          "secret": "river",
-          "word": "marty",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1558,
           "note": null
         },
         {
@@ -768,19 +706,6 @@
           "note": null
         },
         {
-          "secret": "victory",
-          "word": "knock",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 1088,
-          "note": null
-        },
-        {
           "secret": "wisdom",
           "word": "wise",
           "tier": "mid",
@@ -803,19 +728,6 @@
           "actual_band": 2,
           "actual_rank": 539,
           "note": null
-        },
-        {
-          "secret": "wisdom",
-          "word": "cognition",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 805,
-          "note": null
         }
       ],
       "resolution_errors": []
@@ -824,126 +736,126 @@
       "lang": "hi-en",
       "n_scenarios": 227,
       "band_accuracy": {
-        "overall": 0.6784140969162996,
-        "near": 0.68,
+        "overall": 0.7533039647577092,
+        "near": 0.92,
         "mid": 0.019230769230769232,
-        "far": 0.952
+        "far": 0.992
       },
       "band_accuracy_hien_near_split": {
         "translation": {
           "n": 20,
-          "band_accuracy": 0.85
+          "band_accuracy": 1.0
         },
         "associate": {
           "n": 30,
-          "band_accuracy": 0.5666666666666667
+          "band_accuracy": 0.8666666666666667
         }
       },
-      "spearman_correlation": 0.6392671050340981,
+      "spearman_correlation": 0.8129183365093288,
       "monotonicity": {
         "total_pairs": 614,
-        "violations": 94,
-        "violation_rate": 0.15309446254071662,
+        "violations": 41,
+        "violation_rate": 0.06677524429967427,
         "examples": [
           {
             "secret": "aaina",
-            "closer": "reflection (near, rank 1460)",
-            "farther": "image (mid, rank 264)"
+            "closer": "reflection (near, rank 77)",
+            "farther": "image (mid, rank 20)"
           },
           {
             "secret": "aaina",
-            "closer": "reflection (near, rank 1460)",
-            "farther": "glass (mid, rank 1213)"
+            "closer": "reflection (near, rank 77)",
+            "farther": "glass (mid, rank 46)"
           },
           {
             "secret": "aaina",
-            "closer": "bathroom (mid, rank 5131)",
-            "farther": "electron (far, rank 2802)"
+            "closer": "bathroom (mid, rank 861)",
+            "farther": "rim (far, rank 819)"
           },
           {
-            "secret": "baarish",
-            "closer": "umbrella (mid, rank 4832)",
-            "farther": "now (far, rank 4575)"
-          },
-          {
-            "secret": "baarish",
-            "closer": "umbrella (mid, rank 4832)",
-            "farther": "floor (far, rank 3576)"
+            "secret": "aaina",
+            "closer": "bathroom (mid, rank 861)",
+            "farther": "beans (far, rank 597)"
           },
           {
             "secret": "bachpan",
-            "closer": "youth (near, rank 3127)",
-            "farther": "champagne (far, rank 2169)"
+            "closer": "innocence (mid, rank 3693)",
+            "farther": "well (far, rank 2753)"
           },
           {
             "secret": "bachpan",
-            "closer": "youth (near, rank 3127)",
-            "farther": "notch (far, rank 336)"
+            "closer": "innocence (mid, rank 3693)",
+            "farther": "notch (far, rank 3091)"
           },
           {
             "secret": "bachpan",
-            "closer": "youth (near, rank 3127)",
-            "farther": "panthers (far, rank 1408)"
+            "closer": "innocence (mid, rank 3693)",
+            "farther": "garlic (far, rank 1476)"
           },
           {
             "secret": "bachpan",
-            "closer": "childhood (near, rank 3773)",
-            "farther": "champagne (far, rank 2169)"
+            "closer": "past (mid, rank 4269)",
+            "farther": "well (far, rank 2753)"
           },
           {
             "secret": "bachpan",
-            "closer": "childhood (near, rank 3773)",
-            "farther": "notch (far, rank 336)"
+            "closer": "past (mid, rank 4269)",
+            "farther": "notch (far, rank 3091)"
           },
           {
             "secret": "bachpan",
-            "closer": "childhood (near, rank 3773)",
-            "farther": "panthers (far, rank 1408)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "innocence (mid, rank 9811)",
-            "farther": "cares (far, rank 8561)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "innocence (mid, rank 9811)",
-            "farther": "champagne (far, rank 2169)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "innocence (mid, rank 9811)",
-            "farther": "notch (far, rank 336)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "innocence (mid, rank 9811)",
-            "farther": "panthers (far, rank 1408)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "past (mid, rank 8353)",
-            "farther": "champagne (far, rank 2169)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "past (mid, rank 8353)",
-            "farther": "notch (far, rank 336)"
-          },
-          {
-            "secret": "bachpan",
-            "closer": "past (mid, rank 8353)",
-            "farther": "panthers (far, rank 1408)"
+            "closer": "past (mid, rank 4269)",
+            "farther": "garlic (far, rank 1476)"
           },
           {
             "secret": "bagicha",
-            "closer": "yard (near, rank 2365)",
-            "farther": "plant (mid, rank 1746)"
+            "closer": "yard (near, rank 1220)",
+            "farther": "phool (mid, rank 347)"
           },
           {
             "secret": "bagicha",
-            "closer": "yard (near, rank 2365)",
-            "farther": "lawn (mid, rank 2244)"
+            "closer": "yard (near, rank 1220)",
+            "farther": "lawn (mid, rank 972)"
+          },
+          {
+            "secret": "bagicha",
+            "closer": "garden (near, rank 465)",
+            "farther": "phool (mid, rank 347)"
+          },
+          {
+            "secret": "bazar",
+            "closer": "shop (near, rank 11)",
+            "farther": "vendor (mid, rank 9)"
+          },
+          {
+            "secret": "bazar",
+            "closer": "dukaan (near, rank 12)",
+            "farther": "vendor (mid, rank 9)"
+          },
+          {
+            "secret": "bhook",
+            "closer": "meal (mid, rank 3017)",
+            "farther": "thought (far, rank 2227)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "satellite (near, rank 3791)",
+            "farther": "gut (far, rank 2185)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "satellite (near, rank 3791)",
+            "farther": "popping (far, rank 3291)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "satellite (near, rank 3791)",
+            "farther": "eggs (far, rank 1663)"
+          },
+          {
+            "secret": "chaand",
+            "closer": "eclipse (mid, rank 3834)",
+            "farther": "gut (far, rank 2185)"
           }
         ]
       },
@@ -956,8 +868,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 70,
+          "actual_band": 1,
+          "actual_rank": 13,
           "note": null
         },
         {
@@ -968,21 +880,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 58,
-          "note": null
-        },
-        {
-          "secret": "aaina",
-          "word": "reflection",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 1460,
+          "actual_band": 1,
+          "actual_rank": 14,
           "note": null
         },
         {
@@ -993,8 +892,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 5131,
+          "actual_band": 4,
+          "actual_rank": 861,
           "note": null
         },
         {
@@ -1005,8 +904,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 264,
+          "actual_band": 1,
+          "actual_rank": 20,
           "note": null
         },
         {
@@ -1017,8 +916,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 1213,
+          "actual_band": 1,
+          "actual_rank": 46,
           "note": null
         },
         {
@@ -1029,8 +928,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 4832,
+          "actual_band": 4,
+          "actual_rank": 792,
           "note": null
         },
         {
@@ -1041,34 +940,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 1665,
-          "note": null
-        },
-        {
-          "secret": "bachpan",
-          "word": "youth",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 5,
-          "actual_rank": 3127,
-          "note": null
-        },
-        {
-          "secret": "bachpan",
-          "word": "childhood",
-          "tier": "near",
-          "subtype": "translation",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 5,
-          "actual_rank": 3773,
+          "actual_band": 2,
+          "actual_rank": 58,
           "note": null
         },
         {
@@ -1080,7 +953,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 9811,
+          "actual_rank": 3693,
           "note": null
         },
         {
@@ -1092,20 +965,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 8353,
-          "note": null
-        },
-        {
-          "secret": "bachpan",
-          "word": "notch",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 336,
+          "actual_rank": 4269,
           "note": null
         },
         {
@@ -1118,20 +978,7 @@
             2
           ],
           "actual_band": 4,
-          "actual_rank": 2365,
-          "note": null
-        },
-        {
-          "secret": "bagicha",
-          "word": "garden",
-          "tier": "near",
-          "subtype": "translation",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 2416,
+          "actual_rank": 1220,
           "note": null
         },
         {
@@ -1142,8 +989,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 7338,
+          "actual_band": 2,
+          "actual_rank": 347,
           "note": null
         },
         {
@@ -1155,7 +1002,7 @@
             3
           ],
           "actual_band": 4,
-          "actual_rank": 1746,
+          "actual_rank": 1234,
           "note": null
         },
         {
@@ -1167,7 +1014,7 @@
             3
           ],
           "actual_band": 4,
-          "actual_rank": 2244,
+          "actual_rank": 972,
           "note": null
         },
         {
@@ -1179,7 +1026,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 13,
+          "actual_rank": 9,
           "note": null
         },
         {
@@ -1190,34 +1037,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 1962,
-          "note": null
-        },
-        {
-          "secret": "bazar",
-          "word": "holds",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 3,
-          "actual_rank": 507,
-          "note": null
-        },
-        {
-          "secret": "bhook",
-          "word": "starving",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 5,
-          "actual_rank": 3045,
+          "actual_band": 2,
+          "actual_rank": 302,
           "note": null
         },
         {
@@ -1229,8 +1050,8 @@
             1,
             2
           ],
-          "actual_band": 5,
-          "actual_rank": 4549,
+          "actual_band": 4,
+          "actual_rank": 1368,
           "note": null
         },
         {
@@ -1241,8 +1062,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 5543,
+          "actual_band": 4,
+          "actual_rank": 1793,
           "note": null
         },
         {
@@ -1254,7 +1075,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 6832,
+          "actual_rank": 3017,
           "note": null
         },
         {
@@ -1267,7 +1088,7 @@
             2
           ],
           "actual_band": 5,
-          "actual_rank": 3681,
+          "actual_rank": 3791,
           "note": null
         },
         {
@@ -1279,7 +1100,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 4878,
+          "actual_rank": 3834,
           "note": null
         },
         {
@@ -1291,20 +1112,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 2662,
-          "note": null
-        },
-        {
-          "secret": "dost",
-          "word": "yaar",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 874,
+          "actual_rank": 5982,
           "note": null
         },
         {
@@ -1316,7 +1124,7 @@
             3
           ],
           "actual_band": 4,
-          "actual_rank": 1113,
+          "actual_rank": 1489,
           "note": null
         },
         {
@@ -1327,21 +1135,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 686,
-          "note": null
-        },
-        {
-          "secret": "dost",
-          "word": "happy",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 462,
+          "actual_band": 1,
+          "actual_rank": 7,
           "note": null
         },
         {
@@ -1352,8 +1147,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 549,
+          "actual_band": 1,
+          "actual_rank": 37,
           "note": null
         },
         {
@@ -1364,8 +1159,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 1399,
+          "actual_band": 2,
+          "actual_rank": 225,
           "note": null
         },
         {
@@ -1377,7 +1172,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 41,
+          "actual_rank": 12,
           "note": null
         },
         {
@@ -1400,8 +1195,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 70,
+          "actual_band": 1,
+          "actual_rank": 29,
           "note": null
         },
         {
@@ -1413,7 +1208,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 7,
+          "actual_rank": 20,
           "note": null
         },
         {
@@ -1425,7 +1220,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 17,
+          "actual_rank": 14,
           "note": null
         },
         {
@@ -1436,8 +1231,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 4070,
+          "actual_band": 4,
+          "actual_rank": 2454,
           "note": null
         },
         {
@@ -1449,7 +1244,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 6,
+          "actual_rank": 10,
           "note": null
         },
         {
@@ -1461,7 +1256,7 @@
             3
           ],
           "actual_band": 2,
-          "actual_rank": 285,
+          "actual_rank": 61,
           "note": null
         },
         {
@@ -1472,8 +1267,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 74,
+          "actual_band": 1,
+          "actual_rank": 11,
           "note": null
         },
         {
@@ -1484,8 +1279,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 278,
+          "actual_band": 1,
+          "actual_rank": 22,
           "note": null
         },
         {
@@ -1497,8 +1292,8 @@
             1,
             2
           ],
-          "actual_band": 5,
-          "actual_rank": 6283,
+          "actual_band": 3,
+          "actual_rank": 506,
           "note": null
         },
         {
@@ -1510,7 +1305,7 @@
             3
           ],
           "actual_band": 4,
-          "actual_rank": 796,
+          "actual_rank": 1512,
           "note": null
         },
         {
@@ -1522,7 +1317,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 4131,
+          "actual_rank": 4143,
           "note": null
         },
         {
@@ -1534,7 +1329,7 @@
             3
           ],
           "actual_band": 2,
-          "actual_rank": 465,
+          "actual_rank": 81,
           "note": null
         },
         {
@@ -1545,8 +1340,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 833,
+          "actual_band": 1,
+          "actual_rank": 41,
           "note": null
         },
         {
@@ -1558,7 +1353,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 48,
+          "actual_rank": 16,
           "note": null
         },
         {
@@ -1569,47 +1364,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 2,
-          "actual_rank": 298,
-          "note": null
-        },
-        {
-          "secret": "nadi",
-          "word": "des",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
-          "actual_band": 2,
-          "actual_rank": 66,
-          "note": null
-        },
-        {
-          "secret": "pahad",
-          "word": "peak",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 1805,
-          "note": null
-        },
-        {
-          "secret": "pahad",
-          "word": "mountain",
-          "tier": "near",
-          "subtype": "translation",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 877,
+          "actual_band": 1,
+          "actual_rank": 12,
           "note": null
         },
         {
@@ -1621,7 +1377,7 @@
             3
           ],
           "actual_band": 4,
-          "actual_rank": 2069,
+          "actual_rank": 1493,
           "note": null
         },
         {
@@ -1632,8 +1388,21 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 8084,
+          "actual_band": 4,
+          "actual_rank": 1071,
+          "note": null
+        },
+        {
+          "secret": "pahad",
+          "word": "strain",
+          "tier": "far",
+          "subtype": null,
+          "expected_bands": [
+            4,
+            5
+          ],
+          "actual_band": 2,
+          "actual_rank": 480,
           "note": null
         },
         {
@@ -1645,7 +1414,7 @@
             3
           ],
           "actual_band": 1,
-          "actual_rank": 10,
+          "actual_rank": 11,
           "note": null
         },
         {
@@ -1656,33 +1425,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 803,
-          "note": null
-        },
-        {
-          "secret": "parivar",
-          "word": "homes",
-          "tier": "far",
-          "subtype": null,
-          "expected_bands": [
-            4,
-            5
-          ],
           "actual_band": 1,
-          "actual_rank": 34,
-          "note": null
-        },
-        {
-          "secret": "phool",
-          "word": "bagicha",
-          "tier": "mid",
-          "subtype": null,
-          "expected_bands": [
-            3
-          ],
-          "actual_band": 5,
-          "actual_rank": 3800,
+          "actual_rank": 20,
           "note": null
         },
         {
@@ -1693,34 +1437,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 642,
-          "note": null
-        },
-        {
-          "secret": "samunder",
-          "word": "sea",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 863,
-          "note": null
-        },
-        {
-          "secret": "samunder",
-          "word": "paani",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 5,
-          "actual_rank": 2794,
+          "actual_band": 1,
+          "actual_rank": 20,
           "note": null
         },
         {
@@ -1731,34 +1449,20 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 9050,
+          "actual_band": 4,
+          "actual_rank": 1647,
           "note": null
         },
         {
           "secret": "samunder",
-          "word": "jimmy",
-          "tier": "far",
+          "word": "wave",
+          "tier": "mid",
           "subtype": null,
           "expected_bands": [
-            4,
-            5
+            3
           ],
-          "actual_band": 2,
-          "actual_rank": 222,
-          "note": null
-        },
-        {
-          "secret": "sapna",
-          "word": "neend",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 5,
-          "actual_rank": 5471,
+          "actual_band": 4,
+          "actual_rank": 826,
           "note": null
         },
         {
@@ -1769,8 +1473,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 612,
+          "actual_band": 1,
+          "actual_rank": 9,
           "note": null
         },
         {
@@ -1781,21 +1485,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 1039,
-          "note": null
-        },
-        {
-          "secret": "sipahi",
-          "word": "warrior",
-          "tier": "near",
-          "subtype": "associate",
-          "expected_bands": [
-            1,
-            2
-          ],
-          "actual_band": 4,
-          "actual_rank": 1920,
+          "actual_band": 2,
+          "actual_rank": 193,
           "note": null
         },
         {
@@ -1806,8 +1497,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 3848,
+          "actual_band": 1,
+          "actual_rank": 23,
           "note": null
         },
         {
@@ -1819,7 +1510,7 @@
             3
           ],
           "actual_band": 5,
-          "actual_rank": 7287,
+          "actual_rank": 3025,
           "note": null
         },
         {
@@ -1830,8 +1521,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 5,
-          "actual_rank": 3440,
+          "actual_band": 2,
+          "actual_rank": 382,
           "note": null
         },
         {
@@ -1842,8 +1533,8 @@
           "expected_bands": [
             3
           ],
-          "actual_band": 4,
-          "actual_rank": 2281,
+          "actual_band": 2,
+          "actual_rank": 402,
           "note": null
         }
       ],
@@ -1854,115 +1545,115 @@
     "n_pairs": 60,
     "n_resolved": 59,
     "n_resolution_errors": 1,
-    "pass_rate_scorching_or_hot": 0.5423728813559322,
-    "median_rank": 20.0,
-    "mean_rank": 922.4067796610169,
-    "median_rank_percentile": 0.19,
+    "pass_rate_scorching_or_hot": 0.7796610169491526,
+    "median_rank": 3.0,
+    "mean_rank": 114.03389830508475,
+    "median_rank_percentile": 0.03,
     "worst_diverging_pairs": [
-      {
-        "en_secret": "silence",
-        "hien_secret": "khamoshi",
-        "rank": 8244,
-        "rank_percentile": 78.8,
-        "band": 5
-      },
-      {
-        "en_secret": "kitchen",
-        "hien_secret": "rasoi",
-        "rank": 6393,
-        "rank_percentile": 61.11,
-        "band": 5
-      },
-      {
-        "en_secret": "ocean",
-        "hien_secret": "samunder",
-        "rank": 3809,
-        "rank_percentile": 36.41,
-        "band": 5
-      },
-      {
-        "en_secret": "childhood",
-        "hien_secret": "bachpan",
-        "rank": 3773,
-        "rank_percentile": 36.06,
-        "band": 5
-      },
-      {
-        "en_secret": "butterfly",
-        "hien_secret": "titli",
-        "rank": 3761,
-        "rank_percentile": 35.95,
-        "band": 5
-      },
-      {
-        "en_secret": "window",
-        "hien_secret": "khidki",
-        "rank": 3190,
-        "rank_percentile": 30.49,
-        "band": 5
-      },
-      {
-        "en_secret": "festival",
-        "hien_secret": "tyohar",
-        "rank": 3012,
-        "rank_percentile": 28.79,
-        "band": 5
-      },
       {
         "en_secret": "blanket",
         "hien_secret": "razaai",
-        "rank": 2706,
-        "rank_percentile": 25.87,
-        "band": 5
+        "rank": 1821,
+        "rank_percentile": 17.41,
+        "band": 4
       },
       {
-        "en_secret": "shadow",
-        "hien_secret": "parchhain",
-        "rank": 2610,
-        "rank_percentile": 24.95,
+        "en_secret": "silence",
+        "hien_secret": "khamoshi",
+        "rank": 882,
+        "rank_percentile": 8.43,
         "band": 4
       },
       {
         "en_secret": "bridge",
         "hien_secret": "pul",
-        "rank": 2534,
-        "rank_percentile": 24.22,
+        "rank": 766,
+        "rank_percentile": 7.32,
+        "band": 4
+      },
+      {
+        "en_secret": "shadow",
+        "hien_secret": "parchhain",
+        "rank": 561,
+        "rank_percentile": 5.36,
         "band": 4
       },
       {
         "en_secret": "garden",
         "hien_secret": "bagicha",
-        "rank": 2416,
-        "rank_percentile": 23.09,
-        "band": 4
+        "rank": 465,
+        "rank_percentile": 4.44,
+        "band": 2
       },
       {
-        "en_secret": "lamp",
-        "hien_secret": "diya",
-        "rank": 2272,
-        "rank_percentile": 21.72,
-        "band": 4
+        "en_secret": "ocean",
+        "hien_secret": "samunder",
+        "rank": 445,
+        "rank_percentile": 4.25,
+        "band": 2
       },
       {
-        "en_secret": "diamond",
-        "hien_secret": "heera",
-        "rank": 1843,
-        "rank_percentile": 17.62,
-        "band": 4
+        "en_secret": "window",
+        "hien_secret": "khidki",
+        "rank": 430,
+        "rank_percentile": 4.11,
+        "band": 2
       },
       {
         "en_secret": "candle",
         "hien_secret": "mombatti",
-        "rank": 1677,
-        "rank_percentile": 16.03,
-        "band": 4
+        "rank": 350,
+        "rank_percentile": 3.35,
+        "band": 2
       },
       {
         "en_secret": "hunger",
         "hien_secret": "bhook",
-        "rank": 1463,
-        "rank_percentile": 13.98,
-        "band": 4
+        "rank": 216,
+        "rank_percentile": 2.06,
+        "band": 2
+      },
+      {
+        "en_secret": "kitchen",
+        "hien_secret": "rasoi",
+        "rank": 174,
+        "rank_percentile": 1.66,
+        "band": 2
+      },
+      {
+        "en_secret": "mountain",
+        "hien_secret": "pahad",
+        "rank": 118,
+        "rank_percentile": 1.13,
+        "band": 2
+      },
+      {
+        "en_secret": "butterfly",
+        "hien_secret": "titli",
+        "rank": 109,
+        "rank_percentile": 1.04,
+        "band": 2
+      },
+      {
+        "en_secret": "moon",
+        "hien_secret": "chaand",
+        "rank": 49,
+        "rank_percentile": 0.47,
+        "band": 1
+      },
+      {
+        "en_secret": "perfume",
+        "hien_secret": "khushbu",
+        "rank": 45,
+        "rank_percentile": 0.43,
+        "band": 1
+      },
+      {
+        "en_secret": "diamond",
+        "hien_secret": "heera",
+        "rank": 43,
+        "rank_percentile": 0.41,
+        "band": 1
       }
     ],
     "all_records": [
@@ -1971,11 +1662,11 @@
         "hien_secret": "samunder",
         "guess": "ocean",
         "guess_is_valid_en_word": true,
-        "rank": 3809,
+        "rank": 445,
         "vocab_size": 10462,
-        "rank_percentile": 36.41,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 4.25,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -1983,10 +1674,10 @@
         "hien_secret": "gaana",
         "guess": "music",
         "guess_is_valid_en_word": true,
-        "rank": 145,
+        "rank": 14,
         "vocab_size": 10462,
-        "rank_percentile": 1.39,
-        "band": 2,
+        "rank_percentile": 0.13,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2007,10 +1698,10 @@
         "hien_secret": "baarish",
         "guess": "rain",
         "guess_is_valid_en_word": true,
-        "rank": 279,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 2.67,
-        "band": 2,
+        "rank_percentile": 0.02,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2031,11 +1722,11 @@
         "hien_secret": "pahad",
         "guess": "mountain",
         "guess_is_valid_en_word": true,
-        "rank": 877,
+        "rank": 118,
         "vocab_size": 10462,
-        "rank_percentile": 8.38,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 1.13,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2043,9 +1734,9 @@
         "hien_secret": "aag",
         "guess": "fire",
         "guess_is_valid_en_word": true,
-        "rank": 20,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.19,
+        "rank_percentile": 0.02,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2055,10 +1746,10 @@
         "hien_secret": "sapna",
         "guess": "dream",
         "guess_is_valid_en_word": true,
-        "rank": 60,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.57,
-        "band": 2,
+        "rank_percentile": 0.02,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2067,9 +1758,9 @@
         "hien_secret": "paisa",
         "guess": "money",
         "guess_is_valid_en_word": true,
-        "rank": 2,
+        "rank": 3,
         "vocab_size": 10462,
-        "rank_percentile": 0.02,
+        "rank_percentile": 0.03,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2103,11 +1794,11 @@
         "hien_secret": "rasoi",
         "guess": "kitchen",
         "guess_is_valid_en_word": true,
-        "rank": 6393,
+        "rank": 174,
         "vocab_size": 10462,
-        "rank_percentile": 61.11,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 1.66,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2115,11 +1806,11 @@
         "hien_secret": "bagicha",
         "guess": "garden",
         "guess_is_valid_en_word": true,
-        "rank": 2416,
+        "rank": 465,
         "vocab_size": 10462,
-        "rank_percentile": 23.09,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 4.44,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2127,9 +1818,9 @@
         "hien_secret": "pul",
         "guess": "bridge",
         "guess_is_valid_en_word": true,
-        "rank": 2534,
+        "rank": 766,
         "vocab_size": 10462,
-        "rank_percentile": 24.22,
+        "rank_percentile": 7.32,
         "band": 4,
         "consistent": false,
         "resolution_error": null
@@ -2139,10 +1830,10 @@
         "hien_secret": "gaon",
         "guess": "village",
         "guess_is_valid_en_word": true,
-        "rank": 133,
+        "rank": 27,
         "vocab_size": 10462,
-        "rank_percentile": 1.27,
-        "band": 2,
+        "rank_percentile": 0.26,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2163,9 +1854,9 @@
         "hien_secret": "safar",
         "guess": "journey",
         "guess_is_valid_en_word": true,
-        "rank": 8,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.08,
+        "rank_percentile": 0.02,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2175,9 +1866,9 @@
         "hien_secret": "parchhain",
         "guess": "shadow",
         "guess_is_valid_en_word": true,
-        "rank": 2610,
+        "rank": 561,
         "vocab_size": 10462,
-        "rank_percentile": 24.95,
+        "rank_percentile": 5.36,
         "band": 4,
         "consistent": false,
         "resolution_error": null
@@ -2199,9 +1890,9 @@
         "hien_secret": "jungle",
         "guess": "forest",
         "guess_is_valid_en_word": true,
-        "rank": 2,
+        "rank": 3,
         "vocab_size": 10462,
-        "rank_percentile": 0.02,
+        "rank_percentile": 0.03,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2211,10 +1902,10 @@
         "hien_secret": "subah",
         "guess": "sunrise",
         "guess_is_valid_en_word": true,
-        "rank": 91,
+        "rank": 17,
         "vocab_size": 10462,
-        "rank_percentile": 0.87,
-        "band": 2,
+        "rank_percentile": 0.16,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2247,11 +1938,11 @@
         "hien_secret": "tyohar",
         "guess": "festival",
         "guess_is_valid_en_word": true,
-        "rank": 3012,
+        "rank": 4,
         "vocab_size": 10462,
-        "rank_percentile": 28.79,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 0.04,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2271,10 +1962,10 @@
         "hien_secret": "aaina",
         "guess": "mirror",
         "guess_is_valid_en_word": true,
-        "rank": 164,
+        "rank": 3,
         "vocab_size": 10462,
-        "rank_percentile": 1.57,
-        "band": 2,
+        "rank_percentile": 0.03,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2283,10 +1974,10 @@
         "hien_secret": "razaai",
         "guess": "blanket",
         "guess_is_valid_en_word": true,
-        "rank": 2706,
+        "rank": 1821,
         "vocab_size": 10462,
-        "rank_percentile": 25.87,
-        "band": 5,
+        "rank_percentile": 17.41,
+        "band": 4,
         "consistent": false,
         "resolution_error": null
       },
@@ -2307,11 +1998,11 @@
         "hien_secret": "titli",
         "guess": "butterfly",
         "guess_is_valid_en_word": true,
-        "rank": 3761,
+        "rank": 109,
         "vocab_size": 10462,
-        "rank_percentile": 35.95,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 1.04,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2319,10 +2010,10 @@
         "hien_secret": "khamoshi",
         "guess": "silence",
         "guess_is_valid_en_word": true,
-        "rank": 8244,
+        "rank": 882,
         "vocab_size": 10462,
-        "rank_percentile": 78.8,
-        "band": 5,
+        "rank_percentile": 8.43,
+        "band": 4,
         "consistent": false,
         "resolution_error": null
       },
@@ -2331,9 +2022,9 @@
         "hien_secret": "himmat",
         "guess": "courage",
         "guess_is_valid_en_word": true,
-        "rank": 3,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.03,
+        "rank_percentile": 0.02,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2343,11 +2034,11 @@
         "hien_secret": "diya",
         "guess": "lamp",
         "guess_is_valid_en_word": true,
-        "rank": 2272,
+        "rank": 31,
         "vocab_size": 10462,
-        "rank_percentile": 21.72,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 0.3,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2355,10 +2046,10 @@
         "hien_secret": "khazana",
         "guess": "treasure",
         "guess_is_valid_en_word": true,
-        "rank": 234,
+        "rank": 15,
         "vocab_size": 10462,
-        "rank_percentile": 2.24,
-        "band": 2,
+        "rank_percentile": 0.14,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2379,9 +2070,9 @@
         "hien_secret": "fasal",
         "guess": "harvest",
         "guess_is_valid_en_word": true,
-        "rank": 2,
+        "rank": 4,
         "vocab_size": 10462,
-        "rank_percentile": 0.02,
+        "rank_percentile": 0.04,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2391,9 +2082,9 @@
         "hien_secret": "bijli",
         "guess": "lightning",
         "guess_is_valid_en_word": true,
-        "rank": 13,
+        "rank": 3,
         "vocab_size": 10462,
-        "rank_percentile": 0.12,
+        "rank_percentile": 0.03,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2403,9 +2094,9 @@
         "hien_secret": "gyaan",
         "guess": "wisdom",
         "guess_is_valid_en_word": true,
-        "rank": 6,
+        "rank": 3,
         "vocab_size": 10462,
-        "rank_percentile": 0.06,
+        "rank_percentile": 0.03,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2415,11 +2106,11 @@
         "hien_secret": "bachpan",
         "guess": "childhood",
         "guess_is_valid_en_word": true,
-        "rank": 3773,
+        "rank": 13,
         "vocab_size": 10462,
-        "rank_percentile": 36.06,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 0.12,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2451,11 +2142,11 @@
         "hien_secret": "khidki",
         "guess": "window",
         "guess_is_valid_en_word": true,
-        "rank": 3190,
+        "rank": 430,
         "vocab_size": 10462,
-        "rank_percentile": 30.49,
-        "band": 5,
-        "consistent": false,
+        "rank_percentile": 4.11,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2463,10 +2154,10 @@
         "hien_secret": "sipahi",
         "guess": "soldier",
         "guess_is_valid_en_word": true,
-        "rank": 457,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 4.37,
-        "band": 2,
+        "rank_percentile": 0.02,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2487,10 +2178,10 @@
         "hien_secret": "khushbu",
         "guess": "perfume",
         "guess_is_valid_en_word": true,
-        "rank": 354,
+        "rank": 45,
         "vocab_size": 10462,
-        "rank_percentile": 3.38,
-        "band": 2,
+        "rank_percentile": 0.43,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2511,11 +2202,11 @@
         "hien_secret": "mombatti",
         "guess": "candle",
         "guess_is_valid_en_word": true,
-        "rank": 1677,
+        "rank": 350,
         "vocab_size": 10462,
-        "rank_percentile": 16.03,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 3.35,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2523,10 +2214,10 @@
         "hien_secret": "chaand",
         "guess": "moon",
         "guess_is_valid_en_word": true,
-        "rank": 119,
+        "rank": 49,
         "vocab_size": 10462,
-        "rank_percentile": 1.14,
-        "band": 2,
+        "rank_percentile": 0.47,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2559,9 +2250,9 @@
         "hien_secret": "phool",
         "guess": "flower",
         "guess_is_valid_en_word": true,
-        "rank": 3,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.03,
+        "rank_percentile": 0.02,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2571,11 +2262,11 @@
         "hien_secret": "heera",
         "guess": "diamond",
         "guess_is_valid_en_word": true,
-        "rank": 1843,
+        "rank": 43,
         "vocab_size": 10462,
-        "rank_percentile": 17.62,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 0.41,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2595,9 +2286,9 @@
         "hien_secret": "tasveer",
         "guess": "picture",
         "guess_is_valid_en_word": true,
-        "rank": 4,
+        "rank": 2,
         "vocab_size": 10462,
-        "rank_percentile": 0.04,
+        "rank_percentile": 0.02,
         "band": 1,
         "consistent": true,
         "resolution_error": null
@@ -2607,11 +2298,11 @@
         "hien_secret": "bhook",
         "guess": "hunger",
         "guess_is_valid_en_word": true,
-        "rank": 1463,
+        "rank": 216,
         "vocab_size": 10462,
-        "rank_percentile": 13.98,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 2.06,
+        "band": 2,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2619,10 +2310,10 @@
         "hien_secret": "hansi",
         "guess": "laughter",
         "guess_is_valid_en_word": true,
-        "rank": 146,
+        "rank": 4,
         "vocab_size": 10462,
-        "rank_percentile": 1.4,
-        "band": 2,
+        "rank_percentile": 0.04,
+        "band": 1,
         "consistent": true,
         "resolution_error": null
       },
@@ -2631,11 +2322,11 @@
         "hien_secret": "chai",
         "guess": "coffee",
         "guess_is_valid_en_word": true,
-        "rank": 865,
+        "rank": 32,
         "vocab_size": 10462,
-        "rank_percentile": 8.27,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 0.31,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -2643,11 +2334,11 @@
         "hien_secret": "chhata",
         "guess": "umbrella",
         "guess_is_valid_en_word": true,
-        "rank": 694,
+        "rank": 24,
         "vocab_size": 10462,
-        "rank_percentile": 6.63,
-        "band": 4,
-        "consistent": false,
+        "rank_percentile": 0.23,
+        "band": 1,
+        "consistent": true,
         "resolution_error": null
       },
       {
@@ -5319,5 +5010,5 @@
       }
     ]
   },
-  "elapsed_seconds": 2388.8
+  "elapsed_seconds": 64.5
 }

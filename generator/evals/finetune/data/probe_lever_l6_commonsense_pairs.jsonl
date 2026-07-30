@@ -1,0 +1,8 @@
+{"word": "chawal", "gloss": "rice", "property": "texture", "value": "sticky", "domain": "food and cooking", "hard_negative": "kanye"}
+{"word": "kadhai", "gloss": "wok", "property": "function", "value": "stirring", "domain": "food and cooking", "hard_negative": "calif"}
+{"word": "mooli", "gloss": "radish", "property": "texture", "value": "crunchy", "domain": "food and cooking", "hard_negative": "blah"}
+{"word": "roti", "gloss": "flatbread", "property": "texture", "value": "crispy", "domain": "food and cooking", "hard_negative": "cooked"}
+{"word": "kaddu", "gloss": "pumpkin", "property": "color", "value": "orange", "domain": "food and cooking", "hard_negative": "crab"}
+{"word": "roti", "gloss": "bread", "property": "color", "value": "brown", "domain": "home and household objects", "hard_negative": "cooked"}
+{"word": "kitaab", "gloss": "book", "property": "texture", "value": "paper", "domain": "home and household objects", "hard_negative": "read"}
+{"word": "chappal", "gloss": "shoe", "property": "color", "value": "brown", "domain": "home and household objects", "hard_negative": "shaft"}

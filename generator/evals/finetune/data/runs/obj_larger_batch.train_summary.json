@@ -1,0 +1,156 @@
+{
+  "name": "obj_larger_batch",
+  "method": "lora",
+  "n_mnrl_pairs": 756,
+  "n_graded_pairs": 1028,
+  "n_dev_scenarios": 46,
+  "best_dev_spearman_cosine": 0.8238059462557078,
+  "dev_curve": [
+    {
+      "loss": 1.1710540771484375,
+      "epoch": 0.17543859649122806,
+      "step": 10
+    },
+    {
+      "loss": 1.1389677047729492,
+      "epoch": 0.3508771929824561,
+      "step": 20
+    },
+    {
+      "loss": 0.8329133987426758,
+      "epoch": 0.5263157894736842,
+      "step": 30
+    },
+    {
+      "loss": 1.301162338256836,
+      "epoch": 0.7017543859649122,
+      "step": 40
+    },
+    {
+      "loss": 1.295831298828125,
+      "epoch": 0.8771929824561403,
+      "step": 50
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6847298056521212,
+      "epoch": 1.0,
+      "step": 57
+    },
+    {
+      "loss": 1.1924629211425781,
+      "epoch": 1.0526315789473684,
+      "step": 60
+    },
+    {
+      "loss": 0.8241827011108398,
+      "epoch": 1.2280701754385965,
+      "step": 70
+    },
+    {
+      "loss": 1.610407257080078,
+      "epoch": 1.4035087719298245,
+      "step": 80
+    },
+    {
+      "loss": 0.7261823654174805,
+      "epoch": 1.5789473684210527,
+      "step": 90
+    },
+    {
+      "loss": 0.4672989845275879,
+      "epoch": 1.7543859649122808,
+      "step": 100
+    },
+    {
+      "loss": 0.9526439666748047,
+      "epoch": 1.9298245614035088,
+      "step": 110
+    },
+    {
+      "eval_dev_spearman_cosine": 0.7928773789049839,
+      "epoch": 2.0,
+      "step": 114
+    },
+    {
+      "loss": 1.2192934036254883,
+      "epoch": 2.1052631578947367,
+      "step": 120
+    },
+    {
+      "loss": 0.9158844947814941,
+      "epoch": 2.280701754385965,
+      "step": 130
+    },
+    {
+      "loss": 0.9051421165466309,
+      "epoch": 2.456140350877193,
+      "step": 140
+    },
+    {
+      "loss": 1.1693161964416503,
+      "epoch": 2.6315789473684212,
+      "step": 150
+    },
+    {
+      "loss": 0.6236848831176758,
+      "epoch": 2.807017543859649,
+      "step": 160
+    },
+    {
+      "loss": 0.477615213394165,
+      "epoch": 2.982456140350877,
+      "step": 170
+    },
+    {
+      "eval_dev_spearman_cosine": 0.8227818215089951,
+      "epoch": 3.0,
+      "step": 171
+    },
+    {
+      "loss": 0.8755874633789062,
+      "epoch": 3.1578947368421053,
+      "step": 180
+    },
+    {
+      "loss": 1.2607089042663575,
+      "epoch": 3.3333333333333335,
+      "step": 190
+    },
+    {
+      "loss": 0.46374220848083497,
+      "epoch": 3.5087719298245617,
+      "step": 200
+    },
+    {
+      "loss": 0.5023402690887451,
+      "epoch": 3.6842105263157894,
+      "step": 210
+    },
+    {
+      "loss": 1.421299934387207,
+      "epoch": 3.8596491228070176,
+      "step": 220
+    },
+    {
+      "eval_dev_spearman_cosine": 0.8238059462557078,
+      "epoch": 4.0,
+      "step": 228
+    }
+  ],
+  "n_trainable_params": 294912,
+  "n_total_params": 237851136,
+  "trainable_fraction": 0.0012399015828118644,
+  "output_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\obj_larger_batch\\model",
+  "hyperparams": {
+    "method": "lora",
+    "freeze_n_layers": 0,
+    "lora_r": 8,
+    "lora_alpha": 16,
+    "learning_rate": 0.0002,
+    "num_epochs": 4,
+    "batch_size": 32,
+    "warmup_ratio": 0.1,
+    "early_stopping_patience": 2,
+    "seed": 42
+  }
+}

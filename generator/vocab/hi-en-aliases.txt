@@ -4,6 +4,10 @@
 # Aliases are common alternate romanizations players might type.
 # Both canonical and aliases are normalized before storage (normalize.py rules apply).
 # Entries are LOOKUP-FOLDING — not linguistic ground truth.
+# 121 canonicals / 201 aliases as of the Aksharantar-mined extension below (docs/
+# model-excellence-final-report.md finding #2's spelling-variance fix; the original
+# 29 canonicals / 39 aliases above the "--- Aksharantar-mined additions ---" marker
+# are hand-curated and untouched by that extension).
 
 # Bedding / comfort
 razaai: razai, rajai
@@ -21,7 +25,7 @@ chaand: chand
 baarish: barish
 
 # Fragrance
-khushbu: khushboo
+khushbu: khushboo, khushbuu, kushbu
 
 # Candle
 mombatti: mombati
@@ -30,7 +34,7 @@ mombatti: mombati
 hansi: hasi
 
 # Wisdom / knowledge
-gyaan: gyan
+gyaan: gyan, gyana
 
 # Mirror (new secret — entry 26)
 aaina: aina, ayna
@@ -56,7 +60,12 @@ gaana: gana
 # --- Phase 6c: Bollywood pack secrets (eval-gated additions P01–P11) ---
 
 # Love
-pyaar: pyar
+# NOT "paayar" -- normalizes to "payar", which is edit-distance-2 from "palat"
+# (an unrelated word, "turn around") in the bollywood pack's own P01 hi-en
+# clue -- collides with test_clue_spoiler_gate.py's morphological-variant
+# check. Same exclusion class as "vaada: waada" below (a mined variant that
+# collides with unrelated game content, not with another vocab word).
+pyaar: pyar, piar
 
 # Dance
 naach: nach
@@ -77,10 +86,10 @@ kismat: kismet, qismat
 vaada: waada
 
 # Sacrifice
-qurbani: kurbani
+qurbani: kurbani, qurabaani
 
 # Story
-kahani: kahaani
+kahani: kahaani, kehani, kehni
 
 # Star
 sitara: sitaara
@@ -89,10 +98,109 @@ sitara: sitaara
 gussa: ghussa
 
 # Honor
-izzat: izat
+izzat: izat, ijjat, ijzat
 
 # Fight
 ladai: ladaai, larai
 
 # Youth
 jawaani: jawani
+
+# --- Aksharantar-mined additions (spelling-variance fix, docs/model-excellence-final-report.md finding #2) ---
+# Mined via evals/finetune/extend_hien_aliases.py (build_aksharantar_maps +
+# aksharantar_variants_for_secret, is_clean_variant-filtered, full ~544-word
+# hinglish-sourced vocab, false-merge-gated -- see extend_hien_aliases_report.json
+# for the full accounting of what was excluded and why).
+
+aadmi: admi
+accha: achcha
+achaar: achaara
+airport: aiyarport, ayaraport
+almirah: almirahs
+alvida: alavida, alawida
+anaar: anaara
+angoothi: angooti, anguthi, anguuthi
+angutha: anguuthaa
+azaadi: aazaadi
+badbu: badabu
+badla: badala, vadla
+barfi: barphi, burfi
+beizzati: beijjati
+besan: besson
+bhanja: bhanj
+bhanji: bhanajee
+bhindi: bhendi
+birthday: birthed
+biryani: biriani, biriyani
+bowler: baller, boller
+bura: bhura
+chutney: chatnee, chutneys
+daraa: darah
+darwaza: daravaaza, darwaaze, darwaje
+dehat: dohat
+dheere: deere, dheerein, dheeren
+dudh: dudha
+finalist: finalists
+gehoon: gehoo, gehun, gehuun
+ghabrana: gabrana, ghabaraana
+ghadi: gharhi
+ghagra: gagra, ghaaghara, ghaaghra
+ghutna: ghutana
+gurudwara: gurdwara, gurudwar, gurudwaras
+haddi: hadee, hady
+hazaar: hezar
+honth: hont
+hospital: aspital, asputal
+imli: imali
+jaiphal: jaayphala, jaifal, jaiphala
+judwaa: judva, judwa
+kabhi: kabhie, kahbi
+kadhai: kadaai, kadayi
+kharbooze: kharbooje, kharboojey
+khichdi: khichadi, khichari, khichidi
+kitne: kitana, kitane
+ladoo: laado
+laung: launga, llong
+machli: machalii, machhali
+mazaa: maanaa, maaza, mansa
+mehandi: mehandii, mehendi, mehndi
+methi: maithi
+mirch: merach, mirach, mirachon
+mohalla: mauhalla, mauhalle
+nakhoon: naakhoon
+nata: natt
+neeche: neechen, niiche
+nimboo: neemboo, nimbo
+papad: papads, papadum
+peeche: peachey, piche
+perfume: perfumes
+pocha: poncha
+pyaaz: pyaz
+rasoi: rsoi
+rickshaw: riksho, rikshon
+rishtedaar: rishtedar
+sabzi: sabji, subzi
+samunder: samudra, samundra
+santara: suntaraa, suntra
+saree: sarhi, sarri
+saunf: sounf
+seb: seib
+seena: seenaa, seine, senna
+sehat: seht
+shampoo: shampoos
+sharm: sharum, shrm
+sharminda: sahrminda, sharaminda
+sunehra: sunahara, sunehara
+tarbooz: tarabooj, tarabooz, tarbooj
+tawa: tava
+teekha: tikha
+tez: tezz
+thakan: thkaan, thukan
+toaster: toasters, toster
+toothbrush: toothbrushes
+toothpaste: toothpastes
+ummeed: ummed, ummid, ummiid
+urad: udad
+wafadaar: vafaadaar, vaphaadaar
+waqt: vaqt
+zyada: ziada

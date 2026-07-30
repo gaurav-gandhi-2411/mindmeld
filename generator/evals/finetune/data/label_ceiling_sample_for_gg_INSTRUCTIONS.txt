@@ -1,0 +1,20 @@
+Label-ceiling annotation instructions (spec-model-excellence.md item 13)
+==========================================================================
+
+For each row below, you are given a `secret` word and a candidate `word`.
+Judge, using your own understanding of English/Hinglish, how RELATED
+`word` is to `secret`, and fill in the `gg_tier_judgment` column with
+EXACTLY ONE of:
+
+  near  -- word is DIRECTLY or STRONGLY related to secret
+  mid   -- word is MODERATELY or LOOSELY related to secret
+  far   -- word is NOT REALLY related to secret
+
+Please do this in a single sitting, judging each pair independently and
+blind (this file deliberately does not show you the AI-assigned tier).
+Don't look up the benchmark source files while doing this -- the whole
+point is an independent judgment to measure how much a human and the
+AI-authored labels agree.
+
+When done, save the completed CSV and hand it back for scoring via
+evals/finetune/score_label_ceiling.py.

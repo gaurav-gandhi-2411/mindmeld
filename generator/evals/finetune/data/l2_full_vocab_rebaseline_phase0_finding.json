@@ -1,0 +1,67 @@
+{
+  "task": "spec-residual-attack.md L2 full-vocab Devanagari front-end rebaseline (2026-07-19)",
+  "outcome": "STOPPED at Phase 0 per the task's own explicit stop condition -- the mandatory single-batch timing check found the full 211-call LLM pass would exceed the entire 180-minute session budget by itself.",
+  "vm": {
+    "name": "hinglish-rebaseline-a1",
+    "zone": "asia-south1-a",
+    "project": "triageiq-portfolio-495022",
+    "machine_type": "n2-standard-8",
+    "created_utc_approx": "2026-07-19T13:26 UTC (18:56 IST)",
+    "deleted": true
+  },
+  "phase0_setup": {
+    "generator_tree_transfer": "52MB tarball via gcloud compute scp, 13s -- verified via MD5 checksum match on embeddings.py, evals/finetune/pmi_mine.py, and the full aksharantar_hi.jsonl (31391c357d13b60a4bf4c2230879c22e local == remote)",
+    "aksharantar_transfer": "115MB via gcloud compute scp, ~20s, 1,299,155 lines confirmed on VM",
+    "uv_sync": "completed clean, sentence_transformers 5.5.1 / torch 2.12.0+cu130 importable",
+    "ollama_install": "installed via official install.sh, CPU-only mode (no GPU on this VM, as expected -- GPU quota is 0 project-wide)",
+    "qwen3_8b_pull": "5.2GB, pulled successfully in ~4 minutes"
+  },
+  "vocab_and_dict_coverage": {
+    "hien_vocab_size": 10495,
+    "romanized_to_devanagari_dict_entries": 1064180,
+    "dict_hits_on_vocab": 5231,
+    "dict_misses_on_vocab": 5264,
+    "note": "matches the spec's prior recon numbers exactly (~5,231 direct hits, ~5,264 needing LLM fallback -- 211 batches at 25/batch)"
+  },
+  "single_batch_timing_finding": {
+    "method": "timed evals.finetune.pmi_mine.llm_devanagari_batch(25 words) against qwen3:8b on the VM, CPU-only, model already resident (warm) -- the exact call shape the full 211-batch run would use",
+    "batch_1_of_25_words": {
+      "elapsed_seconds": 87.8,
+      "resolved": "25/25",
+      "note": "succeeded, but within 2.2s of the default 90s per-call timeout (llm_augment.TIMEOUT_SECONDS=90, reused by pmi_mine.llm_devanagari_batch's underlying _call_ollama)"
+    },
+    "batch_2_of_25_words": {
+      "elapsed_seconds": ">90 (timed out)",
+      "resolved": "0/25",
+      "error": "Could not reach local Ollama ... Underlying error: timed out"
+    },
+    "parallelism_test": {
+      "config": "OLLAMA_NUM_PARALLEL=4, 4 concurrent 25-word batches via ThreadPoolExecutor",
+      "result": "ALL 4 timed out at 90s, 0/25 resolved in every chunk -- CPU-bound inference does not parallelize favorably at this batch size; splitting 8 vCPUs across 4 concurrent generations made every individual request slower, not faster in aggregate",
+      "conclusion": "no cheap parallelism lever available; sequential is the best achievable throughput on this CPU-only n2-standard-8"
+    },
+    "extrapolation": {
+      "batches_needed": 211,
+      "seconds_per_batch_observed": "~88-90 (at or over the current timeout ceiling; a full run would also incur additional retries/backoff for any batch that times out, pushing the real number higher, not lower)",
+      "total_estimated_minutes_sequential": "~309-316 minutes minimum, before any retry overhead",
+      "budget_available_minutes": 180,
+      "budget_already_consumed_at_time_of_finding_minutes": "~21 (provisioning + transfer + setup + this timing test)",
+      "verdict": "the Phase 1 LLM pass ALONE would consume 1.7-1.9x the ENTIRE session's hard budget, leaving zero time for Phase 2 (L2-alone scoring), Phase 3 (L4/L6 retrain), Phase 4 (combo scoring), or Phase 5 (bake-off). This matches the task's explicit stop condition verbatim: 'if a single batch takes long enough that 211 batches would blow the 180-min budget on its own, stop and report that finding rather than plowing ahead blind.'"
+    }
+  },
+  "what_was_NOT_attempted_because_of_this_stop": [
+    "Full 211-batch LLM resolution pass (Phase 1 step 3) -- not started, zero words resolved via LLM this session",
+    "devanagari_front_end_vocab_table.json -- not created (would have been incomplete/misleading to write a dict-only partial table without the LLM half and call it representative of 'full vocab')",
+    "Phase 2 (L2-alone scoring on the shipped model)",
+    "Phase 3 (L4/L6 retrain)",
+    "Phase 4 (combo scoring)",
+    "Phase 5 (bake-off)"
+  ],
+  "candidate_mitigations_not_yet_tried_or_approved": [
+    "Accept a DICT-ONLY front-end (5,231/10,495 words, ~50% coverage) as a smaller-scope L2 rebaseline, explicitly reporting the ~5,264 LLM-only words as still-romanized/unresolved rather than blocking the whole rebaseline on LLM throughput -- this changes the claim from 'full vocab' to 'dict-covered half of vocab' and needs GG sign-off since it changes what the rebaseline actually measures",
+    "Swap the teacher model for a materially smaller/faster one (e.g. a 1-3B model) purely for this bulk transliteration task -- untested for accuracy on this task, a quality tradeoff that should be an explicit decision, not a unilateral substitution",
+    "Split the LLM pass across multiple smaller/parallel VMs (each running its own Ollama instance on a disjoint word slice) -- would need N separate CPU VMs (multiplies cost and setup overhead N-fold) since single-VM parallelism was just proven not to help; a genuine option but a scope/cost decision, not something to improvise mid-session",
+    "Raise per-call timeout well above 90s (e.g. 150s) and accept the ~309-316 min sequential wall-clock as a SEPARATE, dedicated future session with its own budget (not squeezed into this session's 180 min alongside phases 2-5)"
+  ],
+  "recommendation": "Do not proceed further this session. Report to GG for a scope/budget decision before any further GCP spend: either (a) approve a dict-only-coverage L2 rebaseline as a materially smaller claim, (b) approve a dedicated follow-up session budgeted for ~5-6 hours just for the full LLM transliteration pass (Phase 1 alone), or (c) approve a different teacher-model substitution for this specific bulk task. Phases 2-5 (L2 scoring, L4/L6 retrain, combo scoring, bake-off) are all still fully pending and untouched."
+}

@@ -1,0 +1,27 @@
+{
+  "methodology": "Two automated passes with a local qwen3:8b judge (evals/finetune/homograph_audit.py) were run and rejected as unreliable for this task: the first pass (naive prompt) over-triggered heavily, flagging genuine English-loanword synonym pairs as collisions (e.g. mobile->phone, test->exam, fridge->refrigerator, cycle->bicycle -- these are NOT collisions, same meaning, just a borrowed English word). A recalibrated few-shot prompt improved accuracy but hand-validation against 18 known-labeled cases still showed only 14/18 (78%) correct, including a false negative on a genuine collision (band/closed) -- unacceptable given the user's zero-tolerance framing. The final list below is a direct manual linguistic review of all 119 candidates (every crosslingual/LLM-augmented training pair whose Hindi-side token is also present in the game's curated English vocabulary, vocab.load_en_vocab()), superseding both automated runs.",
+  "n_candidates_reviewed": 119,
+  "collisions": {
+    "door": "English 'door' = entrance/hinged panel, vs Hindi 'door' = far. User-flagged example.",
+    "din": "English 'din' = loud noise, vs Hindi 'din' = day.",
+    "band": "English 'band' = musical group / strip of material, vs Hindi 'band' = closed.",
+    "pair": "English 'pair' = two of a kind, vs Hindi 'pair' (पैर) = foot.",
+    "pet": "English 'pet' = domesticated animal, vs Hindi 'pet' (पेट) = stomach.",
+    "chain": "English 'chain' = linked rings / restrain, vs Hindi 'chain' (as in 'chain se') = peace.",
+    "beta": "English 'beta' = Greek letter / pre-release software version, vs Hindi 'beta' = son.",
+    "pita": "English 'pita' = flatbread (pita bread), vs Hindi 'pita' = father.",
+    "teen": "English 'teen' = teenager, vs Hindi 'teen' = the number three.",
+    "agar": "English 'agar' = gelatinous seaweed substance (agar plate/agar-agar), vs Hindi 'agar' = if.",
+    "koi": "English 'koi' = ornamental fish (koi pond), vs Hindi 'koi' = someone.",
+    "mama": "English colloquial 'mama' = mother, vs Hindi 'mama' = maternal uncle (gender-flipped collision).",
+    "nana": "English colloquial 'nana' = grandmother, vs Hindi 'nana' = maternal grandfather (gender-flipped collision)."
+  },
+  "cleared_as_loanwords_or_synonyms": {
+    "note": "these ARE English words but their English meaning IS consistent with the Hinglish pairing -- borrowed/synonym pairs, not collisions.",
+    "examples": ["mobile->phone", "test->exam", "fridge->refrigerator", "cycle->bicycle", "guru->teacher", "match->game", "score->point", "study->learn", "hat->topi", "mat->rug", "rain->baarish", "weather->mausam", "wind->vayu"]
+  },
+  "fuzzy_negative_pairs_corrected": {
+    "guru->music": "removed -- guru is commonly a music/arts teacher in Indian classical tradition (sangeet guru), too related to serve as an 'unrelated' negative.",
+    "jar->can": "removed -- jar and can are near-synonym containers, not semantically unrelated."
+  }
+}

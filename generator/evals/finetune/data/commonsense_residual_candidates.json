@@ -1,0 +1,138 @@
+[
+  {
+    "word": "tarbooz",
+    "gloss": "watermelon",
+    "related": "lal",
+    "related_gloss": "red",
+    "hard_negative": "pyaaz",
+    "hard_negative_gloss": "onion",
+    "current_neighbors": [
+      "taaza", "kharbooze", "tamatar", "sharbat", "baltimore",
+      "tampa", "tawa", "pyaaz", "turkey", "murray",
+      "vegetables", "vegetable", "porridge", "turkish", "urad"
+    ],
+    "related_rank": 473,
+    "vocab_size": 10495,
+    "justification": "tarbooz's own top-15 neighbors are ~10 genuine produce/food co-occurrence words (taaza/fresh, kharbooze/melon, tamatar/tomato, sharbat/juice, pyaaz/onion, vegetables, porridge, urad) plus a handful of proper-name collision noise (baltimore, tampa, murray, turkish) -- the model correctly clusters tarbooz as 'produce/food' from co-occurrence, but the property fact that watermelon flesh is red (known from cutting one open, not from reading about watermelons) is buried at rank 473/10495 (4.5th percentile) despite 'lal' itself being a cleanly-embedded word (own neighbors: red, lily, color, colored, shade, colour -- no collision noise).",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "anaar",
+    "gloss": "pomegranate",
+    "related": "lal",
+    "related_gloss": "red",
+    "hard_negative": "adrak",
+    "hard_negative_gloss": "ginger",
+    "current_neighbors": [
+      "ana", "anna", "urad", "arnold", "andrea",
+      "ryan", "bernard", "acre", "angoor", "agar",
+      "ace", "grain", "paneer", "adrak", "dana"
+    ],
+    "related_rank": 431,
+    "vocab_size": 10495,
+    "justification": "anaar's neighbor list is a mix of proper-name collision (ana, anna, arnold, andrea, ryan, bernard, ace) and genuine food-domain co-occurrence words (urad, angoor, agar, grain, paneer, adrak, dana -- 'dana' is notably the Hindi word for seed/grain, a real co-occurring phrase 'anaar ke dane'/pomegranate seeds). The model captures the food-category and even the 'seed' co-occurrence, but misses that the seeds are specifically RED -- a fact known from seeing/eating the fruit, not from generic food-co-occurrence text. 'lal' (rank 431/10495, 4.1th percentile) is a clean, well-embedded word (own top neighbors: red, lily, color, colored, shade), so the poor rank is not explained by 'lal' itself being corrupted. Caveat: the mix of proper-name collision noise in anaar's own neighbor list makes this a somewhat less clean example than tarbooz/samosa/mirch -- flagged honestly, not a pure case.",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "nariyal",
+    "gloss": "coconut",
+    "related": "safed",
+    "related_gloss": "white",
+    "hard_negative": "peanut",
+    "hard_negative_gloss": "peanut",
+    "current_neighbors": [
+      "nut", "natalie", "nuts", "maple", "dhania",
+      "coconut", "tender", "pyaaz", "norfolk", "delicate",
+      "bean", "berry", "peanut", "napoleon", "tend"
+    ],
+    "related_rank": 2020,
+    "vocab_size": 10495,
+    "justification": "nariyal's neighbors are dominated by genuine nut/produce co-occurrence words (nut, nuts, maple, dhania, coconut itself, tender, pyaaz, delicate, bean, berry, peanut) with only light proper-name collision (natalie, norfolk, napoleon). The model correctly learns 'nariyal is a nut/food' from how coconut is co-occurringly discussed (coconut oil, coconut milk, coconut water -- functional/culinary contexts), but the visual property that its flesh is white is rarely stated as plainly as 'coconut is white' in text and lands at rank 2020/10495 (19.2th percentile) despite 'safed' being a clean, well-embedded word (own top neighbors: white, whites, pale, velvet, peela/yellow, blonde -- no collision noise).",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "samosa",
+    "gloss": "snack",
+    "related": "garm",
+    "related_gloss": "hot",
+    "hard_negative": "sauce",
+    "hard_negative_gloss": "sauce",
+    "current_neighbors": [
+      "sauce", "sausage", "salad", "sam", "sandwich",
+      "sandwiches", "sabzi", "soup", "roti", "porridge",
+      "pakora", "dosa", "cuisine", "rasoi", "dessert"
+    ],
+    "related_rank": 505,
+    "vocab_size": 10495,
+    "justification": "samosa's own neighbor list is the cleanest of all candidates tested -- 14 of 15 are genuine other-dish/snack co-occurrence words (sauce, sausage, salad, sandwich, sabzi, soup, roti, porridge, pakora, dosa, cuisine, dessert), with only 'sam' as stray noise. The model correctly clusters samosa as 'a food/snack' purely from co-occurring with other dish names in text, but the sensory fact that a samosa is eaten fried and hot is not derivable from that co-occurrence pattern and lands at rank 505/10495 (4.8th percentile) -- 'garm' is a clean word (own top neighbors: warm, hot, warmth, heated, heat -- mirrors 'hot' almost exactly, no collision).",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "mirch",
+    "gloss": "chili",
+    "related": "lal",
+    "related_gloss": "red",
+    "hard_negative": "dalchini",
+    "hard_negative_gloss": "cinnamon",
+    "current_neighbors": [
+      "pepper", "kali mirch", "mint", "spice", "ginger",
+      "pyaaz", "spicy", "miranda", "dalchini", "fig",
+      "garlic", "curry", "salad", "chile", "cheese"
+    ],
+    "related_rank": 610,
+    "vocab_size": 10495,
+    "justification": "mirch's neighbors are almost entirely genuine spice/food co-occurrence words (pepper, kali mirch, mint, spice, ginger, pyaaz, dalchini, fig, garlic, curry, salad, cheese), with a single stray collision item ('miranda'). Notably 'spicy' (English) already ranks at 8/10495 -- the model DOES know mirch is spicy from EN-side co-occurrence -- but the equally-clean word 'lal' (own neighbors: red, lily, color, colored, shade -- no collision) still only ranks 610/10495 (5.8th percentile), showing the model captures the taste co-occurrence fact well but not the visual color property (most red/lal mirch is visually red), a fact from seeing the ingredient rather than reading recipe text.",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "jharna",
+    "gloss": "waterfall",
+    "related": "loud",
+    "related_gloss": "loud",
+    "hard_negative": "foliage",
+    "hard_negative_gloss": "foliage",
+    "current_neighbors": [
+      "jharu", "shower", "shade", "showers", "foliage",
+      "arnold", "fountain", "glenn", "jheel", "vegetation",
+      "rainbow", "jeffrey", "shane", "tawa", "lightning"
+    ],
+    "related_rank": 4082,
+    "vocab_size": 10495,
+    "justification": "jharna's neighbors are roughly half genuine nature/water-imagery co-occurrence words (shower, showers, foliage, fountain, vegetation, rainbow, lightning) and half proper-name collision (arnold, glenn, jeffrey, shane) -- caveated as a mixed case, not a pure one. The model captures the VISUAL nature-scene co-occurrence (waterfalls described alongside foliage, fountains, rainbows in text) but misses the defining SENSORY property of a waterfall -- its roar/sound, known from standing near one, not from reading nature descriptions. 'loud' is a clean word (own top neighbors: loudly, louder, shouted, shout, shouting, noise, sound -- no collision) yet ranks only 4082/10495 (38.9th percentile), the worst rank of any candidate here.",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "til",
+    "gloss": "sesame",
+    "related": "kala",
+    "related_gloss": "black",
+    "hard_negative": "tel",
+    "hard_negative_gloss": "oil",
+    "current_neighbors": [
+      "tel", "tyler", "tin", "tail", "peel",
+      "seeds", "tea", "dal", "chai", "mint",
+      "chile", "tend", "lil", "fig", "fruit"
+    ],
+    "related_rank": 1025,
+    "vocab_size": 10495,
+    "justification": "til's neighbors correctly include 'seeds' (rank 6) and 'tel'/oil (rank 1) -- the model knows til is a seed/oil-producing food from co-occurrence (til ka tel, sesame oil) -- but the specific fact that the common Indian variety is black-seeded ('kaale til') is a visual property from seeing the ingredient, not from oil/cooking co-occurrence text, and 'kala' (a clean word: own neighbors black, colours, colour, color, blacks -- no collision) ranks only 1025/10495 (9.8th percentile). Some light collision noise present (tyler, lil).",
+    "no_leakage_verified": true
+  },
+  {
+    "word": "dudh",
+    "gloss": "milk",
+    "related": "safed",
+    "related_gloss": "white",
+    "hard_negative": "syrup",
+    "hard_negative_gloss": "syrup",
+    "current_neighbors": [
+      "milk", "yogurt", "curd", "dairy", "dahi",
+      "kheer", "sugar", "syrup", "butter", "drink",
+      "cum", "mithai", "tea", "drinks", "chai"
+    ],
+    "related_rank": 683,
+    "vocab_size": 10495,
+    "justification": "dudh's own neighbor list is nearly perfect dairy/food co-occurrence (milk, yogurt, curd, dairy, kheer, sugar, syrup, butter, drink, mithai, tea) with essentially zero collision noise. 'safed' is clean (own neighbors: white, whites, pale, velvet, peela/yellow) yet only ranks 683/10495 (6.5th percentile). WEAKEST/most caveated candidate of the eight: 'milk is white' is such a common explicit statement in English text that this gap plausibly reflects insufficient co-occurrence learning rather than a pure world-knowledge-only fact -- included for completeness and honesty, not claimed as the cleanest evidence.",
+    "no_leakage_verified": true
+  }
+]

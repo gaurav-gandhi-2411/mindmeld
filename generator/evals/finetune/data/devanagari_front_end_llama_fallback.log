@@ -1,0 +1,46 @@
+2026-07-23 10:29:11,088 INFO 275 words still null in checkpoint -- attempting llama3.1:8b fallback
+2026-07-23 10:31:47,176 INFO batch 1/11 done in 156.1s: 25/25 resolved, checkpoint saved
+2026-07-23 10:34:10,505 INFO batch 2/11 done in 143.3s: 25/25 resolved, checkpoint saved
+2026-07-23 10:36:43,192 INFO batch 3/11 done in 152.7s: 25/25 resolved, checkpoint saved
+2026-07-23 10:39:38,420 INFO batch 4/11 done in 175.2s: 25/25 resolved, checkpoint saved
+2026-07-23 10:42:00,391 INFO batch 5/11 done in 142.0s: 25/25 resolved, checkpoint saved
+2026-07-23 10:45:00,491 ERROR llama3.1:8b batch call failed
+Traceback (most recent call last):
+  File "/home/gaura/generator/evals/finetune/resolve_devanagari_llama_fallback.py", line 64, in _llm_devanagari_batch_llama
+    with urllib.request.urlopen(request, timeout=CALL_TIMEOUT_SECONDS) as response:  # noqa: S310
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 187, in urlopen
+    return opener.open(url, data, timeout)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 487, in open
+    response = self._open(req, data)
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 504, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+                              '_open', req)
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 464, in _call_chain
+    result = func(*args)
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 1350, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/urllib/request.py", line 1325, in do_open
+    r = h.getresponse()
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/http/client.py", line 1459, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/http/client.py", line 336, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/http/client.py", line 297, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/gaura/.local/share/uv/python/cpython-3.14.6-linux-x86_64-gnu/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+TimeoutError: timed out
+2026-07-23 10:45:00,501 INFO batch 6/11 done in 180.1s: 0/25 resolved, checkpoint saved
+2026-07-23 10:47:31,456 INFO batch 7/11 done in 151.0s: 25/25 resolved, checkpoint saved
+2026-07-23 10:50:07,956 INFO batch 8/11 done in 156.5s: 25/25 resolved, checkpoint saved
+2026-07-23 10:52:37,493 INFO batch 9/11 done in 149.5s: 24/25 resolved, checkpoint saved
+2026-07-23 10:55:14,682 INFO batch 10/11 done in 157.2s: 25/25 resolved, checkpoint saved
+2026-07-23 10:57:50,821 INFO batch 11/11 done in 156.1s: 25/25 resolved, checkpoint saved
+2026-07-23 10:57:50,847 INFO FINAL: 10467/10495 resolved, 28 still unresolved after both LLM fallbacks: ['lamba', 'kursi', 'darpan', 'tele', 'computer', 'mobile', 'camera', 'radio', 'fan', 'heater', 'fridge', 'washing machine', 'microwave', 'pressure cooker', 'bartan', 'thali', 'gilas', 'chamcha', 'kaanta', 'jharu', 'sabun', 'mirror', 'razor', 'cream', 'powder', 'aatma', 'himmat', 'yatra']

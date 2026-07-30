@@ -1,0 +1,1201 @@
+{
+  "test_secrets_n": 50,
+  "excluded_candidates": {
+    "ande": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "bank": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "ganna": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "hara": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "heera": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "ret": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sandook": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "bua": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "mama": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "mami": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "patli": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tele": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chappal": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gora": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "hing": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "krishna": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "nani": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "patla": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "washing machine": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chaand": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "jawaani": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kyon": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "lassi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "matar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "post office": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "railway": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "aloo": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "andhera": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chaar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chandi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chane": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chhe": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chimni": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "dosa": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "fridge": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "garm": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "jeera": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "juta": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "karela": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "metro": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "mez": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "mooli": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "namak": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "nana": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "paisa": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "palak": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "patthar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "peher": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sabun": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sau": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sharbat": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sitara": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "ulta": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "yatra": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "bedroom": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "bhook": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "budhi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chai": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chamcha": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "dalchini": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "fan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "halwa": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "heater": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "jawaan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "moong": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "muh": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "nila": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "phal": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sarson": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "seedi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "station": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tamatar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "teen": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tel": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "theek": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tika": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "til": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "aam": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "agar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "andar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "angocha": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "baaliya": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "bagicha": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "behen": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chashma": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chattan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "cheeni": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "cycle": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "dada": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "darpan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "door": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "fielder": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gajar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gaon": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gilas": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "haan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "hall": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kaanta": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kala": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kangan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kela": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "maa": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "naak": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "paanch": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "pahad": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "parivar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "pressure cooker": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "pulao": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sach": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "safed": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "salwar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "seedha": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tahni": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "aath": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "baal": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "baalcony": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chachi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chawal": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "chitra": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "cream": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "daant": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "dadi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "dahi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "das": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "deewar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gaala": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "gusse": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "haar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "har": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "idli": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "jaan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kaddu": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kapda": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "khana": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "kursi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "lauki": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "masoor": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "mausi": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "pareshan": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "pati": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "patta": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "poora": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "raita": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "ram": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "saat": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "sar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "shiva": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "thaila": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "toh": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "tokri": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "upar": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "wicket": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)",
+    "zameen": "no Aksharantar dict entry (LLM-fallback-only or fully unresolved)"
+  },
+  "full_batch_result": {
+    "n_patch_words": 58,
+    "patch_words": [
+      "ac",
+      "accha",
+      "airport",
+      "akela",
+      "almirah",
+      "anaar",
+      "badbu",
+      "baigan",
+      "baingan",
+      "besan",
+      "birthday",
+      "chinta",
+      "chutney",
+      "comb",
+      "daraa",
+      "darr",
+      "dhania",
+      "fanoos",
+      "finalist",
+      "ghagra",
+      "haddi",
+      "honth",
+      "imli",
+      "jheel",
+      "junoon",
+      "katora",
+      "laung",
+      "lehnga",
+      "machli",
+      "methi",
+      "mixer",
+      "mohalla",
+      "mombatti",
+      "nahin",
+      "nata",
+      "papad",
+      "patthi",
+      "pocha",
+      "rainbow",
+      "rasoi",
+      "registan",
+      "samunder",
+      "santara",
+      "saree",
+      "saunf",
+      "seb",
+      "seena",
+      "sem",
+      "sharm",
+      "sharminda",
+      "sunehra",
+      "tadap",
+      "tawa",
+      "tez",
+      "tinda",
+      "toaster",
+      "udaasi",
+      "urad"
+    ],
+    "dim1_regression_floor": {
+      "n_shared_pairs": 379,
+      "n_fixed": 11,
+      "n_broken": 4,
+      "net": 7,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "besan/legume",
+        "jheel/lagoon",
+        "jheel/lake",
+        "junoon/passion",
+        "junoon/sunshine",
+        "junoon/zeal",
+        "registan/desert",
+        "registan/dune",
+        "registan/wasteland",
+        "udaasi/melancholy",
+        "udaasi/sadness"
+      ],
+      "broken_pairs": [
+        "chinta/unease",
+        "chinta/worry",
+        "mausi/gora",
+        "mazaa/relaxing"
+      ]
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 50,
+      "n_fixed": 4,
+      "n_broken": 1,
+      "net": 3,
+      "zero_net_regression": true,
+      "zero_regression_strict": false,
+      "fixed_pairs": [
+        "desert->registan",
+        "lake->jheel",
+        "passion->junoon",
+        "sadness->udaasi"
+      ],
+      "broken_pairs": [
+        "worry->chinta"
+      ]
+    },
+    "topheavy_paired_delta": {
+      "n_clusters": 42,
+      "secret_mismatch": null,
+      "ndcg": {
+        "10": {
+          "baseline_point": 0.16463471371340893,
+          "candidate_point": 0.21488006617535862,
+          "delta_point": 0.050245352461949694,
+          "ci_95": [
+            0.013287284936992631,
+            0.09476395709323408
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "50": {
+          "baseline_point": 0.2114638122200802,
+          "candidate_point": 0.27249413079419627,
+          "delta_point": 0.06103031857411606,
+          "ci_95": [
+            0.01674673516112512,
+            0.11542205739323357
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "100": {
+          "baseline_point": 0.2211326307462825,
+          "candidate_point": 0.28255251621387234,
+          "delta_point": 0.061419885467589835,
+          "ci_95": [
+            0.01762323363712092,
+            0.11531604620334142
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        }
+      },
+      "recall": {
+        "10": {
+          "baseline_point": 0.16865079365079363,
+          "candidate_point": 0.22222222222222218,
+          "delta_point": 0.05357142857142855,
+          "ci_95": [
+            0.01190476190476189,
+            0.10714285714285715
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "50": {
+          "baseline_point": 0.32142857142857145,
+          "candidate_point": 0.4166666666666667,
+          "delta_point": 0.09523809523809523,
+          "ci_95": [
+            0.023809523809523836,
+            0.1785714285714286
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "100": {
+          "baseline_point": 0.35714285714285715,
+          "candidate_point": 0.4583333333333333,
+          "delta_point": 0.10119047619047616,
+          "ci_95": [
+            0.029761904761904767,
+            0.19047619047619047
+          ],
+          "ci_significant_improvement": true,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        }
+      },
+      "precision": {
+        "10": {
+          "baseline_point": 1.0,
+          "candidate_point": 1.0,
+          "delta_point": 0.0,
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "ci_significant_improvement": false,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "50": {
+          "baseline_point": 1.0,
+          "candidate_point": 1.0,
+          "delta_point": 0.0,
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "ci_significant_improvement": false,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        },
+        "100": {
+          "baseline_point": 0.9642857142857143,
+          "candidate_point": 1.0,
+          "delta_point": 0.0357142857142857,
+          "ci_95": [
+            0.0,
+            0.11538461538461542
+          ],
+          "ci_significant_improvement": false,
+          "ci_significant_regression": false,
+          "n_valid_bootstrap_draws": 10000
+        }
+      },
+      "mrr": {
+        "baseline_point": 0.19628189942241292,
+        "candidate_point": 0.25565886974196106,
+        "delta_point": 0.05937697031954814,
+        "ci_95": [
+          0.014389283214492005,
+          0.11213714147978085
+        ],
+        "ci_significant_improvement": true,
+        "ci_significant_regression": false,
+        "n_valid_bootstrap_draws": 10000
+      }
+    },
+    "zero_net_regression_verdict": false
+  },
+  "bisection": {
+    "attempts": [
+      {
+        "prefix_size": 40,
+        "n_patch_words": 44,
+        "patch_words": [
+          "ac",
+          "accha",
+          "airport",
+          "akela",
+          "almirah",
+          "anaar",
+          "badbu",
+          "baigan",
+          "baingan",
+          "besan",
+          "birthday",
+          "chinta",
+          "chutney",
+          "comb",
+          "darr",
+          "finalist",
+          "ghagra",
+          "haddi",
+          "honth",
+          "imli",
+          "jheel",
+          "junoon",
+          "laung",
+          "lehnga",
+          "machli",
+          "mixer",
+          "mombatti",
+          "nata",
+          "papad",
+          "patthi",
+          "rainbow",
+          "registan",
+          "samunder",
+          "santara",
+          "saunf",
+          "seb",
+          "seena",
+          "sem",
+          "sharm",
+          "sharminda",
+          "sunehra",
+          "tinda",
+          "toaster",
+          "udaasi"
+        ],
+        "dim1_regression_floor": {
+          "n_shared_pairs": 379,
+          "n_fixed": 11,
+          "n_broken": 3,
+          "net": 8,
+          "zero_net_regression": true,
+          "zero_regression_strict": false,
+          "fixed_pairs": [
+            "besan/legume",
+            "jheel/lagoon",
+            "jheel/lake",
+            "junoon/passion",
+            "junoon/sunshine",
+            "junoon/zeal",
+            "registan/desert",
+            "registan/dune",
+            "registan/wasteland",
+            "udaasi/melancholy",
+            "udaasi/sadness"
+          ],
+          "broken_pairs": [
+            "chinta/unease",
+            "chinta/worry",
+            "mausi/gora"
+          ]
+        },
+        "dim2_regression_floor": {
+          "n_shared_pairs": 50,
+          "n_fixed": 4,
+          "n_broken": 1,
+          "net": 3,
+          "zero_net_regression": true,
+          "zero_regression_strict": false,
+          "fixed_pairs": [
+            "desert->registan",
+            "lake->jheel",
+            "passion->junoon",
+            "sadness->udaasi"
+          ],
+          "broken_pairs": [
+            "worry->chinta"
+          ]
+        },
+        "topheavy_paired_delta": {
+          "n_clusters": 42,
+          "secret_mismatch": null,
+          "ndcg": {
+            "10": {
+              "baseline_point": 0.16463471371340893,
+              "candidate_point": 0.21061446429500577,
+              "delta_point": 0.04597975058159684,
+              "ci_95": [
+                0.009646363769338334,
+                0.0906393404413561
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.2114638122200802,
+              "candidate_point": 0.27308492944524604,
+              "delta_point": 0.06162111722516583,
+              "ci_95": [
+                0.0171974162953748,
+                0.11577802526378642
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.2211326307462825,
+              "candidate_point": 0.28034741944011643,
+              "delta_point": 0.059214788693833925,
+              "ci_95": [
+                0.01518654011916436,
+                0.11314692733794707
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "recall": {
+            "10": {
+              "baseline_point": 0.16865079365079363,
+              "candidate_point": 0.21626984126984125,
+              "delta_point": 0.047619047619047616,
+              "ci_95": [
+                0.005952380952380959,
+                0.10119047619047619
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.32142857142857145,
+              "candidate_point": 0.4226190476190476,
+              "delta_point": 0.10119047619047616,
+              "ci_95": [
+                0.029761904761904767,
+                0.1845238095238096
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.35714285714285715,
+              "candidate_point": 0.4523809523809524,
+              "delta_point": 0.09523809523809523,
+              "ci_95": [
+                0.023809523809523836,
+                0.1845238095238095
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "precision": {
+            "10": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.9642857142857143,
+              "candidate_point": 1.0,
+              "delta_point": 0.0357142857142857,
+              "ci_95": [
+                0.0,
+                0.11538461538461542
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "mrr": {
+            "baseline_point": 0.19628189942241292,
+            "candidate_point": 0.25565266431004763,
+            "delta_point": 0.05937076488763471,
+            "ci_95": [
+              0.01439267021492476,
+              0.11212415488152142
+            ],
+            "ci_significant_improvement": true,
+            "ci_significant_regression": false,
+            "n_valid_bootstrap_draws": 10000
+          }
+        },
+        "zero_net_regression_verdict": false
+      },
+      {
+        "prefix_size": 20,
+        "n_patch_words": 24,
+        "patch_words": [
+          "ac",
+          "airport",
+          "akela",
+          "baigan",
+          "baingan",
+          "besan",
+          "comb",
+          "darr",
+          "haddi",
+          "jheel",
+          "junoon",
+          "laung",
+          "mombatti",
+          "papad",
+          "patthi",
+          "registan",
+          "samunder",
+          "santara",
+          "seb",
+          "sem",
+          "sharm",
+          "tinda",
+          "toaster",
+          "udaasi"
+        ],
+        "dim1_regression_floor": {
+          "n_shared_pairs": 379,
+          "n_fixed": 11,
+          "n_broken": 1,
+          "net": 10,
+          "zero_net_regression": true,
+          "zero_regression_strict": false,
+          "fixed_pairs": [
+            "besan/legume",
+            "jheel/lagoon",
+            "jheel/lake",
+            "junoon/passion",
+            "junoon/sunshine",
+            "junoon/zeal",
+            "registan/desert",
+            "registan/dune",
+            "registan/wasteland",
+            "udaasi/melancholy",
+            "udaasi/sadness"
+          ],
+          "broken_pairs": [
+            "mausi/gora"
+          ]
+        },
+        "dim2_regression_floor": {
+          "n_shared_pairs": 50,
+          "n_fixed": 4,
+          "n_broken": 0,
+          "net": 4,
+          "zero_net_regression": true,
+          "zero_regression_strict": true,
+          "fixed_pairs": [
+            "desert->registan",
+            "lake->jheel",
+            "passion->junoon",
+            "sadness->udaasi"
+          ],
+          "broken_pairs": []
+        },
+        "topheavy_paired_delta": {
+          "n_clusters": 42,
+          "secret_mismatch": null,
+          "ndcg": {
+            "10": {
+              "baseline_point": 0.16463471371340893,
+              "candidate_point": 0.2143370843302196,
+              "delta_point": 0.04970237061681068,
+              "ci_95": [
+                0.015477522276852979,
+                0.09317884339552801
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.2114638122200802,
+              "candidate_point": 0.2790234240445641,
+              "delta_point": 0.06755961182448389,
+              "ci_95": [
+                0.022277479957460048,
+                0.12240349938136513
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.2211326307462825,
+              "candidate_point": 0.2841738257701509,
+              "delta_point": 0.06304119502386837,
+              "ci_95": [
+                0.01950179308174114,
+                0.1161527800754553
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "recall": {
+            "10": {
+              "baseline_point": 0.16865079365079363,
+              "candidate_point": 0.22222222222222218,
+              "delta_point": 0.05357142857142855,
+              "ci_95": [
+                0.011904761904761918,
+                0.10714285714285712
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.32142857142857145,
+              "candidate_point": 0.43452380952380953,
+              "delta_point": 0.11309523809523808,
+              "ci_95": [
+                0.04166666666666666,
+                0.20238095238095238
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.35714285714285715,
+              "candidate_point": 0.4583333333333333,
+              "delta_point": 0.10119047619047616,
+              "ci_95": [
+                0.029761904761904767,
+                0.19047619047619047
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "precision": {
+            "10": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.9642857142857143,
+              "candidate_point": 1.0,
+              "delta_point": 0.0357142857142857,
+              "ci_95": [
+                0.0,
+                0.11538461538461542
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "mrr": {
+            "baseline_point": 0.19628189942241292,
+            "candidate_point": 0.25820016584232225,
+            "delta_point": 0.06191826641990933,
+            "ci_95": [
+              0.016833629771111962,
+              0.11654136268501032
+            ],
+            "ci_significant_improvement": true,
+            "ci_significant_regression": false,
+            "n_valid_bootstrap_draws": 10000
+          }
+        },
+        "zero_net_regression_verdict": false
+      },
+      {
+        "prefix_size": 10,
+        "n_patch_words": 14,
+        "patch_words": [
+          "akela",
+          "baingan",
+          "comb",
+          "darr",
+          "jheel",
+          "junoon",
+          "laung",
+          "registan",
+          "seb",
+          "sem",
+          "sharm",
+          "tinda",
+          "toaster",
+          "udaasi"
+        ],
+        "dim1_regression_floor": {
+          "n_shared_pairs": 379,
+          "n_fixed": 10,
+          "n_broken": 2,
+          "net": 8,
+          "zero_net_regression": true,
+          "zero_regression_strict": false,
+          "fixed_pairs": [
+            "jheel/lagoon",
+            "jheel/lake",
+            "junoon/passion",
+            "junoon/sunshine",
+            "junoon/zeal",
+            "registan/desert",
+            "registan/dune",
+            "registan/wasteland",
+            "udaasi/melancholy",
+            "udaasi/sadness"
+          ],
+          "broken_pairs": [
+            "mausi/gora",
+            "mazaa/relaxing"
+          ]
+        },
+        "dim2_regression_floor": {
+          "n_shared_pairs": 50,
+          "n_fixed": 4,
+          "n_broken": 0,
+          "net": 4,
+          "zero_net_regression": true,
+          "zero_regression_strict": true,
+          "fixed_pairs": [
+            "desert->registan",
+            "lake->jheel",
+            "passion->junoon",
+            "sadness->udaasi"
+          ],
+          "broken_pairs": []
+        },
+        "topheavy_paired_delta": {
+          "n_clusters": 42,
+          "secret_mismatch": null,
+          "ndcg": {
+            "10": {
+              "baseline_point": 0.16463471371340893,
+              "candidate_point": 0.2065983231917931,
+              "delta_point": 0.04196360947838418,
+              "ci_95": [
+                0.009499603235338938,
+                0.08392721895676834
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.2114638122200802,
+              "candidate_point": 0.2666236831059176,
+              "delta_point": 0.0551598708858374,
+              "ci_95": [
+                0.014025946680705864,
+                0.10672183037313615
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.2211326307462825,
+              "candidate_point": 0.27203298617342137,
+              "delta_point": 0.05090035542713886,
+              "ci_95": [
+                0.011825354612613895,
+                0.1023780420173645
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "recall": {
+            "10": {
+              "baseline_point": 0.16865079365079363,
+              "candidate_point": 0.21626984126984125,
+              "delta_point": 0.047619047619047616,
+              "ci_95": [
+                0.01190476190476189,
+                0.10119047619047616
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.32142857142857145,
+              "candidate_point": 0.4107142857142857,
+              "delta_point": 0.08928571428571425,
+              "ci_95": [
+                0.023809523809523836,
+                0.17261904761904762
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.35714285714285715,
+              "candidate_point": 0.43452380952380953,
+              "delta_point": 0.07738095238095238,
+              "ci_95": [
+                0.01785714285714285,
+                0.1607142857142857
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "precision": {
+            "10": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.9642857142857143,
+              "candidate_point": 1.0,
+              "delta_point": 0.0357142857142857,
+              "ci_95": [
+                0.0,
+                0.11538461538461542
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "mrr": {
+            "baseline_point": 0.19628189942241292,
+            "candidate_point": 0.24646666536126632,
+            "delta_point": 0.050184765938853404,
+            "ci_95": [
+              0.011988994918110646,
+              0.09783363365170807
+            ],
+            "ci_significant_improvement": true,
+            "ci_significant_regression": false,
+            "n_valid_bootstrap_draws": 10000
+          }
+        },
+        "zero_net_regression_verdict": false
+      },
+      {
+        "prefix_size": 5,
+        "n_patch_words": 9,
+        "patch_words": [
+          "baingan",
+          "comb",
+          "darr",
+          "jheel",
+          "junoon",
+          "registan",
+          "sharm",
+          "tinda",
+          "udaasi"
+        ],
+        "dim1_regression_floor": {
+          "n_shared_pairs": 379,
+          "n_fixed": 10,
+          "n_broken": 2,
+          "net": 8,
+          "zero_net_regression": true,
+          "zero_regression_strict": false,
+          "fixed_pairs": [
+            "jheel/lagoon",
+            "jheel/lake",
+            "junoon/passion",
+            "junoon/sunshine",
+            "junoon/zeal",
+            "registan/desert",
+            "registan/dune",
+            "registan/wasteland",
+            "udaasi/melancholy",
+            "udaasi/sadness"
+          ],
+          "broken_pairs": [
+            "mausi/gora",
+            "mazaa/relaxing"
+          ]
+        },
+        "dim2_regression_floor": {
+          "n_shared_pairs": 50,
+          "n_fixed": 4,
+          "n_broken": 0,
+          "net": 4,
+          "zero_net_regression": true,
+          "zero_regression_strict": true,
+          "fixed_pairs": [
+            "desert->registan",
+            "lake->jheel",
+            "passion->junoon",
+            "sadness->udaasi"
+          ],
+          "broken_pairs": []
+        },
+        "topheavy_paired_delta": {
+          "n_clusters": 42,
+          "secret_mismatch": null,
+          "ndcg": {
+            "10": {
+              "baseline_point": 0.16463471371340893,
+              "candidate_point": 0.2065983231917931,
+              "delta_point": 0.04196360947838418,
+              "ci_95": [
+                0.009499603235338938,
+                0.08392721895676834
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.2114638122200802,
+              "candidate_point": 0.2665918877852518,
+              "delta_point": 0.055128075565171575,
+              "ci_95": [
+                0.013987378295988201,
+                0.1067210354901195
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.2211326307462825,
+              "candidate_point": 0.2719914316615904,
+              "delta_point": 0.050858800915307895,
+              "ci_95": [
+                0.011796457603097943,
+                0.10233699847344238
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "recall": {
+            "10": {
+              "baseline_point": 0.16865079365079363,
+              "candidate_point": 0.21626984126984125,
+              "delta_point": 0.047619047619047616,
+              "ci_95": [
+                0.01190476190476189,
+                0.10119047619047616
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 0.32142857142857145,
+              "candidate_point": 0.4107142857142857,
+              "delta_point": 0.08928571428571425,
+              "ci_95": [
+                0.023809523809523836,
+                0.17261904761904762
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.35714285714285715,
+              "candidate_point": 0.43452380952380953,
+              "delta_point": 0.07738095238095238,
+              "ci_95": [
+                0.01785714285714285,
+                0.1607142857142857
+              ],
+              "ci_significant_improvement": true,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "precision": {
+            "10": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "50": {
+              "baseline_point": 1.0,
+              "candidate_point": 1.0,
+              "delta_point": 0.0,
+              "ci_95": [
+                0.0,
+                0.0
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            },
+            "100": {
+              "baseline_point": 0.9642857142857143,
+              "candidate_point": 1.0,
+              "delta_point": 0.0357142857142857,
+              "ci_95": [
+                0.0,
+                0.11538461538461542
+              ],
+              "ci_significant_improvement": false,
+              "ci_significant_regression": false,
+              "n_valid_bootstrap_draws": 10000
+            }
+          },
+          "mrr": {
+            "baseline_point": 0.19628189942241292,
+            "candidate_point": 0.24641804096839856,
+            "delta_point": 0.05013614154598564,
+            "ci_95": [
+              0.011940444141688402,
+              0.09773739823356933
+            ],
+            "ci_significant_improvement": true,
+            "ci_significant_regression": false,
+            "n_valid_bootstrap_draws": 10000
+          }
+        },
+        "zero_net_regression_verdict": false
+      }
+    ],
+    "safe_prefix_size": null
+  }
+}

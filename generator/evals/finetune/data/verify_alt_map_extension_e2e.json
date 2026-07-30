@@ -1,0 +1,165 @@
+{
+  "sample_secrets": [
+    "azaadi",
+    "besan",
+    "bhanja",
+    "bhanji",
+    "dehat",
+    "judwaa",
+    "khichdi",
+    "mazaa",
+    "mohalla",
+    "samunder",
+    "sharm",
+    "waqt",
+    "aadmi",
+    "accha",
+    "achaar",
+    "airport",
+    "almirah"
+  ],
+  "n_checked": 26,
+  "n_pass": 26,
+  "n_fail": 0,
+  "failures": [],
+  "per_secret_results": {
+    "azaadi": [
+      {
+        "alias": "aazaadi",
+        "ok": true
+      }
+    ],
+    "besan": [
+      {
+        "alias": "besson",
+        "ok": true
+      }
+    ],
+    "bhanja": [
+      {
+        "alias": "bhanj",
+        "ok": true
+      }
+    ],
+    "bhanji": [
+      {
+        "alias": "bhanajee",
+        "ok": true
+      }
+    ],
+    "dehat": [
+      {
+        "alias": "dohat",
+        "ok": true
+      }
+    ],
+    "judwaa": [
+      {
+        "alias": "judva",
+        "ok": true
+      },
+      {
+        "alias": "judwa",
+        "ok": true
+      }
+    ],
+    "khichdi": [
+      {
+        "alias": "khichadi",
+        "ok": true
+      },
+      {
+        "alias": "khichari",
+        "ok": true
+      },
+      {
+        "alias": "khichidi",
+        "ok": true
+      }
+    ],
+    "mazaa": [
+      {
+        "alias": "maanaa",
+        "ok": true
+      },
+      {
+        "alias": "maaza",
+        "ok": true
+      },
+      {
+        "alias": "mansa",
+        "ok": true
+      }
+    ],
+    "mohalla": [
+      {
+        "alias": "mauhalla",
+        "ok": true
+      },
+      {
+        "alias": "mauhalle",
+        "ok": true
+      }
+    ],
+    "samunder": [
+      {
+        "alias": "samudra",
+        "ok": true
+      },
+      {
+        "alias": "samundra",
+        "ok": true
+      }
+    ],
+    "sharm": [
+      {
+        "alias": "sharum",
+        "ok": true
+      },
+      {
+        "alias": "shrm",
+        "ok": true
+      }
+    ],
+    "waqt": [
+      {
+        "alias": "vaqt",
+        "ok": true
+      }
+    ],
+    "aadmi": [
+      {
+        "alias": "admi",
+        "ok": true
+      }
+    ],
+    "accha": [
+      {
+        "alias": "achcha",
+        "ok": true
+      }
+    ],
+    "achaar": [
+      {
+        "alias": "achaara",
+        "ok": true
+      }
+    ],
+    "airport": [
+      {
+        "alias": "aiyarport",
+        "ok": true
+      },
+      {
+        "alias": "ayaraport",
+        "ok": true
+      }
+    ],
+    "almirah": [
+      {
+        "alias": "almirahs",
+        "ok": true
+      }
+    ]
+  }
+}

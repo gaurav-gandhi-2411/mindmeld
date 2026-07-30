@@ -1,0 +1,622 @@
+{
+  "bachpan::innocence": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The association between 'bachpan' and 'innocence' is real but abstract/weak, not a systematic model bug.",
+    "confidence": 5
+  },
+  "bachpan::past": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bachpan' and 'past' involves a subtle temporal abstraction that is real but not strongly captured by the model.",
+    "confidence": 5
+  },
+  "bagicha::yard": {
+    "category": "polysemy_gloss_ambiguity",
+    "rationale": "The word 'yard' has multiple senses (unit of length vs. garden yard) and the model likely embedded the wrong sense.",
+    "confidence": 5
+  },
+  "bagicha::phool": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bagicha' (garden) and 'phool' (flower) is real but subtle, as flowers are commonly found in gardens, yet the association is not strong enough to place it in the expected warm band.",
+    "confidence": 5
+  },
+  "bagicha::plant": {
+    "category": "polysemy_gloss_ambiguity",
+    "rationale": "The word 'plant' has multiple senses (e.g., garden plant vs. to install) and the model likely embedded the wrong sense in relation to 'bagicha' (garden).",
+    "confidence": 5
+  },
+  "bagicha::lawn": {
+    "category": "polysemy_gloss_ambiguity",
+    "rationale": "The word 'lawn' has multiple senses (e.g., a grassy area vs. a unit of measurement), and the model likely embedded the wrong sense given the secret word 'bagicha' (garden).",
+    "confidence": 5
+  },
+  "chaand::satellite": {
+    "category": "commonsense_world_knowledge",
+    "rationale": "The relation requires knowing 'the moon is a satellite,' a specific fact not captured by general co-occurrence statistics.",
+    "confidence": 5
+  },
+  "chaand::eclipse": {
+    "category": "commonsense_world_knowledge",
+    "rationale": "The relation between 'chaand' (moon) and 'eclipse' requires understanding the astronomical event where the moon passes between the Earth and the sun, a specific fact not captured by general co-occurrence.",
+    "confidence": 5
+  },
+  "chaand::sky": {
+    "category": "commonsense_world_knowledge",
+    "rationale": "The relation between 'chaand' (moon) and 'sky' requires knowing the moon is part of the sky, a specific fact not captured by general co-occurrence.",
+    "confidence": 5
+  },
+  "khazana::gold": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'khazana' and 'gold' is real but subtle, as treasure can often imply gold specifically, yet the model placed it in a band that is closer than intended.",
+    "confidence": 5
+  },
+  "khazana::gem": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'khazana' and 'gem' is real but subtle, as treasure can include gems but is not exclusively about them, leading to a weaker association than expected.",
+    "confidence": 4
+  },
+  "khazana::wealth": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'khazana' (treasure) and 'wealth' is real but subtle, involving abstract economic concepts rather than direct synonymy.",
+    "confidence": 5
+  },
+  "pahad::climb": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "Climbing a hill (pahad) is a common action, but the semantic relation is subtle and context-dependent, making it a challenging association for the model to capture accurately.",
+    "confidence": 4
+  },
+  "pahad::snow": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'pahad' (mountain) and 'snow' is real but subtle, as mountains can have snow but it's not a direct or strong association compared to other words.",
+    "confidence": 5
+  },
+  "pahad::strain": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'pahad' and 'strain' is subtle and context-dependent, reflecting a nuanced semantic connection rather than a systematic model bug.",
+    "confidence": 5
+  },
+  "parivar::parents": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'parivar' and 'parents' is semantically close but subtle, involving cultural and familial concepts that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "parivar::ghar": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'parivar' (family) and 'ghar' (house) is semantically nuanced and context-dependent, making it a subtle association that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "phool::khushbu": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The model associates 'phool' (flower) with 'khushbu' (fragrance) strongly, reflecting a real but subtle semantic link, yet the human expected a warmer band, indicating a nuanced difficulty in capturing the intended relation.",
+    "confidence": 4
+  },
+  "samunder::beach": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'samunder' (ocean) and 'beach' is real but subtle, involving a contextual association rather than a direct semantic link.",
+    "confidence": 5
+  },
+  "samunder::wave": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'samunder' (ocean) and 'wave' is real but subtle, as waves are a common feature of oceans but not a direct synonym or defining characteristic.",
+    "confidence": 5
+  },
+  "azaadi::rights": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'azaadi' (freedom) and 'rights' is real but subtle, as freedom is closely tied to certain rights but not all, making the association nuanced and challenging for the model to capture precisely.",
+    "confidence": 5
+  },
+  "azaadi::release": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'azaadi' (freedom) and 'release' is semantically close but subtle, reflecting a nuanced conceptual link rather than a systematic model error.",
+    "confidence": 5
+  },
+  "basti::migrant": {
+    "category": "vocab_resolution_gap",
+    "rationale": "secret='basti' or word='migrant' not in vocab",
+    "confidence": 5
+  },
+  "basti::housing": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'basti' and 'housing' is real but subtle, involving the concept of a residential area, which may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "besan::legume": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'besan' (chickpea) and 'legume' is real but subtle, as chickpeas are a specific type of legume, yet the model's ranking suggests a weaker association than intended.",
+    "confidence": 5
+  },
+  "besan::gram": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'gram' may be ambiguously transliterated for 'besan' (chickpea flour), leading to confusion with its alternative meaning as a unit of mass.",
+    "confidence": 4
+  },
+  "besan::cooking": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'besan' (gram flour) and 'cooking' is real but subtle, as gram flour is commonly used in cooking but not exclusively tied to it.",
+    "confidence": 5
+  },
+  "besan::protein": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'besan' (gram) and 'protein' is real but subtle, as gram is a unit of mass while protein is a nutrient, making the connection weaker than expected.",
+    "confidence": 5
+  },
+  "bhanja::kin": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'bhanja' has multiple transliterations (e.g., 'bhanja', 'bhanj', 'bhanji') which may have caused the model to associate it with unrelated words due to spelling ambiguity.",
+    "confidence": 4
+  },
+  "bhanja::nephew": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'bhanja' has multiple transliterations and ambiguous spelling, leading to confusion in the model's embedding.",
+    "confidence": 4
+  },
+  "bhanja::household": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bhanja' and 'household' is subtle and context-dependent, reflecting a real but nuanced semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "bhanja::elder": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bhanja' and 'elder' is subtle and context-dependent, reflecting a nuanced familial term rather than a direct semantic link.",
+    "confidence": 4
+  },
+  "bhanji::kin": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'bhanji' may have non-canonical or inconsistent transliterations that affect the model's embedding and relatedness ranking.",
+    "confidence": 4
+  },
+  "bhanji::household": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bhanji' and 'household' is subtle and context-dependent, reflecting a real but nuanced semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "bhanji::auntie": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'bhanji' and 'auntie' is real but subtle, involving cultural or familial nuances that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "chaabi::lock": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relationship between 'chaabi' (key) and 'lock' is real but subtle, involving functional association rather than direct synonymy, which may be weak or context-dependent.",
+    "confidence": 5
+  },
+  "chaabi::key": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'chaabi' is ambiguously transliterated and may be confused with 'key' due to orthographic similarity, leading to an incorrect placement.",
+    "confidence": 4
+  },
+  "chaabi::padlock": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chaabi' (key) and 'padlock' involves a functional relationship that is real but subtle, requiring understanding of lock-and-key mechanics rather than direct semantic overlap.",
+    "confidence": 5
+  },
+  "chaabi::security": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chaabi' (key) and 'security' is real but subtle, as a key is a tool for security rather than a direct synonym, leading to a weaker association than expected.",
+    "confidence": 5
+  },
+  "chattan::cliff": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chattan' and 'cliff' is real but subtle, involving a specific cultural or contextual association not strongly captured by general semantic models.",
+    "confidence": 4
+  },
+  "chattan::mineral": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chattan' and 'mineral' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "chattan::breasts": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'chattan' may have non-canonical or inconsistent transliterations that caused the model to associate it with unrelated concepts like 'breasts'.",
+    "confidence": 4
+  },
+  "chimni::flue": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chimni' (spout) and 'flue' (a passage for smoke) is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "chimni::soot": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chimni' (smoke) and 'soot' (soot) is real but subtle, involving a physical association rather than a direct synonym or definitional link.",
+    "confidence": 5
+  },
+  "chimni::duct": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chimni' (spout) and 'duct' is subtle and context-dependent, reflecting a real but nuanced semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "chinta::stress": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chinta' (worry) and 'stress' is real but subtle, reflecting a nuanced emotional connection rather than a direct synonym or definitional link.",
+    "confidence": 5
+  },
+  "chinta::nervous": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'chinta' (worry) and 'nervous' is real but subtle, reflecting an emotional connection rather than a direct synonym or definitional link.",
+    "confidence": 5
+  },
+  "dahi::breakfast": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dahi' and 'breakfast' is subtle and context-dependent, as yogurt is not a standard breakfast item in all cultural contexts, making it a nuanced association.",
+    "confidence": 4
+  },
+  "dahi::chilled": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dahi' (yogurt) and 'chilled' is subtle and context-dependent, reflecting a real but nuanced association not easily captured by general co-occurrence statistics.",
+    "confidence": 5
+  },
+  "dehat::rural": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dehat' and 'rural' is real but subtle, with 'dehat' carrying connotations of rural life that may not align strongly enough with the general term 'rural' in the model's semantic space.",
+    "confidence": 4
+  },
+  "dehat::countryside": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'dehat' may have non-canonical or inconsistent transliterations that caused the model to misinterpret its semantic relation to 'countryside'.",
+    "confidence": 4
+  },
+  "dehat::meadow": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dehat' and 'meadow' is semantically subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "dehat::pastoral": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dehat' (village) and 'pastoral' is real but subtle, involving cultural or contextual associations not strongly captured by the model.",
+    "confidence": 4
+  },
+  "dhoop::warmth": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The association between 'dhoop' (sunlight) and 'warmth' is real but subtle, as sunlight can generate warmth, but the connection is not direct or strong enough to place it in the expected 'warm' band.",
+    "confidence": 5
+  },
+  "dhoop::ray": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dhoop' (light) and 'ray' (ray) is subtle and context-dependent, reflecting a real but nuanced semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "dhoop::apple": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'dhoop' (light) and 'apple' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "insaaf::verdict": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'insaaf' (justice) and 'verdict' is real but subtle, involving legal context and abstract reasoning, not a systematic model bug.",
+    "confidence": 5
+  },
+  "insaaf::judge": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'insaaf' and 'judge' involves a nuanced legal or moral association that is real but subtle, not a systematic model bug.",
+    "confidence": 5
+  },
+  "jheel::lagoon": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'jheel' and 'lagoon' is real but subtle, involving ecological or geographical semantics that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "jheel::lake": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'jheel' and 'lake' is real but subtle, as 'jheel' can refer to a lake or a pond, making the semantic connection weaker than expected.",
+    "confidence": 4
+  },
+  "jheel::shore": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'jheel' (lake) and 'shore' is real but subtle, involving a specific spatial relationship that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "jheel::fishing": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'jheel' (lake) and 'fishing' is real but subtle, as lakes are commonly associated with fishing, yet the connection is not strong enough to place it in the expected warm band.",
+    "confidence": 4
+  },
+  "judwaa::duplicate": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'judwaa' has multiple transliterations (e.g., 'judwaa', 'judwaa', 'judwaa') that could ambiguously map to different meanings, leading to confusion in the model's embedding.",
+    "confidence": 4
+  },
+  "judwaa::household": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'judwaa' (twin) and 'household' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "judwaa::identical": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'judwaa' (twin) and 'identical' is real but subtle, involving nuanced semantic equivalence rather than direct synonymy.",
+    "confidence": 5
+  },
+  "judwaa::retailer": {
+    "category": "vocab_resolution_gap",
+    "rationale": "secret='judwaa' or word='retailer' not in vocab",
+    "confidence": 5
+  },
+  "junoon::zeal": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'junoon' and 'zeal' is real but subtle, with 'zeal' being a strong emotional state that may not align perfectly with the expected semantic band due to nuanced contextual differences.",
+    "confidence": 4
+  },
+  "junoon::passion": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relationship between 'junoon' and 'passion' is real but subtle and context-dependent, making it a challenging semantic association for the model to capture accurately.",
+    "confidence": 5
+  },
+  "junoon::obsession": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relationship between 'junoon' and 'obsession' is real but subtle, involving emotional intensity rather than a direct synonym or definitional link.",
+    "confidence": 5
+  },
+  "junoon::drive": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'junoon' (obsession) and 'drive' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "junoon::sunshine": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'junoon' and 'sunshine' is subtle and context-dependent, reflecting a nuanced emotional or metaphorical connection rather than a direct semantic link.",
+    "confidence": 5
+  },
+  "kanoon::court": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'kanoon' and 'court' is real but subtle, involving legal systems and judicial roles, which may be weak or context-dependent for the model to capture accurately.",
+    "confidence": 4
+  },
+  "kanoon::legislation": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'kanoon' and 'legislation' is real but subtle, involving legal concepts that may not be strongly captured by the model's semantic representation.",
+    "confidence": 4
+  },
+  "khichdi::khichdi": {
+    "category": "label_error",
+    "rationale": "The model correctly ranks 'khichdi' as the most related word to itself, suggesting the benchmark's tier assignment is likely incorrect.",
+    "confidence": 5
+  },
+  "khichdi::comfort": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relationship between 'khichdi' and 'comfort' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "khichdi::hearty": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'khichdi' and 'hearty' is subtle and context-dependent, reflecting a real but nuanced semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "khichdi::mill": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'khichdi' and 'mill' is subtle and context-dependent, reflecting a real but weak semantic connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "mausi::relative": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'mausi' has multiple transliterations (e.g., 'mausi', 'mausie', 'mausie') which may have caused the model to associate it with unrelated words due to spelling ambiguity.",
+    "confidence": 4
+  },
+  "mausi::household": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mausi' (sister-in-law) and 'household' is subtle and context-dependent, reflecting a real but nuanced semantic connection rather than a systematic model bug.",
+    "confidence": 5
+  },
+  "mausi::niece": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mausi' and 'niece' is culturally specific and semantically nuanced, reflecting a close familial bond that may not be universally captured by the model.",
+    "confidence": 5
+  },
+  "mazaa::cheer": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mazaa' and 'cheer' involves a nuanced emotional connection that is real but subtle, not a systematic model bug.",
+    "confidence": 5
+  },
+  "mazaa::playful": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mazaa' and 'playful' is real but subtle, involving emotional connotation rather than direct semantic overlap.",
+    "confidence": 5
+  },
+  "mazaa::kissed": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mazaa' (fun/pleasure) and 'kissed' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 4
+  },
+  "mithai::sweetness": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The model associates 'mithai' (sweet treat) strongly with 'sweetness' due to semantic overlap, placing it in a high rank, which is closer than the intended 'warm' band, indicating a subtle but real semantic connection.",
+    "confidence": 5
+  },
+  "mithai::treat": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mithai' and 'treat' involves a cultural or metaphorical association that is subtle and not strongly captured by general semantic models.",
+    "confidence": 4
+  },
+  "mohalla::neighbor": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mohalla' and 'neighbor' is real but subtle, involving social context rather than direct semantic overlap.",
+    "confidence": 5
+  },
+  "mohalla::block": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'mohalla' and 'block' is semantically subtle and context-dependent, reflecting a real but nuanced connection that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "paneer::paneer": {
+    "category": "label_error",
+    "rationale": "The model correctly ranks 'paneer' as the most related to itself, but the benchmark incorrectly assigns it to a near tier instead of the expected scorching/hot band.",
+    "confidence": 5
+  },
+  "paneer::cube": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'paneer' and 'cube' is subtle, as paneer is a type of cheese that is often cut into cubes, but this is a specific culinary association rather than a direct semantic link.",
+    "confidence": 4
+  },
+  "paneer::curry": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'paneer' and 'curry' is real but subtle, as paneer is commonly used in curries but not exclusively synonymous with it.",
+    "confidence": 5
+  },
+  "patta::foliage": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'patta' and 'foliage' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 4
+  },
+  "patta::stem": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'patta' and 'stem' is subtle and context-dependent, reflecting a nuanced semantic connection rather than a systematic model bug.",
+    "confidence": 4
+  },
+  "patta::twig": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'patta' and 'twig' is subtle and context-dependent, reflecting a nuanced semantic connection rather than a systematic model bug.",
+    "confidence": 4
+  },
+  "registan::wasteland": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'registan' and 'wasteland' is real but subtle, involving historical or cultural context not easily captured by general semantic models.",
+    "confidence": 4
+  },
+  "registan::desert": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'registan' may have an ambiguous or non-canonical transliteration that confuses the model's embedding.",
+    "confidence": 4
+  },
+  "registan::dune": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'registan' and 'dune' is subtle and context-dependent, reflecting a real but weak semantic connection rather than a systematic model bug.",
+    "confidence": 4
+  },
+  "registan::drought": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'registan' and 'drought' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 4
+  },
+  "sadak::traffic": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sadak' (road) and 'traffic' is real but subtle, involving contextual usage rather than direct synonymy or definitional equivalence.",
+    "confidence": 5
+  },
+  "sadak::pavement": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sadak' (road) and 'pavement' is real but subtle, involving a specific contextual association that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "sandook::vault": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'sandook' may have non-canonical or inconsistent transliteration that caused the model to misinterpret its semantic relation to 'vault'.",
+    "confidence": 4
+  },
+  "sandook::storage": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sandook' and 'storage' is real but subtle, as 'sandook' refers to a type of storage space, yet the model's ranking suggests a weaker association than intended.",
+    "confidence": 4
+  },
+  "sandook::luggage": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sandook' and 'luggage' is real but subtle, as 'sandook' refers to a type of luggage, yet the model's ranking suggests a weaker association than intended.",
+    "confidence": 4
+  },
+  "sarhad::fence": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sarhad' and 'fence' is real but subtle, involving the concept of a boundary, which is not a systematic model bug.",
+    "confidence": 5
+  },
+  "sarhad::checkpoint": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sarhad' and 'checkpoint' is subtle and context-dependent, reflecting a real but nuanced association that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "sarhad::jersey": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'jersey' may be ambiguously transliterated or associated with 'sarhad' due to phonetic similarity rather than semantic relation.",
+    "confidence": 4
+  },
+  "sawaal::answer": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sawaal' and 'answer' is real but subtle, as 'sawaal' (question) and 'answer' are closely related in meaning, yet the model's placement in the 'hot' band suggests a nuanced or weak association that is not a systematic bug.",
+    "confidence": 5
+  },
+  "sawaal::doubt": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sawaal' (question) and 'doubt' is semantically subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "sharm::blush": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'sharm' and 'blush' involves a culturally specific emotional response that is subtle and not universally explicit in semantic associations.",
+    "confidence": 4
+  },
+  "sharm::introvert": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relationship between 'sharm' (shame) and 'introvert' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "thaali::dish": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'thaali' and 'dish' is real but subtle, as 'thaali' is a specific type of dish container rather than a general dish, leading to a weaker association than expected.",
+    "confidence": 5
+  },
+  "thaali::cutlery": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'thaali' and 'cutlery' is semantically plausible but subtle, as 'thaali' refers to a specific type of dish or plate, not directly synonymous with cutlery, making the association nuanced and context-dependent.",
+    "confidence": 4
+  },
+  "thaali::serving": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'thaali' (plate) and 'serving' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  },
+  "tokri::hamper": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'tokri' may have non-canonical or inconsistent transliterations that caused the model to misinterpret its meaning in relation to 'hamper'.",
+    "confidence": 4
+  },
+  "tokri::weave": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'tokri' (a type of pot or container) and 'weave' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 4
+  },
+  "tokri::picnic": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'tokri' (a type of vessel) and 'picnic' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 4
+  },
+  "udaasi::melancholy": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'udaasi' and 'melancholy' is subtle and context-dependent, reflecting a nuanced emotional connection rather than a direct or learnable semantic association.",
+    "confidence": 5
+  },
+  "udaasi::sadness": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'udaasi' and 'sadness' is real but subtle, involving emotional states rather than direct semantic equivalence.",
+    "confidence": 5
+  },
+  "udaasi::misery": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'udaasi' and 'misery' is real but subtle, involving emotional states rather than direct semantic overlap.",
+    "confidence": 5
+  },
+  "udaasi::despair": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'udaasi' and 'despair' is real but subtle, reflecting a nuanced emotional connection rather than a direct or strong semantic link.",
+    "confidence": 5
+  },
+  "udaasi::rahat": {
+    "category": "transliteration_artifact",
+    "rationale": "The word 'udaasi' may have non-canonical or inconsistent transliterations that caused the model to associate it with 'rahat' in a way that diverges from the human-intended band.",
+    "confidence": 4
+  },
+  "udaasi::pleasing": {
+    "category": "vocab_resolution_gap",
+    "rationale": "secret='udaasi' or word='pleasing' not in vocab",
+    "confidence": 5
+  },
+  "waqt::schedule": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'waqt' (time) and 'schedule' involves a subtle temporal association that is not strongly captured by the model despite being a valid semantic link.",
+    "confidence": 4
+  },
+  "waqt::era": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'waqt' (time) and 'era' involves a subtle historical or contextual association that may not be strongly captured by the model.",
+    "confidence": 4
+  },
+  "waqt::newsletter": {
+    "category": "genuine_semantic_difficulty",
+    "rationale": "The relation between 'waqt' (time) and 'newsletter' is subtle and context-dependent, not a systematic model bug.",
+    "confidence": 5
+  }
+}

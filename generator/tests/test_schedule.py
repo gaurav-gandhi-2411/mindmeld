@@ -115,15 +115,19 @@ class TestValidateSchedule:
             f"Schedule length mismatch: en={len(en_schedule)}, hi-en={len(hien_schedule)}"
         )
 
-    def test_en_schedule_has_sixty_entries(self) -> None:
-        """Real en schedule must have exactly 60 entries."""
+    def test_en_schedule_has_sixty_eight_entries(self) -> None:
+        """Real en schedule must have exactly 68 entries (60 original + 8 L5
+        commonsense-override trigger-word pairs added to activate the
+        previously-dormant lever — spec-model-excellence.md item 16)."""
         en_schedule = load_schedule("en")
-        assert len(en_schedule) == 60, f"Expected 60 en entries, got {len(en_schedule)}"
+        assert len(en_schedule) == 68, f"Expected 68 en entries, got {len(en_schedule)}"
 
-    def test_hien_schedule_has_sixty_entries(self) -> None:
-        """Real hi-en schedule must have exactly 60 entries."""
+    def test_hien_schedule_has_sixty_eight_entries(self) -> None:
+        """Real hi-en schedule must have exactly 68 entries (60 original + 8 L5
+        commonsense-override trigger-word pairs added to activate the
+        previously-dormant lever — spec-model-excellence.md item 16)."""
         hien_schedule = load_schedule("hi-en")
-        assert len(hien_schedule) == 60, f"Expected 60 hi-en entries, got {len(hien_schedule)}"
+        assert len(hien_schedule) == 68, f"Expected 68 hi-en entries, got {len(hien_schedule)}"
 
     def test_en_schedule_no_duplicates(self) -> None:
         """No word should appear more than once in the en schedule."""

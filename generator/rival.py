@@ -19,6 +19,11 @@ def _rival_seed(secret: str, puzzle_date_iso: str) -> bytes:
     return hashlib.sha1(raw.encode()).digest()  # noqa: S324
 
 
+def scorching_cutoff(n: int) -> int:
+    """The tightest 'near' threshold: rank <= max(50, n * 0.001) is 'scorching'."""
+    return max(50, int(n * 0.001))
+
+
 def band_for_rank(rank: int, n: int) -> int:
     """
     Python mirror of Dart's bandForRank().
@@ -29,19 +34,37 @@ def band_for_rank(rank: int, n: int) -> int:
       win:       rank == 1
       scorching: rank <= max(50, n * 0.001)
       hot:       rank <= max(500, n * 0.01)
-      warm:      rank <= n * 0.05
+      warm:      rank <= max(1050, n * 0.05)
       cold:      rank <= n * 0.25
       freezing:  else
+
+    warm's 1050-rank floor (added alongside scorching's/hot's existing floors,
+    same max(floor, fraction) shape) fixes a band-calibration bug: for small
+    vocabs (e.g. hi-en, n~10,495) hot's 500-rank floor already consumes most
+    of the un-floored n*0.05=525 warm ceiling, squeezing Warm down to a
+    24-rank sliver (0.23% of vocab) versus EN's healthy 2,200-rank/4.0% Warm
+    band at n=55,000. A floor of 900 (original fix, commit 894f63e) left EN's
+    own thresholds byte-for-byte unchanged (55,000 * 0.05 = 2,750 >> 900, so
+    the floor never binds there) while giving hi-en a ~400-rank/3.8% Warm
+    band. The floor was later widened 900 -> 1050 after a threshold-boundary
+    grid search (evals/finetune/optimize_band_thresholds.py) against the
+    shipped model's bake-off checkpoint found this the only candidate that
+    clears a strict zero-regression gate: +4 fixed / 0 broken, Near/Far
+    confusion-matrix rows byte-identical before/after, Warm recall 8.3% ->
+    13.1% (directionally real, not CI-significant at n=84 mid-tier records).
+    EN remains untouched by the same margin (2,750 >> 1050). See
+    docs/known-limitations.md #18,
+    evals/finetune/data/calibration_threshold_report.md, and PLAN.md for the
+    full before/after calibration data.
     """
     if rank == 1:
         return 0
-    scorching_max = max(50, int(n * 0.001))
-    if rank <= scorching_max:
+    if rank <= scorching_cutoff(n):
         return 1
     hot_max = max(500, int(n * 0.01))
     if rank <= hot_max:
         return 2
-    warm_max = int(n * 0.05)
+    warm_max = max(1050, int(n * 0.05))
     if rank <= warm_max:
         return 3
     cold_max = int(n * 0.25)
@@ -74,13 +97,13 @@ _TIER_PARAMS: dict[str, tuple[float, float, float, float]] = {
     # even tier) can violate the sharp_spread upper bound deterministically. The
     # Gaussian noise on early/late factors already provides enough path variety.
     "sharp": (0.20, 0.00, 0.90, 0.84),
-    "even":  (0.40, 0.00, 0.85, 0.62),
+    "even": (0.40, 0.00, 0.85, 0.62),
     "chill": (0.60, 0.00, 0.75, 0.42),
 }
 
 # Independent per-tier seed offsets so tiers don't share correlated RNG state.
 _TIER_OFFSETS: dict[str, int] = {
-    "even":  0x0000_0000,
+    "even": 0x0000_0000,
     "chill": 0xCAFE_BABE,
     "sharp": 0xDEAD_BEEF,
 }
@@ -105,9 +128,12 @@ def _generate_path(n: int, rng: random.Random, tier: str) -> list[dict]:
     path: list[dict] = [{"rank": start_rank, "band": band_for_rank(start_rank, n)}]
     best_rank = start_rank
 
-    # Band boundary ranks for adaptive convergence (mirror band_for_rank thresholds).
+    # Band boundary ranks for adaptive convergence (mirror band_for_rank thresholds
+    # -- warm_threshold must carry the same 1050-rank floor as band_for_rank's
+    # warm_max, or this path's cold/warm transition would drift out of sync with
+    # the band the player actually sees at that rank).
     hot_threshold = max(500, int(n * 0.01))
-    warm_threshold = int(n * 0.05)
+    warm_threshold = max(1050, int(n * 0.05))
 
     for _ in range(_MAX_PATH_STEPS - 1):
         if best_rank == 1:

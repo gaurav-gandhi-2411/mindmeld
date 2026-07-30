@@ -1,0 +1,465 @@
+from __future__ import annotations
+
+"""
+Bootstrap confidence intervals for the held-out hi-en eval (spec-hinglish-
+diagnostic-sweep.md, Step 0 — "trust the ruler before trusting any result").
+
+IMPORTANT CORRECTION vs the spec's literal wording: the spec says "bootstrap
+a CI on the baseline 0.639 held-out Spearman". 0.639 is NOT a held-out
+number — it is off-the-shelf's score on the FULL 25-secret/227-scenario
+PRODUCTION dim1 set (evals/reports/baseline_report.md), which includes
+secrets that are in this pipeline's train/dev split and therefore cannot be
+used as a held-out comparator. Both ship-decision reports
+(data/ship_decision_report{,_v2}.md) already established the correct
+apples-to-apples number: dim1_test Spearman restricted to the 16 frozen
+TEST secrets (8 of which carry dim1 scenarios, n=73) = 0.4350. This module
+bootstraps a CI on THAT number, not 0.639. See data/ship_decision_report_v2.md
+"SHIP DECISION" section for the prior precedent of this same correction.
+
+Two CIs are computed:
+  1. Marginal CI on a single model's dim1_test Spearman / dim2_test pass-rate
+     — cluster-bootstrap by SECRET (not by scenario), because scenarios
+     within a secret are not independent draws (they share the same secret
+     embedding / rank table). n=8 secrets for dim1, n=16 for dim2 — the
+     bootstrap resamples at the level that is actually i.i.d.
+  2. Paired-difference CI between two models evaluated on the SAME held-out
+     secrets — resample secret indices ONCE per bootstrap iteration and
+     apply the same resample to both models' per-secret record groups. This
+     is a paired bootstrap (lower variance, more powerful than comparing two
+     independent marginal CIs) and is the correct test for "does candidate
+     beat baseline" since both are scored on identical items.
+
+Run: uv run python -m evals.finetune.bootstrap_ci
+"""
+
+import json
+from pathlib import Path
+
+import numpy as np
+
+from evals.finetune.eval_model import OFF_THE_SHELF_MODEL, evaluate_model
+from evals.harness import topheavy
+from evals.harness.metrics import spearman_correlation, top_weighted_correlation
+
+DATA_DIR = Path(__file__).parent / "data"
+N_BOOT = 10000
+SEED = 42
+_TIER_ORDINAL = {"near": 1, "mid": 2, "far": 3}
+
+
+def _dim1_by_secret(records: list[dict]) -> dict[str, list[dict]]:
+    by_secret: dict[str, list[dict]] = {}
+    for r in records:
+        if r["actual_rank"] is None:
+            continue
+        by_secret.setdefault(r["secret"], []).append(r)
+    return by_secret
+
+
+def _dim1_spearman_for_secrets(by_secret: dict[str, list[dict]], secrets: list[str]) -> float:
+    recs: list[dict] = []
+    for s in secrets:
+        recs.extend(by_secret[s])
+    expected = [_TIER_ORDINAL[r["tier"]] for r in recs]
+    actual = [r["actual_rank"] for r in recs]
+    return spearman_correlation(expected, actual)
+
+
+def bootstrap_dim1_spearman_ci(records: list[dict], n_boot: int = N_BOOT, seed: int = SEED) -> dict:
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    point = _dim1_spearman_for_secrets(by_secret, secrets)
+    rng = np.random.default_rng(seed)
+    samples = []
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        val = _dim1_spearman_for_secrets(by_secret, resample)
+        if not np.isnan(val):
+            samples.append(val)
+    lo, hi = (float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5)))
+    return {
+        "point": point,
+        "ci_95": [lo, hi],
+        "n_clusters": len(secrets),
+        "n_scenarios": sum(len(v) for v in by_secret.values()),
+        "n_valid_bootstrap_draws": len(samples),
+        "std": float(np.std(samples)) if samples else None,
+    }
+
+
+def _dim1_top_weighted_corr_for_secrets(
+    by_secret: dict[str, list[dict]], secrets: list[str]
+) -> float:
+    recs: list[dict] = []
+    for s in secrets:
+        recs.extend(by_secret[s])
+    expected = [_TIER_ORDINAL[r["tier"]] for r in recs]
+    actual = [r["actual_rank"] for r in recs]
+    return top_weighted_correlation(expected, actual)
+
+
+def bootstrap_top_weighted_correlation_ci(
+    records: list[dict], n_boot: int = N_BOOT, seed: int = SEED
+) -> dict:
+    """Same cluster-by-secret resampling as bootstrap_dim1_spearman_ci, but
+    computing metrics.top_weighted_correlation(expected_ordinals, actual_ranks)
+    (pooled, flat -- NOT macro-averaged, mirrors how bootstrap_dim1_spearman_ci
+    itself pools) instead of spearman_correlation.
+    """
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    point = _dim1_top_weighted_corr_for_secrets(by_secret, secrets)
+    rng = np.random.default_rng(seed)
+    samples = []
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        val = _dim1_top_weighted_corr_for_secrets(by_secret, resample)
+        if not np.isnan(val):
+            samples.append(val)
+    lo, hi = (float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5)))
+    return {
+        "point": point,
+        "ci_95": [lo, hi],
+        "n_clusters": len(secrets),
+        "n_scenarios": sum(len(v) for v in by_secret.values()),
+        "n_valid_bootstrap_draws": len(samples),
+        "std": float(np.std(samples)) if samples else None,
+    }
+
+
+def _ci_leaf(point_leaf: dict, draws: list[float]) -> dict:
+    """Shared helper: turn a point-estimate {"mean", "n"} leaf plus its list
+    of bootstrap-draw "mean" values into the bootstrap-CI leaf shape used by
+    bootstrap_topheavy_ci."""
+    if len(draws) >= 2:
+        ci = [float(np.percentile(draws, 2.5)), float(np.percentile(draws, 97.5))]
+    else:
+        ci = None
+    return {
+        "point": point_leaf["mean"],
+        "ci_95": ci,
+        "n_valid_bootstrap_draws": len(draws),
+        "n_secrets_point_estimate": point_leaf["n"],
+    }
+
+
+def bootstrap_topheavy_ci(records: list[dict], n_boot: int = N_BOOT, seed: int = SEED) -> dict:
+    """Cluster-bootstrap (by secret) CI for every compute_topheavy_metrics
+    submetric. Point estimate = compute_topheavy_metrics_from_records(records).
+    For each bootstrap draw: resample secret NAMES with replacement (same as
+    bootstrap_dim1_spearman_ci), then build `[by_secret[s] for s in resample]`
+    -- a list with one entry PER DRAW, duplicates included as separate list
+    elements -- and call topheavy.compute_topheavy_metrics(that list) directly
+    (NOT the from_records wrapper, to avoid the re-grouping bug documented on
+    topheavy.compute_topheavy_metrics). Collect percentile 95% CIs (2.5/97.5)
+    for each submetric's "mean" value across valid (non-None) draws. Returns
+    a dict mirroring the point-estimate shape but with each leaf
+    {"mean": ..., "n": ...} replaced by {"point": ..., "ci_95": [lo, hi] | None,
+    "n_valid_bootstrap_draws": int, "n_secrets_point_estimate": int}. CI is
+    None if fewer than 2 valid draws. "n_relevant" is passed through
+    unchanged from the point estimate (deterministic fixture property, not
+    a stochastic quantity -- see topheavy.compute_topheavy_metrics'
+    n_relevant docstring).
+    """
+    point = topheavy.compute_topheavy_metrics_from_records(records)
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    rng = np.random.default_rng(seed)
+
+    ndcg_draws: dict[int, list[float]] = {k: [] for k in topheavy.K_VALUES}
+    recall_draws: dict[int, list[float]] = {k: [] for k in topheavy.K_VALUES}
+    precision_draws: dict[int, list[float]] = {k: [] for k in topheavy.K_VALUES}
+    mrr_draws: list[float] = []
+
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        groups = [by_secret[s] for s in resample]
+        draw = topheavy.compute_topheavy_metrics(groups)
+        for k in topheavy.K_VALUES:
+            m = draw["ndcg"][k]["mean"]
+            if m is not None:
+                ndcg_draws[k].append(m)
+            m = draw["recall"][k]["mean"]
+            if m is not None:
+                recall_draws[k].append(m)
+            m = draw["precision"][k]["mean"]
+            if m is not None:
+                precision_draws[k].append(m)
+        m = draw["mrr"]["mean"]
+        if m is not None:
+            mrr_draws.append(m)
+
+    return {
+        "ndcg": {k: _ci_leaf(point["ndcg"][k], ndcg_draws[k]) for k in topheavy.K_VALUES},
+        "recall": {k: _ci_leaf(point["recall"][k], recall_draws[k]) for k in topheavy.K_VALUES},
+        "precision": {
+            k: _ci_leaf(point["precision"][k], precision_draws[k]) for k in topheavy.K_VALUES
+        },
+        "mrr": _ci_leaf(point["mrr"], mrr_draws),
+        "n_relevant": point["n_relevant"],
+        "n_secrets": point["n_secrets"],
+    }
+
+
+def bootstrap_nonsaturating_ci(records: list[dict], n_boot: int = N_BOOT, seed: int = SEED) -> dict:
+    """Cluster-bootstrap (by secret) CI for topheavy.compute_nonsaturating_metrics'
+    r_precision/map/recall_at_fixed_k_near_r submetrics -- same resample
+    pattern as bootstrap_topheavy_ci (spec-metrics-ceiling-calibration.md
+    WORKSTREAM 1, action 4: every new metric gets a bootstrap CI). Point
+    estimate = compute_nonsaturating_metrics_from_records(records). "n_relevant"
+    is passed through unchanged from the point estimate (deterministic
+    fixture property, not a stochastic quantity -- see topheavy.compute_
+    topheavy_metrics' n_relevant docstring for the same reasoning).
+    """
+    point = topheavy.compute_nonsaturating_metrics_from_records(records)
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    rng = np.random.default_rng(seed)
+
+    r_precision_draws: list[float] = []
+    map_draws: list[float] = []
+    recall_fixed_draws: dict[int, list[float]] = {k: [] for k in topheavy.NONSATURATING_FIXED_K}
+
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        groups = [by_secret[s] for s in resample]
+        draw = topheavy.compute_nonsaturating_metrics(groups)
+        m = draw["r_precision"]["mean"]
+        if m is not None:
+            r_precision_draws.append(m)
+        m = draw["map"]["mean"]
+        if m is not None:
+            map_draws.append(m)
+        for k in topheavy.NONSATURATING_FIXED_K:
+            m = draw["recall_at_fixed_k_near_r"][k]["mean"]
+            if m is not None:
+                recall_fixed_draws[k].append(m)
+
+    return {
+        "n_relevant": point["n_relevant"],
+        "r_precision": _ci_leaf(point["r_precision"], r_precision_draws),
+        "map": _ci_leaf(point["map"], map_draws),
+        "recall_at_fixed_k_near_r": {
+            k: _ci_leaf(point["recall_at_fixed_k_near_r"][k], recall_fixed_draws[k])
+            for k in topheavy.NONSATURATING_FIXED_K
+        },
+        "n_secrets": point["n_secrets"],
+    }
+
+
+def paired_bootstrap_nonsaturating_delta(
+    baseline_records: list[dict],
+    candidate_records: list[dict],
+    n_boot: int = N_BOOT,
+    seed: int = SEED,
+) -> dict:
+    """Paired cluster-bootstrap (by secret) delta CI for r_precision/map --
+    same resample-once-apply-to-both pattern as paired_bootstrap_dim1_delta
+    (spec-metrics-ceiling-calibration.md WORKSTREAM 1, action 4: paired
+    bootstrap for every model-vs-model comparison)."""
+    base_by_secret = _dim1_by_secret(baseline_records)
+    cand_by_secret = _dim1_by_secret(candidate_records)
+    secrets = sorted(set(base_by_secret) & set(cand_by_secret))
+    missing = set(base_by_secret) ^ set(cand_by_secret)
+
+    base_point = topheavy.compute_nonsaturating_metrics([base_by_secret[s] for s in secrets])
+    cand_point = topheavy.compute_nonsaturating_metrics([cand_by_secret[s] for s in secrets])
+
+    rng = np.random.default_rng(seed)
+    r_precision_deltas: list[float] = []
+    map_deltas: list[float] = []
+
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        base_draw = topheavy.compute_nonsaturating_metrics([base_by_secret[s] for s in resample])
+        cand_draw = topheavy.compute_nonsaturating_metrics([cand_by_secret[s] for s in resample])
+        b, c = base_draw["r_precision"]["mean"], cand_draw["r_precision"]["mean"]
+        if b is not None and c is not None:
+            r_precision_deltas.append(c - b)
+        b, c = base_draw["map"]["mean"], cand_draw["map"]["mean"]
+        if b is not None and c is not None:
+            map_deltas.append(c - b)
+
+    def _leaf(base_leaf: dict, cand_leaf: dict, deltas: list[float]) -> dict:
+        b, c = base_leaf["mean"], cand_leaf["mean"]
+        if b is None or c is None or len(deltas) < 2:
+            return {"baseline_point": b, "candidate_point": c, "delta_point": None, "ci_95": None}
+        lo, hi = float(np.percentile(deltas, 2.5)), float(np.percentile(deltas, 97.5))
+        return {
+            "baseline_point": b,
+            "candidate_point": c,
+            "delta_point": c - b,
+            "ci_95": [lo, hi],
+            "ci_significant_improvement": lo > 0,
+            "ci_significant_regression": hi < 0,
+            "n_valid_bootstrap_draws": len(deltas),
+        }
+
+    return {
+        "n_clusters": len(secrets),
+        "secret_mismatch": sorted(missing) if missing else None,
+        "r_precision": _leaf(
+            base_point["r_precision"], cand_point["r_precision"], r_precision_deltas
+        ),
+        "map": _leaf(base_point["map"], cand_point["map"], map_deltas),
+    }
+
+
+def bootstrap_band_ece_ci(
+    records: list[dict], vocab_size: int, n_boot: int = N_BOOT, seed: int = SEED
+) -> dict:
+    """Cluster-by-secret bootstrap CI on topheavy.band_calibration_error(...)['ece'].
+    Point estimate on the true records; each draw flattens the resampled
+    secret groups back into one record list (order doesn't matter for a
+    pooled ECE tally) and recomputes ECE.
+    """
+    point_ece = topheavy.band_calibration_error(records, vocab_size)["ece"]
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    rng = np.random.default_rng(seed)
+    samples = []
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        flat: list[dict] = []
+        for s in resample:
+            flat.extend(by_secret[s])
+        ece = topheavy.band_calibration_error(flat, vocab_size)["ece"]
+        if ece is not None:
+            samples.append(ece)
+    if len(samples) >= 2:
+        ci = [float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5))]
+    else:
+        ci = None
+    return {
+        "point": point_ece,
+        "ci_95": ci,
+        "n_clusters": len(secrets),
+        "n_valid_bootstrap_draws": len(samples),
+    }
+
+
+def paired_bootstrap_dim1_delta(
+    baseline_records: list[dict],
+    candidate_records: list[dict],
+    n_boot: int = N_BOOT,
+    seed: int = SEED,
+) -> dict:
+    base_by_secret = _dim1_by_secret(baseline_records)
+    cand_by_secret = _dim1_by_secret(candidate_records)
+    secrets = sorted(set(base_by_secret) & set(cand_by_secret))
+    missing = set(base_by_secret) ^ set(cand_by_secret)
+    base_point = _dim1_spearman_for_secrets(base_by_secret, secrets)
+    cand_point = _dim1_spearman_for_secrets(cand_by_secret, secrets)
+    rng = np.random.default_rng(seed)
+    deltas = []
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        b = _dim1_spearman_for_secrets(base_by_secret, resample)
+        c = _dim1_spearman_for_secrets(cand_by_secret, resample)
+        if not (np.isnan(b) or np.isnan(c)):
+            deltas.append(c - b)
+    lo, hi = (float(np.percentile(deltas, 2.5)), float(np.percentile(deltas, 97.5)))
+    return {
+        "baseline_point": base_point,
+        "candidate_point": cand_point,
+        "delta_point": cand_point - base_point,
+        "delta_ci_95": [lo, hi],
+        "ci_significant_improvement": lo > 0,
+        "ci_significant_regression": hi < 0,
+        "n_clusters": len(secrets),
+        "secret_mismatch": sorted(missing) if missing else None,
+        "n_valid_bootstrap_draws": len(deltas),
+    }
+
+
+def _dim2_by_pair(records: list[dict]) -> list[dict]:
+    return [r for r in records if r["resolution_error"] is None]
+
+
+def bootstrap_dim2_pass_rate_ci(
+    records: list[dict], n_boot: int = N_BOOT, seed: int = SEED
+) -> dict:
+    resolved = _dim2_by_pair(records)
+    n = len(resolved)
+    consistent = np.array([1.0 if r["consistent"] else 0.0 for r in resolved])
+    point = float(consistent.mean()) if n else None
+    rng = np.random.default_rng(seed)
+    idx_all = np.arange(n)
+    samples = []
+    for _ in range(n_boot):
+        idx = rng.choice(idx_all, size=n, replace=True)
+        samples.append(float(consistent[idx].mean()))
+    lo, hi = (float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5)))
+    return {
+        "point": point,
+        "ci_95": [lo, hi],
+        "n_pairs": n,
+    }
+
+
+def paired_bootstrap_dim2_delta(
+    baseline_records: list[dict],
+    candidate_records: list[dict],
+    n_boot: int = N_BOOT,
+    seed: int = SEED,
+) -> dict:
+    base = _dim2_by_pair(baseline_records)
+    cand = _dim2_by_pair(candidate_records)
+    base_key = {(r["en_secret"], r["hien_secret"]): r["consistent"] for r in base}
+    cand_key = {(r["en_secret"], r["hien_secret"]): r["consistent"] for r in cand}
+    pairs = sorted(set(base_key) & set(cand_key))
+    base_arr = np.array([1.0 if base_key[p] else 0.0 for p in pairs])
+    cand_arr = np.array([1.0 if cand_key[p] else 0.0 for p in pairs])
+    n = len(pairs)
+    rng = np.random.default_rng(seed)
+    idx_all = np.arange(n)
+    deltas = []
+    for _ in range(n_boot):
+        idx = rng.choice(idx_all, size=n, replace=True)
+        deltas.append(float(cand_arr[idx].mean() - base_arr[idx].mean()))
+    lo, hi = (float(np.percentile(deltas, 2.5)), float(np.percentile(deltas, 97.5)))
+    return {
+        "baseline_point": float(base_arr.mean()) if n else None,
+        "candidate_point": float(cand_arr.mean()) if n else None,
+        "delta_point": float(cand_arr.mean() - base_arr.mean()) if n else None,
+        "delta_ci_95": [lo, hi],
+        "ci_significant_improvement": lo > 0,
+        "ci_significant_regression": hi < 0,
+        "n_pairs": n,
+    }
+
+
+def baseline_report() -> dict:
+    result = evaluate_model(OFF_THE_SHELF_MODEL)
+    dim1_ci = bootstrap_dim1_spearman_ci(result["dim1_test"]["records"])
+    dim2_ci = bootstrap_dim2_pass_rate_ci(result["dim2_test"]["records"])
+    out = {
+        "model": OFF_THE_SHELF_MODEL,
+        "note": (
+            "0.639 (spec's quoted figure) is the FULL 25-secret production dim1 set "
+            "score, not a held-out number -- see module docstring. The correct "
+            "held-out TEST comparator is dim1_test below."
+        ),
+        "dim1_test_spearman": dim1_ci,
+        "dim2_test_pass_rate": dim2_ci,
+    }
+    (DATA_DIR / "baseline_holdout_ci.json").write_text(
+        json.dumps(out, indent=2) + "\n", encoding="utf-8"
+    )
+    (DATA_DIR / "baseline_holdout_records.json").write_text(
+        json.dumps(
+            {
+                "dim1_test_records": result["dim1_test"]["records"],
+                "dim2_test_records": result["dim2_test"]["records"],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return out
+
+
+if __name__ == "__main__":
+    out = baseline_report()
+    print(json.dumps(out, indent=2))

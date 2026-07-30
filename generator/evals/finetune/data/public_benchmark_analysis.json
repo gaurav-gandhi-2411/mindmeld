@@ -1,0 +1,135 @@
+{
+  "split_seed": 42,
+  "dev_test_correlation": {
+    "n_models_in_candidate_list": 8,
+    "n_models_used": 8,
+    "models_used": [
+      "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "l3cube-pune/indic-sentence-bert-nli",
+      "google/muril-base-cased",
+      "BAAI/bge-m3",
+      "intfloat/multilingual-e5-large",
+      "ibm-granite/granite-embedding-311m-multilingual-r2",
+      "Qwen/Qwen3-Embedding-0.6B",
+      "gauravgandhi2411/hinglish-relatedness-sbert"
+    ],
+    "models_missing_checkpoint": [],
+    "per_model_dev_test_scores": {
+      "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": {
+        "dev_score": -0.05719757065791507,
+        "test_score": 0.09667866109212755,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "l3cube-pune/indic-sentence-bert-nli": {
+        "dev_score": 0.546882597156507,
+        "test_score": 0.41491844477278855,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "google/muril-base-cased": {
+        "dev_score": 0.2724552178911553,
+        "test_score": 0.09311091643637955,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "BAAI/bge-m3": {
+        "dev_score": 0.09788151532026657,
+        "test_score": 0.07889509818191777,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "intfloat/multilingual-e5-large": {
+        "dev_score": 0.21651917089372913,
+        "test_score": 0.1793979037974413,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "ibm-granite/granite-embedding-311m-multilingual-r2": {
+        "dev_score": 0.22704245609290916,
+        "test_score": 0.03641648335016932,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "Qwen/Qwen3-Embedding-0.6B": {
+        "dev_score": 0.21257762341546146,
+        "test_score": 0.10618161113905054,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      },
+      "gauravgandhi2411/hinglish-relatedness-sbert": {
+        "dev_score": 0.6876090522630562,
+        "test_score": 0.6283990308587584,
+        "n_dev_secrets_resolved": 17,
+        "n_test_secrets_resolved": 17
+      }
+    },
+    "correlation_method": "pearson",
+    "dev_test_pearson_r": 0.8852940766818941,
+    "old_n16_baseline_correlation": 0.12,
+    "materially_improves_on_0_12": true
+  },
+  "shipped_model_bootstrap_ci": {
+    "dim1_spearman": {
+      "full_34": {
+        "point": 0.6567787637579333,
+        "ci_95": [
+          0.5744905978258156,
+          0.7323352618528404
+        ],
+        "n_clusters": 34,
+        "n_scenarios": 303,
+        "n_valid_bootstrap_draws": 10000,
+        "std": 0.04071291261611395
+      },
+      "dev_only": {
+        "point": 0.6876090522630562,
+        "ci_95": [
+          0.6110138830510171,
+          0.7645355390647911
+        ],
+        "n_clusters": 17,
+        "n_scenarios": 151,
+        "n_valid_bootstrap_draws": 10000,
+        "std": 0.039285212812731576
+      },
+      "test_only": {
+        "point": 0.6283990308587584,
+        "ci_95": [
+          0.4806782174753997,
+          0.7553216423049508
+        ],
+        "n_clusters": 17,
+        "n_scenarios": 152,
+        "n_valid_bootstrap_draws": 10000,
+        "std": 0.07055305902779632
+      }
+    },
+    "dim2_pass_rate": {
+      "full_34": {
+        "point": 0.7058823529411765,
+        "ci_95": [
+          0.5588235294117647,
+          0.8529411764705882
+        ],
+        "n_pairs": 34
+      },
+      "dev_only": {
+        "point": 0.8823529411764706,
+        "ci_95": [
+          0.7058823529411765,
+          1.0
+        ],
+        "n_pairs": 17
+      },
+      "test_only": {
+        "point": 0.5294117647058824,
+        "ci_95": [
+          0.29411764705882354,
+          0.7647058823529411
+        ],
+        "n_pairs": 17
+      }
+    }
+  }
+}

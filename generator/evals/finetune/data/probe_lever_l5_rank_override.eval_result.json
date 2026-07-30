@@ -1,0 +1,307 @@
+{
+  "probe": "lever_l5_rank_override",
+  "spec_ref": "spec-residual-attack.md lever L5",
+  "non_fine_tuning": true,
+  "production_files_edited": [],
+  "vocab_size_now": 10495,
+  "forced_rank": 50,
+  "forced_rank_formula": "max(50, int(n * 0.001))  # tightest 'scorching' cutoff",
+  "forced_band_ordinal": 1,
+  "forced_band_name": "scorching",
+  "missing_benchmark_secrets_in_current_vocab": [],
+  "results": [
+    {
+      "word": "tarbooz",
+      "gloss": "watermelon",
+      "related": "lal",
+      "related_gloss": "red",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 473,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 473,
+        "band_ordinal": 2,
+        "band_name": "hot"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          138
+        ],
+        "expected_only_target_idx": 138,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "beans",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "anaar",
+      "gloss": "pomegranate",
+      "related": "lal",
+      "related_gloss": "red",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 431,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 431,
+        "band_ordinal": 2,
+        "band_name": "hot"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          138
+        ],
+        "expected_only_target_idx": 138,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "brandon",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "nariyal",
+      "gloss": "coconut",
+      "related": "safed",
+      "related_gloss": "white",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 2020,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 2020,
+        "band_ordinal": 4,
+        "band_name": "cold"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          142
+        ],
+        "expected_only_target_idx": 142,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "tends",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "samosa",
+      "gloss": "snack",
+      "related": "garm",
+      "related_gloss": "hot",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 505,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 505,
+        "band_ordinal": 3,
+        "band_name": "warm"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          172
+        ],
+        "expected_only_target_idx": 172,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "onion",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "mirch",
+      "gloss": "chili",
+      "related": "lal",
+      "related_gloss": "red",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 610,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 774,
+        "band_ordinal": 4,
+        "band_name": "cold"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          138
+        ],
+        "expected_only_target_idx": 138,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "curd",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "jharna",
+      "gloss": "waterfall",
+      "related": "loud",
+      "related_gloss": "loud",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 4082,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 4082,
+        "band_ordinal": 5,
+        "band_name": "freezing"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          3243
+        ],
+        "expected_only_target_idx": 3243,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "florence",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "til",
+      "gloss": "sesame",
+      "related": "kala",
+      "related_gloss": "black",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 1025,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 1025,
+        "band_ordinal": 4,
+        "band_name": "cold"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          137
+        ],
+        "expected_only_target_idx": 137,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "vegetable",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    },
+    {
+      "word": "dudh",
+      "gloss": "milk",
+      "related": "safed",
+      "related_gloss": "white",
+      "vocab_size_at_curation": 10495,
+      "recorded_related_rank_at_curation": 683,
+      "vocab_size_now": 10495,
+      "before": {
+        "rank": 683,
+        "band_ordinal": 4,
+        "band_name": "cold"
+      },
+      "after": {
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_name": "scorching"
+      },
+      "regression_check": {
+        "method": "full-array diff: np.where(ranks_before != ranks_after) over all 10495 vocab positions",
+        "n_positions_differing": 1,
+        "differing_indices": [
+          142
+        ],
+        "expected_only_target_idx": 142,
+        "pass": true
+      },
+      "rank_collision": {
+        "forced_rank": 50,
+        "originally_held_by": "feeding",
+        "harmless_reasoning": "rival.band_for_rank(rank, n) is a pure function of (rank, n) only (verified by reading its implementation) -- it never dereferences a word or assumes the rank->word mapping is bijective, so two words sharing forced_rank both resolve to the same (correct) band with no exception, no ambiguous lookup, and no crash in this probe's own rank/band computation."
+      },
+      "benchmark_ruler_check": {
+        "34_secrets_own_ranks_unaffected": true
+      }
+    }
+  ],
+  "regression_summary": {
+    "n_words_tested": 8,
+    "n_words_zero_side_effect": 8,
+    "all_clean": true
+  }
+}

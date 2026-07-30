@@ -1,4 +1,64 @@
 # Auto-generated English vocab — do not edit manually
+# Manual eval-gated exception (spec-hinglish-benchmark.md Phase 1a): "paneer"
+# and "khichdi" added here (not in the wordfreq top-N derivation) as the
+# identical-spelling EN glosses for two benchmark-supplement secrets in
+# evals/gen_dim1_benchmark_supplement.py (same pattern as existing
+# island/school/hospital/train/teacher/doctor identical EN<->hi-en pairs).
+# Inserted right after the header (not appended) so load_en_vocab()'s
+# EN_VOCAB_MAX=55000 read-cap can never truncate them off the tail.
+# Manual eval-gated exception (spec-hinglish-benchmark.md Phase 2, bake-off
+# vocab-coverage fix): 42 legitimate English near/mid benchmark-supplement
+# words moved here from further down the file (each was already present,
+# just beyond position 10,000) so _filter_en_for_hien's HIEN_EN_TOP_N=10,000
+# read-cap stops truncating them out of the hi-en vocab -- these are the
+# EN glosses/near-mid words for evals/gen_dim1_benchmark_supplement.py
+# secrets that were resolving to actual_rank: null in the model bake-off.
+# Moved (not duplicated): each word's original later-file occurrence was
+# removed so no duplicate line exists.
+amusement
+auntie
+blush
+boulder
+brightness
+checkpoint
+chilled
+chimney
+curd
+cutlery
+duct
+dune
+duplicate
+flue
+foliage
+hamlet
+hamper
+hearty
+introvert
+kin
+lagoon
+legume
+locality
+meadow
+melancholy
+modesty
+padlock
+pastoral
+pavement
+platter
+playful
+porridge
+query
+shyness
+soot
+sweetness
+twig
+unease
+wasteland
+weave
+yogurt
+zeal
+paneer
+khichdi
 the
 and
 for
@@ -10038,7 +10098,6 @@ aided
 alexis
 allocation
 americas
-amusement
 antibiotics
 anticipation
 appropriately
@@ -10523,7 +10582,6 @@ bingo
 blogging
 boiler
 bon
-boulder
 brock
 calf
 cambodia
@@ -11229,7 +11287,6 @@ kathy
 lag
 lays
 lenders
-locality
 lure
 malicious
 mattress
@@ -11537,7 +11594,6 @@ graffiti
 grenade
 guitars
 hague
-hamlet
 hampton
 helm
 herbs
@@ -11560,7 +11616,6 @@ jerseys
 jessie
 jules
 katy
-kin
 kirby
 kobe
 kris
@@ -11771,7 +11826,6 @@ prosecutors
 protections
 pup
 quarantine
-query
 raf
 rallies
 rapids
@@ -11987,7 +12041,6 @@ warp
 whisky
 winters
 womb
-yogurt
 abe
 abolished
 abusing
@@ -12258,7 +12311,6 @@ omaha
 onwards
 overthrow
 paradigm
-pavement
 payday
 perpetual
 pga
@@ -12444,7 +12496,6 @@ manipulated
 mao
 mare
 marxist
-meadow
 meadows
 ministries
 motivate
@@ -12559,7 +12610,6 @@ disrupt
 donating
 donovan
 drills
-duplicate
 dynamite
 echoes
 economical
@@ -12744,7 +12794,6 @@ doris
 dorm
 drafts
 drip
-duct
 eccentric
 educating
 electro
@@ -12873,7 +12922,6 @@ berries
 blitz
 blockade
 bosnia
-brightness
 bruins
 brushed
 burma
@@ -13063,7 +13111,6 @@ baxter
 bedtime
 belongings
 bloomberg
-blush
 booster
 braves
 bun
@@ -13265,7 +13312,6 @@ cabbage
 canton
 cater
 celtics
-chimney
 chrysler
 circulated
 cloudy
@@ -13549,7 +13595,6 @@ optimum
 ounces
 overwhelmingly
 oyster
-pastoral
 patented
 pea
 pearls
@@ -13743,7 +13788,6 @@ persist
 personalized
 planner
 plaster
-playful
 pleading
 professions
 quirky
@@ -13811,7 +13855,6 @@ vulgar
 waiver
 walton
 watershed
-weave
 wilkinson
 wiring
 yan
@@ -14445,7 +14488,6 @@ cbc
 ceremonial
 chanel
 cheque
-chilled
 cho
 choreography
 cisco
@@ -14829,7 +14871,6 @@ styling
 sublime
 subtitles
 sunni
-sweetness
 teamwork
 tequila
 terrestrial
@@ -15772,7 +15813,6 @@ juniors
 karaoke
 kemp
 kosovo
-lagoon
 len
 lesions
 limp
@@ -16161,7 +16201,6 @@ figs
 filth
 firefox
 floated
-foliage
 foreclosure
 forgets
 fortnight
@@ -16540,7 +16579,6 @@ cabins
 campaigned
 centenary
 ceos
-checkpoint
 chloride
 classify
 clinically
@@ -16633,7 +16671,6 @@ mashed
 maxim
 mcdonalds
 mei
-melancholy
 meteorological
 misplaced
 misty
@@ -16830,7 +16867,6 @@ gotcha
 gst
 guerrilla
 gutter
-hearty
 highschool
 hillside
 hms
@@ -18615,7 +18651,6 @@ asean
 aspiration
 atkins
 attentive
-auntie
 austen
 awakened
 ballpark
@@ -19164,7 +19199,6 @@ dignified
 disapproval
 disobedience
 dreamer
-dune
 dwellers
 electronically
 emancipation
@@ -19328,7 +19362,6 @@ yee
 yellowstone
 ying
 yosemite
-zeal
 abort
 abound
 adversely
@@ -19695,7 +19728,6 @@ gunn
 gunpowder
 guthrie
 guyana
-hamper
 haskell
 hatched
 helix
@@ -20043,7 +20075,6 @@ perpetrated
 pessimistic
 pesticide
 phosphorus
-platter
 pounded
 preachers
 premieres
@@ -20291,7 +20322,6 @@ memorials
 mendoza
 meticulous
 michelin
-modesty
 motherfucking
 moustache
 mubarak
@@ -21770,7 +21800,6 @@ vidal
 viet
 viz
 warms
-wasteland
 watchdog
 watery
 wavelengths
@@ -23970,7 +23999,6 @@ pneumatic
 pointy
 polyester
 polynomial
-porridge
 protester
 pug
 pyongyang
@@ -26691,7 +26719,6 @@ townsville
 tru
 truncated
 trusty
-twig
 ulcer
 ummm
 unconfirmed
@@ -26989,7 +27016,6 @@ smothered
 sneezing
 snooping
 socialization
-soot
 sopranos
 soto
 southport
@@ -27107,7 +27133,6 @@ crayons
 cronies
 crusty
 cumin
-cutlery
 dawes
 decal
 deciduous
@@ -30344,7 +30369,6 @@ corroborated
 coulda
 cred
 cur
-curd
 cursory
 dangle
 daniela
@@ -30829,7 +30853,6 @@ impartiality
 incessantly
 inertial
 intentioned
-introvert
 invades
 invocation
 involuntarily
@@ -31371,7 +31394,6 @@ shears
 shemale
 shiloh
 shrank
-shyness
 slimmer
 snub
 sobering
@@ -36233,7 +36255,6 @@ twa
 ucc
 underscored
 undiagnosed
-unease
 univision
 unrequited
 uptime
@@ -36404,7 +36425,6 @@ flashlights
 flaunting
 flavoring
 flirtatious
-flue
 formulae
 frankfort
 frescoes
@@ -40511,7 +40531,6 @@ ostentatious
 osteopathic
 osx
 oversize
-padlock
 palau
 paltrow
 panini
@@ -45098,7 +45117,6 @@ lannisters
 laparoscopic
 laurier
 leer
-legume
 lemurs
 linesman
 lipa

@@ -58,6 +58,7 @@ Usage (from generator/):
     uv run python evals/gen_dim1_scenarios.py
 """
 
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -160,6 +161,21 @@ HIEN_CURATED: dict[str, dict[str, list[str]]] = {
 }
 
 
+def _far_rng_for_secret(secret: str) -> random.Random:
+    """Deterministic per-secret seed — independent of dict iteration order or
+    which other secrets exist, so adding/removing a secret never perturbs any
+    other secret's far-tier draw. Replaces a single `random.Random` that used
+    to be created once and advanced sequentially across all secrets in
+    sorted order — a real bug flagged (not fixed) in
+    evals/finetune/data/ship_decision_report_v3.md's Step 0 ("shared
+    sequentially-seeded RNG"), fixed here ahead of expanding the held-out
+    benchmark (spec-hinglish-benchmark.md Phase 1).
+    """
+    raw = f"{secret}{FAR_SAMPLE_SEED}".encode()
+    seed_int = int(hashlib.sha256(raw).hexdigest(), 16) % (2**32)
+    return random.Random(seed_int)
+
+
 def _sample_far_words(
     secret: str,
     exclude: set[str],
@@ -206,9 +222,9 @@ def build_scenarios(
     pair) or "associate" (anything else) — see module docstring. EN records
     and non-near tiers always get subtype=None.
     """
-    rng = random.Random(FAR_SAMPLE_SEED)
     records: list[dict] = []
     for secret in sorted(curated):  # sorted: deterministic iteration order
+        rng = _far_rng_for_secret(secret)
         tiers = curated[secret]
         exclude = {secret, *tiers["near"], *tiers["mid"]}
         en_pair = (hien_pair_map or {}).get(secret)

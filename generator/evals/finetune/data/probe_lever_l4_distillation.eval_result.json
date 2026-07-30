@@ -1,0 +1,340 @@
+{
+  "run_name": "probe_lever_l4_distillation",
+  "shipped_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+  "probe_model_path": "/home/gaura/generator/evals/finetune/checkpoints/probe_lever_l4_distillation/model",
+  "forced_cpu_training": false,
+  "dropped_candidates": {
+    "words": [
+      "dudh",
+      "nariyal",
+      "samosa"
+    ],
+    "reasons": {
+      "nariyal": [
+        "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+      ],
+      "samosa": [
+        "score_related (0.0) <= score_hard_negative (0.3) -- the curated hard negative must score strictly lower than the curated true property"
+      ],
+      "dudh": [
+        "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+      ]
+    },
+    "n_clean": 5,
+    "n_total": 8,
+    "_post_hoc_correction_note": "The eval_result.json pulled back from the GCP retry run had this field defaulted to empty due to a train_lib persistence-order bug (fixed in probe_lever_l4_distillation.py train_probe(), 2026-07-19, after a GCP-run agent caught it via direct on-disk train_summary.json inspection). This field and every targeted_word_rank_movement[*].trained_on flag below were corrected post-hoc from the training log ground truth (DROPPED 3 candidate(s)... nariyal/samosa/dudh) and teacher_scores.json -- the dim1/dim2 CI numbers and rank movements themselves are UNCHANGED, only this descriptive metadata was wrong."
+  },
+  "teacher_scores": {
+    "teacher_model_resolved": "qwen3:8b",
+    "resolution_reason": "primary model available and responsive",
+    "candidates": [
+      {
+        "word": "tarbooz",
+        "gloss": "watermelon",
+        "related": "lal",
+        "related_gloss": "red",
+        "hard_negative": "pyaaz",
+        "hard_negative_gloss": "onion",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 0.9,
+        "score_hard_negative": 0.0,
+        "_validation_problems": []
+      },
+      {
+        "word": "anaar",
+        "gloss": "pomegranate",
+        "related": "lal",
+        "related_gloss": "red",
+        "hard_negative": "adrak",
+        "hard_negative_gloss": "ginger",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 0.9,
+        "score_hard_negative": 0.0,
+        "_validation_problems": []
+      },
+      {
+        "word": "nariyal",
+        "gloss": "coconut",
+        "related": "safed",
+        "related_gloss": "white",
+        "hard_negative": "peanut",
+        "hard_negative_gloss": "peanut",
+        "teacher_model": "qwen3:8b",
+        "fact_true": false,
+        "score_related": 0.0,
+        "score_hard_negative": 0.0,
+        "_validation_problems": [
+          "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+        ]
+      },
+      {
+        "word": "samosa",
+        "gloss": "snack",
+        "related": "garm",
+        "related_gloss": "hot",
+        "hard_negative": "sauce",
+        "hard_negative_gloss": "sauce",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 0.0,
+        "score_hard_negative": 0.3,
+        "_validation_problems": [
+          "score_related (0.0) <= score_hard_negative (0.3) -- the curated hard negative must score strictly lower than the curated true property"
+        ]
+      },
+      {
+        "word": "mirch",
+        "gloss": "chili",
+        "related": "lal",
+        "related_gloss": "red",
+        "hard_negative": "dalchini",
+        "hard_negative_gloss": "cinnamon",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 0.9,
+        "score_hard_negative": 0.0,
+        "_validation_problems": []
+      },
+      {
+        "word": "jharna",
+        "gloss": "waterfall",
+        "related": "loud",
+        "related_gloss": "loud",
+        "hard_negative": "foliage",
+        "hard_negative_gloss": "foliage",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 1.0,
+        "score_hard_negative": 0.0,
+        "_validation_problems": []
+      },
+      {
+        "word": "til",
+        "gloss": "sesame",
+        "related": "kala",
+        "related_gloss": "black",
+        "hard_negative": "tel",
+        "hard_negative_gloss": "oil",
+        "teacher_model": "qwen3:8b",
+        "fact_true": false,
+        "score_related": 0.8,
+        "score_hard_negative": 0.0,
+        "_validation_problems": []
+      },
+      {
+        "word": "dudh",
+        "gloss": "milk",
+        "related": "safed",
+        "related_gloss": "white",
+        "hard_negative": "syrup",
+        "hard_negative_gloss": "syrup",
+        "teacher_model": "qwen3:8b",
+        "fact_true": true,
+        "score_related": 0.0,
+        "score_hard_negative": 0.0,
+        "_validation_problems": [
+          "score_related (0.0) <= score_hard_negative (0.0) -- the curated hard negative must score strictly lower than the curated true property"
+        ]
+      }
+    ],
+    "ollama_blocker": null
+  },
+  "n_dim1_secrets": 34,
+  "n_dim1_scenarios": 302,
+  "n_dim2_pairs": 34,
+  "probe_dim1_spearman_ci": {
+    "point": 0.6460614971520446,
+    "ci_95": [
+      0.5570773522457066,
+      0.7291871716058154
+    ],
+    "n_clusters": 34,
+    "n_scenarios": 300,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.04392705024201196
+  },
+  "probe_dim2_pass_rate_ci": {
+    "point": 0.7058823529411765,
+    "ci_95": [
+      0.5588235294117647,
+      0.8529411764705882
+    ],
+    "n_pairs": 34
+  },
+  "shipped_dim1_spearman_ci": {
+    "point": 0.6567787637579333,
+    "ci_95": [
+      0.5744905978258156,
+      0.7323352618528404
+    ],
+    "n_clusters": 34,
+    "n_scenarios": 303,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.04071291261611395
+  },
+  "shipped_dim2_pass_rate_ci": {
+    "point": 0.7058823529411765,
+    "ci_95": [
+      0.5588235294117647,
+      0.8529411764705882
+    ],
+    "n_pairs": 34
+  },
+  "dim1_delta_vs_shipped": {
+    "baseline_point": 0.6567787637579333,
+    "candidate_point": 0.6460614971520446,
+    "delta_point": -0.010717266605888676,
+    "delta_ci_95": [
+      -0.044831375636537656,
+      0.01999266367620629
+    ],
+    "ci_significant_improvement": false,
+    "ci_significant_regression": false,
+    "n_clusters": 34,
+    "secret_mismatch": null,
+    "n_valid_bootstrap_draws": 10000
+  },
+  "dim2_delta_vs_shipped": {
+    "baseline_point": 0.7272727272727273,
+    "candidate_point": 0.7272727272727273,
+    "delta_point": 0.0,
+    "delta_ci_95": [
+      0.0,
+      0.0
+    ],
+    "ci_significant_improvement": false,
+    "ci_significant_regression": false,
+    "n_pairs": 33
+  },
+  "dim1_regression_floor_all_34": {
+    "n_shared_pairs": 279,
+    "n_fixed": 1,
+    "n_broken": 0,
+    "net": 1,
+    "zero_net_regression": true,
+    "zero_regression_strict": true,
+    "fixed_pairs": [
+      "udaasi/rahat"
+    ],
+    "broken_pairs": []
+  },
+  "dim2_regression_floor_all_34": {
+    "n_shared_pairs": 33,
+    "n_fixed": 0,
+    "n_broken": 0,
+    "net": 0,
+    "zero_net_regression": true,
+    "zero_regression_strict": true,
+    "fixed_pairs": [],
+    "broken_pairs": []
+  },
+  "targeted_word_rank_movement": {
+    "tarbooz": {
+      "related": "lal",
+      "related_rank_before_shipped": 473,
+      "related_rank_after_probe": 97,
+      "related_rank_improvement": 376,
+      "candidates_file_related_rank": 473,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "pyaaz",
+      "hard_negative_rank_before_shipped": 9,
+      "hard_negative_rank_after_probe": 34,
+      "vocab_size": 10495,
+      "trained_on": true
+    },
+    "anaar": {
+      "related": "lal",
+      "related_rank_before_shipped": 431,
+      "related_rank_after_probe": 221,
+      "related_rank_improvement": 210,
+      "candidates_file_related_rank": 431,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "adrak",
+      "hard_negative_rank_before_shipped": 15,
+      "hard_negative_rank_after_probe": 34,
+      "vocab_size": 10495,
+      "trained_on": true
+    },
+    "nariyal": {
+      "related": "safed",
+      "related_rank_before_shipped": 2020,
+      "related_rank_after_probe": 1934,
+      "related_rank_improvement": 86,
+      "candidates_file_related_rank": 2020,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "peanut",
+      "hard_negative_rank_before_shipped": 14,
+      "hard_negative_rank_after_probe": 29,
+      "vocab_size": 10495,
+      "trained_on": false
+    },
+    "samosa": {
+      "related": "garm",
+      "related_rank_before_shipped": 505,
+      "related_rank_after_probe": 600,
+      "related_rank_improvement": -95,
+      "candidates_file_related_rank": 505,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "sauce",
+      "hard_negative_rank_before_shipped": 2,
+      "hard_negative_rank_after_probe": 3,
+      "vocab_size": 10495,
+      "trained_on": false
+    },
+    "mirch": {
+      "related": "lal",
+      "related_rank_before_shipped": 774,
+      "related_rank_after_probe": 445,
+      "related_rank_improvement": 329,
+      "candidates_file_related_rank": 610,
+      "before_rank_matches_candidates_file": false,
+      "hard_negative": "dalchini",
+      "hard_negative_rank_before_shipped": 10,
+      "hard_negative_rank_after_probe": 24,
+      "vocab_size": 10495,
+      "trained_on": true
+    },
+    "jharna": {
+      "related": "loud",
+      "related_rank_before_shipped": 4082,
+      "related_rank_after_probe": 2736,
+      "related_rank_improvement": 1346,
+      "candidates_file_related_rank": 4082,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "foliage",
+      "hard_negative_rank_before_shipped": 6,
+      "hard_negative_rank_after_probe": 9,
+      "vocab_size": 10495,
+      "trained_on": true
+    },
+    "til": {
+      "related": "kala",
+      "related_rank_before_shipped": 1025,
+      "related_rank_after_probe": 581,
+      "related_rank_improvement": 444,
+      "candidates_file_related_rank": 1025,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "tel",
+      "hard_negative_rank_before_shipped": 2,
+      "hard_negative_rank_after_probe": 2,
+      "vocab_size": 10495,
+      "trained_on": true
+    },
+    "dudh": {
+      "related": "safed",
+      "related_rank_before_shipped": 683,
+      "related_rank_after_probe": 988,
+      "related_rank_improvement": -305,
+      "candidates_file_related_rank": 683,
+      "before_rank_matches_candidates_file": true,
+      "hard_negative": "syrup",
+      "hard_negative_rank_before_shipped": 9,
+      "hard_negative_rank_after_probe": 8,
+      "vocab_size": 10495,
+      "trained_on": false
+    }
+  },
+  "overfitting_caveat": "This probe trains DIRECTLY on the CLEAN subset of the 8 target words' own (anchor, related, hard_negative) triplets/graded pairs -- a large rank improvement on trained words is EXPECTED from direct training-set exposure and is NOT strong evidence the distillation APPROACH generalizes to held-out commonsense words never seen in training. Generalization to unseen commonsense pairs is tested separately by lever L6 (a different, held-out-word probe) -- not duplicated or claimed here. Separately: candidates in `dropped_candidates` were EXCLUDED from training entirely (reproducible teacher-model calibration failure on qwen3:8b across two independent runs, GG-approved policy 2026-07-19) -- their rank movement in `targeted_word_rank_movement` (marked trained_on=false) should be near-zero/noise, since they were never trained on; a large movement there would indicate an unexpected leak or bug, not a real distillation effect."
+}

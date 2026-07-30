@@ -1,0 +1,23 @@
+{
+  "model": "l3cube-pune/indic-sentence-bert-nli",
+  "note": "0.639 (spec's quoted figure) is the FULL 25-secret production dim1 set score, not a held-out number -- see module docstring. The correct held-out TEST comparator is dim1_test below.",
+  "dim1_test_spearman": {
+    "point": 0.43502792396018175,
+    "ci_95": [
+      0.2230683566903575,
+      0.6317896747023184
+    ],
+    "n_clusters": 8,
+    "n_scenarios": 73,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.10489844319346747
+  },
+  "dim2_test_pass_rate": {
+    "point": 0.375,
+    "ci_95": [
+      0.125,
+      0.625
+    ],
+    "n_pairs": 16
+  }
+}

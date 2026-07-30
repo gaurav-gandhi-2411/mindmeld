@@ -1,0 +1,1257 @@
+{
+  "status": "FINAL -- BLOCKED, no consensus ceiling established",
+  "protocol_reused_unchanged": "build_control_near()/build_control_far()/run_calibration_gate()/calibration_verdict() from evals/finetune/llm_consensus_ceiling.py, called directly -- same seed=42, same exclude= set run_full_protocol() computes internally (the main 75-item sample's own (secret, word) keys), same k=3 self-consistency, same 90% CALIBRATION_BAR. No control items skipped, no bar softened, no third model tried, no re-run at a different temperature to result-shop a pass.",
+  "seed": 42,
+  "temperature": 0.7,
+  "k_self_consistency": 3,
+  "control_near_size": 15,
+  "control_far_size": 15,
+  "calibration_bar": 0.9,
+  "attempts": {
+    "attempt_1_original_pair": {
+      "judges": [
+        "qwen3:8b",
+        "llama3.1:8b"
+      ],
+      "date": "2026-07 (prior GCP session, g2-standard-8 + 1x NVIDIA L4, asia-south1-c, aetherart-497918, ~184.3s protocol wall-clock, ~$0.16)",
+      "per_judge": {
+        "qwen3:8b": {
+          "accuracy": 0.9666666666666667,
+          "near_accuracy": 1.0,
+          "far_accuracy": 0.9333333333333333,
+          "n_control_items": 30,
+          "n_correct": 29,
+          "bar": 0.9,
+          "passed": true
+        },
+        "llama3.1:8b": {
+          "accuracy": 0.8333333333333334,
+          "near_accuracy": 1.0,
+          "far_accuracy": 0.6666666666666666,
+          "n_control_items": 30,
+          "n_correct": 25,
+          "bar": 0.9,
+          "passed": false
+        }
+      },
+      "verdict": "qwen3:8b PASSED (96.7%). llama3.1:8b FAILED (83.3%, far-tier 66.7% -- below the 90% bar)."
+    },
+    "attempt_2_replacement_judge": {
+      "judges_considered": [
+        "gemma2:9b (tried first, per plan)",
+        "mistral:7b (not needed -- gemma2:9b pulled and ran successfully, so no fallback was triggered)"
+      ],
+      "judge_tried": "gemma2:9b",
+      "date": "2026-07-25, same GCP infra pattern (g2-standard-8 + 1x NVIDIA L4, asia-south1-c, aetherart-497918)",
+      "per_judge": {
+        "gemma2:9b": {
+          "accuracy": 0.8666666666666667,
+          "near_accuracy": 1.0,
+          "far_accuracy": 0.7333333333333333,
+          "n_control_items": 30,
+          "n_correct": 26,
+          "bar": 0.9,
+          "passed": false
+        }
+      },
+      "verdict": "gemma2:9b FAILED (86.7%, far-tier 73.3% -- below the 90% bar). STOP condition reached per GG's exact instruction: no third model tried."
+    }
+  },
+  "side_by_side_control_accuracy": {
+    "qwen3:8b": {
+      "overall": 0.9666666666666667,
+      "near": 1.0,
+      "far": 0.9333333333333333,
+      "passed": true
+    },
+    "llama3.1:8b": {
+      "overall": 0.8333333333333334,
+      "near": 1.0,
+      "far": 0.6666666666666666,
+      "passed": false
+    },
+    "gemma2:9b": {
+      "overall": 0.8666666666666667,
+      "near": 1.0,
+      "far": 0.7333333333333333,
+      "passed": false
+    }
+  },
+  "raw": {
+    "qwen3:8b_and_llama3.1:8b": [
+      {
+        "model": "qwen3:8b",
+        "secret": "jheel",
+        "word": "lake",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "paneer",
+        "word": "paneer",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "sharm",
+        "word": "border",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "udaasi",
+        "word": "key",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "azaadi",
+        "word": "freedom",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "insaaf",
+        "word": "justice",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "dehat",
+        "word": "yogurt",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "registan",
+        "word": "platter",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "mithai",
+        "word": "dessert",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "basti",
+        "word": "nephew",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "tokri",
+        "word": "law",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "mazaa",
+        "word": "duration",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "chimni",
+        "word": "chimney",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "kanoon",
+        "word": "sadness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "chattan",
+        "word": "rock",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "junoon",
+        "word": "auntie",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "judwaa",
+        "word": "twin",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "junoon",
+        "word": "passion",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "waqt",
+        "word": "khichdi",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "chaabi",
+        "word": "enjoyment",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "chaabi",
+        "word": "key",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "dahi",
+        "word": "neighborhood",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "chinta",
+        "word": "niece",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "bhanji",
+        "word": "trunk",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "dahi",
+        "word": "yogurt",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "bhanji",
+        "word": "niece",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "patta",
+        "word": "leaf",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "dehat",
+        "word": "countryside",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "dhoop",
+        "word": "sunlight",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "qwen3:8b",
+        "secret": "sarhad",
+        "word": "shyness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "jheel",
+        "word": "lake",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "paneer",
+        "word": "paneer",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "sharm",
+        "word": "border",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "udaasi",
+        "word": "key",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "mid"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "azaadi",
+        "word": "freedom",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "insaaf",
+        "word": "justice",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "dehat",
+        "word": "yogurt",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "mid"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "registan",
+        "word": "platter",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "far",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "mithai",
+        "word": "dessert",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "basti",
+        "word": "nephew",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "tokri",
+        "word": "law",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "mazaa",
+        "word": "duration",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "chimni",
+        "word": "chimney",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "kanoon",
+        "word": "sadness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "chattan",
+        "word": "rock",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "junoon",
+        "word": "auntie",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "judwaa",
+        "word": "twin",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "junoon",
+        "word": "passion",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "waqt",
+        "word": "khichdi",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "chaabi",
+        "word": "enjoyment",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "chaabi",
+        "word": "key",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "dahi",
+        "word": "neighborhood",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "chinta",
+        "word": "niece",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "mid",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "bhanji",
+        "word": "trunk",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "far"
+        ],
+        "correct": false
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "dahi",
+        "word": "yogurt",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "bhanji",
+        "word": "niece",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "patta",
+        "word": "leaf",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "dehat",
+        "word": "countryside",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "dhoop",
+        "word": "sunlight",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "llama3.1:8b",
+        "secret": "sarhad",
+        "word": "shyness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "mid",
+          "far",
+          "far"
+        ],
+        "correct": true
+      }
+    ],
+    "gemma2:9b": [
+      {
+        "model": "gemma2:9b",
+        "secret": "jheel",
+        "word": "lake",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "paneer",
+        "word": "paneer",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "sharm",
+        "word": "border",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "udaasi",
+        "word": "key",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "azaadi",
+        "word": "freedom",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "insaaf",
+        "word": "justice",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "dehat",
+        "word": "yogurt",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "far"
+        ],
+        "correct": false
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "registan",
+        "word": "platter",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "far",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "mithai",
+        "word": "dessert",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "basti",
+        "word": "nephew",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "tokri",
+        "word": "law",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "mazaa",
+        "word": "duration",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "mid"
+        ],
+        "correct": false
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "chimni",
+        "word": "chimney",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "kanoon",
+        "word": "sadness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "mid",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "chattan",
+        "word": "rock",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "junoon",
+        "word": "auntie",
+        "expected": "far",
+        "majority": "mid",
+        "votes": [
+          "mid",
+          "mid",
+          "far"
+        ],
+        "correct": false
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "judwaa",
+        "word": "twin",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "junoon",
+        "word": "passion",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "waqt",
+        "word": "khichdi",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "chaabi",
+        "word": "enjoyment",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "chaabi",
+        "word": "key",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "dahi",
+        "word": "neighborhood",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "chinta",
+        "word": "niece",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "bhanji",
+        "word": "trunk",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "dahi",
+        "word": "yogurt",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "bhanji",
+        "word": "niece",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "patta",
+        "word": "leaf",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "dehat",
+        "word": "countryside",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "dhoop",
+        "word": "sunlight",
+        "expected": "near",
+        "majority": "near",
+        "votes": [
+          "near",
+          "near",
+          "near"
+        ],
+        "correct": true
+      },
+      {
+        "model": "gemma2:9b",
+        "secret": "sarhad",
+        "word": "shyness",
+        "expected": "far",
+        "majority": "far",
+        "votes": [
+          "far",
+          "far",
+          "far"
+        ],
+        "correct": true
+      }
+    ]
+  },
+  "conclusion": "The LLM-consensus label ceiling (spec-metrics-ceiling-calibration.md WORKSTREAM 2) CANNOT currently be established with locally-available ~7-9B instruction-tuned models. Two independent candidate second judges from two different model families (Meta/llama3.1:8b, Google/gemma2:9b) were tried against the SAME qwen3:8b first judge and BOTH failed the mandatory 90% calibration bar, with the SAME specific, reproducible failure mode: over-prediction of relatedness -- labelling unambiguous domain-disjoint FAR-tier control pairs as 'mid' instead of 'far' (llama3.1:8b missed 5/30 control items this way -- registan/platter, mazaa/duration, tokri/law, junoon/auntie, bhanji/trunk; gemma2:9b missed 4/30 -- dehat/yogurt, registan/platter, mazaa/duration, junoon/auntie -- registan/platter and mazaa/duration fail for BOTH models, suggesting these are genuinely harder control items, not model-specific noise). Near-tier control accuracy was 100% for all three models tested -- the failure is specific and asymmetric to the far/unrelated tier, not a general judge quality problem. qwen3:8b remains the one PASSING judge found so far (96.7% overall, 100% near, 93.3% far) and is documented here as the known-good first judge for any future attempt with a genuinely different third model family. Per GG's explicit stop instruction, no third replacement model was tried and the bar was not loosened or re-tested at a different temperature to result-shop a pass. This workstream is closed as a final, honest negative result -- not a blocker requiring further escalation."
+}

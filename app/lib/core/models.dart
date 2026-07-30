@@ -11,7 +11,7 @@ enum TemperatureBand {
   /// Close: rank ≤ max(500, n * 0.01).
   hot,
 
-  /// Nearby: rank ≤ n * 0.05.
+  /// Nearby: rank ≤ max(900, n * 0.05).
   warm,
 
   /// Far: rank ≤ n * 0.25.
@@ -63,7 +63,7 @@ enum TemperatureBand {
 ///   - rank == 1                          → win
 ///   - rank ≤ max(50, n × 0.001)         → scorching
 ///   - rank ≤ max(500, n × 0.01)         → hot
-///   - rank ≤ n × 0.05                   → warm
+///   - rank ≤ max(1050, n × 0.05)        → warm
 ///   - rank ≤ n × 0.25                   → cold
 ///   - else                               → freezing
 ///
@@ -80,7 +80,8 @@ TemperatureBand bandForRank(int rank, int n) {
       (AppConfig.hotFraction * n).floor().clamp(AppConfig.hotFloor, n);
   if (rank <= hotMax) return TemperatureBand.hot;
 
-  final warmMax = (AppConfig.warmFraction * n).floor();
+  final warmMax =
+      (AppConfig.warmFraction * n).floor().clamp(AppConfig.warmFloor, n);
   if (rank <= warmMax) return TemperatureBand.warm;
 
   final coldMax = (AppConfig.coldFraction * n).floor();

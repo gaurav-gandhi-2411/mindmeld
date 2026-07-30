@@ -1,0 +1,1307 @@
+{
+  "run_name": "probe_l2_dict_only_front_end",
+  "shipped_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+  "substitution_coverage": {
+    "n_covered": 5235,
+    "n_vocab": 10495
+  },
+  "flagship_words_devanagari": {
+    "junoon": "जुनून",
+    "registan": "रेगिस्तान",
+    "jheel": "झील",
+    "udaasi": "उदासी"
+  },
+  "n_dim1_secrets": 34,
+  "n_dim1_scenarios": 302,
+  "n_dim2_pairs": 34,
+  "hybrid_dim1_spearman_ci": {
+    "point": 0.47307485713993774,
+    "ci_95": [
+      0.3793420630148963,
+      0.566512048644136
+    ],
+    "n_clusters": 34,
+    "n_scenarios": 300,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.04776780336711991
+  },
+  "hybrid_dim2_pass_rate_ci": {
+    "point": 0.5882352941176471,
+    "ci_95": [
+      0.4117647058823529,
+      0.7647058823529411
+    ],
+    "n_pairs": 34
+  },
+  "shipped_dim1_spearman_ci": {
+    "point": 0.6567787637579333,
+    "ci_95": [
+      0.5744905978258156,
+      0.7323352618528404
+    ],
+    "n_clusters": 34,
+    "n_scenarios": 303,
+    "n_valid_bootstrap_draws": 10000,
+    "std": 0.04071291261611395
+  },
+  "shipped_dim2_pass_rate_ci": {
+    "point": 0.7058823529411765,
+    "ci_95": [
+      0.5588235294117647,
+      0.8529411764705882
+    ],
+    "n_pairs": 34
+  },
+  "dim1_delta_vs_shipped": {
+    "baseline_point": 0.6567787637579333,
+    "candidate_point": 0.47307485713993774,
+    "delta_point": -0.18370390661799557,
+    "delta_ci_95": [
+      -0.3045778604506928,
+      -0.0538988935999339
+    ],
+    "ci_significant_improvement": false,
+    "ci_significant_regression": true,
+    "n_clusters": 34,
+    "secret_mismatch": null,
+    "n_valid_bootstrap_draws": 10000
+  },
+  "dim2_delta_vs_shipped": {
+    "baseline_point": 0.7272727272727273,
+    "candidate_point": 0.6060606060606061,
+    "delta_point": -0.12121212121212122,
+    "delta_ci_95": [
+      -0.33333333333333337,
+      0.09090909090909094
+    ],
+    "ci_significant_improvement": false,
+    "ci_significant_regression": false,
+    "n_pairs": 33
+  },
+  "dim1_regression_floor_all_34": {
+    "n_shared_pairs": 279,
+    "n_fixed": 12,
+    "n_broken": 19,
+    "net": -7,
+    "zero_net_regression": false,
+    "zero_regression_strict": false,
+    "fixed_pairs": [
+      "bhanja/nephew",
+      "chattan/breasts",
+      "jheel/lake",
+      "junoon/passion",
+      "junoon/sunshine",
+      "khichdi/mill",
+      "mazaa/kissed",
+      "patta/stem",
+      "registan/desert",
+      "registan/wasteland",
+      "udaasi/melancholy",
+      "udaasi/sadness"
+    ],
+    "broken_pairs": [
+      "azaadi/freedom",
+      "azaadi/liberty",
+      "basti/settlement",
+      "chattan/boulder",
+      "chinta/panthers",
+      "chinta/unease",
+      "chinta/worry",
+      "dahi/curd",
+      "mausi/gora",
+      "mazaa/amusement",
+      "mazaa/enjoyment",
+      "mithai/dessert",
+      "mohalla/locality",
+      "paneer/curd",
+      "patta/leaf",
+      "sawaal/question",
+      "sharm/modesty",
+      "thaali/platter",
+      "tokri/basket"
+    ]
+  },
+  "dim2_regression_floor_all_34": {
+    "n_shared_pairs": 33,
+    "n_fixed": 5,
+    "n_broken": 9,
+    "net": -4,
+    "zero_net_regression": false,
+    "zero_regression_strict": false,
+    "fixed_pairs": [
+      "desert->registan",
+      "lake->jheel",
+      "nephew->bhanja",
+      "passion->junoon",
+      "sadness->udaasi"
+    ],
+    "broken_pairs": [
+      "basket->tokri",
+      "dessert->mithai",
+      "enjoyment->mazaa",
+      "freedom->azaadi",
+      "leaf->patta",
+      "platter->thaali",
+      "question->sawaal",
+      "settlement->basti",
+      "worry->chinta"
+    ]
+  },
+  "target_words_before_shipped": {
+    "junoon": {
+      "dim1_rows": [
+        {
+          "secret": "junoon",
+          "word": "zeal",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 3660,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "passion",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 3396,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "obsession",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6615,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "drive",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 9025,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "exports",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8959,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "sunshine",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 58,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "oven",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3115,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "labels",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6362,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "fried",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 2101,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "passion",
+        "hien_secret": "junoon",
+        "rank": 3396,
+        "rank_percentile": 32.36,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      }
+    },
+    "registan": {
+      "dim1_rows": [
+        {
+          "secret": "registan",
+          "word": "wasteland",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 2614,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "desert",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 4815,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "dune",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 7302,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "drought",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8337,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "amounts",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 2847,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "infinite",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8575,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "judgement",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 4112,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "rhetoric",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 5792,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "comparing",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3558,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "desert",
+        "hien_secret": "registan",
+        "rank": 4815,
+        "rank_percentile": 45.88,
+        "band": 5,
+        "consistent": false,
+        "resolution_error": null
+      }
+    },
+    "jheel": {
+      "dim1_rows": [
+        {
+          "secret": "jheel",
+          "word": "lagoon",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 1146,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "lake",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 1616,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "shore",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3182,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "fishing",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 205,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "honor",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8640,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "joined",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 5120,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "organizations",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 10406,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "murderer",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 5272,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "feminist",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6802,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "lake",
+        "hien_secret": "jheel",
+        "rank": 1616,
+        "rank_percentile": 15.4,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      }
+    },
+    "udaasi": {
+      "dim1_rows": [
+        {
+          "secret": "udaasi",
+          "word": "melancholy",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 626,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "sadness",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 1082,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "misery",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3006,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "despair",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 265,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "kane",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 2517,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "phillips",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 2061,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "fail",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6392,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "rahat",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 382,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "pleasing",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": null,
+          "actual_band": null,
+          "in_expected_band": false,
+          "resolution_error": "secret='udaasi' or word='pleasing' not in vocab"
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "sadness",
+        "hien_secret": "udaasi",
+        "rank": 1082,
+        "rank_percentile": 10.31,
+        "band": 4,
+        "consistent": false,
+        "resolution_error": null
+      }
+    }
+  },
+  "target_words_after_hybrid": {
+    "junoon": {
+      "dim1_rows": [
+        {
+          "secret": "junoon",
+          "word": "zeal",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 1661,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "passion",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 2,
+          "actual_band": 1,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "obsession",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 1092,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "drive",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 1733,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "exports",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 9381,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "sunshine",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 4701,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "oven",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 7517,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "labels",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 1363,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "junoon",
+          "word": "fried",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6823,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "passion",
+        "hien_secret": "junoon",
+        "rank": 2,
+        "rank_percentile": 0.02,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      }
+    },
+    "registan": {
+      "dim1_rows": [
+        {
+          "secret": "registan",
+          "word": "wasteland",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 129,
+          "actual_band": 2,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "desert",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 83,
+          "actual_band": 2,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "dune",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 378,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "drought",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 17,
+          "actual_band": 1,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "amounts",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6301,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "infinite",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 9107,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "judgement",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 4768,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "rhetoric",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3034,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "registan",
+          "word": "comparing",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 6125,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "desert",
+        "hien_secret": "registan",
+        "rank": 83,
+        "rank_percentile": 0.79,
+        "band": 2,
+        "consistent": true,
+        "resolution_error": null
+      }
+    },
+    "jheel": {
+      "dim1_rows": [
+        {
+          "secret": "jheel",
+          "word": "lagoon",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 7364,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "lake",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 2,
+          "actual_band": 1,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "shore",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 71,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "fishing",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 16,
+          "actual_band": 1,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "joined",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 5128,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "carpenter",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 9697,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "murderer",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8847,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "jheel",
+          "word": "feminist",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 8006,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "lake",
+        "hien_secret": "jheel",
+        "rank": 2,
+        "rank_percentile": 0.02,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      }
+    },
+    "udaasi": {
+      "dim1_rows": [
+        {
+          "secret": "udaasi",
+          "word": "melancholy",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "associate",
+          "note": null,
+          "actual_rank": 6,
+          "actual_band": 1,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "sadness",
+          "tier": "near",
+          "expected_bands": [
+            1,
+            2
+          ],
+          "subtype": "translation",
+          "note": null,
+          "actual_rank": 4,
+          "actual_band": 1,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "misery",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 1303,
+          "actual_band": 4,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "despair",
+          "tier": "mid",
+          "expected_bands": [
+            3
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 3883,
+          "actual_band": 5,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "kane",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 1270,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "phillips",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 5857,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "fail",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 2585,
+          "actual_band": 4,
+          "in_expected_band": true,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "rahat",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": null,
+          "actual_rank": 266,
+          "actual_band": 2,
+          "in_expected_band": false,
+          "resolution_error": null
+        },
+        {
+          "secret": "udaasi",
+          "word": "optical",
+          "tier": "far",
+          "expected_bands": [
+            4,
+            5
+          ],
+          "subtype": null,
+          "note": "production supplement used \"pleasing\" here, which is unresolvable in the current hi-en vocab (report residual finding); swapped for a verified in-vocab far-tier word",
+          "actual_rank": 6110,
+          "actual_band": 5,
+          "in_expected_band": true,
+          "resolution_error": null
+        }
+      ],
+      "dim2_row": {
+        "en_secret": "sadness",
+        "hien_secret": "udaasi",
+        "rank": 4,
+        "rank_percentile": 0.04,
+        "band": 1,
+        "consistent": true,
+        "resolution_error": null
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "test_lora_best_checkpoint_regression",
+  "method": "lora",
+  "n_mnrl_pairs": 20,
+  "n_graded_pairs": 20,
+  "n_dev_scenarios": 46,
+  "best_dev_spearman_cosine": 0.6015708762190487,
+  "dev_curve": [
+    {
+      "eval_dev_spearman_cosine": 0.6015708762190487,
+      "epoch": 1.0,
+      "step": 6
+    },
+    {
+      "loss": 0.4126599788665771,
+      "epoch": 1.6666666666666665,
+      "step": 10
+    },
+    {
+      "eval_dev_spearman_cosine": 0.6015708762190487,
+      "epoch": 2.0,
+      "step": 12
+    }
+  ],
+  "n_trainable_params": 294912,
+  "n_total_params": 237851136,
+  "trainable_fraction": 0.0012399015828118644,
+  "output_dir": "C:\\Users\\gaura\\ml-projects\\mindmeld\\generator\\evals\\finetune\\checkpoints\\test_lora_best_checkpoint_regression\\model",
+  "hyperparams": {
+    "base_model": "l3cube-pune/indic-sentence-bert-nli",
+    "method": "lora",
+    "freeze_n_layers": 0,
+    "lora_r": 8,
+    "lora_alpha": 16,
+    "learning_rate": 2e-05,
+    "num_epochs": 2,
+    "batch_size": 8,
+    "warmup_ratio": 0.1,
+    "early_stopping_patience": 5,
+    "seed": 42
+  }
+}

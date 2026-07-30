@@ -1,0 +1,293 @@
+{
+  "run_name": "probe_lever_l6_commonsense_data",
+  "spec_ref": "spec-residual-attack.md lever L6",
+  "teacher_model": "llama3.1:8b",
+  "n_training_pairs_mined": 8,
+  "training_domain_breakdown": {
+    "food and cooking": 5,
+    "home and household objects": 3
+  },
+  "generalization_check_held_out_8_words": {
+    "probe_model_path": "/home/gaura/generator/evals/finetune/checkpoints/probe_lever_l6_commonsense_data/model",
+    "shipped_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+    "n_held_out_words": 8,
+    "n_rank_improved": 5,
+    "n_rank_regressed": 3,
+    "n_rank_unchanged": 0,
+    "per_word": [
+      {
+        "word": "tarbooz",
+        "gloss": "watermelon",
+        "related": "lal",
+        "related_gloss": "red",
+        "recorded_related_rank_at_curation": 473,
+        "before_shipped": {
+          "related": "lal",
+          "rank": 473,
+          "rank_percentile": 4.51,
+          "band_ordinal": 2,
+          "band_name": "hot"
+        },
+        "after_probe": {
+          "related": "lal",
+          "rank": 282,
+          "rank_percentile": 2.69,
+          "band_ordinal": 2,
+          "band_name": "hot"
+        },
+        "rank_delta": 191,
+        "band_delta": 0
+      },
+      {
+        "word": "anaar",
+        "gloss": "pomegranate",
+        "related": "lal",
+        "related_gloss": "red",
+        "recorded_related_rank_at_curation": 431,
+        "before_shipped": {
+          "related": "lal",
+          "rank": 431,
+          "rank_percentile": 4.11,
+          "band_ordinal": 2,
+          "band_name": "hot"
+        },
+        "after_probe": {
+          "related": "lal",
+          "rank": 659,
+          "rank_percentile": 6.28,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "rank_delta": -228,
+        "band_delta": -2
+      },
+      {
+        "word": "nariyal",
+        "gloss": "coconut",
+        "related": "safed",
+        "related_gloss": "white",
+        "recorded_related_rank_at_curation": 2020,
+        "before_shipped": {
+          "related": "safed",
+          "rank": 2020,
+          "rank_percentile": 19.25,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "after_probe": {
+          "related": "safed",
+          "rank": 2004,
+          "rank_percentile": 19.09,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "rank_delta": 16,
+        "band_delta": 0
+      },
+      {
+        "word": "samosa",
+        "gloss": "snack",
+        "related": "garm",
+        "related_gloss": "hot",
+        "recorded_related_rank_at_curation": 505,
+        "before_shipped": {
+          "related": "garm",
+          "rank": 505,
+          "rank_percentile": 4.81,
+          "band_ordinal": 3,
+          "band_name": "warm"
+        },
+        "after_probe": {
+          "related": "garm",
+          "rank": 792,
+          "rank_percentile": 7.55,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "rank_delta": -287,
+        "band_delta": -1
+      },
+      {
+        "word": "mirch",
+        "gloss": "chili",
+        "related": "lal",
+        "related_gloss": "red",
+        "recorded_related_rank_at_curation": 610,
+        "before_shipped": {
+          "related": "lal",
+          "rank": 774,
+          "rank_percentile": 7.37,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "after_probe": {
+          "related": "lal",
+          "rank": 516,
+          "rank_percentile": 4.92,
+          "band_ordinal": 3,
+          "band_name": "warm"
+        },
+        "rank_delta": 258,
+        "band_delta": 1
+      },
+      {
+        "word": "jharna",
+        "gloss": "waterfall",
+        "related": "loud",
+        "related_gloss": "loud",
+        "recorded_related_rank_at_curation": 4082,
+        "before_shipped": {
+          "related": "loud",
+          "rank": 4082,
+          "rank_percentile": 38.89,
+          "band_ordinal": 5,
+          "band_name": "freezing"
+        },
+        "after_probe": {
+          "related": "loud",
+          "rank": 2727,
+          "rank_percentile": 25.98,
+          "band_ordinal": 5,
+          "band_name": "freezing"
+        },
+        "rank_delta": 1355,
+        "band_delta": 0
+      },
+      {
+        "word": "til",
+        "gloss": "sesame",
+        "related": "kala",
+        "related_gloss": "black",
+        "recorded_related_rank_at_curation": 1025,
+        "before_shipped": {
+          "related": "kala",
+          "rank": 1025,
+          "rank_percentile": 9.77,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "after_probe": {
+          "related": "kala",
+          "rank": 688,
+          "rank_percentile": 6.56,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "rank_delta": 337,
+        "band_delta": 0
+      },
+      {
+        "word": "dudh",
+        "gloss": "milk",
+        "related": "safed",
+        "related_gloss": "white",
+        "recorded_related_rank_at_curation": 683,
+        "before_shipped": {
+          "related": "safed",
+          "rank": 683,
+          "rank_percentile": 6.51,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "after_probe": {
+          "related": "safed",
+          "rank": 1136,
+          "rank_percentile": 10.82,
+          "band_ordinal": 4,
+          "band_name": "cold"
+        },
+        "rank_delta": -453,
+        "band_delta": 0
+      }
+    ]
+  },
+  "benchmark_regression_floor": {
+    "model_path": "/home/gaura/generator/evals/finetune/checkpoints/probe_lever_l6_commonsense_data/model",
+    "n_dim1_secrets": 34,
+    "n_dim1_scenarios": 302,
+    "n_dim2_pairs": 34,
+    "probe_dim1_spearman_ci": {
+      "point": 0.6408286870672633,
+      "ci_95": [
+        0.5517346435759933,
+        0.7235477028652779
+      ],
+      "n_clusters": 34,
+      "n_scenarios": 300,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.043865217211507816
+    },
+    "probe_dim2_pass_rate_ci": {
+      "point": 0.6764705882352942,
+      "ci_95": [
+        0.5294117647058824,
+        0.8235294117647058
+      ],
+      "n_pairs": 34
+    },
+    "shipped_dim1_spearman_ci": {
+      "point": 0.6567787637579333,
+      "ci_95": [
+        0.5744905978258156,
+        0.7323352618528404
+      ],
+      "n_clusters": 34,
+      "n_scenarios": 303,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.04071291261611395
+    },
+    "shipped_dim2_pass_rate_ci": {
+      "point": 0.7058823529411765,
+      "ci_95": [
+        0.5588235294117647,
+        0.8529411764705882
+      ],
+      "n_pairs": 34
+    },
+    "probe_band_accuracy": {
+      "overall": 0.652317880794702,
+      "near": 0.582089552238806,
+      "mid": 0.0,
+      "far": 0.9461077844311377
+    },
+    "dim1_delta_vs_shipped": {
+      "baseline_point": 0.6567787637579333,
+      "candidate_point": 0.6408286870672633,
+      "delta_point": -0.015950076690670056,
+      "delta_ci_95": [
+        -0.053586101817414064,
+        0.018789954991390887
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_clusters": 34,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim2_delta_vs_shipped": {
+      "baseline_point": 0.7272727272727273,
+      "candidate_point": 0.6666666666666666,
+      "delta_point": -0.06060606060606066,
+      "delta_ci_95": [
+        -0.1515151515151515,
+        0.0
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_pairs": 33
+    },
+    "dim2_regression_floor": {
+      "n_common_secrets": 34,
+      "n_newly_broken": 2,
+      "newly_broken": [
+        "sharm",
+        "waqt"
+      ],
+      "n_newly_fixed": 1,
+      "newly_fixed": [
+        "besan"
+      ]
+    }
+  },
+  "_eval_wall_clock_s": 72.5594589049997
+}

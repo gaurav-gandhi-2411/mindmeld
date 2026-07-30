@@ -1,0 +1,190 @@
+{
+  "run_name": "verify_ship_l2_l5_e2e",
+  "benchmark_parity": {
+    "dim1_spearman_ci": {
+      "point": 0.7169592034441117,
+      "ci_95": [
+        0.6508527601256421,
+        0.7774792791784529
+      ],
+      "n_clusters": 34,
+      "n_scenarios": 300,
+      "n_valid_bootstrap_draws": 10000,
+      "std": 0.03246183227607345
+    },
+    "dim2_pass_rate_ci": {
+      "point": 0.8529411764705882,
+      "ci_95": [
+        0.7352941176470589,
+        0.9705882352941176
+      ],
+      "n_pairs": 34
+    },
+    "dim1_delta_vs_shipped": {
+      "baseline_point": 0.6567787637579333,
+      "candidate_point": 0.7169592034441117,
+      "delta_point": 0.060180439686178366,
+      "delta_ci_95": [
+        -0.0016734606467222316,
+        0.14350873373924466
+      ],
+      "ci_significant_improvement": false,
+      "ci_significant_regression": false,
+      "n_clusters": 34,
+      "secret_mismatch": null,
+      "n_valid_bootstrap_draws": 10000
+    },
+    "dim2_delta_vs_shipped": {
+      "baseline_point": 0.7272727272727273,
+      "candidate_point": 0.8484848484848485,
+      "delta_point": 0.12121212121212122,
+      "delta_ci_95": [
+        0.030303030303030276,
+        0.24242424242424243
+      ],
+      "ci_significant_improvement": true,
+      "ci_significant_regression": false,
+      "n_pairs": 33
+    },
+    "dim1_regression_floor": {
+      "n_shared_pairs": 279,
+      "n_fixed": 10,
+      "n_broken": 0,
+      "net": 10,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [
+        "jheel/lagoon",
+        "jheel/lake",
+        "junoon/passion",
+        "junoon/sunshine",
+        "junoon/zeal",
+        "registan/desert",
+        "registan/dune",
+        "registan/wasteland",
+        "udaasi/melancholy",
+        "udaasi/sadness"
+      ],
+      "broken_pairs": []
+    },
+    "dim2_regression_floor": {
+      "n_shared_pairs": 33,
+      "n_fixed": 4,
+      "n_broken": 0,
+      "net": 4,
+      "zero_net_regression": true,
+      "zero_regression_strict": true,
+      "fixed_pairs": [
+        "desert->registan",
+        "lake->jheel",
+        "passion->junoon",
+        "sadness->udaasi"
+      ],
+      "broken_pairs": []
+    },
+    "parity_checks": {
+      "dim1_point_matches": true,
+      "dim2_point_matches": true,
+      "dim1_delta_matches": true,
+      "dim2_delta_matches": true,
+      "dim1_floor_matches": true,
+      "dim2_floor_matches": true
+    },
+    "all_parity_checks_pass": true
+  },
+  "l5_live_payload_check": {
+    "n_words": 8,
+    "all_pass": true,
+    "per_word": [
+      {
+        "secret": "tarbooz",
+        "related": "lal",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 84.6,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "anaar",
+        "related": "lal",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 85.5,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "nariyal",
+        "related": "safed",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 87.1,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "samosa",
+        "related": "garm",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 87.9,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "mirch",
+        "related": "lal",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 89.8,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "jharna",
+        "related": "loud",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 84.8,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "til",
+        "related": "kala",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 88.4,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      },
+      {
+        "secret": "dudh",
+        "related": "safed",
+        "payload_entry_found": true,
+        "rank": 50,
+        "band_ordinal": 1,
+        "band_is_scorching_or_win": true,
+        "displayed_similarity_pct": 88.3,
+        "pct_consistent_with_scorching_band": true,
+        "result_ok": true
+      }
+    ]
+  },
+  "overall_ship_verification_pass": true
+}

@@ -1,0 +1,223 @@
+{
+  "pools": {
+    "a_production_25_secrets": "evals/scenarios/dim1_hien.json",
+    "b_public_benchmark_34_secrets": "evals/finetune/data/public_benchmark_staging/dim1_hien.json",
+    "c_internal_combined_42_secrets": "evals/finetune/data/bakeoff_raw/gauravgandhi2411__hinglish-relatedness-sbert.json (dim1_records)"
+  },
+  "ci_width_curve": {
+    "20": {
+      "median_width": 0.20119880063801793,
+      "iqr_low": 0.16235671219178438,
+      "iqr_high": 0.2312370573009524,
+      "n_draws": 200,
+      "note": null
+    },
+    "25": {
+      "median_width": 0.18015379239127,
+      "iqr_low": 0.1578520143114137,
+      "iqr_high": 0.19915461552276523,
+      "n_draws": 200,
+      "note": null
+    },
+    "30": {
+      "median_width": 0.16346502906320898,
+      "iqr_low": 0.1483652356266468,
+      "iqr_high": 0.17774000677892127,
+      "n_draws": 200,
+      "note": null
+    },
+    "34": {
+      "median_width": 0.15600196763102003,
+      "iqr_low": 0.14560941807219285,
+      "iqr_high": 0.1654897274496639,
+      "n_draws": 200,
+      "note": null
+    },
+    "38": {
+      "median_width": 0.1467368613106203,
+      "iqr_low": 0.13901952746506152,
+      "iqr_high": 0.15349223687845862,
+      "n_draws": 200,
+      "note": null
+    },
+    "42": {
+      "median_width": 0.13751223282362973,
+      "iqr_low": 0.1345687051650676,
+      "iqr_high": 0.14419516773574242,
+      "n_draws": 30,
+      "note": "k == pool size: the secret SET is deterministic (only one 42-choose-42 combination exists), so this spread reflects bootstrap-RNG noise only, not secret-selection noise -- unlike k < pool size."
+    }
+  },
+  "mde_real_effect_curve": {
+    "20": {
+      "detection_rate": 0.22666666666666666,
+      "n_sims": 150
+    },
+    "25": {
+      "detection_rate": 0.2866666666666667,
+      "n_sims": 150
+    },
+    "30": {
+      "detection_rate": 0.32,
+      "n_sims": 150
+    },
+    "34": {
+      "detection_rate": 0.26666666666666666,
+      "n_sims": 30
+    }
+  },
+  "calibration": {
+    "grid": {
+      "0.005": 0.0020817247381303455,
+      "0.01": 0.0061373759771946815,
+      "0.02": 0.01160839978786165,
+      "0.03": 0.017468037414729555,
+      "0.05": 0.02600424332977497,
+      "0.08": 0.03907346095398834,
+      "0.12": 0.053017924491798686,
+      "0.18": 0.06448497078031042,
+      "0.25": 0.08377189627956125,
+      "0.35": 0.10061351253496922,
+      "0.5": 0.10336696977217368
+    },
+    "calibrated": {
+      "0.04": {
+        "intensity": 0.08,
+        "calibration_mean_delta_at_k34": 0.03907346095398834
+      },
+      "0.06": {
+        "intensity": 0.18,
+        "calibration_mean_delta_at_k34": 0.06448497078031042
+      },
+      "0.1": {
+        "intensity": 0.35,
+        "calibration_mean_delta_at_k34": 0.10061351253496922
+      }
+    }
+  },
+  "mde_synthetic_curve": {
+    "0.04": {
+      "20": {
+        "detection_rate": 0.9133333333333333,
+        "n_sims": 150
+      },
+      "25": {
+        "detection_rate": 0.9866666666666667,
+        "n_sims": 150
+      },
+      "30": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "34": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "38": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "42": {
+        "detection_rate": 1.0,
+        "n_sims": 30
+      }
+    },
+    "0.06": {
+      "20": {
+        "detection_rate": 0.9733333333333334,
+        "n_sims": 150
+      },
+      "25": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "30": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "34": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "38": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "42": {
+        "detection_rate": 1.0,
+        "n_sims": 30
+      }
+    },
+    "0.1": {
+      "20": {
+        "detection_rate": 0.9866666666666667,
+        "n_sims": 150
+      },
+      "25": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "30": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "34": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "38": {
+        "detection_rate": 1.0,
+        "n_sims": 150
+      },
+      "42": {
+        "detection_rate": 1.0,
+        "n_sims": 30
+      }
+    }
+  },
+  "extrapolation": {
+    "c_fit": 0.9002100075609373,
+    "c_estimates_per_k": {
+      "20": 0.8997883904360723,
+      "25": 0.9007689619563499,
+      "30": 0.8953348378115713,
+      "34": 0.9096399687576915,
+      "38": 0.9045467626149044,
+      "42": 0.8911811237890345
+    },
+    "predicted_width_at_measured_k": {
+      "20": 0.20129307709318553,
+      "25": 0.18004200151218747,
+      "30": 0.16435510921100716,
+      "34": 0.15438474262782792,
+      "38": 0.14603334674266974,
+      "42": 0.1389054198360527
+    },
+    "residuals_at_measured_k": {
+      "20": -9.42764551676023e-05,
+      "25": 0.00011179087908252949,
+      "30": -0.0008900801477981779,
+      "34": 0.0016172250031921132,
+      "38": 0.0007035145679505639,
+      "42": -0.0013931870124229695
+    },
+    "extrapolated_width": {
+      "50": 0.1273089201676664,
+      "60": 0.11621661224575876,
+      "80": 0.10064653854659276
+    },
+    "note": "EXTRAPOLATION (parametric 1/sqrt(n) assumption) -- distinct from the measured, not-assumed results at n<=42 above."
+  },
+  "conclusion": {
+    "target_effect_size": 0.06,
+    "smallest_k_reaching_80pct_power_synthetic_curve": 20,
+    "detection_rate_at_k34_synthetic": 1.0,
+    "detection_rate_at_k34_real_effect": 0.26666666666666666,
+    "max_detection_rate_real_effect_any_tested_k": 0.32,
+    "ci_width_extrapolation_crossing_n": 56.27625400783769,
+    "recommended_additional_secrets_via_ci_width_extrapolation": 22,
+    "plain_language": "The two MDE curves disagree sharply at k=34: the calibrated-synthetic curve claims 100% detection power there, but the REAL observed L2+L5 effect (same 34 secrets) only detects 27% of the time -- the synthetic injection's uniform per-secret shift is a much cleaner signal than real per-secret heterogeneity, so the synthetic curve's 'k=20 is already enough' claim is treated here as an OPTIMISTIC LOWER BOUND, not an actionable target. The REAL curve itself never exceeds 32% detection across all tested k<=34 (no clear rising trend within the tested range, given real per-secret noise + limited sims), so it cannot pin down a 'crosses 80%' k either. The most defensible number here comes from a THIRD, independent cross-check: extrapolating the Step 3 1/sqrt(n) CI-width fit to find the n at which a ~0.06 point estimate's own CI width would plausibly clear zero (assuming the point estimate holds and the CI stays roughly symmetric) gives n~56 -- i.e. roughly 22 MORE secrets beyond the current 34, an EXTRAPOLATION-derived estimate distinct from either measured MDE curve above.",
+    "synthetic_curve_caveat": "The calibrated-synthetic curve is a documented computational-budget fallback (see module docstring) and, per the discrepancy above, should be read as an optimistic lower bound on secrets needed, NOT a reliable point estimate.",
+    "caveat": "This is a measurement/recommendation for GG to weigh against the mechanical cost of authoring new benchmark secrets (domain tuple + 4 hand-picked EN words + no-leakage grep + two scrub-script passes + GG review of any new advisory rank-10 hits per secret) -- NOT something acted on in this task. No new benchmark secrets were authored here."
+  }
+}

@@ -1,0 +1,35 @@
+# Targeted Devanagari-embedding patch for confirmed subword-tokenization-
+# collision words (spec-residual-attack.md lever L2). This substitutes the
+# EMBEDDING INPUT ONLY for the words below -- every other layer (secret
+# matching, hints, display, share text) continues to use the romanized
+# spelling; see vocab.apply_devanagari_patch for the positional-alignment
+# mechanism.
+#
+# NARROW LIST ONLY. A full-vocab front-end (every dict-coverable word, not
+# just these 4) was built and measured at scale and PROVEN to CI-
+# significantly regress dim1 Spearman (0.6568 -> 0.4731, CI [-0.3046,
+# -0.0539]) with a failed regression floor (19 broken pairs) -- see
+# generator/evals/finetune/data/probe_l2_dict_only_front_end.eval_result.json.
+# Do NOT add words here without a probe (probe_lever_l2_devanagari_hybrid.py
+# pattern) + full 34-secret benchmark regression floor (zero broken pairs)
+# first.
+#
+# Graduated combined result: generator/evals/finetune/data/
+# probe_l2_patch_l5_combined.eval_result.json (dim2 CI-significant +0.1212,
+# dim1 directionally positive +0.0602 not independently significant, zero
+# net regression on both floors).
+#
+# 5th entry (sharm) graduated via the gated collision-scan extension
+# (probe_l2_collision_scan_extension.py): generator/evals/finetune/data/
+# probe_l2_collision_scan_extension_n1.eval_result.json (zero broken pairs
+# on both regression floors, CI-significant topheavy improvement across
+# NDCG/Recall/MRR@{10,50,100}, e.g. MRR +0.050 CI [0.012, 0.098]). A wider
+# 58-word batch from the same collision scan FAILED the gate and was never
+# added -- see that probe's bisection output.
+#
+# Format: romanized_word: devanagari_spelling
+junoon: जुनून
+registan: रेगिस्तान
+jheel: झील
+udaasi: उदासी
+sharm: शरम

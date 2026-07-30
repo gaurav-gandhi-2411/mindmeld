@@ -1,0 +1,542 @@
+[
+  {
+    "word": "dada",
+    "related": "uncle",
+    "unrelated": "laptop",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "bhai",
+    "related": "brother",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "beti",
+    "related": "daughter",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "beta",
+    "related": "son",
+    "unrelated": "chair",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "nani",
+    "related": "grandma",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "mangal",
+    "related": "marriage",
+    "unrelated": "tree",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahayata",
+    "related": "support",
+    "unrelated": "floor",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahayak",
+    "related": "helper",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahayata",
+    "related": "aid",
+    "unrelated": "floor",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahayak",
+    "related": "assistant",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "roti",
+    "related": "bread",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "dal",
+    "related": "lentil",
+    "unrelated": "door",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "ghee",
+    "related": "clarifiedbutter",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "naan",
+    "related": "flatbread",
+    "unrelated": "sky",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "paratha",
+    "related": "flatbread",
+    "unrelated": "water",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "kheema",
+    "related": "mincedmeat",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "chana",
+    "related": "chickpea",
+    "unrelated": "floor",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "ladoo",
+    "related": "sweet",
+    "unrelated": "sky",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "shak",
+    "related": "vegetable",
+    "unrelated": "chair",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sabzi",
+    "related": "vegetable",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sweets",
+    "related": "jalebi",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "rang",
+    "related": "color",
+    "unrelated": "chair",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "decor",
+    "related": "ornament",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "rain",
+    "related": "baarish",
+    "unrelated": "saree",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "wind",
+    "related": "vayu",
+    "unrelated": "chocolate",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "weather",
+    "related": "mausam",
+    "unrelated": "guitar",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khush",
+    "related": "happy",
+    "unrelated": "water",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khayaal",
+    "related": "thought",
+    "unrelated": "dog",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "tum",
+    "related": "you",
+    "unrelated": "time",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "dil",
+    "related": "heart",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khushiyon",
+    "related": "joys",
+    "unrelated": "door",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khush",
+    "related": "joy",
+    "unrelated": "water",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khayaal",
+    "related": "idea",
+    "unrelated": "dog",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khali",
+    "related": "empty",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "padhai",
+    "related": "study",
+    "unrelated": "dance",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "test",
+    "related": "exam",
+    "unrelated": "music",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "teacher",
+    "related": "mentor",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "assignment",
+    "related": "homework",
+    "unrelated": "tree",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "notebook",
+    "related": "journal",
+    "unrelated": "fish",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "subject",
+    "related": "topic",
+    "unrelated": "sky",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "study",
+    "related": "learn",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "chalkboard",
+    "related": "blackboard",
+    "unrelated": "song",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "coach",
+    "related": "trainer",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "score",
+    "related": "point",
+    "unrelated": "tree",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "match",
+    "related": "game",
+    "unrelated": "sky",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "referee",
+    "related": "umpire",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "shakti",
+    "related": "power",
+    "unrelated": "umbrella",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sangeet",
+    "related": "music",
+    "unrelated": "laptop",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "director",
+    "related": "filmmaker",
+    "unrelated": "laptop",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "song",
+    "related": "melody",
+    "unrelated": "umbrella",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "beat",
+    "related": "rhythm",
+    "unrelated": "laptop",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "vocal",
+    "related": "singing",
+    "unrelated": "calendar",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "cinema",
+    "related": "movie",
+    "unrelated": "umbrella",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "audience",
+    "related": "crowd",
+    "unrelated": "calendar",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "rug",
+    "related": "carpet",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "tv",
+    "related": "screen",
+    "unrelated": "lamp",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "mat",
+    "related": "rug",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "gadi",
+    "related": "car",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "shala",
+    "related": "school",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "duniya",
+    "related": "world",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "safar",
+    "related": "trip",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khaas",
+    "related": "special",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "dilwala",
+    "related": "romantic",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "khana",
+    "related": "food",
+    "unrelated": "ladder",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "dard",
+    "related": "pain",
+    "unrelated": "cloud",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sundar",
+    "related": "beautiful",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "shak",
+    "related": "symptom",
+    "unrelated": "chair",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sukh",
+    "related": "happiness",
+    "unrelated": "clock",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "mazza",
+    "related": "pleasure",
+    "unrelated": "light",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "safal",
+    "related": "successful",
+    "unrelated": "water",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "chikitsa",
+    "related": "treatment",
+    "unrelated": "music",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahay",
+    "related": "help",
+    "unrelated": "stone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sundar",
+    "related": "attractive",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sukh",
+    "related": "joy",
+    "unrelated": "clock",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sant",
+    "related": "saint",
+    "unrelated": "glass",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sahay",
+    "related": "support",
+    "unrelated": "stone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sundar",
+    "related": "handsome",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sukh",
+    "related": "contentment",
+    "unrelated": "clock",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sundar",
+    "related": "pretty",
+    "unrelated": "wall",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "hat",
+    "related": "topi",
+    "unrelated": "chair",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "prayer",
+    "related": "namaz",
+    "unrelated": "car",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "god",
+    "related": "bhagwan",
+    "unrelated": "book",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "soul",
+    "related": "atma",
+    "unrelated": "phone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "devotion",
+    "related": "bhakti",
+    "unrelated": "stone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "chant",
+    "related": "kirtan",
+    "unrelated": "glass",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "faith",
+    "related": "dharma",
+    "unrelated": "clock",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "sacrifice",
+    "related": "tyaga",
+    "unrelated": "sky",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "meditation",
+    "related": "dhyana",
+    "unrelated": "stone",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "truth",
+    "related": "satya",
+    "unrelated": "wind",
+    "domain": "reconstructed"
+  },
+  {
+    "word": "chanting",
+    "related": "kirtan",
+    "unrelated": "fire",
+    "domain": "reconstructed"
+  }
+]

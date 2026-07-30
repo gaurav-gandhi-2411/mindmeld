@@ -1,3 +1,893 @@
+# PLAN — spec-metrics-ceiling-calibration.md CLOSED (2026-07-25)
+
+Follow-up to the checkpoint below: WS3 shipped to production, WS2 concluded
+as a final honest negative. Full detail:
+`generator/evals/finetune/data/spec_metrics_ceiling_calibration_consolidated.md`.
+
+**WS3 shipped end-to-end.** `warm_max` floor 900->1050 (`rival.py` +
+`dimension5_winrate.py` + Dart mirror `app/lib/core/config.dart`, all synced)
+-- +4 fixed/0 broken, Near/Far confusion rows byte-identical (unlike the
+prior 900-floor fix, which cost Far 95.7%->93.3%). Commits `0d9efb3`
+(Python), `566f5f6` (Dart). hi-en payloads regenerated + byte-verified live
+(18 files), EN spot-checked byte-identical. Flutter web app rebuilt and
+redeployed to playwarmer.vercel.app (byte-verified WASM, smoke check green)
+-- rival-displayed and player-guess bands consistent again. Honest scope
+documented: addresses only ~25% of the Warm-recall gap (threshold-
+placement-fixable share); the other ~75% is genuine ranking error, a
+documented model/data limitation, not fixed here.
+
+**Side quest: `deploy-warmer.ps1` had a real, separate bug**, found while
+proving the app deploy -- any native command's stderr (not just vercel's)
+crashed the script under Windows PowerShell 5.1's
+`$ErrorActionPreference='Stop'`, on every run, including successful ones
+(confirmed with two unrelated tools: vercel, then uv). Fixed with an
+`Invoke-NativeCommand` helper (EAP scoped per-call via try/finally, decides
+success/failure from the real exit code) applied to all 7 native call sites,
+plus an unrelated encoding bug (8 em-dashes, no BOM, misdecoding into a
+smart-quote under this environment's codepage and corrupting two `throw`
+literals) fixed alongside it. Proven with a clean, fully unattended real
+deploy. Commit `b922a18`.
+
+**WS2 (LLM-consensus ceiling) CLOSED as a final honest negative, not an open
+blocker.** Local GPU contention was chronic (a recurring `aetherart` job,
+not a one-off) and never cleared, so the job moved to GCP (`aetherart-497918`
+-- verified live unused GPU quota there, unlike this repo's usual precedent
+project `triageiq-portfolio-495022` which has 0). Two real full-scale runs,
+`g2-standard-8` + 1x NVIDIA L4, `asia-south1-c`:
+- Attempt 1 (qwen3:8b + llama3.1:8b, ~$0.16): qwen3:8b PASSED calibration
+  (96.7%: 100% near/93.3% far). llama3.1:8b FAILED (83.3%: 100%/66.7%, bar
+  90%).
+- Attempt 2, GG's bounded retry (qwen3:8b + gemma2:9b, gate-only-first,
+  ~$0.41): gemma2:9b also FAILED (86.7%: 100%/73.3%).
+Both failing judges share the identical failure mode -- over-predicting
+relatedness ("mid" not "far") on unambiguous domain-disjoint far-tier
+controls; near-tier was 100% for all three judges tested. Per GG's explicit
+stop condition (no third model, no bar softening, no temperature-shopping):
+**the LLM-consensus label ceiling cannot currently be established with
+locally-available ~7-9B models.** qwen3:8b documented as the one passing
+judge for any future attempt with a genuinely different (bigger/paid) third
+judge. Total GCP spend ~$0.57 across both attempts, both sessions torn down
+and verified zero billable resources.
+
+**What's left, ranked**: (1) decide whether model/benchmark cards should be
+updated with the corrected MAP-win/narrower-tie framing from WS1; (2) the
+ECE gap (0.202 vs granite 0.195) remains open, now provably not closeable
+via thresholds; (3) label ceiling is closed, not open -- next lever would be
+a materially different judge, a real cost/quality call, not a retry; (4) the
+~75% genuine-ranking-error share of Warm-recall is now the clearly-isolated
+remaining piece, same documented-limitation status as junoon/registan.
+
+---
+
+# PLAN — Metric re-specification + label ceiling + calibration frontier (2026-07-25)
+
+Spec: `spec-metrics-ceiling-calibration.md`. Three parallel executor workstreams,
+autonomous end-to-end per standing policy (no manual labeling requested at any
+point). Full consolidated findings:
+`generator/evals/finetune/data/spec_metrics_ceiling_calibration_consolidated.md`.
+Combined full test suite after all three: 777 passed / 4 skipped / 2
+pre-existing-unrelated Ollama-timeout errors (same GPU contention as WS2
+below), zero regressions. Nothing applied to production — `rival.py` and the
+shipped model are unchanged.
+
+**WS1 (retrieval metrics, DONE)** — corrected the mis-specified Precision@10=
+1.000/Recall@10=0.169 saturation. Real finding, not the spec's own working
+hypothesis: |R| (relevance-set size) is 3-5/mean 4.0 per secret, not ~59-60 as
+assumed — the classical `k/|R|` ceiling doesn't literally bind; the real
+mechanism is sparse judgment (~9 judged words per secret out of 10,495-word
+vocab). NDCG@10 was ALREADY graded (`_RELEVANCE_GRADE`, no bug) — documented,
+not "fixed." Added R-precision/MAP/|R|-scaled recall + surfaced |R| everywhere,
+all bootstrap-CI'd. **l3cube tie verdict, correctly scoped**: NDCG@10/Recall@10/
+R-precision ties SURVIVE (genuine n=42 statistical-power limits, not artifacts)
+but **MAP does not tie — shipped leads significantly** (+0.0254, CI
+[+0.0044,+0.0460]). Precision@10's tie WAS a pure saturation artifact (delta=0
+across all 10k draws) — retired, kept in report as superseded.
+`generator/evals/finetune/data/corrected_retrieval_metrics_report.md`.
+
+**WS3 (calibration, DONE)** — diagnosed Warm-band recall 8.3%: 75.3% of the 77
+misses are genuine ranking error (unrecoverable by any threshold), only 24.7%
+threshold-placement-fixable. Joint grid search found ONE candidate clearing a
+strict zero-broken gate: `warm_max` floor 900->1050 (+4 fixed/0 broken, Near
+and Far confusion rows byte-identical -- unlike the prior 900-floor fix which
+cost Far 95.7%->93.3%). Mid recall 8.3%->13.1% (real, zero-cost, not
+CI-significant at n=84). A more aggressive candidate (+6 net) was found and
+explicitly REJECTED for breaking 5 near-tier records -- same one-band-tradeoff
+trap this workstream exists to catch. **Hard limit found**: band ECE (0.202) is
+mathematically independent of band thresholds (`band_calibration_error` never
+reads `actual_band`) -- no threshold search can close the ECE-vs-granite gap;
+confirmed byte-identical (0.2020108359603864) before/after. Realistic-guess
+simulation (118 real puzzles) confirms all 6 bands stay reachable. **Diff
+proposed, NOT applied** -- `generator/evals/finetune/data/
+calibration_threshold_report.md`. Needs GG's go-ahead to ship + a follow-up
+Dart-side change (`app/lib/core/config.dart:176` `warmFloor`,
+`app/test/temperature_bands_test.dart`) not done this session (Flutter/Dart
+explicitly out of scope for the executor).
+
+**WS2 (LLM-consensus label ceiling, BLOCKED)** — `generator/evals/finetune/
+llm_consensus_ceiling.py` fully implements all 10 spec steps (qwen3:8b +
+llama3.1:8b, blind + order-randomised, k=3 self-consistency, mandatory 90%
+calibration gate, Cohen's weighted kappa trust gate, contested-item handling,
+3-way sensitivity analysis, % of ceiling) -- `generator/tests/
+test_llm_consensus_ceiling.py` 42/42 passing against a stubbed Ollama layer.
+The real 75-item/30-control/k=3 run (~630 Ollama calls) is blocked by local
+GPU contention: an unrelated `aetherart` process
+(`_pattachitra_ab_base_comparison.py`) holds 7.7-7.9GB/8GB VRAM at 100%
+utilization -- confirmed live via `nvidia-smi` and an isolated single-call
+probe that still timed out at 302s, checked twice 45 minutes apart with zero
+improvement. Per rule 46a, did not touch the other process, did not
+idle-wait -- escalated instead. Report artifacts on disk are a 6-item smoke
+test only, explicitly not real numbers. **Awaiting GG's choice**: (a) wait for
+`aetherart` to finish, retry later, $0; (b) approve a small capped GCP Ollama
+VM (likely <$1); (c) accept a smaller-than-spec sample now, clearly labeled.
+
+**Ranked what's left** (full detail in the consolidated report): (1) ship the
+Warm-threshold fix -- zero-risk, ready, highest leverage/effort; (2) resolve
+the label-ceiling blocker -- needed before any "% of achievable ceiling" claim
+can be made; (3) decide whether model/benchmark cards should be updated with
+the corrected MAP-win / narrower-tie framing; (4) the ECE gap itself (0.202 vs
+0.195) remains open, now provably NOT closeable via thresholds -- a real,
+scoped follow-up (rank->confidence recalibration) if GG wants to pursue it.
+
+---
+
+# PLAN — SHIPPED: L2-patch + L5 in production (2026-07-23)
+
+GG confirmed ship decision: L2-patch + L5, skip L4. Full ship executed:
+
+1. **Production wiring**: L2 (targeted 4-word Devanagari patch,
+   `vocab.apply_devanagari_patch`) + L5 (ranking-time override,
+   `payload._build_payload_core`) wired into all 3 build entry points.
+   Zero runtime cost, no model retrain. `rival.scorching_cutoff` extracted
+   for reuse. Caught + fixed a real production issue the probe couldn't see:
+   L5 must splice `sims[target_idx]` too, not just rank, or the app's
+   displayed similarity % (guess_tile.dart) would contradict the band.
+   Commits `8333513`, `22cfcbd` (verification). 514 tests pass.
+2. **End-to-end re-verification** (not just probe scripts): benchmark parity
+   confirmed via the REAL production embedding path, byte/value-identical to
+   the combined probe's numbers. L5 live-payload check via real
+   `payload.build_payload()`: all 8 words forced to rank 50/scorching band,
+   displayed similarity 84-90% (consistent, not confusing).
+3. **Cards updated + published live**: HF model card gets a new "Production
+   wrapper" section (numbers clearly separated from the unchanged raw-model
+   headline), Limitations section updated (L1/L3/full-vocab-L2 marked PROVEN
+   DEAD, L2-patch+L5 marked shipped, L4/L6 marked open-for-future). Benchmark
+   card notes the downstream mitigation while keeping its own numbers
+   unwrapped (stays a fair ruler). Both verified live via direct fetch.
+   Commits `6fa6847`, `2af0f12` (one scrub-gate reformat fix, caught
+   correctly by the leak-prevention check, not bypassed).
+4. **Payloads regenerated + deployed**: daily hi-en (60 days, 2026-06-12 to
+   2026-08-10 — caught and fixed a real mistake mid-session: an initial
+   30-day run only regenerated the STALE half of the window and would have
+   left manifest.json under-reporting available days) + onboarding + both
+   live packs (bollywood, cricket) for both langs (en byte-differs from old
+   content but is independently deterministic/reproducible — confirmed via
+   double-build sha256 match — so this is pre-existing drift, not new
+   non-determinism). All byte-verified against the live CDN after push.
+5. **GCP confirmed zero billable resources** (0 instances/disks/snapshots/
+   images) — this entire ship phase used no GCP at all, L4 was skipped.
+6. **Live spot-check**: partial. Decoded the actual byte-verified live CDN
+   payload for today with the app's real algorithm — junoon/registan/jheel/
+   udaasi/tarbooz/dudh all process correctly (found, sane rank/band/%,
+   qsim-band consistency holds) as GUESSES against today's (unrelated)
+   secret. A literal in-browser play-test was blocked by an environment
+   issue (chrome-devtools MCP stuck at the server level, not a stale lock,
+   not resolvable from this session) — not something to claim as done.
+   **L5 is verified-correct in production code but currently DORMANT**: none
+   of its 8 trigger words (tarbooz/anaar/nariyal/samosa/mirch/jharna/til/
+   dudh) are in the current scheduled secrets file, so it has never yet
+   fired on a real puzzle. Adding one to the schedule is a content decision
+   for a future session if GG wants to see it live.
+
+**L4/L6 status for future resume**: both remain live, untested-at-scale
+levers, not closed. L4 (distillation) has a bounded, zero-regression result
+on trained words only (checkpoint lost with the deleted VM, needs retrain).
+L6 (commonsense data) is genuinely inconclusive (5/8 held-out improved, 3/8
+regressed, n=8 too small). Full context: `spec-residual-attack.md`.
+
+---
+
+# PLAN — L2-patch + L5 combination (CLEARS ship bar, 2026-07-23)
+
+GG confirmed: L2 ships ONLY as the narrow targeted-word patch (4 words,
+junoon/registan/jheel/udaasi-class), full-vocab front-end is dead, do not
+revisit. Scored the narrow L2-patch COMBINED with L5 (ranking-override, 8
+curated commonsense words) against the frozen benchmark, no GCP needed.
+`probe_l2_patch_l5_combined.py`, committed `38ec4ba`.
+
+**Structural finding (verified by computation, not assumed): L5 is
+mathematically orthogonal to the 34-secret frozen benchmark** -- its
+rank-override only ever touches one of its own 8 candidate secrets' arrays,
+confirmed zero overlap with the benchmark's 34 secrets. So the combination's
+benchmark score == L2-patch-alone's, reproduced fresh (matches the
+2026-07-19 probe exactly): **dim1 0.6568->0.7170 (+0.0602, CI
+[-0.0017,+0.1435], NOT CI-significant -- barely touches zero), dim2
+0.7273->0.8485 (+0.1212, CI [+0.0303,+0.2424], CI-SIGNIFICANT).** Regression
+floor: 10 fixed/0 broken (dim1), 4 fixed/0 broken (dim2) -- STRICT zero
+regression, nothing broke. L5's own effect (run genuinely on the L2-patched
+matrix): all 8 commonsense words forced to correct band, 0 side effects.
+
+**Ship bar (CI-significant dim1 and/or dim2 + zero net regression):
+CLEARED via dim2.** L2-patch+L5 may already be sufficient to ship without
+L4's retrain -- L4 would only add value for a stronger/more-certain dim1
+result or broader commonsense coverage beyond L5's 8 curated words.
+
+**STOPPED here per GG's instruction** -- awaiting the L4-retrain go/no-go
+decision (the one remaining GCP-cost item) now that L2-patch+L5's baseline
+is known.
+
+---
+
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 2 DONE, L2 FAILS ship gate, 2026-07-23)
+
+**Phase 2 (score L2 at scale) complete -- L2-as-front-end does NOT carry
+forward.** A random 40-word audit of the raw LLM-resolved half of the Phase-1
+table found a 20% quality-issue rate (5% garbage, 15% translations-not-
+transliterations -- including all 4 flagship words corrupted despite the
+earlier 4-word probe resolving them correctly via the same protocol). Scored
+the DICT-ONLY subset instead (5231 words, zero corruption risk) + the 4
+flagship words patched from the already-graduated probe's validated spellings
+(जुनून/रेगिस्तान/झील/उदासी, confirmed correct) -- 5235/10495 (49.9%) coverage,
+no GCP spend needed. `probe_l2_dict_only_front_end.py`, committed `b1c05f9`.
+
+**Result: dim1 0.6568 -> 0.4731, delta -0.1837 CI [-0.3046,-0.0539] --
+CI-SIGNIFICANT REGRESSION.** dim2 0.7273 -> 0.6061, delta -0.1212 (not
+CI-significant, still negative). Regression floor FAILS both dimensions:
+dim1 12 fixed/19 broken (net -7), dim2 5 fixed/9 broken (net -4). The 4
+flagship words themselves DID improve (consistent with the graduated probe),
+but broad dict-vocab substitution regresses ~19 other previously-correct
+pairs. Mechanism: the shipped model is fine-tuned on ROMANIZED text; most
+dict-covered words aren't tokenization-pathological the way the 4 flagship
+words are, so swapping them to Devanagari discards the fine-tuned
+representation with no offsetting benefit.
+
+**Conclusion: L2 as any kind of broad front-end (dict-only or full) fails
+ship criteria decisively -- does not clear CI-significance, violates
+zero-net-regression.** L2's only evidenced form remains the narrow,
+already-graduated one: substitution applied ONLY to specifically identified
+collision words (the original 4), not a general front-end. That's a much
+smaller/cheaper intervention than what "full-vocab front-end" implied, worth
+remembering if L2 factors into a future combination lever.
+
+**STOPPED here per GG's explicit instruction** -- no L4/L6 retraining, no
+further GCP spend this session. Awaiting GG's call on whether the narrow-L2 +
+combination-lever path (L2-targeted + L4 + L5) is still worth pursuing given
+full-front-end-L2 failed, or whether to close this branch of the residual-
+attack program.
+
+---
+
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (Phase 1 DONE, 2026-07-23)
+
+**Phase 1 (LLM transliteration pass) complete.** Resumed from the 27/210-batch
+checkpoint on a fresh GCP VM (`hinglish-rebaseline-b1`, n2-standard-8,
+asia-south1-a, `triageiq-portfolio-495022`). qwen3:8b ran all 184 remaining
+batches clean (zero errors), avg 100s/batch, ~5h11m wall clock:
+4989/5264 LLM misses resolved, 275 unresolved (dict covered 5231/10495 free).
+
+The 275 misses included **junoon and registan** -- 2 of the 4 flagship
+subword-collision words this whole L2 lever exists to fix -- so the table as
+first built didn't cover its own primary target case. Ran a second fallback
+pass (`resolve_devanagari_llama_fallback.py`) with llama3.1:8b, the same
+secondary-fallback protocol `probe_lever_l2_devanagari_hybrid.py` already used
+and had graduate on those exact 4 words. Closed 192/275 (28 still null after
+both LLMs -- mostly loanwords/compounds: computer, mobile, camera, washing
+machine, etc. -- left null, never fabricated). **Final: 10467/10495 (99.7%)
+resolved; junoon/registan/jheel/udaasi all resolved.** Committed `3050659`.
+
+GCP torn down and verified empty (instances/disks/snapshots/images) after
+each session. Total this session's VM uptime ~6h10m; estimated compute spend
+~$2.90 (public list price basis, same methodology as the Phase-0 finding --
+not live-billing-queried this time). Cumulative program spend to date
+(Phase 0 $0.17-0.18 + probe wave $0.536 + this session ~$2.90) ≈ **~$3.6-3.7**.
+
+**Next: Phase 2** -- score L2-as-full-front-end against the frozen benchmark +
+regression floor (all currently-working pairs must not break). Then Phase 3
+(retrain L4/L6, checkpoints lost with the deleted VM), Phase 4 (combo scoring:
+L2 alone / L2+L4 / L2+L5 / L2+L4+L5), optionally Phase 5 (bake-off). **STOP
+gate unchanged: present the final combined comparison table for GG's review
+before shipping anything** -- ship criteria (CI-significant win + zero net
+regression) also unchanged.
+
+---
+
+# PLAN — L2 full-vocab Devanagari front-end rebaseline (STOPPED at Phase 0, 2026-07-19)
+
+GG confirmed L2/L4/L5 GRADUATE from the probe wave below and asked for L2 to be re-tested
+as a candidate NEW BASELINE: a full-vocabulary Devanagari transliteration front-end
+(generalizing L2's existing 4-word hybrid probe to all ~10,495 hi-en vocab words), then
+L4/L5/L6 re-measured STACKED on top of it. GCP session provisioned (`hinglish-rebaseline-
+a1`, n2-standard-8, asia-south1-a, `triageiq-portfolio-495022`), generator/ tree + the
+115MB `aksharantar_hi.jsonl` dict source transferred and MD5-verified, `uv sync` +
+Ollama + qwen3:8b pull all completed clean.
+
+**STOPPED at the task's own explicit mandatory checkpoint**: before committing to the
+full 211-batch LLM fallback pass (5,264/10,495 vocab words have no dict hit and need
+qwen3:8b), one real 25-word batch was timed first, per instruction. Result: 87.8s for a
+successful batch (within 2.2s of the 90s per-call timeout), a second batch timed out at
+90s with 0/25 resolved, and a 4-way-parallel test (`OLLAMA_NUM_PARALLEL=4`) made things
+WORSE (all 4 concurrent batches timed out, 0/100 resolved) — CPU-only 8B-model inference
+on an 8-vCPU VM does not parallelize favorably at this batch size, confirmed empirically,
+not assumed. Extrapolated: 211 batches x ~88-90s = ~309-316 minutes minimum, sequential,
+before any retry overhead — **1.7-1.9x the entire 180-minute session budget, on the LLM
+step alone**, before Phase 2 (L2 scoring), Phase 3 (L4/L6 retrain), Phase 4 (combo
+scoring), or Phase 5 (bake-off) even start. This is exactly the task's own stated stop
+condition, not a judgment call — VM deleted immediately after the finding (uptime ~21
+min, confirmed via `gcloud compute instances list` returning 0 items), estimated spend
+~$0.17-0.18 (compute portion live-queried via Cloud Billing Catalog API: N2 Instance
+Core running in Mumbai $0.03797/vCPU-hr + N2 Instance Ram running in Mumbai
+$0.005088/GB-hr; disk portion is public list price, not live-queried, a minor
+component). Full finding: `generator/evals/finetune/data/
+l2_full_vocab_rebaseline_phase0_finding.json`.
+
+**Zero words resolved via LLM this session** — the dict-primary resolution (5,231/10,495
+direct hits, confirmed matches the prior recon's numbers exactly) is real and cheap
+(<1s, no LLM needed), but a "full vocab" front-end table was deliberately NOT written
+partially, since a dict-only table silently mislabeled as "full vocab" would misrepresent
+what Phase 2 onward actually measured. Phases 1 (LLM half) through 5 are all untouched.
+
+**Awaiting GG's call before any further GCP spend** on one of: (a) a smaller-scope
+DICT-ONLY front-end (~50% vocab coverage, explicitly labeled as such, not "full vocab"),
+(b) a dedicated follow-up session budgeted ~5-6 hours just for the LLM transliteration
+pass, or (c) a different/faster teacher model for this specific bulk task (untested for
+transliteration accuracy, a quality tradeoff needing sign-off, not a unilateral swap).
+
+---
+
+# PLAN — Hinglish residual-attack probe wave (STOP gate reached, 2026-07-19)
+
+Spec: `spec-residual-attack.md`. Probed all 6 non-combination levers (L1-L6)
+against the two documented residuals (subword-collision: junoon/registan/
+jheel/udaasi; associative-commonsense: property/taste/color facts, curated
+word list at `generator/evals/finetune/data/commonsense_residual_
+candidates.json`). Entry-21 LoRA-checkpoint fix (a7a7109) confirmed merged
+first, per spec order.
+
+**Result**: L1 (higher LoRA capacity) and L3 (alternative base tokenization)
+PROVEN DEAD. L2 (Devanagari-hybrid embedding, inference-time) and L5
+(ranking-time rank-override, build-time) GRADUATE — neither needs model
+retraining. L4 (targeted distillation) GRADUATES with bounded scope (safe,
+zero-regression on 5/8 trained candidates, not generalization evidence). L6
+(commonsense-shaped data, held-out generalization test) is genuinely
+INCONCLUSIVE — mixed 5/3 signal, small domain-imbalanced training set (n=8),
+not CI-significant, not zero-regression-strict.
+
+Local GPU/Ollama were contended by unrelated concurrent local sessions
+(`aetherart` SDXL job + a `reclaim` project session) for L4/L6's probes; GG
+approved GCP fallback (only billing-enabled project `triageiq-portfolio-
+495022`, GPU quota 0 everywhere so on-demand CPU VMs were used — the LoRA
+training code is CPU-only by design already). Two GCP VM sessions total
+(first hit reproducible blockers -- 3/8 L4 candidates fail qwen3:8b
+calibration, L6's 30s timeout too short for VM latency; both fixed and
+retried), cleanly torn down each time, **total GCP spend $0.536**. Commits:
+`b173af4` (L1/L2/L3/L5 + curation), `2654b9c` (L4/L6 GCP results + a real
+persistence-order bug an agent caught mid-run).
+
+**STOP gate**: comparison table presented to GG per spec's explicit
+"STOP after probes" instruction, before any L7 combination or ship
+decision. Awaiting GG's go/no-go on which lever(s) to carry into
+production wiring (L2/L5 need no further training — they need generalizing
+past the 4-8 hand-curated words and wiring into `embeddings.py`/`payload.py`
+respectively; L4's bounded win doesn't need scaling, it needs a scope
+decision on whether bounded-safe is enough to ship at all).
+
+---
+
+# PLAN — Hinglish research release, Phase 1 (in progress, 2026-07-19)
+
+Spec: `spec-hinglish-research-release.md` (new, supersedes spec-hinglish-benchmark.md
+going forward -- that older spec's own Phase 1, 50-secret/8-model bake-off, is done
+and committed through `d212af0`). This phase targets the new spec's bigger Phase-1
+bar: a several-hundred-pair public benchmark with a dev/test split that actually
+predicts test (old problem: dev-test corr only 0.12), commercial-licensed-or-honestly-
+labeled sourcing, and a strict scrub. **STOP gate after this phase, per spec: present
+benchmark size/sample/dev-test corr/scrub result to GG before it's used as the ruler
+for anything downstream.**
+
+## Recovered mid-session state (this session started here, not from scratch)
+
+Found uncommitted, unexplained tree state at session start: a P0 cache-key fix
+(`embeddings.py` + `generator/tests/test_embeddings.py`), a partially re-run 8-model
+bake-off (6/8 checkpoints re-run clean, only `wall_clock_seconds` changed -- confirms
+the fix didn't change committed Phase-1 numbers), and a new, not-yet-wired-in
+`generator/evals/finetune/data/public_benchmark_staging/` (276 dim1_en + 274 dim1_hien
++ 30 dim2 draft pairs, 31 of the existing 34 "benchmark-only" secrets from
+`phase1_benchmark_report.md`'s domain table). Diagnosed as this same task's own prior
+progress, interrupted mid-run by a context compaction (order of missing bake-off
+checkpoints exactly matches `CANDIDATE_MODELS` list order; `run_model()`'s
+checkpoint-immediately-per-model design is resumable by construction). **Confirmed
+with GG** (AskUserQuestion, this session): resume as own work, don't discard; source
+the benchmark as majority expert-tiered/synthetic (same near/mid/far/subtype rigor
+already proven) + IndicCorp v2 CC0 supplement, honestly labeled -- not overclaimed as
+human-annotated commercial data (that data doesn't exist for Hindi, per the licensing
+gate already run in the data-expansion wave, see PLAN.md's "Licensing gate" section
+below).
+
+## In flight
+
+- Bake-off re-run resumed in background (`benchmark_bakeoff.py --all`) to regenerate
+  the 2 missing checkpoints (Qwen3-Embedding-0.6B, shipped model) -- CPU inference,
+  ~45-60min estimated. Once done: all 8 checkpoints confirmed post-fix, then commit
+  the P0 fix + test + bakeoff_raw/*.json as one atomic commit.
+- Executor subagent dispatched (background) to: add the 3 missing benchmark-only
+  secrets (junoon/insaaf/udaasi) to the staging files with verified in-vocab words;
+  write + run `scrub_public_benchmark.py` (per-word collision check against every
+  live daily-schedule secret + every pack secret + aliases + morphological variants,
+  stricter than the precedent `publish_to_hf.py` 2-co-occurring-secrets check since a
+  benchmark word list is a single-collision risk, not a co-occurrence risk); build a
+  domain-stratified dev/test split of the 34 secrets and MEASURE (not estimate)
+  dev<->test correlation using the 8 bake-off models' already-computed dim1_records,
+  sliced by secret membership; compute bootstrap CIs on the finalized 34-secret set;
+  write `public_benchmark_phase1_report.md`. Explicitly told not to touch git or
+  production game content, and not to force/fudge the correlation number.
+
+## Update: both background jobs landed, P0 fix committed (f31b0f5)
+
+- Bake-off re-run: all 8/8 checkpoints regenerated post-fix; every score byte-
+  identical to pre-fix (only wall_clock_seconds differs, verified via git diff);
+  `bakeoff_comparison.md` byte-identical. Committed as `f31b0f5`.
+- Benchmark-finalization executor: completed 34/34 secrets, built+ran
+  `scrub_public_benchmark.py` (found/fixed 16 real blocking collisions, incl. one
+  it introduced itself; 539 advisory Levenshtein-only hits disclosed, non-blocking
+  by design -- rationale in the script's docstring), built a stratified 17/17
+  dev/test split (seed=42), measured dev<->test Pearson r=0.885 (n=8 models) vs the
+  old 0.12 baseline, computed bootstrap CIs (full/dev/test). Full report:
+  `generator/evals/finetune/data/public_benchmark_phase1_report.md`.
+- **Independently re-verified by me** (not just trusted): re-ran
+  `scrub_public_benchmark.py` myself -> same 0/539 blocking/advisory split; re-ran
+  `public_benchmark_analysis.py` myself -> same r=0.8852940766818941, n=8.
+- Full generator test suite running in background to confirm nothing broke
+  repo-wide before the benchmark files are committed (executor's own in-session run
+  already showed 496 passed/4 skipped -- the 4 skips are the pre-existing,
+  documented, unrelated Ollama-judge flake).
+
+## Phase 1: CLEARED and PUBLISHED (2026-07-19)
+
+GG's review found a real gap I'd missed (bhanji's hi-en far tier silently short a word --
+17th collision, not 16) and asked two follow-ups before clearing: a semantic-proximity
+scrub (string scrub alone can't catch a benchmark word that's a strong SEMANTIC associate
+of a live secret with zero string overlap) and precise provenance language. Both done:
+- `semantic_scrub_public_benchmark.py` built, reusing production rank/band machinery.
+  Necessary calibration finding: at this benchmark's word density (~325 words / 10.5k-55k
+  vocab), naive hot-band hits are mostly chance noise (~1.3-2.9x baseline, computed not
+  assumed) -- same trap the string scrub's Levenshtein branch hit once already.
+- GG's targeted pass: 20 genuine "obvious one-hop associate" words swapped (the
+  border->boundary/storage->memory class), 24 chance-level ones left alone, 2
+  (`border`/`sunlight`) left as unswappable ground-truth secret translations.
+- Reverified headline numbers against the ACTUALLY-published (post-swap) word content
+  rather than trust the pre-swap bake-off numbers: negligible drift (r=0.894 vs 0.885;
+  shipped Spearman 0.656 vs 0.657).
+- Provenance confirmed accurate and shipped verbatim: AI-authored near/mid tiers,
+  hash-sampled far tiers, not independently human-annotated, not commercial data.
+
+**Published**: https://huggingface.co/datasets/gauravgandhi2411/hinglish-relatedness-benchmark
+(CC-BY-4.0, dim1 headline + dim2 secondary with honest per-domain table). Commits:
+`c63a935` (correction + semantic scrub), `5a9d30f` (targeted swap + reverify), `01540dd`
+(publish).
+
+## IMPORTANT correction before Phase 2 starts: the "abstract-emotional cluster" premise doesn't match the data
+
+GG's Phase-2 direction named "the abstract-emotional cluster" as the benchmark's localized
+weakness (echoing khamoshi/bachpan from the OLD 60-secret known-limitations list). Checked
+this against the ACTUAL dim2 per-domain fail-rate on the new 34-secret benchmark before
+building anything on it (rule: verify premises against ground truth, the requester can be
+wrong) -- it doesn't hold for this benchmark: abstract is the STRONGEST domain (0/5 failed,
+0%), not the weakest. The real weak clusters here are **food (3/5, 60%), nature (2/5, 40%),
+and emotion (2/5, 40%)** -- emotion partially overlaps GG's instinct but abstract does not,
+and food is the actual worst performer, unmentioned in the original framing. n=4-5/domain is
+small (one flip moves a domain's rate 20-25pp), flagged as directional not tight in the
+published card. **Surfaced to GG for confirmation before Phase 2's data-mining effort spends
+GCP credits targeting the wrong cluster.**
+
+## GG's redirect: fix the benchmark first, re-derive weakness, probe before mining (2026-07-19)
+
+GG's Phase-2-mining instruction included fabricated examples (`bhutta`->maize,
+`jheel`->pond) attributed to "the report" -- neither exists anywhere in this project's
+data or anything I wrote. Verified via direct grep/file-read before acting (rule: the
+requester can be wrong), flagged it, GG confirmed a reviewer had invented them and
+retracted. Proceeded with the REAL findings instead:
+
+- **besan/gram was a second labeling defect**, distinct from the paneer/khichdi
+  degenerate-pair artifact already fixed: "gram" reads in this corpus as the Indian-
+  English "gram panchayat" (village) sense (checked via gram's own nearest neighbors:
+  village/rural/hamlet/countryside), not "gram flour." Fixed -> `besan`/**flour**
+  (verified unambiguous: dough/wheat/grain/bread neighborhood; besan now hot-band,
+  correctly consistent). `dim1_en`'s mirrored "gram" secret renamed/rebuilt against
+  verified bands. Republished as **v1.1** with a visible Changelog section (not a
+  silent overwrite, per GG's explicit request). Commit `2341d39`.
+- **Corrected, complete domain table**: food's apparent 60%->33%->**0%** fail rate was
+  entirely a labeling artifact (2 degenerate pairs + 1 bad gloss), not model weakness.
+  Real residual: **emotion + nature specifically (40% each)** -- object/place/kinship
+  each have exactly one real failure (chaabi, dehat, bhanja resp.), not clustered.
+- **junoon/registan root-caused as subword-tokenization collision** (nearest-neighbor
+  inspection: junoon~afternoon/noon/june, registan~register/registry/registration) --
+  correctly-spelled romanizations, no better spelling exists, EN glosses are clean.
+  This is a genuine model/tokenizer characteristic, NOT benchmark-editable like
+  besan/gram was -- documented as such in the card, not smoothed over.
+- Reverified headline numbers post-fix: dev<->test Pearson r **0.920** (was 0.894, was
+  0.885), shipped full-34 dim1 Spearman **0.657 [0.569, 0.736]**.
+
+**Cheap probe launched (background executor, before any GCP spend)**: find 5-10 OTHER
+short/rare hi-en words (NOT benchmark secrets, no-leakage-verified) showing the same
+subword-collision signature, build ~20-40 targeted contrastive pairs + hard negatives
+against the identified spurious neighbors, fine-tune via `train_lib.py`'s existing LoRA
+config with pairs injected in-memory (no on-disk training-file changes), evaluate on the
+frozen 34-secret benchmark with paired bootstrap CIs vs the current shipped checkpoint.
+Question: does junoon/registan/jheel/udaasi move at all? If yes -> GCP-scale mining is
+justified; if no -> document as an architectural limitation (retrieval-augmentation or
+different-architecture territory), don't spend credits scaling something a cheap probe
+shows won't work. Result pending.
+
+## Probe result: negative, GCP-scale mining NOT recommended on this lever (2026-07-19)
+
+9 no-leakage-verified words with the junoon/registan collision signature already had
+one round of mined hard negatives (shipped model's own training data) and still
+failed. A second, hand-precision-targeted round (fine-tuned via `train_lib.py`'s
+in-memory override, winning LoRA recipe) did NOT move the needle: full-34 dim1 delta
++0.0037 (not sig), dim2 delta -0.0606 (not sig, CI upper bound at exactly zero --
+directionally negative), target words moved inconsistently with zero flips, 2
+unrelated secrets newly regressed. Independently re-verified every number against
+raw JSON before accepting. Documented as known-limitations.md entry 20 (the finding)
+and entry 21 (a real, separate `load_best_model_at_end` bug found as a side effect --
+doesn't affect shipped numbers, flagged for a future fix). Commit `1582a8b`.
+
+**My read**: this satisfies the spec's own stop condition ("don't spend GCP credits
+scaling data a cheap probe shows won't move the metric"). Do not proceed to full
+Phase 2 GCP-scale mining with this same recipe (more contrastive/hard-negative pairs,
+same LoRA capacity) -- awaiting GG's call: accept as a documented limitation and stop
+here, probe a materially different lever first (large-scale iterative mining, higher
+LoRA rank, non-fine-tuning mitigation), or override with reasoning I'm missing.
+
+## Closed cleanly at field-leading state (2026-07-19) -- GG's 3-part close-out
+
+1. **Fixed entry 21 despite being flagged out-of-scope**: root-caused
+   `load_best_model_at_end`'s silent LoRA bug precisely (`transformers.Trainer.
+   _load_best_model()` branches on `_is_peft_model(self.model)`, but `self.model`
+   is always the outer `SentenceTransformer`, never the nested `PeftModel` --
+   always False, falls through to a path expecting a full `model.safetensors` a
+   LoRA checkpoint never has). Fixed via explicit `peft.set_peft_model_state_dict`
+   restoration + a hard assertion the reload reproduces the tracked-best score.
+   Regression test runs a REAL small LoRA loop (not mocked -- a mock wouldn't have
+   caught the original bug). Checked impact on the shipped model: immaterial
+   (Delta 0.0014) and moot regardless (TEST numbers always come from the actual
+   saved artifact). Commit `a7a7109`.
+2. **Reframed entry 20** from "accepted limitation" to a triaged, ranked attack
+   list for a future resume (higher LoRA capacity / iterative large-scale
+   hard-negative mining / retrieval-time reranking / better-tokenization base /
+   post-launch player data) with LEVER 1 (more same-recipe hard negatives)
+   explicitly marked proven-dead so it isn't re-tested by a future session.
+   Commit (reframe).
+3. **Republished the model card** (was stale since the 50-secret bake-off/public
+   benchmark shipped): now leads all 7 alternatives claim front and center
+   (0.675/0.740, 14/14 CI-significant), links the public benchmark, notes the
+   dev-test-correlation fix (0.12->0.920), documents the residual as open/
+   characterized (not closed). Scrub-verified before push, live-fetched and
+   confirmed after. Commit `7d7317d`.
+
+**Final published state, byte-verified not just trusted**:
+- Model: `gauravgandhi2411/hinglish-relatedness-sbert` -- field-leading, card current.
+- Benchmark: `gauravgandhi2411/hinglish-relatedness-benchmark` v1.1 -- corrected,
+  changelog visible, residual documented consistently with the model card and
+  known-limitations.md.
+- No GCP spend this session (probe ran locally/CPU, same as every other experiment
+  in this project's history). No further training.
+
+## Next
+
+Once the full-suite re-run confirms green, commit the benchmark finalization
+(staging files, scrub/split/analysis scripts + their tests, the report) as its own
+atomic commit, then present the full Phase-1 picture to GG at the spec's STOP gate
+(benchmark size, pair sample, dev<->test corr, scrub result, the 16 word
+substitutions, the dim2 stability caveat) before Phase 2 (scale training data)
+starts. Do not publish or treat the benchmark as the ruler before that review.
+
+---
+
+# PLAN — Hinglish diagnostic sweep v3 (SHIPPED 2026-07-18)
+
+Spec: `spec-hinglish-diagnostic-sweep.md`. Branch `feat/hinglish-finetune` (continuation).
+Autonomous orchestrator run. Full report:
+`generator/evals/finetune/data/ship_decision_report_v3.md`.
+
+## The reframe: method was the fault, not data (confirmed)
+
+v1 and v2 both regressed while holding the training METHOD fixed (full-parameter
+fine-tune) and varying data — v2's regression got WORSE with 43% more data, which was
+correctly read as "not a data problem" but never led to testing the METHOD axis. This
+session held data at v2's set (756/1028 pairs) and swept 13 capacity-control configs
+(full-finetune LR sweep, frozen-layers, LoRA r=8/16/32, head-only). **Every full/frozen
+config stayed within noise of baseline; every LoRA config beat it, three CI-significantly.**
+
+## Correction to spec's baseline number
+
+Spec's Step 0 says "bootstrap a CI on the baseline 0.639 held-out Spearman" — 0.639 is
+NOT held-out, it's the FULL 25-secret production set score (`baseline_report.md`), which
+includes train/dev secrets. The correct held-out comparator (established by v1/v2's own
+ship reports, reused here): dim1_test Spearman restricted to the 16 frozen TEST secrets
+(8 with dim1 scenarios, n=73) = **0.4350**, 95% bootstrap CI [0.223, 0.632] (cluster-by-
+secret, n=8 clusters — wide, as expected). Every config below is judged with a PAIRED
+bootstrap against this number (same-secret resample applied to both models at once —
+much tighter than the marginal CI, and the statistically correct test for "does candidate
+beat baseline on identical items").
+
+Test-set expansion (the spec's stated fallback for a noisy ruler) was considered and
+explicitly rejected this session: the only 25 curated dim1 secrets share ONE sequential
+seeded RNG across `gen_dim1_scenarios.py`'s far-tier sampler — adding secrets would shift
+the RNG draws for every EXISTING secret's far words, silently corrupting the checked-in
+`baseline_report.md` numbers other docs/gates depend on. Flagged as a real, low-risk,
+scoped follow-up (seed far-sampling per-secret via hash) rather than done unsafely.
+
+## Winning config: LoRA r=8, lr=2e-4, 4 epochs + mined hard negatives
+
+Full 19-config sweep table in the v3 report. Capacity-control winner
+(`cap_lora_r8_lr2e-4`): dim1_test 0.6339 (paired-CI [+0.033,+0.377], regression floor net
++4). Layering mined hard negatives on top (`hard_negatives.py`: per-anchor confusable
+vocab word ranked 50-500 under the OFF-THE-SHELF model, not a random easy negative) pushed
+further — **`obj_hard_neg`: dim1_test 0.7044 (paired-CI [+0.130,+0.412]), dim2_test 0.8125
+(paired-CI [+0.188,+0.688]), dim1 regression floor 9 fixed/2 broken (net +7), dim2
+regression floor 7 fixed/0 broken (net +7, strictly zero-broken).** Residual-weakest pairs
+(titli/khamoshi/rasoi/samunder/bachpan — held out, never trained): dim2 pass-rate 0.0 ->
+**0.8 (4/5)**, beating v1's best partial result (0.4) by 2x.
+
+Objective-alignment side-finding: dev-vs-test Spearman correlation across the wave-1
+sweep is only **0.12** — the DEV evaluator used for checkpoint selection barely predicts
+held-out TEST performance (dev clusters 0.72-0.82 regardless of config; test ranges
+0.32-0.66). The training loop's own success signal is nearly uninformative about the
+real target — a distinct, useful diagnostic finding independent of the capacity result.
+
+Forgetting check: `obj_hard_neg`'s raw embedding drift (0.180 mean, trained-vocab) is
+comparable to the badly-regressed full-finetune's (0.217) — drift MAGNITUDE alone doesn't
+predict harm. What differs is LoRA's low-rank constraint (0.12% of params trainable):
+movement is confined to a small subspace shaped by genuine contrastive signal, not a
+free-form update that can chase spurious correlations.
+
+Input-quality cleaning (vocab-presence filter on the noisy `corpus_pmi` source, 756/1028
+-> 669/888 pairs) slightly HURT once capacity was controlled (0.6339 -> 0.6098) — not
+pursued further.
+
+**Learning curve (winning config, 25%/50%/100% data): 0.4713 -> 0.5517 -> 0.6339,
+monotonically RISING.** Definitive: once the method is fixed, more data DOES help. v1/v2's
+finding that more data hurt was real but attributable to the uncontrolled method
+amplifying noise, not data volume being intrinsically harmful — both diagnoses were
+partially right, method was just the blocking constraint tested last.
+
+## Ship decision: **SHIPPED 2026-07-18**
+
+All 5 scriptable ship gates passed (held-out Spearman paired-CI-significant, dim2 improved
+paired-CI-significant, zero net regression on both dims with dim2 strictly zero-broken,
+EN-unchanged proof, frozen-split/no-leakage + full suite green: 458 passed/4 skipped).
+Two items were reserved for GG per the orchestrating task's explicit "only GG can do
+this" carve-out, both now resolved: **(1) production hosting** — GG chose public HF Hub
+(portfolio asset) over private; checkpoint pushed to
+`gauravgandhi2411/hinglish-relatedness-sbert` (CC-BY-4.0), loaded with zero runtime auth
+since it's public — simpler than the originally-scoped private-repo-plus-token path.
+**(2) live spot-check** — results below.
+
+### Publish pipeline (complete)
+
+- `HF_TOKEN` set locally (repo-root `.env`, loaded via `python-dotenv` in `config.py`) and
+  as a GitHub secret (no workflow currently consumes it — payload publishing is a local
+  script, not CI — but set per GG's request for future use). **Security-verified before
+  any commit**: `.env` confirmed gitignored (`git check-ignore` exit 0), not tracked
+  (`git ls-files` empty), and never present anywhere in git history (`git log --all -p`
+  search for the filename and for any `hf_`-shaped token string, both zero hits).
+- **Scrub catch**: `SentenceTransformer.save()`'s auto-generated checkpoint `README.md`
+  embedded literal training-sample word pairs as widget examples and a training-data
+  table — including actual daily-schedule game secrets (`aag`->flame/fire/smoke,
+  `baarish`->shower) and their trained relatedness. Never uploaded. Replaced with a
+  hand-written model card (task description, held-out eval table with CIs, LoRA config,
+  full attribution, honest limitations, a usage snippet using words verified absent from
+  the 60-secret schedule) plus an automated scrub scan (2+ distinct game secrets
+  co-occurring on one line fails the push) that was verified to actually catch the
+  original leak before being trusted.
+- License chain verified directly against source pages (not assumed from old comments):
+  base model `l3cube-pune/indic-sentence-bert-nli` CC-BY-4.0, IndicCorp v2 CC0, Aksharantar
+  CC-BY/CC0, Qwen3-8B (LLM-augmented pairs + translit fallback) Apache-2.0. HingCorpus/
+  IndoWordNet (non-commercial/research-only) confirmed zero contribution — never
+  referenced anywhere in `assemble_data.py`'s 5 actual sources.
+- `config.MODELS["hi-en"]` flipped to the public HF ID. `embeddings.py` now passes
+  `token=os.environ.get("HF_TOKEN")` explicitly to `SentenceTransformer(...)` (a no-op
+  for public repos, needed if a future model swap goes private again).
+- All hi-en daily (60 days, 2026-06-12..2026-08-10) + Bollywood (25) + Cricket (25) pack
+  payloads regenerated with the new model (`publish_all.py`, a new orchestration script
+  that closes a gap in `publish.py`'s own documented "packs are orchestrated separately"
+  design by reusing both scripts' existing tested internals against one shared temp dir).
+  Schedule-validation, spoiler-gate, and `--strict-sizes` size-gate all passed. Deployed to
+  the payloads GitHub Pages site; **byte-verified**: all 111 `.gz` payload files fetched
+  live and `cmp`'d against the git-committed bytes, 0 mismatches (the human-readable
+  `manifest.json` shows a diff under naive `diff`, traced to git's standard CRLF-local/
+  LF-blob line-ending normalization on Windows, confirmed benign by comparing decoded
+  JSON content field-by-field, not a real content or determinism issue).
+- `baseline_report.md`/`.json` regenerated: `legacy_fixtures` + `dimension1_ranking` +
+  `dimension2_crosslang` recomputed with the new model (the only 3 sections that read
+  `embed_vocab`/`config.MODELS` — verified by grep); `dimension3_judge` (LLM clue
+  judging) / `dimension4_rival` / `dimension5_winrate` carried forward unchanged since
+  neither references the embedding model at all — re-running them would reproduce
+  identical output for ~40 minutes of LLM-judge cost. New hi-en Spearman (full 25-secret
+  production set): **0.639 -> 0.800** (EN 0.837). This full-set number is NOT the
+  apples-to-apples generalization claim (it now includes trained secrets, unlike the old
+  baseline) — the honest number remains the held-out 0.4350 -> 0.7044 above; both are
+  reported, neither hidden.
+
+## Gotchas discovered
+
+- `sentence_transformers.base.modules.transformer.Transformer.auto_model` is a read-only
+  property aliasing the real backing attribute `.model` — assigning `module.auto_model =
+  peft_model` silently no-ops (nn.Module's `__setattr__` stores it under a throwaway
+  `_modules` key without ever invoking the property's setter, and there is no setter).
+  Wrapping/merging a LoRA adapter into an SBERT `SentenceTransformer` must assign the real
+  `.model` attribute, not the convenience property — otherwise training silently proceeds
+  on the UN-wrapped base model with 100% trainable params while every other signal (no
+  errors, plausible loss curve) looks fine. Caught only by explicitly asserting
+  `isinstance(peft_model, PeftModel)` post-training and printing `trainable_fraction`.
+- LoRA capacity snapshotting must happen BEFORE `merge_and_unload()` — merging folds
+  adapter weights into plain frozen `Linear` layers and zeroes `requires_grad` everywhere,
+  so computing `n_trainable_params` after merge misreports every LoRA run as having
+  trained 0 parameters.
+- Doubling MNRL batch size (more random in-batch negatives) on top of mined hard negatives
+  made results WORSE than hard negatives alone (0.632 vs 0.704 dim1_test) — more negatives
+  isn't strictly better; random in-batch negatives can dilute a deliberately-mined hard
+  negative's contrastive pressure rather than reinforcing it.
+
+---
+
+# PLAN — Hinglish data expansion + retrain v2 (complete — did not ship, 2026-07-18)
+
+Spec: `spec-hinglish-data-expansion.md`. Branch `feat/hinglish-finetune` (continuation).
+Orchestrator + executor subagents, autonomous run with one GG review gate (data-sample
+approval before training). Full report: `generator/evals/finetune/data/ship_decision_report_v2.md`.
+
+## Licensing gate (complete) — 3 of 5 candidate sources ruled out
+
+Researched availability + commercial license for all 5 spec-candidate sources before
+touching any of them: Hindi WordSim-353 (not verifiably available anywhere — no public
+dataset found despite two independent research passes), Multi-SimLex Hindi (Hindi not in
+its 12-language core set), Hindi WordNet/IndoWordNet (data stated "provided openly for
+the purpose of research" — research-only, excluded), IndicCorp v1 + HingCorpus
+(CC-BY-NC-SA-4.0 — excluded). Only **IndicCorp v2** (CC0) and **Aksharantar** (CC-BY/CC0)
+cleared the gate. IndicXlit (the spec's named transliteration engine) failed to install
+on this Windows/Python 3.13 machine (confirmed live: `fairseq` build error, matches an
+open unresolved upstream GitHub issue) — substituted Aksharantar's own (Devanagari,
+romanized) pairs as a static transliteration dictionary instead.
+
+## Data assembly (complete) — corpus-PMI mining + quality filter, GG-approved
+
+Aksharantar's Hindi dictionary turned out to have poor coverage of short common bare-stem
+words (0/20 on a spot-check against existing `hinglish.txt` vocabulary) — worked around
+with a local-LLM (qwen3:8b) transliteration fallback gated by real corpus-occurrence
+verification (an LLM-proposed Devanagari spelling was only trusted if it actually appears
+>=3 times in the downloaded corpus sample). Mined 2,718 candidate relatedness pairs via
+PMI co-occurrence over a 209,168-sentence IndicCorp v2 Hindi sample (150MB, CC0),
+restricted to a 396-word verified anchor vocabulary. Dict-vs-LLM transliteration
+calibration agreement was only 34.6% (reported honestly, not hidden) — noise appeared
+across the full PMI-score range, not just at the bottom, so a score floor alone couldn't
+clean it up. Ran an isolated LLM-judge quality filter (same pattern as
+`homograph_audit.py`): 2,718 -> 326 accepted (12%, deliberately conservative — all 6
+known-bad examples flagged in the mining report were correctly rejected). **GG review
+gate**: presented full licensing report, per-source counts, and a cross-source sample for
+approval before training — GG approved with one edit (dropped `gaana`/`views`, a
+platform-engagement-metric artifact, not semantic relatedness; scanned for and confirmed
+no other platform-context pairs of that type slipped through). Final: 756 MNRL / 1028
+graded pairs (+39%/+46% over v1's 543/705), 5 sources, no-leakage assertion passed.
+
+## Retrain + eval (complete) — regressed further than v1, did not ship
+
+Same method/hyperparameters as v1 (held constant deliberately): SBERT contrastive,
+MNRL + CosineSimilarityLoss, 4 epochs, lr=2e-5, seed 42, CPU-only, ~9min runtime, ran to
+completion (no early stop, dev Spearman 0.780->0.816 monotonic). **Held-out TEST Spearman
+0.324 (worse than v1's 0.376, worse than baseline's 0.435)**; dim1_test net regression -3
+(worse than v1's -2); dim2_test net -2 with 0 pairs fixed (worse than v1's net 0 with 2
+fixed); residual-weak dim2 pass-rate 0/5 (worse than v1's 2/5). **All 3 ship gates fail,
+more severely than v1.** The key finding: 43% more training data made every held-out
+metric worse, not better — this falsifies the v1 hypothesis that data volume was the
+bottleneck. Off-the-shelf `l3cube-pune/indic-sentence-bert-nli` stays in production,
+unchanged (EN-unchanged proof: `config.py` byte-identical, `train.py` never imports
+`config` at all).
+
+## Ship decision: **NOT SHIPPED**
+
+`docs/known-limitations.md` entry 1 updated with the full v1+v2 history. No payload
+regeneration, no live spot-check (nothing shipped — off-the-shelf model already live).
+Commercial-data avenue now genuinely exhausted at reasonable engineering effort — next
+lever if revisited is the OPTIMIZATION axis (LoRA, frozen layers, lower LR — untested by
+either attempt), or real player-guess data post-launch (in-domain signal no external
+corpus can match, zero further licensing risk).
+
+## Gotchas discovered
+
+- Academic word-similarity benchmarks (WordSim-353, SimLex-999/Multi-SimLex) that "should"
+  exist for a major language like Hindi sometimes don't have a confirmed public release —
+  don't assume availability from a paper title; verify a real download link before
+  planning around it.
+- A "provided openly for the purpose of research" phrase in a dataset's own README is a
+  clear non-commercial signal even without a formal SPDX license tag — don't require a
+  named license to treat data as excluded.
+- `pip install` failures for ML packages with native/compiled dependencies (`fairseq`) on
+  Windows are worth testing directly (in an isolated scratch venv) rather than trusting an
+  old GitHub issue's staleness — it reproduced exactly as reported.
+- A dictionary mined from running text (Aksharantar) systematically under-covers short,
+  high-frequency bare-stem words relative to longer/compound/inflected forms — a coverage
+  gap that doesn't show up until you spot-check against the SPECIFIC vocabulary you need,
+  not the dataset's aggregate size.
+- PMI-mined corpus relatedness needs an isolated LLM-judge quality pass, not just a score
+  threshold — noise (transliteration hallucination AND spurious co-occurrence) appeared
+  across the full PMI-score range in this run, so raising the floor alone wouldn't have
+  cleaned it up.
+- More training data is not a universal fix for a small-fine-tune overfitting signature —
+  this session directly tested and falsified that hypothesis; the dev/test decoupling
+  pattern (dev climbs, test doesn't) persisted and got worse with more data, pointing at
+  the optimization/regularization axis instead.
+
+---
+
+# PLAN — Hinglish embedding fine-tune (complete — did not ship, 2026-07-17)
+
+Spec: `reports/spec-hinglish-finetune.md`. Branch `feat/hinglish-finetune`. Goal: beat the
+off-the-shelf hi-en champion (`l3cube-pune/indic-sentence-bert-nli`, Spearman 0.639) via a
+Warmer-specific contrastive fine-tune. Full report:
+`generator/evals/finetune/data/ship_decision_report.md`.
+
+## Frozen split + no-leakage guarantee (complete)
+
+60 daily-schedule hi-en secrets → 33 train / 11 dev / 16 test (`evals/finetune/split.py`,
+seed 42). The 5 documented residual-weak secrets (titli, khamoshi, rasoi, samunder,
+bachpan — known-limitations.md #1) forced into test, never trainable. Every training
+record asserted (code + test) to exclude held-out secrets/translations —
+`tests/test_finetune_no_leakage.py`.
+
+## Data assembly (complete) — 543 MNRL / 705 graded pairs, 4 sources
+
+dim1 triplets (train-secrets only, 24/108), LLM-augmented via local qwen3:8b + isolated
+judge filter (89/178, 37% acceptance), cross-lingual `hinglish.txt` pairs (421/421, after
+dropping 57 degenerate self-identical loanword pairs), alias variants (32/32). GG
+spot-check of a 25-pair sample caught a critical bug class before training: **homograph
+collisions** — romanized-Hindi words whose Latin spelling coincides with a real,
+different-meaning English word (door=far in Hindi vs door=entrance in English). Audited
+all 119 candidates where the Hindi-side token also appears in the game's English vocab;
+two automated local-LLM-judge passes proved unreliable (over-flagged genuine loanword
+synonyms like mobile→phone; recalibrated version still missed a real collision) — final
+list is a manual linguistic review (`evals/finetune/data/homograph_exclusions.json`). 13
+words dropped entirely (door, din, band, pair, pet, chain, beta, pita, teen, agar, koi,
+mama, nana — the last two are gender-flipped collisions, English mama/nana = mother/
+grandmother vs Hindi = maternal uncle/grandfather) + 2 fuzzy LLM negatives corrected
+(guru→music, jar→can — too related to serve as "unrelated" negatives).
+
+## Training (complete)
+
+SBERT contrastive fine-tune, MNRL + CosineSimilarityLoss, 4 epochs, lr=2e-5, batch=16,
+early-stopping on DEV (patience=2), seed 42, CPU-only/$0/no API key. Dev-curve stable,
+no divergence (spearman_cosine 0.840→0.833→0.845→0.842).
+
+## Ship decision: **NOT SHIPPED**
+
+Held-out TEST Spearman **regressed** (0.435→0.376 on the restricted 8-secret subset with
+dim1 curated scenarios) instead of improving; dim1_test broke 5 previously-correct pairs
+while fixing 3 (net -2, fails the zero-regression gate); dim2_test cross-language
+consistency stayed flat with a worse median rank. Meanwhile DEV metrics improved
+substantially (0.781→0.838) — the classic small-data-fine-tune overfitting signature the
+spec's risk section explicitly anticipated: the model adapted to dev-adjacent vocabulary
+without generalizing to genuinely unseen test words. One partial win: 2 of the 5
+residual-weak pairs (rasoi, bachpan) fixed on the held-out check, but this didn't clear
+the other gates. Off-the-shelf model stays in production; `docs/known-limitations.md` #1
+updated with the honest result and a documented next step (more training data — LLM
+augmentation contributed only 89 of 543 pairs after filtering — and/or LoRA/frozen-layers
+to reduce the effective parameter budget). Recipe fully reproducible (seed 42, all data
+committed except the 913MB checkpoint / 5.4GB training checkpoints, gitignored since
+nothing shipped).
+
+## Gotchas discovered
+
+- Ollama's `format: "json"` mode collapses a requested JSON *array* of N items down to a
+  single object on qwen3:8b — fixed by passing an explicit JSON-schema `format` (Ollama
+  structured outputs) instead of the bare string `"json"`.
+- A local-LLM judge asked to spot bad word-association pairs is unreliable for nuanced
+  linguistic judgment even after few-shot recalibration (14/18 on hand-labeled cases) —
+  a manual review by the orchestrating model was more accurate and not meaningfully
+  slower for a bounded (~119-item) candidate list.
+- The machine slept mid-session during a background audit run; the task sat in "running"
+  state for ~4 real-world hours with zero progress. `TaskOutput(block=false)` caught it;
+  killed and re-ran cleanly. Worth checking wall-clock-vs-expected-runtime before trusting
+  a "still running" status on a long gap.
+
 # PLAN — WASM-stub remediation wave (P0, in progress)
 
 Spec: known-limitations entry 19 + GG's P0 directive 2026-07-17. Branch
@@ -726,3 +1616,483 @@ orchestrator review), live-verified 2026-07-11.
   everything staged for a final orchestrator commit -- fine in this case (each commit was itself
   tested and atomic) but worth being explicit about commit ownership when running several parallel
   executors against the same repo.
+
+## Hinglish benchmark -- Phase 1 (spec-hinglish-benchmark.md), COMPLETE, awaiting GG go for Phase 2
+
+- [x] Fixed the shared-sequential-RNG bug in `gen_dim1_scenarios.py` blocking safe held-out
+  expansion (`16f35d1`) -- per-secret hash-derived seeding, one-time documented break of the old
+  (buggy) `baseline_report.md` numbers (EN 0.837->0.842, hi-en 0.800->0.813).
+- [x] Expanded held-out test secrets 16 -> 50 across 7 domains (nature/emotion/abstract/object/
+  place/food/kinship), fully separate from the production 25-secret pipeline (`704cabd`).
+  Bollywood/Cricket pack secrets explicitly rejected as a source -- verified most already leaked
+  into training via open-vocabulary data-assembly paths. No-leakage re-verified against all 5
+  training files, twice.
+- [x] Found (during my own review, not the executor's) a 42-word vocab-coverage gap -- near/mid
+  curated words outside `HIEN_EN_TOP_N`'s frequency cutoff, concentrated in the new secrets' most
+  diagnostic tier. Fixed + re-ran the full bake-off (`78df6f2`): dim1 resolution 334/379 -> 376/379.
+- [x] 8-model comparative bake-off (5 original baselines + IBM Granite-311m-r2 + Qwen3-Embedding-0.6B
+  + our shipped fine-tune) on the same expanded set, paired bootstrap CIs (`d73db64`, `78df6f2`).
+  **Verdict: shipped model leads all 7, CI-significant on both dim1/dim2, zero exceptions across 14
+  comparisons. No newer base beats l3cube-pune off-the-shelf -- Phase 2c's "fine-tune a newer base"
+  does not apply.** Full report: `generator/evals/finetune/data/phase1_benchmark_report.md`.
+- [ ] **STOP POINT for GG**: go/no-go on Phase 2 (accuracy push). Also needs a decision on three
+  items surfaced but deliberately not resolved: (1) a latent `embeddings.py` cache-key/row-order
+  bug found as a side effect (real, contained, needs its own before/after payload verification --
+  out of benchmark scope); (2) `hf_model_card.md`'s published held-out numbers are now stale on two
+  counts (RNG fix + new 50-secret comparator) -- republish now or bundle with Phase 2?; (3) public
+  benchmark proposal (spec 1c) -- recommend publishing only the 34 new supplement secrets (the
+  original 16 are live game secrets, would need scrubbing; the 34 new ones never were).
+
+## Model Excellence Program (spec-model-excellence.md) -- Workstream A COMPLETE, STOP POINT for GG
+
+- [x] **New task-appropriate metric suite**, additive (old Spearman/band-accuracy/near-far-separation
+  columns kept, not removed): `evals/harness/metrics.py` gained `dcg_gain`, `ndcg_from_judged`,
+  `mean_reciprocal_rank`, `expected_calibration_error`, `top_weighted_correlation` (all NaN/None-safe,
+  no scipy, matching the file's existing convention). New `evals/harness/topheavy.py`: per-secret
+  NDCG@{10,50,100}/Recall@{10,50,100}/Precision@{10,50,100}/MRR (macro-averaged across secrets, `n`
+  reported honestly per submetric since precision@10 is sparse by construction -- most secrets have
+  only 2-6 judged words), plus band-confusion matrix, per-band precision/recall, and a documented
+  rank-percentile-proxy ECE for band calibration. New bootstrap CI wrappers in `bootstrap_ci.py`
+  (cluster-by-secret, `N_BOOT=10000`/`seed=42`, matching existing pattern) -- critically,
+  `bootstrap_topheavy_ci` passes per-draw secret groups directly into `compute_topheavy_metrics`
+  (never re-groups by name), so a secret drawn twice in a resample correctly counts twice in that
+  draw's macro-average instead of silently collapsing -- this was the single highest-risk correctness
+  property in the design and was independently verified by a separate verifier subagent (explicit
+  test: same secret passed twice -> n=2, not n=1).
+- [x] **8-model bake-off re-run under the new suite** (`evals/finetune/benchmark_bakeoff.py --all`,
+  all 8 checkpoints re-embedded from HF cache, none failed, ~6m13s wall clock; `REQUIRED_CHECKPOINT_KEYS`
+  grew to force the recompute rather than silently reuse stale checkpoints). Full table:
+  `generator/evals/finetune/data/bakeoff_comparison.md`.
+  **Verdict: leadership re-established under task-appropriate metrics.** Shipped model
+  (`gauravgandhi2411/hinglish-relatedness-sbert`) leads all 7 comparators on NDCG@{10,50,100}, MRR,
+  Recall@{10,50,100}, and top-weighted correlation (0.7740 vs next-best l3cube-pune 0.6329) -- this is
+  NOT the same ranking question the old Spearman-only table answered, and the model wins it anyway.
+  **Honest exception, not smoothed over:** on band-calibration ECE (lower=better), shipped scores
+  0.2020; `ibm-granite/granite-embedding-311m-multilingual-r2` scores 0.1947 -- Granite calibrates
+  band placement slightly better than the shipped model, even though Granite loses badly on every
+  ranking-quality metric. (Correction to an earlier verbal misstatement during this work: Qwen3-0.6B
+  does NOT beat shipped on ECE -- Qwen scores 0.2137, worse than shipped's 0.2020. Only Granite beats
+  shipped on this one metric, confirmed directly from `bakeoff_comparison.json`.)
+- [x] **Band-confusion matrix + per-band P/R for the shipped model** (shipped-model-only, not all 8,
+  by explicit scope limit -- rendering 8 full 3x6 matrices was judged not worth the table bloat for
+  this deliverable): reveals the "warm" band is nearly never predicted (`n_predicted=2` vs 84
+  human-expected warm records) -- the production floor logic (`max(500,...)`/`max(50,...)` in
+  `rival.band_for_rank`) that `docs/known-limitations.md` already flagged as making hi-en's Warm band
+  only ~19 ranks wide is now independently confirmed from the outcome side, not just the width
+  arithmetic. Candidate target for Workstream B/F follow-up.
+- [x] **Verification**: independent verifier subagent re-derived NDCG@10/@50 by hand, confirmed the
+  bootstrap-dedup property structurally and via test, ran the full suite itself rather than trusting
+  the executor's reported counts (541 passed / 4 skipped, zero failures; 29/29 new
+  `test_topheavy_metrics.py`), confirmed `--report` mode is byte-identical across reruns (seed=42),
+  and caught one reporting error (see the Qwen/Granite correction above) that the executor's own
+  summary got backwards.
+- [x] **STOP POINT for GG cleared** (spec-model-excellence.md's own stop point 1): GG reviewed,
+  approved committing (`00b0bfd`), and confirmed the ECE formulation stands as-is. Workstream B
+  started immediately after.
+
+## Model Excellence Program -- Workstream B COMPLETE (`ac6f41d`), STOP POINT for GG (sharm patch)
+
+- [x] **Item 8, full-vocab collision scan**: `evals/finetune/collision_scan.py` scans all 544
+  hinglish-sourced words (reconstructed origin split: 544 hinglish-sourced / 9,951 english-sourced
+  out of 10,495 total) for the subword-collision signature (top-15 neighbors dominated by
+  orthographically-similar english-sourced tokens). Calibrated against the 4 already-shipped L2
+  words + `probe_subword_collision.py`'s 9 hand-picked candidates at threshold=0.2, K=15 -- catches
+  junoon (0.467)/registan (0.400) cleanly, misses naukri/udaasi (0.000, zero-bigram-overlap/only
+  "partially confirmed" in the source probe respectively, a documented signature limitation, not a
+  bug). **211/544 (38.8%) flagged collision-prone.**
+- [x] **Item 8, gated extension attempt** (`evals/finetune/probe_l2_collision_scan_extension.py`,
+  staging-only -- `vocab/hi-en-devanagari-patch.txt` verified byte-identical throughout, confirmed
+  independently by the verifier): the full 58-word dict-coverable candidate batch (154 of 211
+  flagged words excluded for lacking an Aksharantar entry) **FAILS** the repo's strict
+  zero-broken-pairs gate (4 broken dim1 pairs, 1 broken dim2 pair) via the same collateral-noise
+  mechanism that killed the earlier full-vocab attempt (`probe_l2_dict_only_front_end`) -- one break
+  is a genuine Aksharantar mapping bug (chinta/worry -> छींटा "splash", wrong word), the rest are
+  whole-embedding-manifold noise from inserting new vocabulary text. Bisection (40/20/10/5-word
+  prefixes) found **no safe subset** at any of those sizes. **A minimal +1 word extension (`sharm`
+  -> शरम, the single most-severe flagged word) DOES clear both gates cleanly**: 0 broken pairs
+  dim1/dim2, CI-significant improvement on every Workstream A topheavy submetric (MRR delta +0.050
+  CI [0.012, 0.098], NDCG/Recall similarly positive, zero regressions anywhere).
+  **STOP POINT for GG**: should `sharm: शरम` be added to the LIVE `vocab/hi-en-devanagari-patch.txt`
+  (5th entry)? Fully gated and verified safe, but this is live game-content, not committed
+  pending your go/no-go -- same production-blast-radius caution as any daily-secret-affecting
+  change. `apply_devanagari_patch` is invoked from `build.py:137` and `build_packs.py:302`, both
+  in the live payload-generation path (`publish.py` imports `build.py`), confirmed by direct grep.
+- [x] **Items 5-7, failure taxonomy**: local-Ollama-judge ($0 cost) classification of all 124
+  failing shipped-model pairs -- genuine_semantic_difficulty 99/124 (79.8%), transliteration_artifact
+  14 (11.3%), polysemy/commonsense/label_error/vocab_resolution_gap the remainder. 4/4 agreement
+  with hand-labeled calibration examples. Cross-referenced against the collision scan: 57/124 (46%)
+  of failing pairs have an independently collision-flagged secret -- real, computed evidence
+  (verified) that the raw per-pair taxonomy undercounts subword-collision as a cause, since the
+  judge never sees the secret's full neighbor list when classifying one pair at a time.
+- [x] **Item 6, frequency buckets**: self-caught and fixed a real bug mid-task (initial version
+  ranked english-sourced words against the full 55k-word `en.txt` instead of the ~9,951 actually
+  in the hi-en vocab, forcing 365/379 records into "head" by construction; post-fix code
+  independently confirmed by the verifier to correctly scope to the in-vocab subset). Final result:
+  **no clean head/tail penalty** -- tail scores *better* than head (-22.8%, inverted from the
+  expected direction), flagged honestly as a likely tier-composition confound (far-tier decoys
+  concentrate in "tail") rather than overclaimed as a genuine frequency effect. 57.2% of
+  hinglish-sourced words have unresolved frequency (garbage-transliteration vs. genuine-rarity is
+  not automatically distinguishable) -- reported as its own bucket, not silently folded into tail.
+- [x] **Item 7, domain/POS**: domain breakdown covers only the 34 benchmark-supplement secrets
+  (original 25 production secrets have no domain field, explicitly left unlabeled rather than
+  guessed) -- weakest domain: emotion (61.4% in-expected-band rate). POS/concreteness via the same
+  local judge (no new spaCy/nltk dependency, code-mixed English+romanized-Hindi words don't suit an
+  English-only tagger anyway) -- weakest POS: noun (63.0%). Both flagged as AI-derived, unverified
+  labels, same epistemic status as the benchmark's own near/mid/far tiers.
+- [x] **Biggest single finding, independently corroborates Workstream A**: 83/84 resolved mid-tier
+  records fail because the mid-tier's only accepted band (`warm`, band 3) is a **24-rank window out
+  of 10,495 (0.23% of vocab)** -- vs near-tier's 499-rank window and far-tier's 9,971-rank window.
+  Arithmetic independently re-verified by the verifier from `rival.band_for_rank` directly
+  (hot_max=max(500,104)=500, warm_max=int(10495*0.05)=524, so warm=ranks 501-524). This is very
+  likely a **benchmark band-width design artifact**, not primarily a model defect, and directly
+  matches Workstream A's band-confusion-matrix finding that Warm is nearly never predicted
+  (2 predictions vs 84 expected). **Top recommended target for Workstream F** (widen mid-tier's
+  accepted bands and re-measure, or otherwise address the Warm-band-width issue
+  `docs/known-limitations.md` already flagged from the width-arithmetic side).
+- [x] **Verification**: independent verifier subagent confirmed (1) live patch file empty diff,
+  (2) +1-word gate numbers match the raw eval_result JSON exactly (not just prose), (3) calibration
+  threshold reasoning is defensible not post-hoc-rationalized, (4) band-width arithmetic is correct,
+  (5) frequency-bucket fix is real in the post-fix code, (6) 63 new tests pass, (7) nothing
+  committed by either executor, (8) the 57/124 cross-reference is a real computed join not an
+  invented number. Overall verdict: PASS, trustworthy to report and commit.
+- [x] **STOP POINT cleared**: GG approved both -- sharm shipped to the live patch (`80cf3ad`,
+  re-verified through the real production path, numbers matched staged to 1e-9); Workstream C
+  approved to proceed.
+
+## Model Excellence Program -- Workstream C measurement phase COMPLETE (`4eb6386`), STOP POINT for GG (retraining decision)
+
+- [x] **Items 9+11, spelling/casing/whitespace/typo robustness eval** (`evals/finetune/
+  spelling_robustness.py`): embeds variant spellings DIRECTLY through the shipped model, bypassing
+  `normalize.py`/`canonical_for()`'s string-fold layer entirely -- that layer only guarantees
+  gameplay-lookup consistency for the 29 alias-file words (confirmed via `payload.py:150-283`: the
+  embedding matrix is built once for canonical vocab only, variant-spelling payload entries are
+  copied rank/qsim, never a fresh embedding) and had never been measured at the embedding level for
+  any other word before this. Reused the existing 42-secret bakeoff test set as baseline, no new
+  scenario authoring.
+- [x] **Headline finding: NOT spelling-invariant outside the 3 alias-covered test secrets.** On 267
+  genuinely held-out real-world spelling variants (Aksharantar-corpus-derived, n=13 test secrets
+  with coverage), band-agreement rate is only **67.4% [95% CI 0.538, 0.801]** -- a different valid
+  spelling of the same secret changes which temperature band a test word lands in roughly a third
+  of the time. Worst case: `azaadi`/`rights` rank 16 (scorching) -> `azaaadi`/`rights` rank 9753
+  (freezing), drift 9737 ranks -- confirmed by the verifier as a real Aksharantar entry (source=
+  "Existing", Levenshtein-distance-verified clean, not filter noise), not a synthetic artifact.
+  Genuine good catch during the build: the 3 alias-file-covered test secrets (bagicha/chaand/pahad)
+  turned out to have ZERO training exposure to their own aliases (`assemble_data.alias_source()`
+  already excludes held-out secrets from training data, confirmed via direct grep of
+  `train_mnrl_pairs.jsonl`) -- so even that smaller `alias_file_untrained_heldout` category (37
+  pairs, 43.2% band-agreement) is honest held-out evidence, not training-contaminated.
+  Whitespace-only variants show perfect 1.000 agreement -- confirmed via direct embedding
+  comparison (byte-identical vectors) that sentence-transformers strips whitespace before
+  tokenization, not a measurement bug.
+- [x] **Verification**: independent verifier subagent hand-recomputed the band-agreement rate from
+  raw per-record data (180/267, matches to float precision), independently replicated the
+  cluster-by-secret bootstrap CI, confirmed the worst-case example against the raw Aksharantar
+  corpus file directly, confirmed the alias-training-exclusion claim via direct grep, and confirmed
+  the whitespace perfect-agreement result via a direct embedding comparison rather than trusting
+  the code. Overall verdict: PASS. 45 new tests pass; full suite clean (pre-existing
+  Ollama-contention-related `test_harness_judge.py` failures unrelated, confirmed untouched).
+- [x] **STOP POINT cleared**: GG approved proceeding with retraining now.
+
+## Model Excellence Program -- Workstream C item 10 COMPLETE (`bc4b25a`): NO-GO, honest negative
+
+- [x] **Variant-augmented retraining attempted, rejected.** `variant_source()` added to
+  `assemble_data.py` (mirrors `alias_source()`'s exact pattern), 189 new Aksharantar-derived
+  training pairs across the full hinglish vocab, zero leakage into held-out secrets, zero overlap
+  with the 267-pair spelling-robustness eval set. Trained with the shipped model's EXACT recipe
+  (LoRA r=8/lr=2e-4/4 epochs, seed=42) -- data-only change, isolating the effect. **Result: FAILS
+  zero-net-regression** on the 42-secret suite (dim1: 2 fixed/10 broken, net -8; dim2: 1 fixed/4
+  broken, net -3) and shows **no CI-meaningful spelling-robustness improvement** (band-agreement
+  67.4% baseline -> 66.3% candidate, heavily overlapping CIs, if anything slightly worse). Same
+  failure signature as the earlier full-vocab Devanagari-patch and 58-word collision-batch attempts
+  -- a large injection of new vocabulary/pairs perturbs the whole embedding manifold faster than it
+  fixes the targeted gap. Spot-verified directly from the raw eval_result.json (not just executor
+  prose): shipped checkpoint (`checkpoints/obj_hard_neg/model/`, `evals/finetune/model/`) confirmed
+  byte-identical throughout. Not published, not promoted. The rejected candidate LoRA checkpoint
+  (`checkpoints/variant_augmented/`) intentionally left untracked -- no reason to carry a rejected
+  experiment's binary weights in git history.
+- [x] **Program status on the USP claim**: the spelling-invariance gap (67.4% band-agreement on
+  held-out variants) remains OPEN and unresolved -- the naive fix didn't work. This is now a
+  documented, evidenced limitation rather than an aspirational claim, consistent with this project's
+  "honest documentation" standard. Future attempts would need a different mechanism (e.g. a
+  smaller/more targeted variant set gated incrementally like the L2 collision-scan extension was,
+  rather than one large batch) -- flagged as a candidate follow-up, not attempted this session.
+
+## Model Excellence Program -- Workstream D COMPLETE (`7526c93`, `4152473`), STOP POINT for GG
+
+- [x] **Item 14, external comparability search** (`docs/known-limitations.md` entry 22): live web
+  search found no existing public resource matching this project's task shape (word-level
+  relatedness ranking over romanized, code-mixed Hindi-English). GLUECoS/LinCE (real Hindi-English
+  code-mixed benchmarks) have no relatedness task at all; SemRel2024 (real Hindi relatedness
+  dataset) is sentence-level and monolingual, not word-level/code-mixed. Evidences rather than
+  merely asserts the "no comparable public benchmark existed" position.
+- [x] **Item 12, statistical power analysis** (`evals/finetune/power_analysis.py`): measured CI
+  width shrinking from 0.201 (n=20 secrets) to 0.138 (n=42) by subsampling the internal pool.
+  Real-effect MDE simulation (using the actual historical L2+L5 delta) shows only 23-32% detection
+  rate even at the current 34-secret public benchmark size -- consistent with that change's
+  historical near-miss CI. A synthetic-injection MDE curve claims much higher detection but
+  disagrees sharply with the real-effect curve at the one overlapping point (100% vs 27% at n=34) --
+  reported as an optimistic lower bound, not averaged away or hidden. Extrapolation: roughly 56
+  secrets (~22 more than current) would be needed for a ~0.06-magnitude effect to reliably clear
+  significance -- a rough heuristic, not a precise target. No new secrets authored (that's a
+  separate content-authoring decision for GG, given each one needs curation + scrub-script passes +
+  review of any new advisory hits).
+- [x] **Item 13, label-ceiling sample prepared, NOT annotated** (`evals/finetune/data/
+  label_ceiling_sample_for_gg.csv`, 75 rows, stratified near/mid/far x 7 domains, blind -- AI tier
+  withheld, row order shuffled after catching a real leakage bug where tier-grouped ordering
+  would have let the withheld label be inferred from position alone). Scorer
+  (`score_label_ceiling.py`, weighted Cohen's kappa + CI) written and validated against textbook
+  golden values, NOT run against real data.
+  **STOP POINT for GG**: `evals/finetune/data/label_ceiling_sample_for_gg.csv` +
+  `..._INSTRUCTIONS.txt` are ready for you to fill in the blank `gg_tier_judgment` column (75
+  pairs, single sitting). Once returned, `uv run python -m evals.finetune.score_label_ceiling`
+  computes the benchmark's own label ceiling.
+- [x] Self-caught data-provenance discrepancy: `evals/scenarios/dim1_hien.json`'s benchmark-
+  supplement content (306 records) and the actually-published `public_benchmark_staging/
+  dim1_hien.json` (302 records) differ by 24 words -- staging used as canonical throughout,
+  documented rather than silently assumed identical.
+- [x] **STOP POINT cleared**: GG approved continuing to E and F.
+
+## Model Excellence Program -- Workstreams E + F COMPLETE, program CLOSED pending GG label-ceiling annotation
+
+- [x] **Workstream E, efficiency** (`bf4744a`): shipped model 956.7MB (dominated by a
+  197,285-token embedding table, ~606MB), 2.99ms/word warm latency -- but production has NO live
+  per-user embedding inference today (payload precomputes once per secret at build time), so this
+  is offline-build/local-run cost, not a live bottleneck, stated honestly rather than framed as a
+  bigger problem than it is. Binary quantization of the precomputed vocab embedding cache: **32x
+  storage reduction, zero net regression -- a real, gated partial win.** int8 embedding
+  quantization, torch dynamic weight quantization, and a MiniLM-L12 distillation candidate all
+  **failed** the zero-regression gate decisively (weight quant only shrinks the small transformer
+  body since dynamic quantization doesn't touch the dominant embedding table; MiniLM already scored
+  near-random on hi-en off-the-shelf pre-fine-tune, per the ORIGINAL 9-candidate bake-off, and 4
+  epochs can't teach romanized-Hindi understanding from scratch). Self-caught a real bug mid-probe
+  (a read-only `.auto_model` property silently no-op'd a model swap, same bug class `train_lib.py`
+  already documents for LoRA) before trusting the weight-quantization result. Verdict: the
+  "same-quality, materially smaller MODEL" USP is NOT achieved -- honest NO-GO on that axis, one
+  genuine win on the embedding-cache-storage axis.
+- [x] **Workstream F, L5 dormancy + L4/L6 confirmation** (`2f4dd15`): scheduled all 8 L5 trigger
+  words into the live cyclic schedule (`vocab/secrets_hi-en.txt`/`secrets_en.txt`, 60->68 entries) --
+  each will fire on a confirmed future date (2026-08-11 through 2026-08-18). Caught a real
+  dependency not in the original task scope: `clues.py` indexes by the same cyclic modulus and
+  `test_clue_spoiler_gate.py` asserts `len(clues)==len(schedule)`, so matching clues had to be
+  authored too (8 per language, 2 near-miss leaks caught and fixed) or the whole 72-day cycle's
+  clue/secret pairing would have desynced, not just the 8 new days. Confirmed the frozen
+  train/dev/test split is unaffected (reads the already-committed `split.json`, not the live
+  schedule). L4/L6: found `docs/known-limitations.md` entry 20 never actually carried the L4/L6
+  labels its own probe scripts pointed readers to -- added a dated, cross-checked addendum
+  confirming both remain live, untested-at-scale levers (not a new investigation, a genuine doc
+  gap fixed).
+- [x] **Program capstone deliverable**: `docs/model-excellence-final-report.md` (`4d861c0`) --
+  every finding across Workstreams A-F, ranked by prevalence and user impact, each with its
+  evidenced next attack. Top-ranked, not yet attempted: the mid-tier Warm band's ~24-rank width is
+  a game-CALIBRATION artifact (not a model defect) that two independent analyses converged on from
+  opposite directions -- widening the band formula and re-measuring is the cheapest, highest-
+  leverage next step, no retraining required. Second-ranked: spelling-variance non-invariance
+  remains open after a failed retraining attempt; the report flags a lower-risk alternative never
+  tried this program (extend `vocab/hi-en-aliases.txt` directly with Aksharantar-derived variants,
+  sidestepping model-regression risk entirely).
+- [ ] **Program status**: A-F substantially complete. The shipped model is unchanged except two
+  small, fully-gated production patches (L2 patch 4->5 words, L5 trigger words now reachable). No
+  retraining was promoted -- both attempts this program produced honest, evidenced NO-GOs, and "the
+  current published model stands until beaten" held throughout. **The one open action item
+  requires GG specifically**: fill in `evals/finetune/data/label_ceiling_sample_for_gg.csv` (75
+  pairs, single sitting, no rush) to establish the benchmark's own label ceiling -- everything else
+  in the original spec is either complete, gated-and-shipped, or a documented/evidenced finding
+  with its next attack identified.
+
+## Spelling-variance fix -- deterministic alias-lookup extension (finding #2 closed, NOT via retraining)
+
+- [x] **Mechanism**: `docs/model-excellence-final-report.md` finding #2 named a lower-risk
+  alternative to the failed `bc4b25a` retraining attempt -- extend `vocab/hi-en-aliases.txt`
+  directly (the same LOOKUP-FOLDING mechanism `normalize.py`/`payload.py` already use to resolve a
+  typed variant to its canonical spelling BEFORE any embedding lookup). This session implemented
+  that alternative. **Zero model/training-data changes** -- `evals/finetune/train_mnrl_pairs.jsonl`
+  and every other `*_pairs*.jsonl` file, plus the shipped checkpoint, are untouched.
+- [x] **Candidate generation** (`generator/evals/finetune/extend_hien_aliases.py`, new file):
+  reuses `spelling_robustness.py`'s `build_aksharantar_maps`/`aksharantar_variants_for_secret`/
+  `is_clean_variant` verbatim (the SAME machinery `assemble_data.variant_source()` used for the
+  rejected retraining candidate), across the FULL ~544-word hinglish-sourced vocab -- 226 candidate
+  (canonical, variant) pairs generated (vs 189/193 for the train-split-only retraining attempt;
+  more here because held-out secrets are correctly INCLUDED -- alias-folding is a deterministic
+  lookup, not a statistically-generalizing model, so there's no leakage concern the way there was
+  for retraining).
+- [x] **False-merge quality gate** (the task's single named biggest risk): every candidate checked
+  against (a) the full vocab list for a DIFFERENT-word collision, (b) the pre-extension alias file
+  for a DIFFERENT-canonical collision, (c) internal consistency within the new batch itself. **12 of
+  226 candidates excluded as genuine false-merge risks** (8 vocab collisions, 4 internal-batch
+  conflicts) -- real near-misses caught, not hypothetical: `honth` (lips) mined a variant that
+  normalizes to `hunt`, another to `hut` (both pre-existing unrelated English vocab words);
+  `neeche` mined a variant that normalizes to `niche`; `kitne` mined a variant colliding with the
+  distinct vocab word `kitna`. A further 51 candidates were excluded as harmless no-ops (5 already
+  literal duplicates of existing aliases, 31 whose normalized form already equals their own
+  canonical -- i.e. already resolve correctly with zero file changes -- 15 redundant duplicate
+  normalized forms within the new batch itself, which still resolve correctly via their kept
+  sibling spelling). **163 candidates survived the automated gate** -- full accounting (every
+  exclusion + reason) in `generator/evals/finetune/data/extend_hien_aliases_report.json`.
+- [x] **A 2nd, orthogonal collision found by the FULL test suite, not the automated gate**: `(pyaar,
+  paayar)` passed all 3 automated false-merge checks but broke
+  `test_clue_spoiler_gate.py::test_spoiler_gate_pack_content[bollywood-hi-en]` -- `paayar`
+  normalizes to `payar`, which is edit-distance-2 from `palat` (an unrelated word meaning "turn
+  around") in the bollywood pack's own P01 hi-en clue, false-tripping the spoiler gate's
+  morphological-variant check. This is exactly why the task specified running the FULL suite, not
+  just alias/payload-specific tests -- caught real cross-system content risk the alias-file's own
+  gate has no visibility into (it doesn't read clue/pack content, by design -- that's out of this
+  task's scope to add). Excluded manually with an inline comment, same pattern as the file's
+  pre-existing `vaada: waada` exclusion. **162 final survivors added.**
+- [x] **`vocab/hi-en-aliases.txt` extended**: 29 -> 121 canonicals, 39 -> 201 aliases. All 29
+  original entries preserved byte-for-byte except 6 that gained additional aliases appended in
+  place (`khushbu`, `gyaan`, `pyaar`, `qurbani`, `kahani`, `izzat`); new canonicals appended under a
+  dated section header. Header comment updated to reflect the new scale.
+- [x] **Verified through the REAL production path** (precedent: `verify_ship_l2_extension_e2e.py` --
+  call the actual shipped functions, not a reimplementation): `normalize.canonical_for()` and
+  `payload.py`'s real `_build_payload_core`/alt-map builder, run against the full 10,495-word
+  production `load_hien_vocab()` (synthetic embeddings -- this verifies the LOOKUP mechanism's
+  correctness, not ranking quality, which the mechanism deliberately never touches), for a 17-secret
+  representative sample (all 13 `aksharantar_heldout`-covered secrets + 5 others): **26/26 new
+  (secret, alias) pairs resolve correctly** via both `canonical_for()` and the real alt-map's
+  `[rank, qsim]` (verified equal to the canonical word's own entry, not just present).
+- [x] **Re-measured the actual success criterion**: of the original 267-record `aksharantar_heldout`
+  eval set (30 unique secret/variant pairs, 13 secrets, 67.4% embedding-level band-agreement
+  baseline), lookup-based resolution via the extended alias file is **267/267 (100%)**, up from
+  63/267 (23.6%) pre-fix -- 100% BY CONSTRUCTION for every covered pair, since a resolved lookup
+  inherits the canonical spelling's exact rank (this is the correct re-measurement per the task's
+  framing: alias-folding happens before embedding, so "does it resolve" is the right question, not
+  "does directly embedding the variant produce the same rank", which is what the ORIGINAL
+  `aksharantar_heldout` measurement deliberately tests and is UNCHANGED by this fix -- the embedding
+  itself was never touched). 23 of the 30 unique pairs were newly fixed by this session's alias
+  additions; 7 already resolved correctly before this task (via normalize()'s fold rules alone or
+  pre-existing alias entries). None of the 30 eval pairs involve `pyaar` (the one spoiler-gate
+  exclusion above), so that exclusion does not affect this 267/267 number. Broader
+  full-candidate-set coverage: 213/226 (94.2%) of ALL mined candidates (not just the 267-record eval
+  sample) now resolve correctly; the remaining 5.8% are exactly the 12 automated-gate false-merge
+  exclusions plus the 1 spoiler-gate exclusion, not a residual gap.
+- [x] **Zero-regression check**: full `uv run pytest` from `generator/`. Before the spoiler-gate
+  fix above, `test_clue_spoiler_gate.py::test_spoiler_gate_pack_content[bollywood-hi-en]` was the
+  ONE failure in the entire 718-test suite (713 passed, 1 failed, 4 skipped) -- a real regression
+  this change introduced and the full-suite run caught, as intended. **After the fix: 714 passed, 0
+  failed, 4 skipped** (608s wall clock) -- confirmed clean on a run where the file was not touched
+  mid-execution (the first post-edit run read a stale in-process `lru_cache`d alias map from before
+  the fix landed, giving a misleading still-failing result; re-run confirmed the fix, not a cache
+  artifact).
+- [x] **Docs**: `docs/model-excellence-final-report.md` finding #2 updated in place (FIXED
+  (2026-07-24) heading, full before/after numbers, "why this worked where retraining didn't"
+  section) -- not a new numbered entry, per the task's own framing that finding #2 was already the
+  right home for this.
+- [ ] **NOT committed**: everything in this checkpoint is staged/unstaged on disk only, per explicit
+  instruction -- an orchestrator-level commit follows after combined review with a parallel
+  band-calibration (finding #1) change. Nothing pushed/published anywhere; no payloads republished
+  to the live payloads repo (that remains a separate, later, human-confirmed step).
+
+## Band-calibration fix -- hi-en Warm band widened via a floor, not a fraction change (finding #1 closed)
+
+- [x] **Mechanism**: `docs/model-excellence-final-report.md` finding #1 (hi-en's Warm band was only
+  24 ranks / 0.23% of vocab wide, vs EN's 2,200 ranks / 4.0%) named `warm_max = int(n * 0.08)` as an
+  untested next attack. That exact hypothesis was tested and **rejected**: raising `warmFraction`
+  globally also inflates EN's Warm band from 4.0% to 7.0% of vocab (2,200 -> 3,850 ranks), eating
+  into EN's Cold band -- directly contradicting the goal of leaving EN's already-shipped, presumably
+  well-tuned band feel untouched. Root cause, actually isolated: unlike Scorching (`max(50, n*
+  0.001)`) and Hot (`max(500, n*0.01)`), Warm had no floor of its own -- so at hi-en's vocab scale,
+  Hot's floor eating into the un-floored Warm ceiling had nothing to counteract it. **Fix shipped**:
+  added a 900-rank floor to Warm (`warm_max = max(900, int(n * 0.05))`), the same `max(floor,
+  n*fraction)` shape the other two bands already use -- `warmFraction` itself is UNCHANGED at 0.05.
+  900 was chosen empirically (not a round-number guess): it produces a hi-en Warm width of 400 ranks
+  / 3.81% of vocab, closely matching EN's existing 4.0% feel, while being mathematically guaranteed
+  not to bind at EN's scale (55,000 * 0.05 = 2,750 >> 900).
+- [x] **Kept in sync, all sites found and fixed**: `rival.band_for_rank` (Python source of truth) and
+  `bandForRank`/`AppConfig.warmFloor` (Dart, `models.dart`/`config.dart`) both carry the floor.
+  Audited for every OTHER inline `n * 0.05` re-derivation that could silently drift: `rival.
+  _generate_path`'s own `warm_threshold` (adaptive-convergence cold/warm transition -- was already
+  duplicating band_for_rank's formula pre-fix, now carries the same floor);
+  `dimension5_winrate._simulate_one`'s own `warm_threshold` (win-rate player-model reduction
+  schedule, same fix); `test_onboarding_build.py`'s EN teaching-ladder boundary check (doesn't
+  change EN's numeric outcome since the floor never binds there, but kept honest). `failure_taxonomy.
+  band_rank_range` needed NO code change -- it already derives its window by scanning
+  `band_for_rank` directly rather than duplicating the formula, exactly the pattern the other sites
+  should have followed; its own tests still needed updating since they hardcoded the OLD scanned
+  result (24-rank window -> 400-rank window).
+- [x] **Tests updated, not just widened**: every hardcoded boundary value in `generator/tests/
+  test_rival.py` (new `test_hien_warm_floor_fix` at the real n=10,495; `test_small_vocab_hot_floor`
+  at the pathological n=1,000 explicitly documented as an ACCEPTED edge case -- Warm is now
+  reachable there but Cold becomes fully swallowed instead, since n=1,000 is not a real vocab this
+  game uses, both real langs are >=10,495) and `app/test/temperature_bands_test.dart` (n=10,439
+  fixture group's 501-524 Warm window recomputed to 501-900) recomputed to the exact new numbers,
+  plus `test_failure_taxonomy.py`'s two hardcoded-window tests (24 -> 400 ranks).
+- [x] **Empirical validation, not just a formula check**:
+  - **Band-confusion matrix** (bake-off checkpoint `gauravgandhi2411/hinglish-relatedness-sbert`,
+    379 dim1 records, real n=10,495): Warm's predicted-count rose 2 -> 17, recall 1.2% -> 8.3% of the
+    84 expected-Warm records, precision held ~0.41-0.50 (the newly-captured records aren't noise).
+    **EN confirmed byte-identical**: re-ran `dimension1_ranking._resolve_actuals` for all 227 EN
+    dim1 scenario records against both formulas -- **0 records changed `actual_band`**.
+  - **ECE unaffected by construction, not by luck**: `band_calibration_error` derives its confidence
+    signal from `1 - actual_rank/vocab_size` directly, never from `actual_band` -- so it's
+    mathematically invariant to any band-boundary change; reported (0.202, identical both formulas)
+    for completeness, not claimed as fix evidence.
+  - **Guess-distribution simulation** (adapted `dimension5_winrate`'s exact RNG/reduction-model
+    machinery, 118 real hi-en puzzles x 100 simulated noisy-guesser trajectories each, scratch script
+    not committed): fraction of simulated guess-steps landing in Warm rose from **0.37% -> 4.44%**
+    (477/130,036 -> 5,846/131,716 steps) -- the actual "will players encounter this band" proof, not
+    just a static width calculation.
+  - **Rival-path calibration gate** (`dimension4_rival`, real production `generate_rival_data`, 236
+    real daily+pack puzzles both langs): re-ran against both the OLD formula (loaded via `git show
+    HEAD:generator/rival.py` into an isolated module, zero working-tree changes) and the NEW --
+    **identical results, 0/236 flagged both before and after**, median par 8.0 / chill_spread 5.0 /
+    sharp_spread 3.0 unchanged. Confirms Hot's floor (unchanged), not Warm's, dominates rival-path
+    pacing -- this fix doesn't touch it.
+- [x] **Dart UI/UX read-only review** (`win_screen.dart` share-card + best-band label, `puzzle_
+  screen.dart` live rival indicator + best-guess pill + onboarding example tile, `guess_tile.dart`
+  hint/guess rendering, `rival_state.dart`): confirmed every site consumes only the `TemperatureBand`
+  enum/label/emoji/color, never a raw rank number or an assumed band width. No threshold-adjacent
+  hardcoding found -- no changes needed.
+- [x] **Local payload regen, NOT published** (`generator/build.py`, 21 days both langs starting
+  2026-07-24, output to a scratch dir outside both this repo and the sibling payloads repo): all 42
+  payloads within their gzip size targets, par distributions sane (EN median 9, hi-en median 8, both
+  within the [4,16]/median-[8,12] calibration targets). Spot-checked rival paths by eye across
+  several dates -- band sequences non-degenerate, and one real generated payload (hi-en 2026-08-05,
+  chill tier, rank 820) directly exercises the new Warm band in production-shaped output, confirming
+  the fix is live end-to-end, not just formula-correct in isolation.
+- [x] **Test suite**: Dart (`flutter test`, full suite, 524 tests) -- 523 passed, 1 pre-existing
+  flake (`puzzle_completed_analytics_test.dart`'s win-outcome test, unrelated to band logic --
+  confirmed by rerunning in isolation, where it passes cleanly every time) confirmed NOT caused by
+  this change. Python: every file this change touched passes in a targeted run (`test_rival.py`,
+  `test_failure_taxonomy.py`, `test_onboarding_build.py`, `test_payload.py`, `test_vocab.py` --
+  208/208 passed); the full `uv run pytest` from `generator/` (all of `tests/`, including the slow
+  real-LoRA-training regression test) was still running at the time this checkpoint was written --
+  see the next checkpoint entry or session notes for its final count.
+- [x] **Docs**: `docs/known-limitations.md` entry #18 updated in place to FIXED (2026-07-24) status
+  (root cause, fix, and the same before/after numbers as above) following entry #21's established
+  FIXED-entry style; `docs/model-excellence-final-report.md` finding #1 updated in place to FIXED
+  (development-complete, pending deploy) status, explicitly naming and rejecting the
+  originally-hypothesized fraction-only fix.
+- [x] **Committed** (`894f63e` band fix, `d205a19` alias extension, `6243bab` shared docs) after an
+  independent verifier subagent re-derived the band math live, re-confirmed all 8 false-merge
+  exclusions and 15 spot-checked inclusions against the real vocab, and re-ran the full combined
+  suite fresh (712 passed/4 skipped/0 failed Python, 523/524 Dart with 1 confirmed-unrelated
+  pre-existing flake). Overall verdict: PASS, safe to deploy.
+- [x] **DEPLOYED (2026-07-24), both systems, byte-verified live**:
+  - Payloads: `uv run python publish_all.py --days 68 --langs en,hi-en` from `generator/` (68 =
+    exactly one full post-L5-fix schedule cycle, covering 2026-06-12 through 2026-08-18 so the
+    pending L5 trigger-word dates get the new formula/alias data too, not just today-forward).
+    Pushed to `mindmeld-payloads` (`6e4bfd9`, "payload drop 2026-06-12..2026-08-18 (en,hi-en) +
+    packs", 189 files). Byte-verified against the live GitHub Pages CDN at three independent points
+    (SHA-256 match, not just HTTP 200, per this project's own "never trust a green push" lesson):
+    a regular day (2026-06-12), the manifest (`generated_at` confirmed fresh, last day 2026-08-18),
+    and the first L5 trigger-word date (2026-08-11, tarbooz) -- all three matched the pushed content
+    exactly. Pre-push content spot-check confirmed the diff was real and expected, not a trivial
+    metadata-only change: alt_map grew 476->624 entries on the sampled day (the alias extension
+    taking effect), ~2,605/10,495 word ranks shifted by 1-3 positions (the known, previously-seen
+    "vocab injection" collateral-noise pattern from adding new embedded strings, harmless).
+  - App: `./deploy-warmer.ps1` (Flutter/JDK added to PATH for the session --
+    `C:\Users\gaura\sdks\flutter\bin`/`jdk17\bin`, not on PATH by default in this environment) --
+    every guard passed (web-plugin registrant, Firebase authorized-domains, web-dist/ project-link
+    check, the byte-size live-wasm-match check that exists specifically because `vercel deploy`
+    silently drifted the `playwarmer.vercel.app` alias once before), deployed to Vercel production,
+    aliased, and the post-deploy smoke check passed (HTTP 200, booted true, 0 page/request errors).
+    Live wasm confirmed byte-matching this exact build (2,803,437 bytes).
+  - Final live check: navigated to `https://playwarmer.vercel.app/` in a real browser, confirmed
+    today's actual puzzle (2026-07-24, hi-en) renders correctly with no visual breakage and zero
+    console errors/warnings. Full interactive gameplay verification (typing a guess and checking
+    band-color output) hit a Flutter-CanvasKit browser-automation limitation (the rendered UI isn't
+    a real DOM input the keyboard-event simulation could reliably drive) -- not itself evidence of
+    an app problem, since `deploy-warmer.ps1`'s own automated smoke check already exercises real
+    boot behavior separately and passed cleanly.
+- [x] Both this checkpoint and the sibling alias-extension checkpoint's payload-regen scratch output
+  were cleaned up; nothing left behind outside the two repos.

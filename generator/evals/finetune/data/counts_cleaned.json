@@ -1,0 +1,7 @@
+{
+  "mnrl_total_after_dedup": 669,
+  "graded_total_after_dedup": 888,
+  "corpus_pmi_cleaned_mnrl": 127,
+  "corpus_pmi_cleaned_graded": 185,
+  "no_leakage_assertion": "passed"
+}

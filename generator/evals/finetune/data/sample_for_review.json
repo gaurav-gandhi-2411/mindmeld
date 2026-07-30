@@ -1,0 +1,141 @@
+{
+  "mnrl_sample": [
+    {
+      "anchor": "chhat",
+      "positive": "anand",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "zindagi",
+      "positive": "life",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "bhai",
+      "positive": "brother",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "jharna",
+      "positive": "waterfall",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "andar",
+      "positive": "inside",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "lamba",
+      "positive": "tall",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "chawal",
+      "positive": "rice",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "fielder",
+      "positive": "covers",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "god",
+      "positive": "bhagwan",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "gilas",
+      "positive": "doosra",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "naach",
+      "positive": "gaana",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "shak",
+      "positive": "symptom",
+      "source": "llm_augmented"
+    },
+    {
+      "anchor": "lahsun",
+      "positive": "paka",
+      "source": "corpus_pmi"
+    },
+    {
+      "anchor": "do",
+      "positive": "two",
+      "source": "crosslingual"
+    },
+    {
+      "anchor": "sahayak",
+      "positive": "assistant",
+      "source": "llm_augmented"
+    }
+  ],
+  "graded_sample": [
+    {
+      "sentence1": "jeet",
+      "sentence2": "ginger",
+      "score": 0.05,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "match",
+      "sentence2": "sky",
+      "score": 0.05,
+      "source": "llm_augmented"
+    },
+    {
+      "sentence1": "ulta",
+      "sentence2": "opposite",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "maidan",
+      "sentence2": "field",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "jeet",
+      "sentence2": "win",
+      "score": 0.85,
+      "source": "dim1_triplets"
+    },
+    {
+      "sentence1": "mirch",
+      "sentence2": "chili",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "masjid",
+      "sentence2": "jumu",
+      "score": 0.6791639676852907,
+      "source": "corpus_pmi"
+    },
+    {
+      "sentence1": "bhada",
+      "sentence2": "ugly",
+      "score": 0.9,
+      "source": "crosslingual"
+    },
+    {
+      "sentence1": "thali",
+      "sentence2": "bhog",
+      "score": 0.6370059220015756,
+      "source": "corpus_pmi"
+    },
+    {
+      "sentence1": "angutha",
+      "sentence2": "thumb",
+      "score": 0.9,
+      "source": "crosslingual"
+    }
+  ]
+}
