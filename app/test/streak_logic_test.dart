@@ -311,27 +311,46 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
-  // Passive streak reset (on Stats screen open)
+  // Passive streak check (on Stats screen open) — no freeze held/applicable
   // ---------------------------------------------------------------------------
-  group('applyPassiveStreakReset', () {
-    test('gap > 1 day resets streak to 0 and persists', () async {
+  group('rescueStreakOrReset — no freeze available', () {
+    test('gap > 2 days resets streak to 0 and persists (freeze cannot cover it)',
+        () async {
       final (db, tmpDir) = await openTestDb();
       try {
         final day1 = DateTime(2026, 6, 10);
         final day5 = DateTime(2026, 6, 15);
         await db.recordWin(lang: 'en', guessCount: 5, today: day1);
 
-        final reset = await db.applyPassiveStreakReset(lang: 'en', today: day5);
-        expect(reset.currentStreak, equals(0),
+        final result = await db.rescueStreakOrReset(lang: 'en', today: day5);
+        expect(result.rescued, isFalse,
+            reason: 'a 4-missed-day gap is not a single-missed-day rescue');
+        expect(result.stats.currentStreak, equals(0),
             reason: 'streak reset to 0 after gap');
-        expect(reset.maxStreak, equals(1), reason: 'maxStreak unchanged');
-        expect(reset.played, equals(1), reason: 'played count unchanged');
-        expect(reset.wins, equals(1), reason: 'wins unchanged');
+        expect(result.stats.maxStreak, equals(1), reason: 'maxStreak unchanged');
+        expect(result.stats.played, equals(1), reason: 'played count unchanged');
+        expect(result.stats.wins, equals(1), reason: 'wins unchanged');
 
         // Confirm persisted to DB.
         final reloaded = await db.loadStats('en');
         expect(reloaded.currentStreak, equals(0),
             reason: 'persisted streak is 0');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('gap = 2 days (one missed day) resets to 0 when no freeze is held',
+        () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final day1 = DateTime(2026, 6, 10);
+        final day3 = DateTime(2026, 6, 12); // exactly one missed day (6/11)
+        await db.recordWin(lang: 'en', guessCount: 5, today: day1);
+
+        final result = await db.rescueStreakOrReset(lang: 'en', today: day3);
+        expect(result.rescued, isFalse, reason: 'no freeze held — cannot rescue');
+        expect(result.stats.currentStreak, equals(0));
       } finally {
         await closeTestDb(db, tmpDir);
       }
@@ -344,9 +363,9 @@ void main() {
         final day2 = DateTime(2026, 6, 11);
         await db.recordWin(lang: 'en', guessCount: 5, today: day1);
 
-        final result =
-            await db.applyPassiveStreakReset(lang: 'en', today: day2);
-        expect(result.currentStreak, equals(1),
+        final result = await db.rescueStreakOrReset(lang: 'en', today: day2);
+        expect(result.rescued, isFalse);
+        expect(result.stats.currentStreak, equals(1),
             reason: 'consecutive day preserves streak');
       } finally {
         await closeTestDb(db, tmpDir);
@@ -359,9 +378,9 @@ void main() {
         final day1 = DateTime(2026, 6, 10);
         await db.recordWin(lang: 'en', guessCount: 5, today: day1);
 
-        final result =
-            await db.applyPassiveStreakReset(lang: 'en', today: day1);
-        expect(result.currentStreak, equals(1),
+        final result = await db.rescueStreakOrReset(lang: 'en', today: day1);
+        expect(result.rescued, isFalse);
+        expect(result.stats.currentStreak, equals(1),
             reason: 'same-day return preserves streak');
       } finally {
         await closeTestDb(db, tmpDir);
@@ -376,10 +395,9 @@ void main() {
         await db.recordWin(lang: 'en', guessCount: 5, today: day1);
         await db.recordLoss(lang: 'en');
 
-        final result =
-            await db.applyPassiveStreakReset(lang: 'en', today: day5);
-        expect(result.currentStreak, equals(0),
-            reason: 'already 0 — no-op');
+        final result = await db.rescueStreakOrReset(lang: 'en', today: day5);
+        expect(result.rescued, isFalse);
+        expect(result.stats.currentStreak, equals(0), reason: 'already 0 — no-op');
       } finally {
         await closeTestDb(db, tmpDir);
       }
@@ -388,12 +406,175 @@ void main() {
     test('no prior win is a no-op', () async {
       final (db, tmpDir) = await openTestDb();
       try {
-        final result = await db.applyPassiveStreakReset(
+        final result = await db.rescueStreakOrReset(
           lang: 'en',
           today: DateTime(2026, 6, 15),
         );
-        expect(result.currentStreak, equals(0),
+        expect(result.rescued, isFalse);
+        expect(result.stats.currentStreak, equals(0),
             reason: 'no prior win — nothing to reset');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Earning: recordWin grants a freeze every streakFreezeMilestoneDays days
+  // ---------------------------------------------------------------------------
+  group('recordWin — streak-freeze earning', () {
+    test('no freeze granted before the first milestone', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        var day = DateTime(2026, 6, 1);
+        PlayerStats stats = PlayerStats.empty;
+        for (var i = 0; i < streakFreezeMilestoneDays - 1; i++) {
+          stats = await db.recordWin(lang: 'en', guessCount: 5, today: day);
+          day = day.add(const Duration(days: 1));
+        }
+        expect(stats.currentStreak, equals(streakFreezeMilestoneDays - 1));
+        expect(stats.streakFreezes, equals(0));
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('exactly one freeze granted on reaching the Nth-day milestone', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        var day = DateTime(2026, 6, 1);
+        PlayerStats stats = PlayerStats.empty;
+        for (var i = 0; i < streakFreezeMilestoneDays; i++) {
+          stats = await db.recordWin(lang: 'en', guessCount: 5, today: day);
+          day = day.add(const Duration(days: 1));
+        }
+        expect(stats.currentStreak, equals(streakFreezeMilestoneDays));
+        expect(stats.streakFreezes, equals(1),
+            reason: 'reaching day $streakFreezeMilestoneDays grants exactly one freeze');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('replaying the same day (idempotent) never double-grants', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        var day = DateTime(2026, 6, 1);
+        for (var i = 0; i < streakFreezeMilestoneDays; i++) {
+          await db.recordWin(lang: 'en', guessCount: 5, today: day);
+          day = day.add(const Duration(days: 1));
+        }
+        // Replay the milestone day itself (same-day idempotent call).
+        final replayed = await db.recordWin(
+          lang: 'en',
+          guessCount: 5,
+          today: day.subtract(const Duration(days: 1)),
+        );
+        expect(replayed.currentStreak, equals(streakFreezeMilestoneDays));
+        expect(replayed.streakFreezes, equals(1),
+            reason: 'replaying the milestone day must not grant a second freeze');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('grant is capped at maxStreakFreezes across multiple milestones', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        var day = DateTime(2026, 6, 1);
+        PlayerStats stats = PlayerStats.empty;
+        // Play far enough past several milestones to exceed the cap.
+        final daysNeeded = streakFreezeMilestoneDays * (maxStreakFreezes + 2);
+        for (var i = 0; i < daysNeeded; i++) {
+          stats = await db.recordWin(lang: 'en', guessCount: 5, today: day);
+          day = day.add(const Duration(days: 1));
+        }
+        expect(stats.streakFreezes, equals(maxStreakFreezes),
+            reason: 'freezes never exceed the cap even across many milestones');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rescue: rescueStreakOrReset spends a held freeze to cover one missed day
+  // ---------------------------------------------------------------------------
+  group('rescueStreakOrReset — freeze available', () {
+    /// Wins [streakFreezeMilestoneDays] consecutive days starting [start],
+    /// leaving the player with exactly one freeze and that streak length.
+    Future<DateTime> winToFirstMilestone(AppPersistence db, DateTime start) async {
+      var day = start;
+      for (var i = 0; i < streakFreezeMilestoneDays; i++) {
+        await db.recordWin(lang: 'en', guessCount: 5, today: day);
+        day = day.add(const Duration(days: 1));
+      }
+      return day.subtract(const Duration(days: 1)); // the milestone day itself
+    }
+
+    test('gap=2 (one missed day) with a freeze held: streak preserved, freeze spent',
+        () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final milestoneDay = await winToFirstMilestone(db, DateTime(2026, 6, 1));
+        final before = await db.loadStats('en');
+        expect(before.streakFreezes, equals(1));
+
+        // Miss milestoneDay+1; open Stats on milestoneDay+2 (gap=2).
+        final checkDay = milestoneDay.add(const Duration(days: 2));
+        final result = await db.rescueStreakOrReset(lang: 'en', today: checkDay);
+
+        expect(result.rescued, isTrue);
+        expect(result.stats.currentStreak, equals(streakFreezeMilestoneDays),
+            reason: 'streak preserved through the rescued missed day');
+        expect(result.stats.streakFreezes, equals(0), reason: 'freeze was spent');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test(
+        'critical: after a rescue, a real win the same day extends the streak '
+        'instead of resetting it (lastWinDate must be bridged, not left stale)',
+        () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final milestoneDay = await winToFirstMilestone(db, DateTime(2026, 6, 1));
+        final checkDay = milestoneDay.add(const Duration(days: 2));
+
+        final rescue = await db.rescueStreakOrReset(lang: 'en', today: checkDay);
+        expect(rescue.rescued, isTrue);
+
+        // Player then actually plays and wins TODAY (checkDay). If
+        // lastWinDate were left at the stale original milestoneDay, this
+        // would see a 2-day gap and reset to 1 — exactly the bug the bridge
+        // fix in rescueStreakOrReset exists to prevent.
+        final afterWin =
+            await db.recordWin(lang: 'en', guessCount: 6, today: checkDay);
+        expect(afterWin.currentStreak, equals(streakFreezeMilestoneDays + 1),
+            reason: 'the rescued streak must extend by one on the next real win, '
+                'not reset');
+      } finally {
+        await closeTestDb(db, tmpDir);
+      }
+    });
+
+    test('gap=3 (two missed days) resets even with a freeze held — '
+        'a freeze covers exactly one missed day, not an extended absence', () async {
+      final (db, tmpDir) = await openTestDb();
+      try {
+        final milestoneDay = await winToFirstMilestone(db, DateTime(2026, 6, 1));
+        final before = await db.loadStats('en');
+        expect(before.streakFreezes, equals(1));
+
+        final checkDay = milestoneDay.add(const Duration(days: 3));
+        final result = await db.rescueStreakOrReset(lang: 'en', today: checkDay);
+
+        expect(result.rescued, isFalse,
+            reason: 'two missed days exceeds what one freeze covers');
+        expect(result.stats.currentStreak, equals(0));
+        expect(result.stats.streakFreezes, equals(1),
+            reason: 'freeze is NOT spent when it cannot cover the whole gap');
       } finally {
         await closeTestDb(db, tmpDir);
       }

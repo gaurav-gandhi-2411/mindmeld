@@ -254,12 +254,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Archive row subtitle: "Unlocked" when entitled, "Coming soon" otherwise.
-  String _archiveSubtitle() {
-    if (_entitlements.archive) return 'Unlocked';
-    return 'Coming soon';
-  }
-
   /// Delegates to [ConsentManager.showPrivacyOptions].
   ///
   /// Only reachable when [AppConfig.adsEnabled] is true AND
@@ -378,25 +372,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           // Themed Packs (phase 6c) is a navigation row, not a purchase row —
           // it opens the pack selector rather than IapGateway.purchase().
-          // Excluded from the generic products loop below.
+          // Puzzle Archive shipped free (the "Practice" tab, see
+          // ArchiveScreen) and Streak Freeze shipped as an earned mechanic
+          // (see AppPersistence.recordWin/rescueStreakOrReset, surfaced on
+          // the Stats tab), neither as a purchase — both excluded from the
+          // generic products loop below, same as themedPacks.
           ...IapProduct.values
-              .where((p) => p != IapProduct.themedPacks)
+              .where((p) =>
+                  p != IapProduct.themedPacks &&
+                  p != IapProduct.archive &&
+                  p != IapProduct.streakFreeze)
               .map(
             (p) {
               final available = IapStub.isAvailable(p);
-              // For the archive product, show unlocked state when entitled.
-              final subtitle = p == IapProduct.archive
-                  ? _archiveSubtitle()
-                  : (available ? 'Coming soon' : 'Coming in a future update');
+              final subtitle = available ? 'Coming soon' : 'Coming in a future update';
               return ListTile(
                 title: Text(IapStub.productNames[p] ?? p.name),
                 subtitle: Text(subtitle),
                 trailing: available
                     ? (_entitlements.removeAds && p == IapProduct.removeAds
                         ? Icon(Icons.check_circle, color: tokens.accentText)
-                        : _entitlements.archive && p == IapProduct.archive
-                            ? Icon(Icons.check_circle, color: tokens.accentText)
-                            : const Icon(Icons.chevron_right))
+                        : const Icon(Icons.chevron_right))
                     : const Chip(label: Text('Soon')),
                 enabled: available,
                 onTap: available ? () => _purchase(p) : null,

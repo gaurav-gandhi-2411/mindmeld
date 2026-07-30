@@ -169,11 +169,20 @@ Widget _buildSettings(NotificationService service) {
 /// scroll there first via [WidgetTester.scrollUntilVisible].
 Future<void> _scrollToNotifToggle(WidgetTester tester) async {
   await tester.pumpAndSettle();
+  final target = find.widgetWithText(SwitchListTile, 'Daily puzzle reminder');
   await tester.scrollUntilVisible(
-    find.widgetWithText(SwitchListTile, 'Daily puzzle reminder'),
+    target,
     200,
     scrollable: find.byType(Scrollable),
   );
+  // scrollUntilVisible stops once the target is merely present/built, which
+  // is not the same as fully within the viewport's hit-testable bounds — the
+  // exact list length (and therefore how close the target sits to whatever
+  // scroll increment last landed) affects whether those coincide. ensureVisible
+  // scrolls precisely so the target's bounds are actually inside the
+  // viewport, which is what the tap() calls below need.
+  await tester.ensureVisible(target);
+  await tester.pumpAndSettle();
 }
 
 void main() {

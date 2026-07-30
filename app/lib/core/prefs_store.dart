@@ -218,6 +218,7 @@ class PrefsStore implements StorageBackend {
         currentStreak: (m['current_streak'] as num).toInt(),
         maxStreak: (m['max_streak'] as num).toInt(),
         guessDistribution: distRaw.map((k, v) => MapEntry(k, (v as num).toInt())),
+        streakFreezes: (m['streak_freezes'] as num?)?.toInt() ?? 0,
       );
     } catch (e) {
       dev.log('PrefsStore.loadStats decode error: $e', name: 'PrefsStore');
@@ -252,6 +253,7 @@ class PrefsStore implements StorageBackend {
       'max_streak': stats.maxStreak,
       'last_win_date': lastWinDate?.toIso8601String(),
       'dist': stats.guessDistribution,
+      'streak_freezes': stats.streakFreezes,
     };
     await _p.setString(_statsKey(lang), jsonEncode(m));
   }

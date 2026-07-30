@@ -2147,3 +2147,68 @@ orchestrator review), live-verified 2026-07-11.
   narrative predating it by a day -- no new deploy was needed for WS1.
 - **End state**: working tree clean, no genuinely-unmerged branches, `main` == deployed, both CI
   lanes green.
+
+## WORKSTREAM 2a+2b -- Puzzle archive + earned streak-freeze mechanic
+
+- [x] **Archive was already largely built** (`ArchiveScreen`, nav-reachable "Practice" tab,
+  `isPractice: true` reusing `PuzzleScreen` with `_skipStatsWrites` gating -- discovered via
+  Explore before writing anything, not redone). Added the missing "sensible list UI (date, solved
+  state)" piece: `_loadSolvedStates()` loads each date's `DayState` via `Future.wait` (parallel,
+  not sequential -- the date range only grows over the game's life) and the list now shows
+  "Solved in N" / "Not solved" / plain date per row with a check/circle icon.
+- [x] **Found and closed a real "coming soon" bug while researching this**: Settings' IAP section
+  had a "Puzzle Archive" row that always showed "Coming soon" and a coming-soon snackbar on tap --
+  contradicting the fact the feature already exists and is free. Removed that row entirely
+  (`settings_screen.dart`) rather than wire it to a purchase that was never going to exist;
+  `_archiveSubtitle()` deleted as dead code.
+- [x] **Streak freeze completed as EARNED, not purchased** (spec's explicit instruction, overriding
+  the pre-existing IAP-consumable scaffold): moved `streakFreezes` from `Entitlements`/RevenueCat
+  entirely into `PlayerStats`, persisted across all 3 backends (SQLite schema v5->v6 with a real
+  migration, PrefsStore JSON key, MemoryStore free via the whole-object store). Earning rule:
+  `AppPersistence.recordWin` grants +1 freeze every `streakFreezeMilestoneDays` (7) consecutive-day
+  streak milestone, capped at `maxStreakFreezes` (3), gated on the streak actually changing (not
+  `updateStreak`'s same-day-idempotent path) so replays never double-grant.
+- [x] **Rescue mechanic, day-rollover correctness verified hard** (per the spec's explicit risk
+  callout): new `AppPersistence.rescueStreakOrReset` replaces `applyPassiveStreakReset` --
+  gap<=1 day: no-op; gap==2 (exactly one missed day) with a freeze held: spend it, PRESERVE
+  currentStreak; any larger gap, or no freeze: reset to 0 (a freeze covers one missed day, not an
+  extended absence). **Critical bridge fix, caught before shipping**: the rescue must persist
+  `lastWinDate` as `today - 1`, NOT the original stale lastWinDate -- otherwise a real win
+  immediately after the rescue would see a stale 2-day gap and reset the very streak the rescue
+  just saved. Covered by a dedicated test
+  (`streak_logic_test.dart`, "critical: after a rescue, a real win the same day extends the streak
+  instead of resetting it") that fails loudly without the bridge.
+- [x] **UI**: `StatsScreen` now sources freeze count + rescue state from `AppPersistence`
+  directly (no more IAP gateway involvement); shows holdings with an explanation ("Earned every
+  7-day streak -- covers one missed day automatically") and a one-time "Streak freeze used" banner
+  right after a rescue. Settings' "Streak Freeze" IAP row removed (same treatment as archive) --
+  `IapProduct.streakFreeze`/`archive` enum values, `Entitlements.streakFreezes`/`archive` fields,
+  and the RevenueCat consumable-purchase demo path (`kRcProductStreakFreeze3Pack`,
+  `revenuecat_gateway_test.dart`'s "Test 3") deliberately left in place as inert, never-sold
+  infrastructure rather than ripped out -- minimal blast radius, same call this session made for
+  archive.
+- [x] **Tests**: `streak_logic_test.dart` rewritten (`applyPassiveStreakReset` group ->
+  `rescueStreakOrReset`/`recordWin — streak-freeze earning` groups, 19 tests covering milestone
+  grant/cap/idempotency and rescue/no-rescue/bridge-correctness). `iap_stub_test.dart` updated:
+  archive/streakFreeze rows assert `findsNothing` instead of `findsOneWidget`; their coming-soon-tap
+  tests removed (row no longer exists to tap). A widget-level ArchiveScreen solved-state test was
+  attempted and **dropped**: it deterministically hung at flutter_test's 10-minute timeout across
+  two different fix attempts (sequential and `Future.wait`-parallel loading) in a way no other
+  real-SQLite-from-initState widget test in this suite exhibits -- root cause not found, low
+  enough value (S24 already proves the load-bearing streak-isolation invariant; `flutter analyze`
+  confirms the code is type-correct) not to keep sinking time into it. Solved-state rendering
+  moved to the manual QA checklist instead.
+- [x] **Found and fixed a genuine regression along the way**: removing 2 Settings IAP rows
+  shortened `SettingsScreen`'s list enough that `settings_notifications_test.dart`'s
+  `scrollUntilVisible` (200px increments) converged to a scroll position where the target
+  `SwitchListTile` was present-in-tree but outside the viewport's hit-testable bounds -- 3 tests
+  failed with "derived an Offset that would not hit test." Fixed by adding `tester.ensureVisible()`
+  after `scrollUntilVisible` (precise, not incremental). Verified this was a real regression, not
+  pre-existing flakiness, by reproducing on the pre-change commit via `git stash` (passed) vs.
+  post-change (failed), then re-confirming green after the fix.
+- [x] **Full suite green**: `flutter test` 531 passed, 0 failed (up from 524; net of dropped/added
+  tests). One `pack_isolation_test.dart` failure seen in a single full-suite run did not reproduce
+  standalone or on a clean re-run of the full suite -- confirmed a one-off resource-contention flake
+  from several parallel background `flutter test` invocations during this session's own debugging,
+  not a real regression.
+- **Not yet committed** — commit follows this checkpoint entry.

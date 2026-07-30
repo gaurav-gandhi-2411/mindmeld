@@ -70,6 +70,30 @@ StreakResult updateStreak({
   );
 }
 
+/// Streak-freeze earning rule: one freeze granted every this-many-day streak
+/// milestone (7, 14, 21, ...), capped at [maxStreakFreezes] held at once.
+/// Earned, never purchased — see `AppPersistence.recordWin`'s grant and
+/// `AppPersistence.rescueStreakOrReset`'s consumption.
+const int streakFreezeMilestoneDays = 7;
+
+/// Maximum number of unconsumed streak freezes a player can hold at once.
+const int maxStreakFreezes = 3;
+
+/// Result of [AppPersistence.rescueStreakOrReset].
+class StreakRescueResult {
+  const StreakRescueResult({required this.stats, required this.rescued});
+
+  /// Stats after the check — either unchanged, freeze-consumed
+  /// (streak preserved), or streak reset to 0.
+  final PlayerStats stats;
+
+  /// True when a streak freeze was just spent to cover exactly one missed
+  /// day. False for "nothing to do" (streak intact) and for "streak reset"
+  /// (gap too large, or no freeze held) alike — callers that need to tell
+  /// those two apart can compare `stats.currentStreak` before/after.
+  final bool rescued;
+}
+
 /// [SqliteStore.meta] key marking the one-time PrefsStore -> SQLite
 /// migration (wasm-stub-remediation wave, see [migratePrefsIntoSqliteIfNeeded])
 /// as done. Bump the suffix (`_v2`, ...) if the migration logic itself ever
@@ -329,12 +353,25 @@ class AppPersistence {
     final key = guessCount.toString();
     dist[key] = (dist[key] ?? 0) + 1;
 
+    // Earned streak-freeze grant: every streakFreezeMilestoneDays-day streak
+    // milestone earns one freeze, capped at maxStreakFreezes held. Gated on
+    // the streak actually just changing (excludes updateStreak's diff==0
+    // idempotent-replay path) so replaying the same day's win never
+    // double-grants.
+    final justReachedMilestone = streak.currentStreak != current.currentStreak &&
+        streak.currentStreak > 0 &&
+        streak.currentStreak % streakFreezeMilestoneDays == 0;
+    final freezes = justReachedMilestone
+        ? (current.streakFreezes + 1).clamp(0, maxStreakFreezes)
+        : current.streakFreezes;
+
     final updated = current.copyWith(
       played: current.played + 1,
       wins: current.wins + 1,
       currentStreak: streak.currentStreak,
       maxStreak: streak.maxStreak,
       guessDistribution: dist,
+      streakFreezes: freezes,
     );
 
     await _store.saveStats(lang, updated, today);
@@ -353,31 +390,59 @@ class AppPersistence {
     return updated;
   }
 
-  /// Passive streak reset called on Stats screen open.
+  /// Passive streak check called on Stats screen open — folds in the earned
+  /// streak-freeze mechanic (see [streakFreezeMilestoneDays]/
+  /// [maxStreakFreezes]) so callers no longer orchestrate freeze consumption
+  /// separately against an IAP gateway.
   ///
-  /// If today is more than 1 day after the last win, the streak is broken.
-  /// Resets [currentStreak] to 0 and persists the change (preserving
-  /// [lastWinDate] and all other stats). Streak-freeze consumption is the
-  /// caller's responsibility before invoking this.
+  /// - Streak already 0, no prior win, or gap <= 1 day: no-op.
+  /// - Gap of EXACTLY 2 days (one missed day) AND a freeze is held: spend
+  ///   one freeze, PRESERVE [PlayerStats.currentStreak], `rescued: true`. A
+  ///   freeze protects a single missed day, not an extended absence.
+  /// - Any larger gap, or no freeze held: reset [PlayerStats.currentStreak]
+  ///   to 0, `rescued: false` — same unconditional reset as before the
+  ///   freeze mechanic existed.
   ///
-  /// Returns the (possibly updated) stats.
-  Future<PlayerStats> applyPassiveStreakReset({
+  /// Persists the resulting stats in either the rescue or reset branch.
+  Future<StreakRescueResult> rescueStreakOrReset({
     required String lang,
     required DateTime today,
   }) async {
     final current = await loadStats(lang);
-    if (current.currentStreak == 0) return current;
+    if (current.currentStreak == 0) {
+      return StreakRescueResult(stats: current, rescued: false);
+    }
 
     final lastWin = await loadLastWinDate(lang);
-    if (lastWin == null) return current;
+    if (lastWin == null) {
+      return StreakRescueResult(stats: current, rescued: false);
+    }
 
     final todayNorm = DateTime(today.year, today.month, today.day);
     final lastNorm = DateTime(lastWin.year, lastWin.month, lastWin.day);
-    if (todayNorm.difference(lastNorm).inDays <= 1) return current;
+    final gapDays = todayNorm.difference(lastNorm).inDays;
+    if (gapDays <= 1) {
+      return StreakRescueResult(stats: current, rescued: false);
+    }
 
-    final updated = current.copyWith(currentStreak: 0);
-    await _store.saveStats(lang, updated, null);
-    return updated;
+    if (gapDays == 2 && current.streakFreezes > 0) {
+      final rescued = current.copyWith(streakFreezes: current.streakFreezes - 1);
+      // Bridge lastWinDate to "yesterday" (todayNorm - 1), NOT the original
+      // lastWin: this makes the missed day look covered. Critical for
+      // correctness — if a subsequent real win today calls recordWin() and
+      // it still sees the ORIGINAL (2-days-stale) lastWinDate, updateStreak
+      // computes diff=2 and resets the very streak this rescue just saved.
+      // Bridging to todayNorm-1 makes that follow-up win see diff=1 and
+      // extend the streak normally, exactly as if the missed day had been
+      // played.
+      final bridgedLastWin = todayNorm.subtract(const Duration(days: 1));
+      await _store.saveStats(lang, rescued, bridgedLastWin);
+      return StreakRescueResult(stats: rescued, rescued: true);
+    }
+
+    final reset = current.copyWith(currentStreak: 0);
+    await _store.saveStats(lang, reset, null);
+    return StreakRescueResult(stats: reset, rescued: false);
   }
 
   // ---------------------------------------------------------------------------

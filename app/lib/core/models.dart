@@ -267,6 +267,7 @@ class PlayerStats {
     required this.currentStreak,
     required this.maxStreak,
     required this.guessDistribution,
+    this.streakFreezes = 0,
   });
 
   final int played;
@@ -277,6 +278,11 @@ class PlayerStats {
   /// Map of guess count → win count, e.g. {"5": 3, "12": 1}.
   final Map<String, int> guessDistribution;
 
+  /// Number of unconsumed streak-freeze uses held. Earned (see
+  /// `AppPersistence.recordWin`'s milestone grant), never purchased — see
+  /// `AppPersistence.rescueStreakOrReset` for how a freeze is spent.
+  final int streakFreezes;
+
   double get winPct => played == 0 ? 0 : wins / played;
 
   PlayerStats copyWith({
@@ -285,6 +291,7 @@ class PlayerStats {
     int? currentStreak,
     int? maxStreak,
     Map<String, int>? guessDistribution,
+    int? streakFreezes,
   }) {
     return PlayerStats(
       played: played ?? this.played,
@@ -292,6 +299,7 @@ class PlayerStats {
       currentStreak: currentStreak ?? this.currentStreak,
       maxStreak: maxStreak ?? this.maxStreak,
       guessDistribution: guessDistribution ?? this.guessDistribution,
+      streakFreezes: streakFreezes ?? this.streakFreezes,
     );
   }
 
@@ -301,6 +309,7 @@ class PlayerStats {
     currentStreak: 0,
     maxStreak: 0,
     guessDistribution: {},
+    streakFreezes: 0,
   );
 }
 

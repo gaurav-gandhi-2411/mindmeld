@@ -2,24 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:mindmeld/core/design_tokens.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/persistence.dart';
-import 'package:mindmeld/iap/entitlements.dart';
-import 'package:mindmeld/iap/revenuecat_gateway.dart';
 
-/// Displays player statistics: streak, max streak, played, win %, guess distribution,
-/// and streak-freeze count (sourced from the IAP gateway entitlements).
+/// Displays player statistics: streak, max streak, played, win %, guess
+/// distribution, and streak-freeze holdings (earned — see
+/// [AppPersistence.recordWin]'s milestone grant and
+/// [AppPersistence.rescueStreakOrReset]'s consumption — never purchased).
 class StatsScreen extends StatefulWidget {
   const StatsScreen({
     super.key,
     required this.lang,
-    /// Optional gateway override for tests. When null [buildIapGateway] is used.
-    this.iapGateway,
     this.active = true,
   });
 
   final String lang;
-
-  /// Optional IAP gateway; package-accessible for test injection.
-  final IapGateway? iapGateway;
 
   /// Whether this tab is the currently-selected destination in the app
   /// shell's [IndexedStack].
@@ -40,15 +35,15 @@ class StatsScreen extends StatefulWidget {
 
 class _StatsScreenState extends State<StatsScreen> {
   PlayerStats? _stats;
-  Entitlements _entitlements = Entitlements.empty;
   bool _loading = true;
 
-  late final IapGateway _gateway;
+  /// True for one load only, right after a streak freeze was just spent to
+  /// cover a missed day — drives the one-time "Streak freeze used!" banner.
+  bool _justRescued = false;
 
   @override
   void initState() {
     super.initState();
-    _gateway = widget.iapGateway ?? buildIapGateway();
     _load();
   }
 
@@ -61,8 +56,8 @@ class _StatsScreenState extends State<StatsScreen> {
     // stale for the new lang). Not reloading on every build here is
     // deliberate: this screen is always mounted (see [StatsScreen.active]
     // doc), so an unconditional reload on every rebuild would re-fire the
-    // passive-streak-reset write and the IAP gateway call far more often
-    // than the data can actually change.
+    // passive-streak-rescue write far more often than the data can actually
+    // change.
     final becameActive = widget.active && !oldWidget.active;
     final langChanged = widget.lang != oldWidget.lang;
     if (becameActive || langChanged) {
@@ -72,43 +67,28 @@ class _StatsScreenState extends State<StatsScreen> {
 
   Future<void> _load() async {
     final today = DateTime.now();
-    var e = await _gateway.current();
     var s = await AppPersistence.instance.loadStats(widget.lang);
+    var justRescued = false;
 
-    // Passive streak reset: fix stale streak display when the player missed day(s).
+    // Passive streak check: fix a stale streak display when the player
+    // missed day(s), spending an earned streak freeze first if one covers
+    // exactly the gap (see AppPersistence.rescueStreakOrReset).
     if (s.currentStreak > 0) {
-      final lastWin = await AppPersistence.instance.loadLastWinDate(widget.lang);
-      if (_isStreakBroken(lastWin, today)) {
-        if (e.streakFreezes > 0) {
-          await _gateway.consumeStreakFreeze();
-          e = Entitlements(
-            removeAds: e.removeAds,
-            archive: e.archive,
-            streakFreezes: e.streakFreezes - 1,
-          );
-        } else {
-          s = await AppPersistence.instance.applyPassiveStreakReset(
-            lang: widget.lang,
-            today: today,
-          );
-        }
-      }
+      final result = await AppPersistence.instance.rescueStreakOrReset(
+        lang: widget.lang,
+        today: today,
+      );
+      s = result.stats;
+      justRescued = result.rescued;
     }
 
     if (mounted) {
       setState(() {
         _stats = s;
-        _entitlements = e;
+        _justRescued = justRescued;
         _loading = false;
       });
     }
-  }
-
-  static bool _isStreakBroken(DateTime? lastWin, DateTime today) {
-    if (lastWin == null) return false;
-    final todayNorm = DateTime(today.year, today.month, today.day);
-    final lastNorm = DateTime(lastWin.year, lastWin.month, lastWin.day);
-    return todayNorm.difference(lastNorm).inDays > 1;
   }
 
   @override
@@ -119,6 +99,7 @@ class _StatsScreenState extends State<StatsScreen> {
 
     final stats = _stats ?? PlayerStats.empty;
     final winPctStr = '${(stats.winPct * 100).toStringAsFixed(0)}%';
+    final tokens = Theme.of(context).extension<WarmerTokens>() ?? WarmerTokens.light;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Statistics')),
@@ -127,6 +108,30 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_justRescued) ...[
+              Container(
+                padding: const EdgeInsets.all(WarmerSpacing.md),
+                decoration: BoxDecoration(
+                  color: tokens.win.tintBg,
+                  borderRadius: BorderRadius.circular(WarmerRadius.xs),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.ac_unit, color: tokens.win.text, size: 20),
+                    const SizedBox(width: WarmerSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        'Streak freeze used — a missed day was covered, your '
+                        'streak is safe!',
+                        style: TextStyle(color: tokens.win.text),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: WarmerSpacing.xl),
+            ],
+
             // Top numbers row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -156,12 +161,27 @@ class _StatsScreenState extends State<StatsScreen> {
             else
               ..._buildDistribution(context, stats),
 
-            // Streak-freeze count — surfaces non-zero values from IAP entitlements.
-            if (_entitlements.streakFreezes > 0) ...[
+            // Streak-freeze holdings — earned every streakFreezeMilestoneDays-day
+            // streak, capped at maxStreakFreezes; see AppPersistence.recordWin.
+            if (stats.streakFreezes > 0) ...[
               const SizedBox(height: WarmerSpacing.xl),
-              Text(
-                'Streak freezes: ${_entitlements.streakFreezes}',
-                style: Theme.of(context).textTheme.bodyMedium,
+              Row(
+                children: [
+                  Icon(Icons.ac_unit, color: tokens.text2, size: 18),
+                  const SizedBox(width: WarmerSpacing.sm),
+                  Text(
+                    'Streak freezes: ${stats.streakFreezes}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 2, left: 26),
+                child: Text(
+                  'Earned every $streakFreezeMilestoneDays-day streak — covers one '
+                  'missed day automatically.',
+                  style: TextStyle(color: tokens.text2, fontSize: 12),
+                ),
               ),
             ],
           ],

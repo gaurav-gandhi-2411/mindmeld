@@ -2,13 +2,20 @@
 /// "IAP screens render via stub."
 ///
 /// These tests verify:
-///   1. All four IAP products are rendered in the settings screen.
+///   1. Remove Ads and Streak Freeze are rendered as purchasable rows in the
+///      settings screen. Puzzle Archive is NOT rendered there — it shipped
+///      free via the "Practice" tab (see ArchiveScreen) rather than as an
+///      IAP, so it must never surface a "coming soon" purchase row again.
 ///   2. Themed Packs (phase 6c) is a navigation row into the pack selector —
 ///      not a purchase row — and is enabled/tappable.
 ///   3. Tapping a purchasable product surfaces the stub "coming soon" result
 ///      without crashing (snackbar appears).
 ///   4. IapStub.isAvailable(themedPacks) stays false — it is no longer part
 ///      of the generic purchase() flow (packs use IapGateway.purchasePack).
+///   5. IapProduct.archive itself is retained as an enum/entitlements value
+///      (harmless, unused by any UI) rather than ripped out, to avoid
+///      churning the RevenueCat product-mapping/entitlements plumbing for a
+///      product that was never actually sold.
 library;
 
 import 'package:flutter/material.dart';
@@ -55,10 +62,10 @@ Widget _buildSettingsScreen({
 
 void main() {
   // -------------------------------------------------------------------------
-  // All four products render
+  // Purchasable/nav rows render (archive excluded — ships free)
   // -------------------------------------------------------------------------
 
-  group('SettingsScreen IAP section — all four products render', () {
+  group('SettingsScreen IAP section', () {
     testWidgets('Remove Ads product is visible', (tester) async {
       await tester.pumpWidget(_buildSettingsScreen());
       await tester.pump();
@@ -69,25 +76,31 @@ void main() {
       );
     });
 
-    testWidgets('Puzzle Archive product is visible', (tester) async {
-      await tester.pumpWidget(_buildSettingsScreen());
-      await tester.pump();
+    testWidgets(
+      'Puzzle Archive is NOT rendered as a purchasable IAP row (ships free)',
+      (tester) async {
+        await tester.pumpWidget(_buildSettingsScreen());
+        await tester.pump();
 
-      expect(
-        find.text(IapStub.productNames[IapProduct.archive]!),
-        findsOneWidget,
-      );
-    });
+        expect(
+          find.text(IapStub.productNames[IapProduct.archive]!),
+          findsNothing,
+        );
+      },
+    );
 
-    testWidgets('Streak Freeze product is visible', (tester) async {
-      await tester.pumpWidget(_buildSettingsScreen());
-      await tester.pump();
+    testWidgets(
+      'Streak Freeze is NOT rendered as a purchasable IAP row (earned, not bought)',
+      (tester) async {
+        await tester.pumpWidget(_buildSettingsScreen());
+        await tester.pump();
 
-      expect(
-        find.text(IapStub.productNames[IapProduct.streakFreeze]!),
-        findsOneWidget,
-      );
-    });
+        expect(
+          find.text(IapStub.productNames[IapProduct.streakFreeze]!),
+          findsNothing,
+        );
+      },
+    );
 
     testWidgets('Themed Packs product is visible', (tester) async {
       await tester.pumpWidget(_buildSettingsScreen());
@@ -201,45 +214,6 @@ void main() {
       },
     );
 
-    testWidgets(
-      'tapping Puzzle Archive shows coming-soon snackbar',
-      (tester) async {
-        await tester.pumpWidget(_buildSettingsScreen());
-        await tester.pump();
-
-        await tester.tap(
-          find.text(IapStub.productNames[IapProduct.archive]!),
-        );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text(
-            'Coming soon! In-app purchases will be available in the next update.',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'tapping Streak Freeze shows coming-soon snackbar',
-      (tester) async {
-        await tester.pumpWidget(_buildSettingsScreen());
-        await tester.pump();
-
-        await tester.tap(
-          find.text(IapStub.productNames[IapProduct.streakFreeze]!),
-        );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text(
-            'Coming soon! In-app purchases will be available in the next update.',
-          ),
-          findsOneWidget,
-        );
-      },
-    );
   });
 
   // -------------------------------------------------------------------------

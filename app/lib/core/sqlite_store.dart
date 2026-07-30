@@ -78,7 +78,7 @@ class SqliteStore implements StorageBackend {
     _db = await factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: 5,
+        version: 6,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       ),
@@ -120,7 +120,8 @@ class SqliteStore implements StorageBackend {
         current_streak INTEGER NOT NULL DEFAULT 0,
         max_streak INTEGER NOT NULL DEFAULT 0,
         last_win_date TEXT,
-        dist_json TEXT NOT NULL DEFAULT '{}'
+        dist_json TEXT NOT NULL DEFAULT '{}',
+        streak_freezes INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -142,6 +143,7 @@ class SqliteStore implements StorageBackend {
   /// v2 → v3: add flushed column to analytics.
   /// v3 → v4: add pack_progress table (phase 6c themed packs).
   /// v4 → v5: add meta table (internal flags, e.g. migration markers).
+  /// v5 → v6: add streak_freezes to stats (earned streak-freeze mechanic).
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
@@ -158,6 +160,11 @@ class SqliteStore implements StorageBackend {
     }
     if (oldVersion < 5) {
       await db.execute(_createMetaSql);
+    }
+    if (oldVersion < 6) {
+      await db.execute(
+        'ALTER TABLE stats ADD COLUMN streak_freezes INTEGER NOT NULL DEFAULT 0',
+      );
     }
   }
 
@@ -375,6 +382,7 @@ class SqliteStore implements StorageBackend {
       currentStreak: row['current_streak'] as int,
       maxStreak: row['max_streak'] as int,
       guessDistribution: distJson.map((k, v) => MapEntry(k, v as int)),
+      streakFreezes: (row['streak_freezes'] as int?) ?? 0,
     );
   }
 
@@ -408,6 +416,7 @@ class SqliteStore implements StorageBackend {
         'max_streak': stats.maxStreak,
         'last_win_date': lastWinDate?.toIso8601String(),
         'dist_json': jsonEncode(stats.guessDistribution),
+        'streak_freezes': stats.streakFreezes,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
