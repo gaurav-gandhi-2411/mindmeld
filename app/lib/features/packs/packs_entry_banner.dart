@@ -76,12 +76,12 @@ class PacksEntryBanner extends StatelessWidget {
                       if (!compact) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'Bollywood, Cricket, Food & more',
+                          'Bollywood, Cricket & Indian Kitchen',
                           style: TextStyle(color: tokens.text2, fontSize: 12),
                         ),
                       ] else
                         Text(
-                          'Bollywood & Cricket live — more packs coming soon',
+                          'Bollywood, Cricket & Indian Kitchen — all live',
                           style: TextStyle(color: tokens.text2, fontSize: 11),
                         ),
                     ],
