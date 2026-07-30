@@ -2252,7 +2252,7 @@ orchestrator review), live-verified 2026-07-11.
   a human eye is the right tool anyway.
 - **Committed** (`719c1b7`) and pushed.
 
-## WORKSTREAM 2d -- Indian Food pack: DRAFTED, VALIDATED, awaiting GG review (STOP POINT)
+## WORKSTREAM 2d -- Indian Kitchen pack: LIVE (2026-07-30, closed)
 
 - [x] **Recipe followed exactly** (spec-cricket-pack.md, retargetable per its own text): ~25
   common-noun secrets, no proper nouns, theme in the clue not the secret, embedding-validated
@@ -2315,12 +2315,54 @@ orchestrator review), live-verified 2026-07-11.
   skipped / 0 failed.
 - [x] **Dedup confirmed** against daily (EN + hi-en), Bollywood, and Cricket secret lists — zero
   overlap, checked by direct comparison, not assumed.
-- **NOT YET DONE, deliberately — STOP POINT per the task instruction**: payloads not generated
-  (`build_packs.py` not run), pack not published, `packs.json` status still `coming_soon`,
-  Nature/Space stub deletion not yet done (bundled with this pack's launch per the task's own
-  sequencing). Committed to `main` as reviewable draft content only — committing is not shipping;
-  baking/publishing/flipping-live are the actual ship actions being held for GG's explicit review
-  of the secrets + clues below.
+- [x] **GG review round 1 (six findings) — all addressed, revision 2/3**: the draft above wasn't
+  distinctly Indian (secrets read as generic cooking words) and, more seriously, GG's own manual
+  cross-list check surfaced collisions the exact-string dedup above had missed entirely: real
+  cosine computation against the actual production embedding pipeline found `pepper<->mirch`
+  0.927, `sauce<->samosa` 0.865, `spice<->mirch` 0.865, and 9 more draft-1 secrets at >=0.80
+  against LIVE hi-en secrets — this session's own first-pass numbers for `aroma`/`pantry`
+  (reported informally above) could not be reproduced against the real pipeline either and are
+  presumed to be from an unverified scratch script. 15 of 25 secrets cut, replaced via a
+  candidate pool + a full food/kitchen-dominant neighbor read in both languages (rejected e.g.
+  `knife` — weapon-dominant both langs, `menu` — EN dominant sense is UI navigation, `ladle` —
+  hi-en dominant sense is "ladka"/child). Also found the public-benchmark-scrub gate above needed
+  re-running against the REPLACEMENT secrets, not just the original 4 words — caught 5 more
+  collisions (`basket`, `tray`, `tablecloth`, `oven`, `neighbor`) before GG's second review.
+- [x] **GG review round 2 (within-pack crowding + rename) — revision 4**: `blessing`/`gratitude`/
+  `generosity` mutually 0.70-0.75 hi-en, `shop`/`grocery` 0.768, `cupboard`/`shelf` 0.740 — all
+  under the 0.80 gate but tight enough to split per the same design-quality standard that cut
+  draft 1's `banquet`/`feast`. Cut to one per pair, backfilled with `elder`/`etiquette`/`bargain`/
+  `credit`. Renamed "Indian Food" -> "Indian Kitchen" (EN) / "Ghar ka Khana" (hi-en) — GG's read
+  that the pack is a hospitality/domestic-kitchen pack, not a strict food pack, agreed with and
+  applied everywhere (`packs.json`, bundled manifest asset, `packs_entry_banner.dart`).
+- [x] **Baked, published, live, byte-verified, 2026-07-30**: `build_packs.py` (full manifest, not
+  `--packs indian-food` — that scoped flag silently drops the other packs from the manifest, same
+  trap documented in the 2026-07-10 Cricket launch entry below). Published to `mindmeld-payloads`
+  (commit `91f914a`) via a **scoped sync** — only `packs/indian-food/` + `packs/manifest.json`.
+  Deliberately did NOT republish Bollywood/Cricket's hi-en payloads even though a fresh rebuild
+  produces different hint words for them: this pack's `vocab/hinglish.txt` additions grew the
+  hi-en vocab 10495->10509 words, which shifts nearest-neighbor rankings for the WHOLE hi-en
+  space (not just this pack's own secrets) — republishing would have silently changed
+  already-shipped Bollywood/Cricket puzzles' hint content for live players, caught by diffing a
+  fresh rebuild against the currently-published payloads before pushing anything (EN payloads
+  were byte-identical; hi-en payloads for Bollywood/Cricket were not, confirming the vocab-growth
+  mechanism, not a bug). Byte-verified: all 50 Indian Kitchen payload files match the live CDN
+  post-deploy; manifest.json content (parsed) matches (whitespace differs, GitHub Pages
+  serving artifact, not a content issue).
+- [x] `nature-wild` deleted entirely (comment-only stub, zero authored content, confirmed before
+  deleting) — `packs.json` down to 3 entries, all `live`. Zero coming-soon pack tiles at launch,
+  per spec-warmer-closeout.md.
+- [x] Deployed to production twice (`playwarmer.vercel.app`) — first pass, then a second pass
+  after finding `packs_entry_banner.dart`'s compact copy still read "more packs coming soon"
+  (stale from the Cricket launch). Both passes: local wasm-boot gate PASS, Vercel promotion,
+  wasm byte-match guard PASS, post-deploy smoke check PASS, zero pageerror/requestfailed.
+- [x] Tests updated for the 3-pack all-live lineup: `test_packs.py`, `pack_catalog_test.dart`,
+  `pack_selector_screen_test.dart` (bundled manifest re-synced; the coming_soon-tap-does-nothing
+  test was removed — no coming_soon pack remains in the fixture to exercise that path against,
+  noted as a gap for whenever a future pack ships as a coming_soon stub again). 530 Flutter tests
+  + 59 Python pack/scrub tests green.
+- Source commits: `5abde82` (pack launch), `4d80635` (banner copy fix), both pushed to `main`.
+  Payloads: `mindmeld-payloads` commit `91f914a`, pushed.
 
 ## WORKSTREAM 3/4 -- Final launch readiness (`/launch-check` run against mindmeld/Warmer, T2)
 
