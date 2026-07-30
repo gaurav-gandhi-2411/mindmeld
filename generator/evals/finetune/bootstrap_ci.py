@@ -156,7 +156,10 @@ def bootstrap_topheavy_ci(records: list[dict], n_boot: int = N_BOOT, seed: int =
     a dict mirroring the point-estimate shape but with each leaf
     {"mean": ..., "n": ...} replaced by {"point": ..., "ci_95": [lo, hi] | None,
     "n_valid_bootstrap_draws": int, "n_secrets_point_estimate": int}. CI is
-    None if fewer than 2 valid draws.
+    None if fewer than 2 valid draws. "n_relevant" is passed through
+    unchanged from the point estimate (deterministic fixture property, not
+    a stochastic quantity -- see topheavy.compute_topheavy_metrics'
+    n_relevant docstring).
     """
     point = topheavy.compute_topheavy_metrics_from_records(records)
     by_secret = _dim1_by_secret(records)
@@ -193,7 +196,112 @@ def bootstrap_topheavy_ci(records: list[dict], n_boot: int = N_BOOT, seed: int =
             k: _ci_leaf(point["precision"][k], precision_draws[k]) for k in topheavy.K_VALUES
         },
         "mrr": _ci_leaf(point["mrr"], mrr_draws),
+        "n_relevant": point["n_relevant"],
         "n_secrets": point["n_secrets"],
+    }
+
+
+def bootstrap_nonsaturating_ci(records: list[dict], n_boot: int = N_BOOT, seed: int = SEED) -> dict:
+    """Cluster-bootstrap (by secret) CI for topheavy.compute_nonsaturating_metrics'
+    r_precision/map/recall_at_fixed_k_near_r submetrics -- same resample
+    pattern as bootstrap_topheavy_ci (spec-metrics-ceiling-calibration.md
+    WORKSTREAM 1, action 4: every new metric gets a bootstrap CI). Point
+    estimate = compute_nonsaturating_metrics_from_records(records). "n_relevant"
+    is passed through unchanged from the point estimate (deterministic
+    fixture property, not a stochastic quantity -- see topheavy.compute_
+    topheavy_metrics' n_relevant docstring for the same reasoning).
+    """
+    point = topheavy.compute_nonsaturating_metrics_from_records(records)
+    by_secret = _dim1_by_secret(records)
+    secrets = sorted(by_secret)
+    rng = np.random.default_rng(seed)
+
+    r_precision_draws: list[float] = []
+    map_draws: list[float] = []
+    recall_fixed_draws: dict[int, list[float]] = {k: [] for k in topheavy.NONSATURATING_FIXED_K}
+
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        groups = [by_secret[s] for s in resample]
+        draw = topheavy.compute_nonsaturating_metrics(groups)
+        m = draw["r_precision"]["mean"]
+        if m is not None:
+            r_precision_draws.append(m)
+        m = draw["map"]["mean"]
+        if m is not None:
+            map_draws.append(m)
+        for k in topheavy.NONSATURATING_FIXED_K:
+            m = draw["recall_at_fixed_k_near_r"][k]["mean"]
+            if m is not None:
+                recall_fixed_draws[k].append(m)
+
+    return {
+        "n_relevant": point["n_relevant"],
+        "r_precision": _ci_leaf(point["r_precision"], r_precision_draws),
+        "map": _ci_leaf(point["map"], map_draws),
+        "recall_at_fixed_k_near_r": {
+            k: _ci_leaf(point["recall_at_fixed_k_near_r"][k], recall_fixed_draws[k])
+            for k in topheavy.NONSATURATING_FIXED_K
+        },
+        "n_secrets": point["n_secrets"],
+    }
+
+
+def paired_bootstrap_nonsaturating_delta(
+    baseline_records: list[dict],
+    candidate_records: list[dict],
+    n_boot: int = N_BOOT,
+    seed: int = SEED,
+) -> dict:
+    """Paired cluster-bootstrap (by secret) delta CI for r_precision/map --
+    same resample-once-apply-to-both pattern as paired_bootstrap_dim1_delta
+    (spec-metrics-ceiling-calibration.md WORKSTREAM 1, action 4: paired
+    bootstrap for every model-vs-model comparison)."""
+    base_by_secret = _dim1_by_secret(baseline_records)
+    cand_by_secret = _dim1_by_secret(candidate_records)
+    secrets = sorted(set(base_by_secret) & set(cand_by_secret))
+    missing = set(base_by_secret) ^ set(cand_by_secret)
+
+    base_point = topheavy.compute_nonsaturating_metrics([base_by_secret[s] for s in secrets])
+    cand_point = topheavy.compute_nonsaturating_metrics([cand_by_secret[s] for s in secrets])
+
+    rng = np.random.default_rng(seed)
+    r_precision_deltas: list[float] = []
+    map_deltas: list[float] = []
+
+    for _ in range(n_boot):
+        resample = rng.choice(secrets, size=len(secrets), replace=True).tolist()
+        base_draw = topheavy.compute_nonsaturating_metrics([base_by_secret[s] for s in resample])
+        cand_draw = topheavy.compute_nonsaturating_metrics([cand_by_secret[s] for s in resample])
+        b, c = base_draw["r_precision"]["mean"], cand_draw["r_precision"]["mean"]
+        if b is not None and c is not None:
+            r_precision_deltas.append(c - b)
+        b, c = base_draw["map"]["mean"], cand_draw["map"]["mean"]
+        if b is not None and c is not None:
+            map_deltas.append(c - b)
+
+    def _leaf(base_leaf: dict, cand_leaf: dict, deltas: list[float]) -> dict:
+        b, c = base_leaf["mean"], cand_leaf["mean"]
+        if b is None or c is None or len(deltas) < 2:
+            return {"baseline_point": b, "candidate_point": c, "delta_point": None, "ci_95": None}
+        lo, hi = float(np.percentile(deltas, 2.5)), float(np.percentile(deltas, 97.5))
+        return {
+            "baseline_point": b,
+            "candidate_point": c,
+            "delta_point": c - b,
+            "ci_95": [lo, hi],
+            "ci_significant_improvement": lo > 0,
+            "ci_significant_regression": hi < 0,
+            "n_valid_bootstrap_draws": len(deltas),
+        }
+
+    return {
+        "n_clusters": len(secrets),
+        "secret_mismatch": sorted(missing) if missing else None,
+        "r_precision": _leaf(
+            base_point["r_precision"], cand_point["r_precision"], r_precision_deltas
+        ),
+        "map": _leaf(base_point["map"], cand_point["map"], map_deltas),
     }
 
 

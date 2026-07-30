@@ -35,6 +35,8 @@ from evals.harness.metrics import (
 from evals.harness.topheavy import (
     band_calibration_error,
     band_confusion_matrix,
+    compute_nonsaturating_metrics,
+    compute_nonsaturating_metrics_from_records,
     compute_topheavy_metrics,
     compute_topheavy_metrics_from_records,
     group_by_secret,
@@ -192,6 +194,8 @@ def test_compute_topheavy_metrics_hand_computed_toy():
     assert result["ndcg"][10]["mean"] == pytest.approx(0.6280, abs=1e-3)
     assert result["ndcg"][50]["mean"] == pytest.approx(0.7547, abs=1e-3)
     assert result["n_secrets"] == 1
+    # |R| (near+mid tier count) for sec1 = {A, B, D} = 3.
+    assert result["n_relevant"] == {"mean": 3.0, "min": 3, "max": 3, "values": [3], "n": 1}
 
 
 def test_compute_topheavy_metrics_from_records_matches_manual_grouping():
@@ -209,6 +213,7 @@ def test_compute_topheavy_metrics_empty_groups_no_exceptions():
         assert result["recall"][k] == {"mean": None, "n": 0}
         assert result["precision"][k] == {"mean": None, "n": 0}
     assert result["mrr"] == {"mean": None, "n": 0}
+    assert result["n_relevant"] == {"mean": None, "min": None, "max": None, "values": [], "n": 0}
 
 
 def test_group_with_zero_relevant_tier_excluded_from_recall_mean():
@@ -248,6 +253,111 @@ def test_same_secret_resampled_twice_counts_as_two_independent_groups():
     assert result["ndcg"][10]["n"] == 2
     # both draws are identical -> macro mean equals the single-draw value
     assert result["recall"][10]["mean"] == pytest.approx(2 / 3, abs=1e-3)
+
+
+def test_topheavy_precision_saturation_now_explained_by_n_relevant():
+    """Regression test for spec-metrics-ceiling-calibration.md WORKSTREAM 1
+    action 1: before this change, n_relevant (|R|) was computed internally
+    by compute_topheavy_metrics but never returned, so a caller seeing
+    Precision@10=1.000 alongside a much lower Recall@10 had no way to check
+    WHY without re-deriving |R| by hand from the raw records. This asserts
+    n_relevant is now visible in the SAME returned dict, making the
+    saturation mathematically checkable rather than silently hidden."""
+    group = [
+        {"secret": "s1", "tier": "near", "actual_rank": 5},  # only this one cracks top-10
+        {"secret": "s1", "tier": "near", "actual_rank": 50},
+        {"secret": "s1", "tier": "near", "actual_rank": 80},
+    ]
+    result = compute_topheavy_metrics([group])
+    assert result["precision"][10]["mean"] == pytest.approx(1.0)
+    assert result["recall"][10]["mean"] == pytest.approx(1 / 3, abs=1e-6)
+    # Before this change n_relevant was invisible; now a caller can
+    # reconstruct hit = recall * n_relevant = 1, explaining precision's
+    # apparent perfection as "the one judged item that DID crack top-10
+    # happened to be relevant", not "the model retrieved everything
+    # relevant" -- the ceiling artifact is now legible from the dict alone.
+    assert result["n_relevant"] == {"mean": 3.0, "min": 3, "max": 3, "values": [3], "n": 1}
+
+
+# ---------------------------------------------------------------------------
+# compute_nonsaturating_metrics / compute_nonsaturating_metrics_from_records
+# ---------------------------------------------------------------------------
+#
+# Hand-computed on the same "sec1" toy fixture (see module docstring):
+#   relevant (near/mid) records sorted by actual_rank: A(rank=1), B(rank=5),
+#   D(rank=20) -> |R| = 3.
+#   R-precision (== recall@|R|=3): hit = count with actual_rank<=3 = {A} = 1
+#     -> r_precision = 1/3 = 0.33333.
+#   MAP: AP = (1/1 [A is the 1st relevant found, at its own rank 1]
+#             + 2/5 [B is the 2nd relevant found, at its own rank 5]
+#             + 3/20 [D is the 3rd relevant found, at its own rank 20]) / 3
+#          = (1 + 0.4 + 0.15) / 3 = 1.55 / 3 = 0.516667.
+#   recall_at_fixed_k_near_r: k=3 -> hit=1 -> 1/3; k=4 -> hit=1 (still just
+#     A) -> 1/3; k=5 -> hit=2 (A, B) -> 2/3; k=6 -> hit=2 (still A, B) -> 2/3.
+
+
+def test_compute_nonsaturating_metrics_hand_computed_toy():
+    result = compute_nonsaturating_metrics([_toy_group()])
+    assert result["n_secrets"] == 1
+    assert result["n_relevant"] == {"mean": 3.0, "min": 3, "max": 3, "values": [3], "n": 1}
+    assert result["r_precision"]["mean"] == pytest.approx(1 / 3, abs=1e-6)
+    assert result["r_precision"]["n"] == 1
+    assert result["map"]["mean"] == pytest.approx(1.55 / 3, abs=1e-6)
+    assert result["map"]["n"] == 1
+    rk = result["recall_at_fixed_k_near_r"]
+    assert rk[3]["mean"] == pytest.approx(1 / 3, abs=1e-6)
+    assert rk[4]["mean"] == pytest.approx(1 / 3, abs=1e-6)
+    assert rk[5]["mean"] == pytest.approx(2 / 3, abs=1e-6)
+    assert rk[6]["mean"] == pytest.approx(2 / 3, abs=1e-6)
+
+
+def test_compute_nonsaturating_metrics_from_records_matches_manual_grouping():
+    records = _toy_group()
+    via_wrapper = compute_nonsaturating_metrics_from_records(records)
+    via_manual = compute_nonsaturating_metrics([records])
+    assert via_wrapper == via_manual
+
+
+def test_compute_nonsaturating_metrics_empty_groups_no_exceptions():
+    result = compute_nonsaturating_metrics([])
+    assert result["n_secrets"] == 0
+    assert result["n_relevant"] == {"mean": None, "min": None, "max": None, "values": [], "n": 0}
+    assert result["r_precision"] == {"mean": None, "n": 0}
+    assert result["map"] == {"mean": None, "n": 0}
+    for k in (3, 4, 5, 6):
+        assert result["recall_at_fixed_k_near_r"][k] == {"mean": None, "n": 0}
+
+
+def test_compute_nonsaturating_metrics_zero_relevant_group_excluded():
+    # A group entirely "far" tier has |R|=0 -> r_precision/map/recall_at_fixed_k_near_r
+    # must be None-excluded (not zero-filled) for that group, same convention as
+    # compute_topheavy_metrics' recall@k.
+    far_only = [{"secret": "s1", "tier": "far", "actual_rank": 1}]
+    relevant_group = [
+        {"secret": "s2", "tier": "near", "actual_rank": 1},
+        {"secret": "s2", "tier": "mid", "actual_rank": 2},
+    ]
+    result = compute_nonsaturating_metrics([far_only, relevant_group])
+    assert result["n_secrets"] == 2
+    # only relevant_group (|R|=2) contributes: hit@2 = both ranks (1,2) <= 2 -> r_prec=1.0
+    assert result["r_precision"]["mean"] == pytest.approx(1.0)
+    assert result["r_precision"]["n"] == 1
+    assert result["map"]["n"] == 1
+    # n_relevant distribution still counts BOTH groups (0 and 2), unlike r_precision/map.
+    assert result["n_relevant"]["values"] == [0, 2]
+    assert result["n_relevant"]["n"] == 2
+
+
+def test_same_secret_resampled_twice_counts_as_two_independent_groups_nonsaturating():
+    """Mirrors the topheavy dedup-bootstrap regression test: a bootstrap
+    draw resampling the same secret twice must contribute two independent
+    entries, not be silently collapsed by internal re-grouping."""
+    group = _toy_group()
+    result = compute_nonsaturating_metrics([group, group])
+    assert result["n_secrets"] == 2
+    assert result["r_precision"]["n"] == 2
+    assert result["map"]["n"] == 2
+    assert result["r_precision"]["mean"] == pytest.approx(1 / 3, abs=1e-6)
 
 
 # ---------------------------------------------------------------------------

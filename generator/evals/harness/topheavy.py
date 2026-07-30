@@ -30,8 +30,20 @@ from evals.harness.metrics import (
 
 _RELEVANCE_GRADE = {"near": 2.0, "mid": 1.0, "far": 0.0}
 # Binary-relevance set for Recall/Precision; "far" is the authored decoy/negative class.
+# NOTE: NDCG below does NOT use this binary set -- it consumes _RELEVANCE_GRADE directly
+# (graded relevance), see compute_topheavy_metrics's ranked_judged construction. Verified
+# during spec-metrics-ceiling-calibration.md WORKSTREAM 1 (2026-07-24): NDCG@k was ALREADY
+# correctly graded before that workstream, not a binary-relevance bug -- see
+# evals/finetune/data/corrected_retrieval_metrics_report.md "Methodology" section.
 _RELEVANT_TIERS = {"near", "mid"}
 K_VALUES = (10, 50, 100)
+# Fixed k values close to the OBSERVED |R| (near+mid relevance-set size) range for the
+# hi-en dim1 fixtures used by evals/finetune/benchmark_bakeoff.py (per-secret |R| in
+# [3, 5], mean ~4 -- see corrected_retrieval_metrics_report.md's |R|-distribution table).
+# Reported alongside the per-secret-adaptive R-precision/recall-at-|R| in
+# compute_nonsaturating_metrics so the choice of comparison k is transparent rather than
+# silently baked into one number.
+NONSATURATING_FIXED_K = (3, 4, 5, 6)
 
 # Sanity check: this module's relevance-grade tier taxonomy must never drift
 # out of sync with dimension1_ranking's canonical tier-ordinal taxonomy —
@@ -87,11 +99,22 @@ def compute_topheavy_metrics(secret_groups) -> dict:
     metrics — especially precision@10 — will often have very few
     contributing groups given ~2-6 judged words per secret; n is reported
     honestly rather than hiding a sparse denominator).
+
+    Also returns "n_relevant": the distribution of |R| (count of near+mid
+    tier judged records) across groups -- {"mean", "min", "max", "values",
+    "n"} -- surfaced so Precision@k==1.000/Recall@k==low readings can be
+    checked against the actual relevance-set size instead of asserted
+    (spec-metrics-ceiling-calibration.md WORKSTREAM 1, action 1). This is a
+    deterministic property of the fixture, not a stochastic estimate, so
+    callers bootstrapping this dict (bootstrap_ci.bootstrap_topheavy_ci)
+    pass the point-estimate's n_relevant straight through rather than
+    re-deriving a bootstrap CI for it.
     """
     ndcg_values: dict[int, list[float]] = {k: [] for k in K_VALUES}
     recall_values: dict[int, list[float]] = {k: [] for k in K_VALUES}
     precision_values: dict[int, list[float]] = {k: [] for k in K_VALUES}
     mrr_ranks: list[int | None] = []
+    n_relevant_values: list[int] = []
     n_secrets = 0
 
     for group in secret_groups:
@@ -99,6 +122,7 @@ def compute_topheavy_metrics(secret_groups) -> dict:
         ranked_judged = [(r["actual_rank"], _RELEVANCE_GRADE[r["tier"]]) for r in group]
         relevant_records = [r for r in group if r["tier"] in _RELEVANT_TIERS]
         n_relevant = len(relevant_records)
+        n_relevant_values.append(n_relevant)
 
         near_records = [r for r in group if r["tier"] == "near"]
         best_near_rank = min((r["actual_rank"] for r in near_records), default=None)
@@ -129,8 +153,107 @@ def compute_topheavy_metrics(secret_groups) -> dict:
         "recall": {k: _agg(recall_values[k]) for k in K_VALUES},
         "precision": {k: _agg(precision_values[k]) for k in K_VALUES},
         "mrr": mrr,
+        "n_relevant": {
+            "mean": float(np.mean(n_relevant_values)) if n_relevant_values else None,
+            "min": min(n_relevant_values) if n_relevant_values else None,
+            "max": max(n_relevant_values) if n_relevant_values else None,
+            "values": n_relevant_values,
+            "n": n_secrets,
+        },
         "n_secrets": n_secrets,
     }
+
+
+def compute_nonsaturating_metrics(secret_groups) -> dict:
+    """secret_groups: same contract as compute_topheavy_metrics (an ITERABLE
+    of per-secret judged-record lists; do NOT re-group by secret internally
+    -- see that function's docstring for why, the cluster-bootstrap caller
+    relies on it).
+
+    Adds the non-saturating retrieval metrics spec-metrics-ceiling-
+    calibration.md WORKSTREAM 1 action 3 calls for -- Precision@k/Recall@k
+    with a FIXED k (10/50/100) saturate/collapse once |R| (the per-secret
+    near+mid relevance-set size) is small relative to k or the sparse-judged
+    candidate pool; these instead scale the cutoff to |R| itself so the
+    metric cannot trivially hit its ceiling:
+
+      R-precision (== recall@|R|, since cutoff==|R| makes precision and
+        recall numerically identical -- standard IR fact, not a bug):
+        for a group with n_relevant = |R| > 0, hit = count of relevant
+        (near/mid) records with actual_rank <= n_relevant (i.e. literally
+        in the global top-|R| of the full vocab ranking); r_precision =
+        hit / n_relevant. None-skipped (not zero-filled) for groups with
+        n_relevant == 0, same convention as compute_topheavy_metrics'
+        recall.
+
+      MAP (mean average precision): standard formula. For a group's
+        relevant records sorted ascending by actual_rank r_1 < r_2 < ... <
+        r_{|R|}, AP = (1/|R|) * sum_{i=1}^{|R|} (i / r_i) -- i/r_i is
+        precision at the i-th relevant item's own global rank position
+        (i relevant items found among the top r_i of the full vocab
+        ranking). MAP = macro-mean of AP across groups with |R| > 0.
+
+      recall_at_fixed_k_near_r: recall@k (same hit/n_relevant formula as
+        compute_topheavy_metrics' recall, just NOT restricted to
+        K_VALUES=(10,50,100)) for k in NONSATURATING_FIXED_K -- fixed
+        cutoffs chosen to sit inside the OBSERVED |R| range (reported
+        alongside r_precision's per-secret-ADAPTIVE cutoff so the choice
+        is transparent, per the task's explicit ask for both variants).
+
+    Returns {"n_relevant": {...same shape as compute_topheavy_metrics'},
+    "r_precision": {"mean", "n"}, "map": {"mean", "n"},
+    "recall_at_fixed_k_near_r": {k: {"mean", "n"} for k in
+    NONSATURATING_FIXED_K}, "n_secrets": int}.
+    """
+    n_relevant_values: list[int] = []
+    r_precision_values: list[float] = []
+    ap_values: list[float] = []
+    recall_fixed_values: dict[int, list[float]] = {k: [] for k in NONSATURATING_FIXED_K}
+    n_secrets = 0
+
+    for group in secret_groups:
+        n_secrets += 1
+        relevant_records = [r for r in group if r["tier"] in _RELEVANT_TIERS]
+        n_relevant = len(relevant_records)
+        n_relevant_values.append(n_relevant)
+        if n_relevant == 0:
+            continue
+
+        hit_at_r = sum(1 for r in relevant_records if r["actual_rank"] <= n_relevant)
+        r_precision_values.append(hit_at_r / n_relevant)
+
+        sorted_ranks = sorted(r["actual_rank"] for r in relevant_records)
+        ap = sum((i + 1) / rank for i, rank in enumerate(sorted_ranks)) / n_relevant
+        ap_values.append(ap)
+
+        for k in NONSATURATING_FIXED_K:
+            hit = sum(1 for r in relevant_records if r["actual_rank"] <= k)
+            recall_fixed_values[k].append(hit / n_relevant)
+
+    return {
+        "n_relevant": {
+            "mean": float(np.mean(n_relevant_values)) if n_relevant_values else None,
+            "min": min(n_relevant_values) if n_relevant_values else None,
+            "max": max(n_relevant_values) if n_relevant_values else None,
+            "values": n_relevant_values,
+            "n": n_secrets,
+        },
+        "r_precision": _agg(r_precision_values),
+        "map": _agg(ap_values),
+        "recall_at_fixed_k_near_r": {
+            k: _agg(recall_fixed_values[k]) for k in NONSATURATING_FIXED_K
+        },
+        "n_secrets": n_secrets,
+    }
+
+
+def compute_nonsaturating_metrics_from_records(records: list[dict]) -> dict:
+    """Convenience wrapper mirroring compute_topheavy_metrics_from_records:
+    group by secret, then compute_nonsaturating_metrics. Only for the
+    single point-estimate call -- do NOT use inside a bootstrap resample
+    loop (see compute_nonsaturating_metrics' contract note)."""
+    by_secret = group_by_secret(records)
+    return compute_nonsaturating_metrics(by_secret.values())
 
 
 def compute_topheavy_metrics_from_records(records: list[dict]) -> dict:
