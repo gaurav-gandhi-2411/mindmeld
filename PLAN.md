@@ -2096,3 +2096,54 @@ orchestrator review), live-verified 2026-07-11.
     boot behavior separately and passed cleanly.
 - [x] Both this checkpoint and the sibling alias-extension checkpoint's payload-regen scratch output
   were cleaned up; nothing left behind outside the two repos.
+
+# PLAN -- spec-warmer-closeout.md (2026-07-30)
+
+## WORKSTREAM 1 -- Repo hygiene: CLOSED
+
+- [x] **Pre-change inventory**: 3 modified + 9 untracked files on `feat/hinglish-finetune`
+  (WS1/WS2/WS3 analysis artifacts from spec-metrics-ceiling-calibration.md, never committed). 5
+  local branches genuinely unmerged (`feat/hinglish-finetune` + 4 open GitHub PRs: #4 deploy-
+  provenance-log, #5 perf-budgets-readme, #6 pr-template-precommit); `chore/dedup-design-tokens`
+  found **falsely unmerged** -- PR #3 was squash-merged 2026-07-12, origin ref already deleted,
+  local branch pointer stale (the exact failure mode `git-branch-staleness-before-committing`
+  memory warns about).
+- [x] **Committed the outstanding artifacts** in 4 logical commits (`c02f3af` WS1 corrected
+  retrieval metrics, `5dbbb40` WS2 LLM-consensus ceiling honest-negative, `bfb06cc` WS3 band-
+  threshold calibration evidence, `ad0955f` the two closeout specs). 94/94 targeted tests + full
+  777-passed/6-skipped generator suite verified before committing.
+- [x] **PR #4 (deploy-provenance-log) NOT merged -- closed as superseded.** Its
+  `scripts/deploy-warmer.ps1` is a stale duplicate pipeline from 2026-07-12: no `--wasm` flag, no
+  byte-verify live-wasm-match guard, predates the stderr-crash fix (`b922a18`, 2026-07-25).
+  Merging would have made README's "Recommended" deploy path point at an inferior, out-of-sync
+  script instead of the actual proven one at repo root. The provenance-log idea itself (dirty-tree
+  guard + `reports/deploys.log`) is genuinely useful and recorded as a deferred follow-up, not
+  built now. Closed via `gh pr close 4` with the reasoning posted as a PR comment.
+- [x] **PR #5, #6 merged for real** after a **trial merge on a scratch branch** to verify the
+  actual 3-way merge result (a raw two-way diff of PR #5's branch vs main was misleading --
+  looked like it would revert README's `--wasm`/`ANALYTICS_ENABLED` documentation, but git's real
+  merge correctly layered only the new content on top of main's current state; verified by
+  inspecting the merged README directly, not by trusting 0-conflict-marker output alone).
+- [x] **`feat/hinglish-finetune` merged into main** (76 commits, clean merge-tree, 0 conflict
+  markers). Field-leading Hinglish model + benchmark, WS1/WS2/WS3 follow-ups, already-shipped
+  warm_floor 900->1050 fix all now on main.
+- [x] **Branch cleanup**: force-deleted stale `chore/dedup-design-tokens`; deleted all now-
+  fully-merged local branches (`feat/hinglish-finetune`, `chore/perf-budgets-readme`,
+  `chore/pr-template-precommit`, plus 4 already-merged-pre-session branches:
+  `feat/first-session-hook`, `fix/known-limitations-pass`, `fix/wasm-stub-remediation`,
+  `wave-launch-1-readiness`). Only `main` and the intentionally-unmerged-and-closed
+  `chore/deploy-provenance-log` remain.
+- [x] **Full verification on the merge commit**: generator `777 passed, 6 skipped, 0 failed`;
+  Flutter `flutter test` `525/525 passed, 0 failed` (the prior session's one documented flake did
+  not recur). Pushed to `origin/main` (`f0648b8`); both CI lanes on the push (`e2e-web` DDC,
+  `e2e-web-wasm`) completed `success`. GitHub auto-detected PRs #5/#6 as merged via commit
+  reachability (closed automatically); PR #4 closed manually as superseded.
+- [x] **Byte-verified live deployment**: built `main` locally with the exact deploy-warmer.ps1
+  flags (`flutter build web --release --no-web-resources-cdn --wasm
+  --dart-define=ANALYTICS_ENABLED=true`) and compared SHA-256 against the live
+  `https://playwarmer.vercel.app/main.dart.wasm` -- **byte-identical**
+  (`c8f6a9994674bf31aa2dfe8125a80eef0880c56bb2d456d2d66b33893f4f42ab`). Confirms the warm_floor
+  1050 Dart mirror (`566f5f6`, 2026-07-25) was already live despite PLAN.md's last explicit deploy
+  narrative predating it by a day -- no new deploy was needed for WS1.
+- **End state**: working tree clean, no genuinely-unmerged branches, `main` == deployed, both CI
+  lanes green.
