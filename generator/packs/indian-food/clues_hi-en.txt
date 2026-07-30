@@ -1,29 +1,36 @@
 # Indian Food pack — Hinglish clues, one per line, keyed line-by-line to secrets_hi-en.txt
 # ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
 # Written for an Indian player — culturally native, not translated
-# Pending GG review
-Ek chammach itna tez, poori thali ka mood badal de
-Dabbe mein saat rang, har ek ka apna kaam
-Itni thaaliyan ki mez neeche se chatakne lagti hai
-Nani ke haath ki likhai, kabhi hoobahoo copy nahi hoti
-Rasoi mein hukum chalata hai, jo kabhi poori tarah shaant nahi hoti
-Chaas banaya jaata hai garmi ke sabse tez dopeher ke liye
-Bulaaya kisi ne nahi, phir bhi sab rasoi ki taraf khinche chale aate
-Chhota sa kamra, har dabba bhara, kisi mein bhi jagah khaali nahi
-Side mein rakhi, phir bhi sabse pehle khatam hoti hai
-Shukrawar raat ke liye teen hafte pehle hi jagah nahi milti
-Poore ilaake ka itihaas, chulhe par likha hua
-Khushboo dahleez tak pahunchte hi jaag jaati hai
-Jitna bola gaya utna kabhi nahi hota, hamesha zyada
-Akhir mein daala jaata hai, poore khaane ka mizaaj badal deta hai
-Naam poochne se pehle hi khaana samne rakh diya jaata hai
-Ek murra hua bhoora tinka, poore patile ko mehka deta hai
-Sabse pehle kadkadaya jaata hai, poori rasoi ko khabar ho jaati hai
-Ek chutki se poora khaana chauk jaata hai
-Chawal mein chhupa hua, ek kadak dant se pata chal jaata hai
-Mez ka sabse simple katora, phir bhi kabhi bachta nahi
-Ubla, masaledaar, thele se bikta hai naam poochhe bina
-Kaha jaata hai apna hi ghar samjho, phir bhi sankoch nahi jaata
-Aanch ke upar tab tak, jab tak khushboo badal na jaaye
-Garmi mein band kar diya jaata hai, bharosa karke ki sahi niklega
+#
+# REVISION 4 (2026-07-30): re-ordered/extended to match secrets_hi-en.txt
+# after the within-pack crowding fix. REVISION 2 rewrote these so each EN/
+# Hinglish clue pair describes the same underlying idea per GG finding 6,
+# and avoided using another pack secret's exact word or a live daily
+# secret's exact hi-en token as flavor text, even though the mechanical
+# spoiler gate only checks a clue against its own secret+aliases.
+# GG-approved 2026-07-30 — baked and published same day.
+Sab rishtedaar aa gaye, aur mez phir bhi chhoti pad rahi hai
+Side mein rakhi katori, sabse pehle khali ho jaati hai
+Har December mein poora bhara hota hai, teen hafte pehle hi jagah nahi milti
+Tandoor ka dhuaan sadak tak pahunchte hi jaag jaata hai
+Aunty jitna bolti hai utna kabhi nahi deti, hamesha zyada
+Darwaze par bhagwan jaisa maana jaata hai, naam poochne se pehle
+Raat ke khaane ka pata bina bulaye chal jaata hai
+Mitti ki garmi mein band, bharosa ki sahi niklega
 Roz shaam usi kone pe wahi thela laga deta hai
+Bade jashn mein doosri baar ke liye line kabhi khatam nahi hoti
+Suraj nikalne se pehle jalta hai, raat mein sabse aakhir mein bujhta hai
+Kitna bhi pet bhar jaaye, yeh sabse aakhir mein khaali hota hai
+Doosri baar ke liye haath se haath jaata hai, beech mein dhoya nahi jaata
+Steel ka, thoda pichka hua, khane walon se bhi purana
+Kirane ki dukaan jahan malik order sunne se pehle hi jaan jaata hai
+Khaas mauke se pehle poora bhaari khareeda jaata hai, chhote packet mein nahi
+Garam dabba ek baje tak sahi jagah pahunch hi jaata hai
+Yahin ek anjaan insaan, ghar mein aane se pehle hi anjaan nahi rehta
+Kisi ko khaali plate ke saath jaane hi nahi deti
+Raat ko band hota hai, phir bhi sabko pata hota hai achhe biscuit kahan rakhe hain
+Chalis saal pehle jaise banta tha, aaj bhi bilkul waise hi banta hai
+Tawe se pehli garam roti hamesha isi ko milti hai, bhale hi koi aur zyada bhooka ho
+Pehle haath dhona, aur khaane ki taraf paanv na karna — yeh sab isi mein aata hai
+Thele wale ka pehla daam kabhi seedha maan mat lena
+Nakad kabhi nahi diya jaata — ek copy mein likha jaata hai, mahine ke aakhir tak

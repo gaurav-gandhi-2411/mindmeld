@@ -33,33 +33,18 @@
     },
     {
       "id": "indian-food",
-      "title": {"en": "Indian Food", "hi-en": "Indian Food"},
+      "title": {"en": "Indian Kitchen", "hi-en": "Ghar ka Khana"},
       "tagline": {
         "en": "Spice, sizzle, and comfort",
         "hi-en": "Ghar ka khana, dil ka sukoon"
       },
       "free": false,
-      "status": "coming_soon",
+      "status": "live",
       "accent": "#9C5E20",
       "accentDark": "#6B3F14",
       "icon": "food",
       "langs": ["en", "hi-en"],
-      "count": 0
-    },
-    {
-      "id": "nature-wild",
-      "title": {"en": "Nature & Wild", "hi-en": "Nature & Wild"},
-      "tagline": {
-        "en": "The untamed world",
-        "hi-en": "Jungle jungle baat chali hai"
-      },
-      "free": false,
-      "status": "coming_soon",
-      "accent": "#3D7068",
-      "accentDark": "#24443F",
-      "icon": "nature",
-      "langs": ["en", "hi-en"],
-      "count": 0
+      "count": 25
     }
   ]
 }

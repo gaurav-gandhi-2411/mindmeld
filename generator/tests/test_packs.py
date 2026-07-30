@@ -91,10 +91,10 @@ _SAFE_CLUES = [
 class TestLoadPacksMeta:
     """Tests for load_packs_meta() against the real packs.json and synthetic manifests."""
 
-    def test_real_manifest_loads_four_packs(self) -> None:
+    def test_real_manifest_loads_three_packs(self) -> None:
         packs = load_packs_meta()
         ids = [p.id for p in packs]
-        assert ids == ["bollywood", "cricket", "indian-food", "nature-wild"]
+        assert ids == ["bollywood", "cricket", "indian-food"]
 
     def test_bollywood_is_live_and_free(self) -> None:
         packs = {p.id: p for p in load_packs_meta()}
@@ -106,11 +106,10 @@ class TestLoadPacksMeta:
         assert packs["cricket"].status == "live"
         assert packs["cricket"].free is False
 
-    def test_remaining_packs_are_coming_soon_and_paid(self) -> None:
+    def test_indian_food_is_live_and_paid(self) -> None:
         packs = {p.id: p for p in load_packs_meta()}
-        for pack_id in ("indian-food", "nature-wild"):
-            assert packs[pack_id].status == "coming_soon"
-            assert packs[pack_id].free is False
+        assert packs["indian-food"].status == "live"
+        assert packs["indian-food"].free is False
 
     def test_all_packs_have_both_langs(self) -> None:
         for pack in load_packs_meta():

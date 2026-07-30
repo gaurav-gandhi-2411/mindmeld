@@ -1,28 +1,43 @@
 # Indian Food pack — English clues, one per line, keyed line-by-line to secrets_en.txt
 # ≤~12 words each; frames the secret without naming it (spoiler-gated at build time)
-# Pending GG review
-A small spoonful that hijacks the whole plate with heat and tang
-Ground fine, it turns plain rice into something unforgettable
-Table groaning under more dishes than anyone can finish
-Handed down in a grandmother's handwriting, never quite followed exactly
-Shouts orders across a room full of clattering pans, never satisfied
-Churned thin and sour, poured over rice on the hottest afternoons
-Pulls the whole house to the kitchen before anyone's called
-A small room where every jar is labeled and none of them agree
-The small bowl nobody orders but everybody finishes first
-Booked out on a Friday night, three weeks in advance
-A whole region's history, written entirely in what's on the stove
-Grows the moment the smell reaches the front door
-Never quite as small as the person serving it promised
-Poured last, and somehow the part everyone remembers most
-A stranger fed before they've even said their name
-One curled brown stick that perfumes the whole pot
-Crushed first, and the whole kitchen knows dinner has started
-A single twist and the whole dish wakes up
-Hidden in the rice, and one bite says you found it the hard way
-The plainest bowl on the table, and somehow never leftover
-Boiled, spiced, and sold from a cart before anyone asks its name
-Told to treat the house like their own, and almost never does
-Held over the flame until the smell changes completely
-Shut in the heat and trusted to come out right
+#
+# REVISION 4 (2026-07-30): re-ordered/extended to match secrets_en.txt after
+# the within-pack crowding fix (shop/shelf/blessing/gratitude ->
+# elder/etiquette/bargain/credit). REVISION 2 rewrote these per GG finding 1
+# — draft 1's EN clues read as generic cooking/restaurant prose with no
+# Indian specificity (the secrets are necessarily generic English words per
+# the round-1 vocab lesson, so the Indian identity has to live entirely in
+# the clue text). These clues name concrete Indian referents (tandoor,
+# dabba/tiffin delivery, kirana-store credit tabs, bazaar haggling, elders
+# eating first, "atithi devo bhava" guest norms) instead of Western-neutral
+# restaurant/kitchen imagery. Each clue also avoids naming any OTHER secret
+# in this pack or any live daily/Bollywood/Cricket secret verbatim —
+# reworded out during self-review, separate from the mechanical
+# spoiler-gate pytest which only checks a clue against its OWN
+# secret+aliases.
+# GG-approved 2026-07-30 — baked and published same day.
+Every relative has shown up, and the table still isn't big enough
+The tiny dish nobody orders, and everybody fights over first
+Booked solid every December, three weeks before anyone thinks to ask
+Wakes up the moment the tandoor's smoke reaches the street
+Never quite as small as aunty promised while serving
+Treated like god at the door, before anyone asks their name
+Announces what's for dinner before anyone's called to eat
+Shut inside clay heat, and trusted to come out right
 Sets up the same cart on the same corner every single evening
+At a big celebration, the line for seconds never actually ends
+Lit before the sun's even up, and the last thing turned off at night
+The last thing to run out at any Indian table, no matter how full everyone is
+Passed hand to hand for seconds, never washed in between
+Steel, dented, and older than everyone currently eating from it
+The corner store where the owner knows your order before you say it
+Bought heavy and whole before a big occasion, never in small bags
+A hot lunchbox that finds the right desk by one o'clock without fail
+Where a stranger stops being a stranger before they've even entered the house
+Refuses to let anyone leave the table with an empty plate
+Locked at night, and everyone still knows exactly where the good biscuits are kept
+A recipe followed exactly the way it was followed forty years ago
+Gets the first hot roti off the pan, always, no matter who's hungrier
+Says wash your hands first, and never point the sole of your foot at the food
+Never pays the first price a street seller says out loud
+Never paid in cash on the spot — it goes in a notebook until month's end

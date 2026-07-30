@@ -89,33 +89,36 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('renders all 4 pack tiles with correct live/coming-soon states',
+  testWidgets('renders all 3 pack tiles, all live, no coming-soon chips',
       (tester) async {
     await tester.pumpWidget(buildScreen());
     await settle(tester);
 
     expect(find.text('Bollywood'), findsOneWidget);
     expect(find.text('Cricket'), findsOneWidget);
-    expect(find.text('Indian Food'), findsOneWidget);
-    expect(find.text('Nature & Wild'), findsOneWidget);
+    expect(find.text('Indian Kitchen'), findsOneWidget);
 
-    // Bollywood and Cricket are live + unlocked → each shows won/count progress.
-    expect(find.text('0/25'), findsNWidgets(2));
-
-    // Indian Food / Nature & Wild are coming_soon → dimmed "Coming soon" chip each.
-    expect(find.widgetWithText(Chip, 'Coming soon'), findsNWidgets(2));
+    // All 3 packs are live + unlocked → each shows won/count progress.
+    // The Nature & Wild coming_soon stub was deleted at launch (spec-
+    // warmer-closeout.md: "no coming soon tiles at launch") — there is no
+    // longer a fixture pack to exercise the coming_soon-tap-does-nothing
+    // path against; that behavior is otherwise untested pending a new
+    // coming_soon pack being added as a future content drop.
+    expect(find.text('0/25'), findsNWidgets(3));
+    expect(find.widgetWithText(Chip, 'Coming soon'), findsNothing);
   });
 
-  testWidgets('tapping a coming_soon tile does nothing (stays on selector)',
+  testWidgets('tapping the Indian Kitchen tile opens the puzzle list',
       (tester) async {
     await tester.pumpWidget(buildScreen());
     await settle(tester);
 
-    await tester.tap(find.text('Indian Food'));
-    await tester.pump();
+    await tester.tap(find.text('Indian Kitchen'));
+    await tester.pump(); // begin the route push transition
+    await settle(tester); // let PackPuzzleListScreen's sqflite read complete
+    await tester.pump(const Duration(milliseconds: 400)); // finish transition
 
-    expect(find.text('Themed Packs'), findsOneWidget,
-        reason: 'coming_soon tiles are not tappable — no navigation occurs');
+    expect(find.text('Puzzle #1'), findsOneWidget);
   });
 
   testWidgets('tapping the Bollywood tile opens the puzzle list', (tester) async {

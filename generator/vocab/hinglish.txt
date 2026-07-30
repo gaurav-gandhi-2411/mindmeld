@@ -541,6 +541,27 @@ cinnamon	cinnamon
 clove	clove
 lentil	lentil
 chickpea	chickpea
+# Indian Food pack revision 2/3 additions (eval-gated): pickle/buttermilk/
+# pantry/cinnamon/clove/lentil/chickpea above are no longer pack secrets
+# (cut for cross-list collision or phonetic noise, see secrets_hi-en.txt)
+# but left in place since removing them is unnecessary and out of scope for
+# this pack-content revision. These 5 are the actual new secrets missing
+# from the auto-included top-10k English words after the benchmark-scrub
+# swap; all embedding-validated food/hospitality-dominant before addition —
+# see secrets_hi-en.txt header for the full log.
+buffet	buffet
+stove	stove
+doorstep	doorstep
+generosity	generosity
+cupboard	cupboard
+# Indian Food pack revision 4 (2026-07-30): within-pack crowding fix — GG
+# found blessing/gratitude/generosity (mutually 0.70-0.75 hi-en), shop/
+# grocery (0.768), and cupboard/shelf (0.740) as near-pairs even though all
+# were under the 0.80 gate; cut to one per pair (kept generosity, grocery,
+# cupboard) and backfilled with elder, etiquette, bargain, credit — see
+# secrets_hi-en.txt header. etiquette is the only one of the 4 missing from
+# the auto-included top-10k English words.
+etiquette	etiquette
 # Phase 1a (spec-hinglish-benchmark.md) — held-out benchmark-supplement
 # secrets ONLY (evals/gen_dim1_benchmark_supplement.py). These 34 words are
 # NEVER part of the daily-schedule 60-secret pool (vocab/secrets_hi-en.txt) —

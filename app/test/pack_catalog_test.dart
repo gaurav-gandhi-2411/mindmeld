@@ -51,11 +51,11 @@ void main() {
       manifest = PackManifest.fromJson(json);
     });
 
-    test('parses all four packs from the frozen lineup', () {
+    test('parses all three packs from the frozen lineup', () {
       expect(manifest.v, equals(1));
-      expect(manifest.packs, hasLength(4));
+      expect(manifest.packs, hasLength(3));
       expect(manifest.packs.map((p) => p.id),
-          containsAll(['bollywood', 'cricket', 'indian-food', 'nature-wild']));
+          containsAll(['bollywood', 'cricket', 'indian-food']));
     });
 
     test('bollywood is free, live, count 25, icon film', () {
@@ -78,13 +78,14 @@ void main() {
       expect(cricket.titleFor('hi-en'), equals('Cricket'));
     });
 
-    test('indian-food/nature-wild are paid and coming_soon', () {
-      for (final id in ['indian-food', 'nature-wild']) {
-        final pack = manifest.packs.firstWhere((p) => p.id == id);
-        expect(pack.free, isFalse, reason: '$id must not be free');
-        expect(pack.isLive, isFalse, reason: '$id must be coming_soon');
-        expect(pack.count, equals(0));
-      }
+    test('indian-food is paid, live, count 25, icon restaurant', () {
+      final indianFood = manifest.packs.firstWhere((p) => p.id == 'indian-food');
+      expect(indianFood.free, isFalse);
+      expect(indianFood.isLive, isTrue);
+      expect(indianFood.count, equals(25));
+      expect(indianFood.iconData, equals(Icons.restaurant));
+      expect(indianFood.titleFor('en'), equals('Indian Kitchen'));
+      expect(indianFood.titleFor('hi-en'), equals('Ghar ka Khana'));
     });
   });
 
@@ -167,7 +168,7 @@ void main() {
       final result = await catalog.fetch();
 
       expect(result.source, equals(PackManifestSource.bundledAsset));
-      expect(result.manifest.packs, hasLength(4));
+      expect(result.manifest.packs, hasLength(3));
       expect(catalog.lastSource, equals(PackManifestSource.bundledAsset));
     });
 
@@ -196,7 +197,7 @@ void main() {
 
       final result = await catalog.fetch();
       expect(result.source, equals(PackManifestSource.network));
-      expect(result.manifest.packs, hasLength(4));
+      expect(result.manifest.packs, hasLength(3));
     });
 
     test('loadBundled loads the manifest directly without network', () async {
@@ -206,7 +207,7 @@ void main() {
       );
       final result = await catalog.loadBundled();
       expect(result.source, equals(PackManifestSource.bundledAsset));
-      expect(result.manifest.packs, hasLength(4));
+      expect(result.manifest.packs, hasLength(3));
     });
   });
 
