@@ -785,6 +785,62 @@ arXiv:2503.21670 "COMI-LINGUA", 2025, both post-date this project's original 202
 training-data search and show the space is still moving) and a suitable resource
 could emerge later.
 
+## Deferred roadmap (spec-warmer-closeout.md WORKSTREAM 5 — explicitly NOT built this pass)
+
+Post-launch candidates, triaged and recorded so they're a considered list rather than
+forgotten ideas or silently dropped. None of these are launch blockers; all need real
+usage data or nontrivial new infrastructure this closeout deliberately didn't build.
+
+### R1. Any-word guessing (on-device quantised embedding model)
+
+Currently guesses are scored against a fixed, precomputed vocab (the payload's `words`
+map) — a player typing a word outside that vocab gets an out-of-vocab rejection, not a
+real semantic score. True any-word guessing needs a browser-runnable quantised
+embedding model (WASM/ONNX-Runtime-Web or similar) to embed arbitrary player input
+client-side. Heavy (model download size, inference latency budget, a second
+model-quality bar beyond the existing server-precomputed one) — better scoped after
+real usage shows how often players actually hit the out-of-vocab wall, rather than
+building speculatively.
+
+### R2. Post-game semantic map
+
+A visual (e.g. force-directed or UMAP-style) map of the player's guesses in embedding
+space, shown after a win/loss, so players can SEE why a guess was hot/cold relative to
+others. Genuine engagement enhancement, not a launch blocker — needs its own design
+pass (what's spoiler-safe to show, rendering approach for a CanvasKit app) before
+scoping further.
+
+### R3. LLM content pipeline
+
+Clue/secret authoring for packs is currently a manual, human-reviewed process (see
+every pack's own spec.md-style content doc and GG-review stop points). An LLM-assisted
+drafting pipeline (candidate generation + automated embedding/spoiler/semantic-neighbor
+pre-screening, still human-reviewed before baking) could speed up future pack
+authoring, but isn't needed until pack cadence itself demands it — premature to build
+ahead of a proven need.
+
+### R4. Further Hinglish model gains (L4 distillation / L6 commonsense data)
+
+Both remaining levers identified in prior model-excellence work
+(`docs/model-excellence-final-report.md`) are **data-hungry**: L4 (knowledge
+distillation from a larger teacher) needs a strong teacher + compute budget beyond
+this project's $0-cost-path default; L6 (commonsense training data) needs volume no
+synthetic-generation pass has matched. The standing best source for either is **real
+player guess data** (which words players actually try, which ones the model
+under/over-ranks in practice) — doesn't exist yet at any real N since the game hasn't
+had real traffic. Revisit once usage data accumulates; building either lever ahead of
+that data would be guessing at what to fix.
+
+### R5. Pre-promotion local-wasm-boot check in the deploy script
+
+Carried forward from known-limitations entry 23 (today's boot-hang incident): no
+automated check currently runs the actual production `--wasm` build's smoke test
+BEFORE promoting to production — today's catch relied on the POST-deploy smoke check
+plus a human noticing and stopping to investigate. Add a pre-promotion local-build +
+serve + smoke-check step to `deploy-warmer.ps1` itself, so this failure class is
+caught before touching production, not after. Small, concrete, and worth doing soon —
+listed here rather than built under this session's own time pressure.
+
 ## Documentation hygiene (not a product limitation, noted for completeness)
 
 ### 16. Eval baseline report predates the maxGuesses tuning fix
