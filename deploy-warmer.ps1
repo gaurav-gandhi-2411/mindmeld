@@ -129,7 +129,7 @@ Invoke-Step "Guard: Firebase Auth authorized-domains check" {
     try {
         Invoke-NativeCommand -FilePath 'uv' -Description "Firebase Auth authorized-domains check" -ArgumentList @(
             'run', 'python', 'scripts/check_authorized_domains.py',
-            '--project-id', 'mindmeld-c4bba', '--domain', 'playwarmer.vercel.app'
+            '--project-id', 'warmer-prod-260813', '--domain', 'playwarmer.vercel.app'
         ) | Out-Null
     } finally {
         Pop-Location
