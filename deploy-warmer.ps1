@@ -267,14 +267,24 @@ Invoke-Step "Deploy to Vercel production" {
         # STDERR must not be treated as a script-terminating error.
         $deployLines = Invoke-VercelCommand -Arguments @('deploy', '--prod', '--yes') `
             -Description "Vercel production deploy"
-        # The JSON block is pretty-printed across multiple lines, so grab it by
-        # matching the "url" key directly rather than trying to isolate/parse
-        # a single JSON line (a prior version of this script tried the latter
-        # and always failed to find it -- caught by this step's own throw,
-        # not silently, but fixing the root cause here).
-        $urlLine = $deployLines | Where-Object { $_ -match '^\s*"url":\s*"(https://[^"]+)"' } | Select-Object -First 1
-        if ($urlLine -and $urlLine -match '"url":\s*"(https://[^"]+)"') {
-            $global:deploymentUrl = $matches[1]
+        # Real incident (2026-08-14): the previous regex matched a `"url":
+        # "https://..."` JSON-shaped line, which Vercel CLI 58.x's `deploy`
+        # command does not emit without an explicit --json flag (confirmed via
+        # `vercel deploy --help`) -- it never matched, deploymentUrl stayed
+        # $null, and the next guard threw "Could not parse the deployment
+        # URL", even though the deploy itself succeeded. Per Vercel's own
+        # --help example ("Write Deployment URL to a file: $ vercel >
+        # deployment-url.txt"), a completed non-interactive deploy writes
+        # ONLY the bare final URL to stdout -- no label, no quotes, no other
+        # text on that line (all the "Building...", "Uploading..." progress
+        # goes to stderr, which Invoke-VercelCommand also captures into
+        # $deployLines via 2>&1, so this must match a line that is nothing
+        # BUT a URL to avoid picking up a labeled "Inspect"/"Production" line
+        # instead). -Last, not -First: if any other bare-URL-only line ever
+        # precedes it, the actual deployment URL is the final one written.
+        $urlLine = $deployLines | Where-Object { $_.Trim() -match '^https://\S+$' } | Select-Object -Last 1
+        if ($urlLine) {
+            $global:deploymentUrl = $urlLine.Trim()
         }
     } finally {
         Pop-Location
