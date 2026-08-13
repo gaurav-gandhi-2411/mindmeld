@@ -30,11 +30,13 @@ import 'package:firebase_core/firebase_core.dart';
 /// analyticsEnabled=true on web.
 const FirebaseOptions firebaseWebOptions = FirebaseOptions(
   // From Firebase Console → Project Settings → Web app → SDK setup and config.
-  apiKey: "AIzaSyC999pJZXIAHE_kPQDNryTlcgekhoj92bk",
-  authDomain: "mindmeld-c4bba.firebaseapp.com",
-  projectId: "mindmeld-c4bba",
-  storageBucket: "mindmeld-c4bba.firebasestorage.app",
-  messagingSenderId: "376728425568",
-  appId: "1:376728425568:web:3b309894293175630e9f05",
-  measurementId: "G-RERQZ48NPX" // Analytics stream measurement ID (G-XXXXXXXX).
+  apiKey: "AIzaSyAprUaMs4noRgYb3ydsBXJceAwY1bGcqFc",
+  authDomain: "warmer-prod-260813.firebaseapp.com",
+  projectId: "warmer-prod-260813",
+  storageBucket: "warmer-prod-260813.firebasestorage.app",
+  messagingSenderId: "419573145963",
+  appId: "1:419573145963:web:330a4484ecc801a61dac2e"
+  // measurementId intentionally omitted: Google Analytics isn't linked on the
+  // new project yet (Console-only step, not available via CLI/API). Core
+  // Auth/Firestore/FCM are unaffected; link Analytics later if needed.
 );
