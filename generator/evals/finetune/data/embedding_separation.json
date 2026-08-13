@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "what": "Mean silhouette score of the production Hinglish eval vocabulary in each model's raw embedding space",
+  "finetuned_model": "gauravgandhi2411/hinglish-relatedness-sbert",
+  "base_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "n_terms": 419,
+  "n_clusters": 7,
+  "seed": 42,
+  "source": "generator/evals/finetune/data/bakeoff_raw/gauravgandhi2411__hinglish-relatedness-sbert.json (dim1_records + dim2_records secret/word vocabulary)",
+  "space": "raw normalized embeddings, NOT the t-SNE projection",
+  "ft_partition": {
+    "labels_from": "kmeans on fine-tuned embeddings",
+    "finetuned": {
+      "cosine": 0.04207635298371315,
+      "euclidean": 0.024671144783496857
+    },
+    "base": {
+      "cosine": 0.0017323056235909462,
+      "euclidean": 0.0026465619448572397
+    },
+    "ratio": {
+      "cosine": 24.2892,
+      "euclidean": 9.322
+    }
+  },
+  "own_partition": {
+    "labels_from": "kmeans fitted separately on each model's own embeddings",
+    "finetuned": {
+      "cosine": 0.04207635298371315,
+      "euclidean": 0.024671144783496857
+    },
+    "base": {
+      "cosine": 0.060576073825359344,
+      "euclidean": 0.03696826100349426
+    },
+    "ratio": {
+      "cosine": 0.6946,
+      "euclidean": 0.6674
+    }
+  },
+  "per_cluster_ft_partition": {
+    "finetuned": [
+      {
+        "cluster": 0,
+        "n": 23,
+        "mean_silhouette": 0.248696
+      },
+      {
+        "cluster": 1,
+        "n": 53,
+        "mean_silhouette": -0.002144
+      },
+      {
+        "cluster": 2,
+        "n": 80,
+        "mean_silhouette": -0.031122
+      },
+      {
+        "cluster": 3,
+        "n": 68,
+        "mean_silhouette": 0.059777
+      },
+      {
+        "cluster": 4,
+        "n": 48,
+        "mean_silhouette": 0.058416
+      },
+      {
+        "cluster": 5,
+        "n": 77,
+        "mean_silhouette": 0.093057
+      },
+      {
+        "cluster": 6,
+        "n": 70,
+        "mean_silhouette": 0.006845
+      }
+    ],
+    "base": [
+      {
+        "cluster": 0,
+        "n": 23,
+        "mean_silhouette": 0.166741
+      },
+      {
+        "cluster": 1,
+        "n": 53,
+        "mean_silhouette": -0.030467
+      },
+      {
+        "cluster": 2,
+        "n": 80,
+        "mean_silhouette": -0.020648
+      },
+      {
+        "cluster": 3,
+        "n": 68,
+        "mean_silhouette": -0.00762
+      },
+      {
+        "cluster": 4,
+        "n": 48,
+        "mean_silhouette": 0.035145
+      },
+      {
+        "cluster": 5,
+        "n": 77,
+        "mean_silhouette": -0.029789
+      },
+      {
+        "cluster": 6,
+        "n": 70,
+        "mean_silhouette": 0.018319
+      }
+    ]
+  },
+  "caveat": "ft_partition scores both models against KMeans labels fitted on the fine-tuned embeddings, which favours the fine-tuned model by construction. own_partition is the control. Silhouette ranges -1..1; values near zero mean weak cluster structure in absolute terms regardless of the ratio between them."
+}
