@@ -2,7 +2,7 @@
 authorized-domains list — guards against the 2026-07-07 class of bug.
 
 Background: playmindmeld.vercel.app went live without ever being added to
-the mindmeld-c4bba project's Identity Toolkit `authorizedDomains`. Every
+the warmer-prod-260813 project's Identity Toolkit `authorizedDomains`. Every
 firebase_auth call (starting with signInAnonymously()) then failed with a
 `[firebase_auth/channel-error]` that *looked* like a web-plugin-registration
 bug and cost significant diagnosis time before the real cause was found (see
@@ -23,7 +23,7 @@ secret to manage.
 
 Usage:
     uv run python scripts/check_authorized_domains.py \\
-        --project-id mindmeld-c4bba \\
+        --project-id warmer-prod-260813 \\
         --domain playwarmer.vercel.app
 """
 
@@ -93,7 +93,7 @@ def _fetch_authorized_domains(project_id: str, token: str) -> list[str]:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--project-id", required=True, help="Firebase project ID, e.g. mindmeld-c4bba"
+        "--project-id", required=True, help="Firebase project ID, e.g. warmer-prod-260813"
     )
     parser.add_argument(
         "--domain",
