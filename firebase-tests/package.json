@@ -12,8 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
-    "firebase": "^12.15.0",
-    "firebase-tools": "^15.22.4",
-    "puppeteer-core": "^25.3.0"
+    "firebase": "^12.17.1",
+    "firebase-tools": "^15.26.0",
+    "puppeteer-core": "^25.6.0"
   }
 }
