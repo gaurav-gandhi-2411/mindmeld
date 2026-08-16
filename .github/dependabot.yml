@@ -1,0 +1,53 @@
+version: 2
+updates:
+  # Python — generator/ (uv: uv.lock lives here, not at repo root)
+  - package-ecosystem: uv
+    directory: /generator
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    assignees:
+      - gaurav-gandhi-2411
+    labels:
+      - dependencies
+
+  # Node — firebase-tests
+  - package-ecosystem: npm
+    directory: /firebase-tests
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    assignees:
+      - gaurav-gandhi-2411
+    labels:
+      - dependencies
+
+  # GitHub Actions — keep action versions current
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    assignees:
+      - gaurav-gandhi-2411
+    labels:
+      - dependencies
