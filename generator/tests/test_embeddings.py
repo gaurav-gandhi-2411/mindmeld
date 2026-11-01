@@ -39,17 +39,23 @@ def test_cache_key_differs_for_reordered_vocab_same_set():
     """
     vocab_a = ["dog", "cat", "bird"]
     vocab_b = ["bird", "dog", "cat"]
-    assert _cache_key(vocab_a, "some-model") != _cache_key(vocab_b, "some-model")
+    assert _cache_key(vocab_a, "some-model", "r1") != _cache_key(vocab_b, "some-model", "r1")
 
 
 def test_cache_key_stable_for_same_order():
     vocab = ["dog", "cat", "bird"]
-    assert _cache_key(list(vocab), "some-model") == _cache_key(list(vocab), "some-model")
+    key_1 = _cache_key(list(vocab), "some-model", "r1")
+    assert key_1 == _cache_key(list(vocab), "some-model", "r1")
 
 
 def test_cache_key_differs_by_model_name():
     vocab = ["dog", "cat", "bird"]
-    assert _cache_key(vocab, "model-a") != _cache_key(vocab, "model-b")
+    assert _cache_key(vocab, "model-a", "r1") != _cache_key(vocab, "model-b", "r1")
+
+
+def test_cache_key_differs_by_revision():
+    vocab = ["dog", "cat", "bird"]
+    assert _cache_key(vocab, "m", "rev-a") != _cache_key(vocab, "m", "rev-b")
 
 
 class _FakeSentenceTransformer:
@@ -61,8 +67,10 @@ class _FakeSentenceTransformer:
     at a given row, which the test below detects.
     """
 
-    def __init__(self, model_name: str, token: str | None = None) -> None:
-        del model_name, token
+    def __init__(
+        self, model_name: str, revision: str | None = None, token: str | None = None
+    ) -> None:
+        del model_name, revision, token
 
     def encode(
         self,
@@ -133,3 +141,38 @@ def test_embed_vocab_reordered_vocab_never_returns_misaligned_rows(
         actual = matrix_a[i]
         cos_sim = float(np.dot(expected, actual))
         assert cos_sim > 0.999, f"row {i} of matrix_a ({word!r}) misaligned"
+
+
+def test_embed_vocab_passes_pinned_revision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """embed_vocab must load the model at MODEL_REVISIONS[lang], not floating main."""
+    seen: dict[str, object] = {}
+
+    class _Spy(_FakeSentenceTransformer):
+        def __init__(
+            self, model_name: str, revision: str | None = None, token: str | None = None
+        ) -> None:
+            seen["model_name"] = model_name
+            seen["revision"] = revision
+            super().__init__(model_name, revision, token)
+
+    fake_module = types.ModuleType("sentence_transformers")
+    fake_module.SentenceTransformer = _Spy  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "sentence_transformers", fake_module)
+    monkeypatch.setattr("embeddings.CACHE_DIR", tmp_path)
+
+    for lang in ("en", "hi-en"):
+        embed_vocab(["dog", "cat"], lang, show_progress=False)
+        assert seen["revision"] == config.MODEL_REVISIONS[lang]
+        assert seen["model_name"] == config.MODELS[lang]
+
+
+def test_embed_vocab_cache_invalidated_by_revision_change(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _fake_sentence_transformers: None
+) -> None:
+    monkeypatch.setattr("embeddings.CACHE_DIR", tmp_path)
+    embed_vocab(["dog", "cat"], "en", show_progress=False)
+    monkeypatch.setitem(config.MODEL_REVISIONS, "en", "different-revision")
+    embed_vocab(["dog", "cat"], "en", show_progress=False)
+    assert len(list(tmp_path.glob("en-*.npy"))) == 2

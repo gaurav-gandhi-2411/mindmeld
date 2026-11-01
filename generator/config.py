@@ -59,6 +59,18 @@ MODELS: dict[str, str] = {
     "hi-en": "gauravgandhi2411/hinglish-relatedness-sbert",
 }
 
+# Pinned HF commit SHAs for the production models above. Without a pin, a
+# silent upstream re-upload would change embeddings (and therefore every
+# rank) while the cache key stayed the same. The revision is part of
+# embeddings._cache_key, so bumping a pin invalidates cached matrices.
+MODEL_REVISIONS: dict[str, str] = {
+    # HF main as of 2026-11-01 (last modified 2026-06-01).
+    "en": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    # Last commit 2026-07-23 was card-only; weights unchanged since 138f4f5dde31
+    # (2026-07-18).
+    "hi-en": "4b06ad914005cf93ad6a99878566c00a5a0af47b",
+}
+
 # ---------------------------------------------------------------------------
 # Vocab size targets
 # ---------------------------------------------------------------------------
