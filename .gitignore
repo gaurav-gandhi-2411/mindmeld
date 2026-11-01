@@ -50,6 +50,16 @@ app/*.iml
 *serviceAccountKey*.json
 *firebase-adminsdk*.json
 *.pem
+# Firestore exports and Firebase Auth exports hold user documents and password
+# hashes (2026-08-13 migration left one at data/ untracked but NOT ignored;
+# spec-phase-b.md P0). Never commit these, wherever they land.
+data/firestore_export*
+**/firestore_export*/
+*auth*export*
+accounts.json
+*.hash
+*.hashes
+*.hash.*
 
 # IDE / OS
 .idea/
