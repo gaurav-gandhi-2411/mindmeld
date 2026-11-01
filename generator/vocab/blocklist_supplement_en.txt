@@ -1,0 +1,46 @@
+# Curated 2026-11-01 supplement to profanity_en.txt + blocklist_ldnoobw_en.txt.
+# Purpose: hate-speech, racial slur, sexual-abuse and explicit terms that a prior
+# audit found present in vocab/en.txt (the guessable vocab and hint pool) but that
+# neither the original list nor LDNOOBW covers. One lowercase word per line.
+# Applied at vocab-load time (vocab.load_en_vocab / load_hien_vocab).
+# Deliberately NOT included although edgy: suicide, terrorist, genocide, holocaust,
+# jihad, cocaine, heroin, escort, lynch(ing) -- legitimate news/education vocabulary.
+nazi
+nazis
+hitler
+negro
+negroes
+pedophile
+pedophiles
+paedophile
+paedophiles
+rapist
+rapists
+raped
+raping
+molest
+molested
+molester
+molesters
+molesting
+fetish
+fetishes
+hooker
+hookers
+naked
+nude
+nudes
+boobs
+cum
+anal
+bestiality
+stripper
+strippers
+orgasm
+orgasms
+genital
+genitals
+bondage
+slutty
+coon
+paki

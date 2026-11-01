@@ -1,0 +1,74 @@
+# Curated 2026-11-01 supplement to profanity_hi.txt + blocklist_ldnoobw_hi.txt.
+# Purpose: common romanized Hindi/Hinglish abuse, sexual slurs and casteist slurs,
+# including spelling variants. One lowercase single token per line. Applied to the
+# hi-en vocab at load time (and to en via the union where relevant).
+# Ambiguous everyday words (e.g. "bc"/"mc" abbreviations) are included on purpose:
+# as 2-letter tokens they fall below EN_MIN_LEN for en, but hinglish.txt has no length floor.
+gandu
+gaandu
+gandfattu
+chutiya
+chutia
+chutiye
+chutiyapa
+chut
+choot
+chod
+chodu
+bhenchod
+behenchod
+bhanchod
+benchod
+bhenchodh
+behnchod
+madarchod
+madharchod
+maderchod
+madarchodh
+mc
+bc
+bsdk
+bhosdike
+bhosdika
+bhosdi
+bhosda
+bhosadike
+bhosadi
+randi
+raand
+randwa
+harami
+haramzada
+haramzade
+haramkhor
+lund
+lauda
+lavda
+loda
+lode
+lawda
+gaand
+gand
+gaandmara
+gaandfat
+chakka
+chakke
+hijra
+hijda
+kamina
+kamine
+kanjar
+tatti
+jhaant
+jhant
+jhatu
+chamar
+chamaar
+bhangi
+bhangan
+chuhra
+kutti
+kuttiya
+raandi
+randikhana
+hijde
