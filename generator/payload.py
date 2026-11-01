@@ -40,6 +40,7 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
+from profanity import load_en_profanity, load_hi_profanity
 from rival import generate_rival_data, max_guesses_for_par, scorching_cutoff
 from vocab import load_commonsense_overrides
 
@@ -251,6 +252,9 @@ def _build_payload_core(
     alt_map: dict[str, list[int]] = {}
     if lang == "hi-en":
         alias_map = load_alias_map()
+        # A fold/alias variant that is itself blocklisted (e.g. normalize("sheet") ==
+        # "shit") must never become an accepted guess. normalize() is left untouched.
+        blocked_variants = load_en_profanity() | load_hi_profanity()
         # Build reverse map: canonical → [rank, qsim] from words_map
         canonical_to_rv: dict[str, list[int]] = {}
         for i, word in enumerate(vocab):
@@ -279,6 +283,8 @@ def _build_payload_core(
             candidates = sorted(candidate_set)
 
             for variant in candidates:
+                if variant in blocked_variants:
+                    continue
                 variant_hash = _word_hash(variant, salt)
                 if variant_hash in seen_hashes:
                     # Canonical entry already exists at this hash — canonical wins

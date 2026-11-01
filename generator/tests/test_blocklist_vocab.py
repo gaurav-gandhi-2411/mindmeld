@@ -80,3 +80,31 @@ def test_hints_come_only_from_loaded_vocab(
     assert hint_words
     assert set(hint_words) <= set(vocab)
     assert not set(hint_words) & blocklist
+
+
+def test_en_vocab_applies_union_en_hi_blocklist(en_vocab: list[str]) -> None:
+    # India-first audience: EN vocab must also exclude HI-only entries (lauda, randi, ...).
+    assert not set(en_vocab) & (load_en_profanity() | load_hi_profanity())
+
+
+@pytest.mark.parametrize("lang", ["en", "hi-en"])
+def test_no_guess_acceptance_key_hashes_a_blocklisted_word(
+    lang: str, en_vocab: list[str], hien_vocab: list[str]
+) -> None:
+    """Neither `words` nor `alt` (fold/alias-derived) may accept a blocklisted string."""
+    from datetime import date
+
+    from config import derive_salt
+    from payload import _word_hash
+
+    vocab = en_vocab if lang == "en" else hien_vocab
+    day = date(2026, 11, 1)
+    rng = np.random.default_rng(42)
+    matrix = rng.standard_normal((len(vocab), 16)).astype(np.float32)
+    matrix /= np.linalg.norm(matrix, axis=1, keepdims=True)
+    payload = build_payload(vocab, matrix, load_schedule(lang)[0], lang, day)
+    salt = derive_salt(day, lang)
+    accepted = set(payload["words"]) | set(payload.get("alt", {}))
+    blocked = {w: _word_hash(w, salt) for w in load_en_profanity() | load_hi_profanity()}
+    leaked = sorted(w for w, h in blocked.items() if h in accepted)
+    assert not leaked
