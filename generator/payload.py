@@ -222,7 +222,15 @@ def _build_payload_core(
             target_idx = vocab.index(related)
             forced_rank = scorching_cutoff(len(vocab))
             sims[target_idx] = sims[order[forced_rank - 1]]
-            ranks[target_idx] = forced_rank
+            # Re-insert (not overwrite) so ranks stay a permutation of 1..n: lift the
+            # target out of the sorted order and drop it in at forced_rank, which shifts
+            # the words in between by exactly one place. Every moved word keeps its own
+            # similarity; only the target's was borrowed above. A plain
+            # `ranks[target_idx] = forced_rank` duplicated the rank held by the word
+            # already there and left a hole at the target's old rank.
+            order = np.insert(order[order != target_idx], forced_rank - 1, target_idx)
+            for rank_minus1, idx in enumerate(order):
+                ranks[idx] = rank_minus1 + 1
 
     # Build words dict: {hash12: [rank, qsim]}
     words_map: dict[str, list[int]] = {}
