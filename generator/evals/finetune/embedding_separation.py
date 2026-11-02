@@ -222,8 +222,9 @@ def main() -> None:
         "24.3x, which is why both are reported and neither is chosen after the fact.",
         "",
         "This does not weaken the fine-tune's actual result. The task metric it was "
-        "trained for -- Spearman correlation on the Hinglish relatedness eval, "
-        "-0.003 -> 0.813 (see reports/baseline_report.md) -- is a direct measurement "
+        "trained for -- held-out dim1 Spearman on the Hinglish relatedness eval, "
+        "base 0.435 -> fine-tuned 0.704 on the same 8 held-out secrets, paired-CI "
+        "[+0.130, +0.412] (see ship_decision_report_v3.md) -- is a direct measurement "
         "of the thing that matters and is unaffected by any of the above. What this "
         "report rules out is the separate, weaker claim that the fine-tune is visible "
         "as cluster separation.",
