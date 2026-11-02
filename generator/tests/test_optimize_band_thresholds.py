@@ -24,7 +24,9 @@ from evals.finetune.optimize_band_thresholds import (
     regression_floor,
     tier_accuracy,
 )
+from packs import load_pack_secrets, load_packs_meta
 from rival import band_for_rank
+from schedule import load_schedule
 
 # ---------------------------------------------------------------------------
 # band_for_rank_params parity with the real production rival.band_for_rank
@@ -318,7 +320,16 @@ class TestBandReachability:
         result = band_reachability(CURRENT_PARAMS, n, n_sims=10, seed=42)
         assert result["all_bands_reachable"] is True
         assert result["unreached_bands"] == []
-        assert result["n_puzzles"] == 118
+        # Derived, not hard-coded: the universe is the hi-en daily schedule plus every LIVE
+        # hi-en pack, so it grows whenever a pack goes live (it was 118, then 143). A literal
+        # here broke the suite the first time a pack shipped without anyone touching this code.
+        expected = len(load_schedule("hi-en")) + sum(
+            len(load_pack_secrets(p, "hi-en"))
+            for p in load_packs_meta()
+            if p.status == "live" and "hi-en" in p.langs
+        )
+        assert expected > len(load_schedule("hi-en"))  # at least one live pack is counted
+        assert result["n_puzzles"] == expected
 
     def test_pathological_params_can_starve_a_band(self) -> None:
         # Sanity check the detector itself: a warm_floor wide enough to
