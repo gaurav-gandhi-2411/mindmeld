@@ -13,7 +13,7 @@
   "dependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
     "firebase": "^12.15.0",
-    "firebase-tools": "^15.22.4",
-    "puppeteer-core": "^25.3.0"
+    "firebase-tools": "^15.33.0",
+    "puppeteer-core": "^25.13.0"
   }
 }
