@@ -79,7 +79,7 @@ with:
 
 ```bash
 uv run python scripts/check_authorized_domains.py \
-  --project-id mindmeld-c4bba \
+  --project-id warmer-prod-260813 \
   --domain playwarmer.vercel.app
 ```
 
