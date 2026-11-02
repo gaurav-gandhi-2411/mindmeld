@@ -135,14 +135,15 @@ cd generator
 uv run publish --days 30
 ```
 
-**Uptime monitoring.** `.github/workflows/uptime-check.yml` polls the live app,
-the CDN manifest, and one real CDN payload every 15 minutes
-(`scripts/check_uptime.py`) and opens a GitHub issue — which GitHub emails to
-you by default — the moment any of them breaks; it auto-closes the issue on
-recovery. This exists because on 2026-07-12 the `playwarmer` Vercel project
-was deleted from the account and both production domains 404'd for an
-unknown window before anyone noticed — nothing alerted, it was found by
-accident during an unrelated deploy. **You will only receive the alert if
+**Uptime monitoring.** The hourly `Payload monitor` workflow in
+[mindmeld-payloads](https://github.com/gaurav-gandhi-2411/mindmeld-payloads/blob/main/.github/workflows/monitor.yml)
+checks that the UTC yesterday/today/tomorrow payloads for both languages return 200 and
+decode, that the live app serves its shell, and warns when fewer than 14 future days are
+published. It keeps one `payload-alert` issue (edited in place, auto-closed on recovery).
+It replaced this repo's 15-minute `uptime-check.yml` (now disabled), which never tested
+today's date and missed the 2026-08-19 outage when the payload schedule ran out. The
+original motivation still holds: on 2026-07-12 the `playwarmer` Vercel project was deleted
+and both production domains 404'd before anyone noticed. **You will only receive the alert if
 GitHub email notifications for "Issues" are enabled on your account**
 (github.com → Settings → Notifications) — verify this once; a check that
 alerts nobody is a check that "logs," not one that "alerts."
@@ -193,18 +194,22 @@ tracked separately, not counted against the own-domain bundle budget.
 
 ## Results (honest numbers)
 
-- **Payload sizes (gzipped):** en 776–778 KB/day (target < 1.5 MB); hi-en 146 KB/day
-  (target < 400 KB).
-- **Vocab:** en 55,000 words (wordfreq-derived, profanity-filtered, capped per spec);
-  hi-en 10,439 (503 curated romanized Hinglish seeds + top English words — Hinglish list is
-  a starter set, expandable via eval-gated additions).
-- **Hinglish eval gate:** 60/60 active ordering fixtures pass. Honest caveat: 125 candidate
-  assertions were written; ~45 first-round candidates failed because
-  `paraphrase-multilingual-MiniLM-L12-v2` clusters romanized Hindi by script rather than
-  meaning (e.g. `cos(dost, paisa)` > `cos(dost, friend)`). 5 linguistically-valid pairs that
-  the model genuinely fails are kept in `generator/evals/fixtures_known_failures/` as
-  documentation. Working fixture strategy: Hindi anchor → its English translation vs a
-  semantically distant English word.
+- **Payload sizes (gzipped):** en 774–778 KB/day (target < 1.5 MB); hi-en 153–154 KB/day
+  (target < 400 KB). Measured over the published 2026-10-31..11-30 files
+  (`mindmeld-payloads` @ `35cd2d2`).
+- **Vocab (the payload's `n`):** en 54,878 words (wordfreq-derived, blocklist-filtered,
+  capped per spec); hi-en 10,509 (curated romanized Hinglish seeds + top English words).
+  Dates published before 2026-08-19 carry en 55,000 / hi-en 10,495, before the expanded
+  blocklist.
+- **Hinglish model:** hi-en uses
+  [`gauravgandhi2411/hinglish-relatedness-sbert`](https://huggingface.co/gauravgandhi2411/hinglish-relatedness-sbert),
+  fine-tuned from `l3cube-pune/indic-sentence-bert-nli`. Like-for-like held-out result
+  (dim1 Spearman, 8 held-out secrets / 73 scenarios, same test set for both): base
+  **0.435 → fine-tuned 0.704**, paired-CI [+0.130, +0.412]
+  (`generator/evals/finetune/data/ship_decision_report_v3.md`). The first model shipped,
+  `paraphrase-multilingual-MiniLM-L12-v2`, scored ~random on romanized Hinglish (it
+  clusters by script, not meaning) and was replaced; its old figures are not comparable to
+  the held-out number above. See `docs/known-limitations.md` for the residual gaps.
 - **Tests:** generator 160/160; app 94/94 widget/unit; 2/2 emulator integration tests
   (full guess→feedback→win loop in both languages, bundled payloads).
 
@@ -232,6 +237,12 @@ Useful for:
 - Testing the onboarding flow end-to-end
 - Simulating a first-time user on a device that has prior play history
 - Verifying that win/loss screens survive app reopen
+
+## Licence
+
+Code: MIT (`LICENSE`). Models and word lists keep their own licences — notably
+`generator/vocab/en.txt` is derived from wordfreq data and is CC-BY-SA-4.0. See
+`THIRD_PARTY.md`.
 
 ## LLM usage
 
