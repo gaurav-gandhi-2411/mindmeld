@@ -108,6 +108,20 @@ Future<void> _tapGuessAndAwaitWin(WidgetTester tester) async {
   await tester.pump();
 }
 
+/// Keeps draining real async work and advancing fake time until [done] holds
+/// (at most ~2s of real time). The fixed 300ms waits above assume the sqflite
+/// write finishes in time; on a loaded CI runner it sometimes doesn't, so the
+/// win-flash timer is scheduled after the 700ms pump and onWin never fires
+/// (app-tests on PR #38, 2026-11-03: expected 1 onWin call, got 0).
+Future<void> _pumpUntil(WidgetTester tester, bool Function() done) async {
+  for (var i = 0; i < 20 && !done(); i++) {
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    await tester.pump(const Duration(milliseconds: 700));
+  }
+}
+
 /// Finds [text] rendered specifically inside an [AppBar] — used to
 /// disambiguate a screen's title from an identically-labelled NavigationBar
 /// destination (e.g. both the Settings tab's AppBar title and its nav label
@@ -468,6 +482,7 @@ void main() {
 
         await tester.enterText(find.byType(TextField), 'ocean');
         await _tapGuessAndAwaitWin(tester);
+        await _pumpUntil(tester, () => onWinCalls >= 1);
 
         expect(onWinCalls, equals(1), reason: 'an active win must call onWin exactly once');
 
@@ -606,6 +621,7 @@ void main() {
       // session, with no app restart in between.
       await tester.enterText(find.byType(TextField), 'ocean');
       await _tapGuessAndAwaitWin(tester);
+      await _pumpUntil(tester, () => _appBarTitle('You got it!').evaluate().isNotEmpty);
 
       expect(_appBarTitle('You got it!'), findsOneWidget,
           reason: 'sanity: the active win must route to the win screen');

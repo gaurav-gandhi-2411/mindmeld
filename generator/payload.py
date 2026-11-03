@@ -40,6 +40,7 @@ from config import (
 )
 from embeddings import cosine_similarities
 from normalize import load_alias_map, normalize
+from profanity import load_en_profanity, load_hi_profanity
 from rival import generate_rival_data, max_guesses_for_par, scorching_cutoff
 from vocab import load_commonsense_overrides
 
@@ -222,7 +223,15 @@ def _build_payload_core(
             target_idx = vocab.index(related)
             forced_rank = scorching_cutoff(len(vocab))
             sims[target_idx] = sims[order[forced_rank - 1]]
-            ranks[target_idx] = forced_rank
+            # Re-insert (not overwrite) so ranks stay a permutation of 1..n: lift the
+            # target out of the sorted order and drop it in at forced_rank, which shifts
+            # the words in between by exactly one place. Every moved word keeps its own
+            # similarity; only the target's was borrowed above. A plain
+            # `ranks[target_idx] = forced_rank` duplicated the rank held by the word
+            # already there and left a hole at the target's old rank.
+            order = np.insert(order[order != target_idx], forced_rank - 1, target_idx)
+            for rank_minus1, idx in enumerate(order):
+                ranks[idx] = rank_minus1 + 1
 
     # Build words dict: {hash12: [rank, qsim]}
     words_map: dict[str, list[int]] = {}
@@ -243,6 +252,9 @@ def _build_payload_core(
     alt_map: dict[str, list[int]] = {}
     if lang == "hi-en":
         alias_map = load_alias_map()
+        # A fold/alias variant that is itself blocklisted (e.g. normalize("sheet") ==
+        # "shit") must never become an accepted guess. normalize() is left untouched.
+        blocked_variants = load_en_profanity() | load_hi_profanity()
         # Build reverse map: canonical → [rank, qsim] from words_map
         canonical_to_rv: dict[str, list[int]] = {}
         for i, word in enumerate(vocab):
@@ -271,6 +283,8 @@ def _build_payload_core(
             candidates = sorted(candidate_set)
 
             for variant in candidates:
+                if variant in blocked_variants:
+                    continue
                 variant_hash = _word_hash(variant, salt)
                 if variant_hash in seen_hashes:
                     # Canonical entry already exists at this hash — canonical wins

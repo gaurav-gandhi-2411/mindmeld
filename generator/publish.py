@@ -107,6 +107,7 @@ def _run_build(
     from manifest import build_manifest, write_manifest
     from payload import build_payload, write_payload
     from schedule import load_schedule, secret_for_date, validate_schedule
+    from vocab import apply_devanagari_patch
 
     out_dir.mkdir(parents=True, exist_ok=True)
     days_list: list[date] = [start + timedelta(days=i) for i in range(days)]
@@ -136,7 +137,10 @@ def _run_build(
             sys.exit(1)
 
         print(f"[{lang}] Embedding vocab (may load model on first run)...")
-        matrix = embed_vocab(vocab, lang, show_progress=True)
+        # L2 lever: same embedding-INPUT-only Devanagari substitution as build.py;
+        # `vocab` stays romanized for word_to_idx / secret matching / hints.
+        embed_input = apply_devanagari_patch(vocab) if lang == "hi-en" else vocab
+        matrix = embed_vocab(embed_input, lang, show_progress=True)
 
         day_records: list[dict] = []
         for puzzle_date in days_list:
