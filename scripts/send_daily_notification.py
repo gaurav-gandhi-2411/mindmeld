@@ -57,10 +57,12 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from typing import Any, Protocol
 
 import firebase_admin
+import puzzle_check  # sibling module; `uv run scripts/...` puts scripts/ on sys.path
 from firebase_admin import credentials, firestore, messaging
 from google.cloud.firestore_v1.client import Client as FirestoreClient
 
@@ -298,7 +300,27 @@ def main(argv: list[str] | None = None) -> None:
             "the Firestore query (or FIRESTORE_EMULATOR_HOST pointed at a local emulator)."
         ),
     )
+    parser.add_argument(
+        "--date",
+        default=None,
+        help="Puzzle date YYYY-MM-DD to check (default: today in IST). Testing override.",
+    )
     args = parser.parse_args(argv)
+
+    # Gate BEFORE any Firestore/FCM contact: only announce a puzzle that exists.
+    if args.date is not None and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", args.date):
+        print(f"ERROR: --date must be YYYY-MM-DD, got {args.date!r}", file=sys.stderr)
+        sys.exit(2)
+    date = args.date or puzzle_check.today_ist()
+    try:
+        status, details = puzzle_check.check_all(VALID_LANGS, date)
+    except Exception as e:  # noqa: BLE001 -- any check failure must fail closed
+        print(f"ERROR: puzzle check failed for {date}, not sending: {e}", file=sys.stderr)
+        sys.exit(1)
+    if status is not puzzle_check.PuzzleStatus.OK:
+        print(f"no puzzle for {date}")
+        print(f"reason ({status.value}): {'; '.join(details)}")
+        sys.exit(0)
 
     service_account_dict = _load_service_account_dict()
     if not firebase_admin._apps:  # noqa: SLF001 -- firebase_admin has no public "is any app initialized" check

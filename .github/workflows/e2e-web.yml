@@ -1,9 +1,7 @@
 name: E2E web (integration_test)
 
-# This repo's GitHub plan tier has NO branch protection configured, so this
-# workflow CANNOT be made a "required" check -- it runs and reports on every
-# push/PR, but nothing currently blocks a merge on its failure. That is a
-# known, documented gap, not an oversight.
+# Both jobs (e2e-web, e2e-web-wasm) are REQUIRED checks on main since the repo went public
+# (2026-11-02, branch protection), so a red run blocks merges.
 #
 # Wires integration_test/app_test.dart (full guess -> win loop for en/hi-en,
 # a garbage-word rejection check, and a spoiler-safety assertion on the share
@@ -61,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
@@ -120,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 22
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
@@ -169,6 +167,13 @@ jobs:
       - name: Build production wasm artifact
         working-directory: app
         run: flutter build web --release --no-web-resources-cdn --wasm
+
+      # Pinned to the Node/npm the lockfile is maintained with. Without it the runner's bundled
+      # npm rejected package-lock.json as "not in sync" (Missing: proxy-agent@8.0.2 ...) on every
+      # run since 2026-08-16, while `npm ci` with Node 24.15.0 / npm 11.13.0 installs it cleanly.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
 
       - name: npm ci (puppeteer harness)
         working-directory: firebase-tests

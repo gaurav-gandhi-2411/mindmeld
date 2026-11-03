@@ -29,11 +29,13 @@ checkpoint I/O), so this test doesn't try to fake that away.
 """
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 from sentence_transformers import SentenceTransformer
 
+from evals.finetune import train_lib
 from evals.finetune.train_lib import DATA_DIR, TrainConfig, run_training
 
 
@@ -43,9 +45,14 @@ def _load_jsonl(path: Path) -> list[dict]:
 
 
 @pytest.fixture(scope="module")
-def tiny_lora_run() -> dict:
+def tiny_lora_run(tmp_path_factory: pytest.TempPathFactory) -> Iterator[dict]:
     """One small, real LoRA training run, shared across assertions in this
-    file (training is the expensive part; re-run it once, not per-test)."""
+    file (training is the expensive part; re-run it once, not per-test).
+
+    RUNS_DIR and CHECKPOINT_ROOT are redirected into a temp dir: run_training
+    writes `<RUNS_DIR>/<name>.train_summary.json`, and RUNS_DIR is a tracked
+    directory, so without the redirect every test run rewrote a committed file.
+    """
     mnrl_records = _load_jsonl(DATA_DIR / "train_mnrl_pairs.jsonl")[:20]
     graded_records = _load_jsonl(DATA_DIR / "train_graded_pairs.jsonl")[:20]
 
@@ -60,7 +67,11 @@ def tiny_lora_run() -> dict:
         mnrl_records=mnrl_records,
         graded_records=graded_records,
     )
-    return run_training(cfg)
+    tmp_root = tmp_path_factory.mktemp("lora_run")
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(train_lib, "RUNS_DIR", tmp_root / "runs")
+        mp.setattr(train_lib, "CHECKPOINT_ROOT", tmp_root / "checkpoints")
+        yield run_training(cfg)
 
 
 def test_saved_model_dev_score_matches_tracked_best(tiny_lora_run: dict) -> None:

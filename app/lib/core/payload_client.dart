@@ -9,10 +9,44 @@ enum PayloadSource { network, bundledAsset }
 
 /// Result of a payload fetch, including which source was used.
 class PayloadResult {
-  const PayloadResult({required this.payload, required this.source});
+  const PayloadResult({
+    required this.payload,
+    required this.source,
+    this.servedDate,
+    this.requestedDate,
+  });
 
   final DailyPayload payload;
   final PayloadSource source;
+
+  /// Date (yyyy-MM-dd) of the puzzle actually served. Null when the producer
+  /// did not record it (pack/onboarding fetches, legacy test fakes).
+  final String? servedDate;
+
+  /// Date (yyyy-MM-dd) the caller asked for. Null when not recorded.
+  final String? requestedDate;
+
+  /// True when an older puzzle was served because the requested day's payload
+  /// is missing (B2 lookback).
+  bool get isFallbackDate =>
+      servedDate != null &&
+      requestedDate != null &&
+      servedDate != requestedDate;
+}
+
+/// Maximum number of days [PayloadClient.fetch] steps back when the requested
+/// day's payload is definitively missing. 14 days covers a two-week generator
+/// outage while bounding the worst case to 14 quick 404 round-trips and
+/// keeping the substitute puzzle reasonably recent.
+const int kMaxPayloadLookbackDays = 14;
+
+/// Returns [date] (yyyy-MM-dd) shifted back by [days], using UTC date-only
+/// arithmetic so local-timezone DST changes can never skip or repeat a day.
+String shiftDateBack(String date, int days) {
+  final d = DateTime.parse(date);
+  final s = DateTime.utc(d.year, d.month, d.day - days);
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${s.year.toString().padLeft(4, '0')}-${two(s.month)}-${two(s.day)}';
 }
 
 /// Fetches daily puzzle payloads from the network, falling back to bundled assets.
@@ -52,35 +86,96 @@ class PayloadClient {
   /// Sets [lastSource] to reflect which path was used.
   Future<PayloadResult> fetch(String lang, String date) async {
     // 1. Try network
+    var missing = false;
     try {
-      final url = Uri.parse('$_baseUrl/$lang/$date.json.gz');
-      final response = await _http.get(url).timeout(_timeout);
-      if (response.statusCode == 200) {
-        final payload = PayloadCodec.decode(
-          Uint8List.fromList(response.bodyBytes),
-        );
-        final result =
-            PayloadResult(payload: payload, source: PayloadSource.network);
+      final (result, status) = await _fetchNetwork(lang, date, date);
+      if (result != null) {
         lastSource = result.source;
         return result;
       }
+      // Only a 404 means "no puzzle for this day"; other statuses are errors.
+      missing = status == 404;
     } catch (_) {
-      // Fall through to bundled asset.
+      // Fall through to bundled asset. Transport errors/timeouts never look
+      // back: an offline user must not wait up to 14 x timeout.
     }
 
     // 2. Fall back to bundled asset
-    final result = await _loadFromAsset(lang, date);
-    lastSource = result.source;
-    return result;
+    try {
+      final result = await _loadFromAsset(lang, date, date);
+      lastSource = result.source;
+      return result;
+    } catch (_) {
+      if (!missing) rethrow;
+    }
+
+    // 3. Day definitively missing on network and in assets: step back to the
+    // latest available puzzle (B2).
+    for (var i = 1; i <= kMaxPayloadLookbackDays; i++) {
+      final prev = shiftDateBack(date, i);
+      var prevMissing = false;
+      try {
+        final (result, status) = await _fetchNetwork(lang, prev, date);
+        if (result != null) {
+          lastSource = result.source;
+          return result;
+        }
+        prevMissing = status == 404;
+      } catch (_) {
+        // Not a definite miss; still try the bundled asset below.
+      }
+      try {
+        final result = await _loadFromAsset(lang, prev, date);
+        lastSource = result.source;
+        return result;
+      } catch (_) {
+        if (!prevMissing) break;
+      }
+    }
+    throw Exception(
+      'No puzzle available for $lang on $date '
+      '(looked back $kMaxPayloadLookbackDays days)',
+    );
+  }
+
+  /// GETs the network payload for [date]. Returns a null result (with the
+  /// HTTP status) on a non-200 reply; throws on transport/decode errors.
+  Future<(PayloadResult?, int)> _fetchNetwork(
+    String lang,
+    String date,
+    String requested,
+  ) async {
+    final url = Uri.parse('$_baseUrl/$lang/$date.json.gz');
+    final response = await _http.get(url).timeout(_timeout);
+    if (response.statusCode != 200) return (null, response.statusCode);
+    final payload = PayloadCodec.decode(Uint8List.fromList(response.bodyBytes));
+    return (
+      PayloadResult(
+        payload: payload,
+        source: PayloadSource.network,
+        servedDate: date,
+        requestedDate: requested,
+      ),
+      200,
+    );
   }
 
   /// Load payload directly from bundled assets (used by tests and offline mode).
-  Future<PayloadResult> _loadFromAsset(String lang, String date) async {
+  Future<PayloadResult> _loadFromAsset(
+    String lang,
+    String date, [
+    String? requested,
+  ]) async {
     final assetKey = 'assets/payloads/$lang/$date.json.gz';
     final byteData = await _assets.load(assetKey);
     final bytes = byteData.buffer.asUint8List();
     final payload = PayloadCodec.decode(bytes);
-    return PayloadResult(payload: payload, source: PayloadSource.bundledAsset);
+    return PayloadResult(
+      payload: payload,
+      source: PayloadSource.bundledAsset,
+      servedDate: date,
+      requestedDate: requested ?? date,
+    );
   }
 
   /// Explicitly load from the bundled asset (public for testing).

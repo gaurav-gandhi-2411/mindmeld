@@ -471,9 +471,10 @@ def _simulate_trajectory(n: int, rng: random.Random) -> list[int]:
 
 
 def _hien_puzzle_secrets() -> list[str]:
-    """The 118 real hi-en puzzle secrets (68 daily + 50 live-pack) -- same
-    puzzle universe the prior 900-floor fix used for its own guess-
-    distribution validation (PLAN.md: '118 real hi-en puzzles')."""
+    """Every real hi-en puzzle secret: the daily schedule plus all LIVE hi-en
+    packs. Same puzzle universe the prior 900-floor fix used for its own
+    guess-distribution validation (118 at the time, PLAN.md: '118 real hi-en
+    puzzles'); it grows as packs go live, so callers must not hard-code it."""
     secrets = list(load_schedule("hi-en"))
     for pack in load_packs_meta():
         if pack.status == "live" and "hi-en" in pack.langs:

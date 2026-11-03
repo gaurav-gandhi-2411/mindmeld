@@ -157,7 +157,9 @@ before assuming a data or instrumentation bug.
 
 ### 7. Firebase console checks (where to look)
 
-- **Auth**: `mindmeld-c4bba` project → Authentication → Users (anonymous identities) and
+- **Auth**: `warmer-prod-260813` project (the live project per `.firebaserc` since the
+  2026-08-13 migration — do NOT check `mindmeld-c4bba`, which is the old, retired project)
+  → Authentication → Users (anonymous identities) and
   Settings → Authorized domains (guarded automatically by
   `scripts/check_authorized_domains.py` on every deploy — should never actually need a
   manual check unless that guard is bypassed).

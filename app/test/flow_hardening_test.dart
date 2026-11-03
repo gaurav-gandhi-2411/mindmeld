@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mindmeld/ads/rewarded_ad_service.dart';
 import 'package:mindmeld/core/memory_store.dart';
 import 'package:mindmeld/core/models.dart';
 import 'package:mindmeld/core/payload_client.dart';
@@ -46,13 +45,6 @@ Future<void> _pumpUntilLoaded(WidgetTester tester) async {
     await Future<void>.delayed(const Duration(milliseconds: 300));
   });
   await tester.pump();
-}
-
-/// Instant-grant hint gate for tests (no ad modal).
-class _InstantHintGate implements HintGate {
-  @override
-  Future<HintGateResult> requestHint(BuildContext context) =>
-      Future.value(const HintGateResult(granted: true, fallback: true));
 }
 
 void main() {
@@ -367,14 +359,14 @@ void main() {
       );
 
       // Simulate submitting the winning word as the 5th (last) guess.
-      const won = true; // rank == 1
       final newGuesses = [
         ...existingGuesses,
         Guess(word: 'ocean', rank: 1, similarity: 1.0, band: TemperatureBand.win),
       ];
+      final won = newGuesses.last.rank == 1;
       const hintsUsed = 0;
       final budgetExhausted =
-          !won && maxG != null && (newGuesses.length + hintsUsed) >= maxG;
+          !won && (newGuesses.length + hintsUsed) >= maxG;
       expect(won, isTrue, reason: 'S9: must detect win');
       expect(budgetExhausted, isFalse,
           reason: 'S9: must NOT trigger loss on last-slot win');
@@ -395,7 +387,7 @@ void main() {
       ];
       const hintsUsed = 0;
       final budgetExhausted =
-          !won && maxG != null && (newGuesses.length + hintsUsed) >= maxG;
+          !won && (newGuesses.length + hintsUsed) >= maxG;
       expect(budgetExhausted, isTrue,
           reason: 'S10: budget exhaustion must trigger loss');
     });
