@@ -10,9 +10,13 @@ run-name: >-
   Daily notification${{ inputs.dry_run == true && ' (dry run)' || '' }}
 
 on:
-  schedule:
-    # 03:00 UTC = 08:30 IST (spec: India-first, ~8:30am IST single-time send).
-    - cron: "0 3 * * *"
+  # Schedule disabled 2026-11-03 pending Phase C (GG): the FIREBASE_SERVICE_ACCOUNT
+  # secret belongs to the legacy mindmeld-c4bba project, and repointing to
+  # warmer-prod needs a new service-account key, which is a Phase C decision.
+  # Restore the cron below once that is done. Was:
+  # schedule:
+  #   # 03:00 UTC = 08:30 IST (spec: India-first, ~8:30am IST single-time send).
+  #   - cron: "0 3 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
