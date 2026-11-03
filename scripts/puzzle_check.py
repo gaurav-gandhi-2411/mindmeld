@@ -10,7 +10,8 @@ firebase-admin. Mirrors the app's loader:
   * "Valid" = gzip -> UTF-8 -> JSON object (payload_codec.dart:24-27) with the keys
     DailyPayload.fromJson requires and their types (app/lib/core/models.dart:176-235):
     v:int, lang:str, date:str, model:str, n:int, salt:str, s:str,
-    words:{hash:[int,int]}, hints:[[int,str]]. Optional keys (alt, rival, ...) are not checked.
+    words:{hash:[int,int]}, hints:[[int,str]]. Optional keys are checked only where Dart
+    would throw: alt; rival/parGuesses when v>=2; clue/maxGuesses when v>=3; pack/idx.
   * "Today": the app uses the device-local date (app/lib/main.dart:357-359). Players are
     India-first and the cron fires at 03:00 UTC = 08:30 IST, when the IST and UTC dates
     agree, so today is computed in IST (fixed +05:30, no tzdata dependency).
@@ -62,18 +63,50 @@ def payload_url(lang: str, date: str, base_url: str = PAYLOAD_BASE_URL) -> str:
     return f"{base_url}/{lang}/{date}.json.gz"
 
 
+def _is_int(value: object) -> bool:
+    """Dart `as int`: JSON ints only (Python bool is an int subclass, Dart's is not)."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 def _is_pair(value: object, second: type) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) >= 2
-        and isinstance(value[0], int)
-        and isinstance(value[1], second)
-    )
+    """Dart `list[0] as int, list[1] as <second>` (models.dart:176-182, 196-202)."""
+    if not (isinstance(value, list) and len(value) >= 2 and _is_int(value[0])):
+        return False
+    return _is_int(value[1]) if second is int else isinstance(value[1], second)
 
 
 def _has_type(obj: dict, key: str, typ: type) -> bool:
     value = obj.get(key)
     return isinstance(value, typ) and not isinstance(value, bool)
+
+
+def _opt(obj: dict, key: str, typ: type) -> bool:
+    """Dart `json[key] as T?`: absent or null is fine, otherwise must be a T."""
+    value = obj.get(key)
+    return value is None or (_is_int(value) if typ is int else isinstance(value, typ))
+
+
+def _is_word_map(value: object) -> bool:
+    """Dart `as Map<String,dynamic>` then each value as [int,int] (models.dart:176-182)."""
+    return isinstance(value, dict) and all(_is_pair(x, int) for x in value.values())
+
+
+def _is_rival_tier(value: object) -> bool:
+    """RivalTierData.fromJson (models.dart:451-459): path:[{rank:int,band:int}], solveAt:int."""
+    if not isinstance(value, dict) or not _has_type(value, "solveAt", int):
+        return False
+    path = value.get("path")
+    return isinstance(path, list) and all(
+        isinstance(step, dict) and _has_type(step, "rank", int) and _has_type(step, "band", int)
+        for step in path
+    )
+
+
+def _is_rival(value: object) -> bool:
+    """RivalData.fromJson (models.dart:485-488): even/chill/sharp tiers, all required."""
+    return isinstance(value, dict) and all(
+        _is_rival_tier(value.get(tier)) for tier in ("even", "chill", "sharp")
+    )
 
 
 def validate_payload(raw: bytes) -> str | None:
@@ -95,12 +128,27 @@ def validate_payload(raw: bytes) -> str | None:
     ):
         if not _has_type(obj, key, typ):
             return f"missing or wrong-typed key {key!r}"
-    words = obj.get("words")
-    if not isinstance(words, dict) or not all(_is_pair(x, int) for x in words.values()):
+    if not _is_word_map(obj.get("words")):
         return "missing or malformed 'words'"
     hints = obj.get("hints")
     if not isinstance(hints, list) or not all(_is_pair(x, str) for x in hints):
         return "missing or malformed 'hints'"
+    # Optional fields. A present-but-null `alt`/`rival` is a Dart cast error (containsKey is
+    # true, `null as Map` throws), whereas `as T?` fields accept null.
+    if "alt" in obj and not _is_word_map(obj["alt"]):  # models.dart:187-196
+        return "malformed 'alt'"
+    if obj["v"] >= 2:  # models.dart:208-215
+        if "rival" in obj and not _is_rival(obj["rival"]):
+            return "malformed 'rival'"
+        if not _opt(obj, "parGuesses", int):
+            return "wrong-typed 'parGuesses'"
+    if obj["v"] >= 3:  # models.dart:218-223
+        if not _opt(obj, "clue", str):
+            return "wrong-typed 'clue'"
+        if not _opt(obj, "maxGuesses", int):
+            return "wrong-typed 'maxGuesses'"
+    if not _opt(obj, "pack", str) or not _opt(obj, "idx", int):  # models.dart:241-242
+        return "wrong-typed 'pack' or 'idx'"
     return None
 
 

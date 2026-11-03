@@ -35,6 +35,11 @@ GOOD: dict[str, Any] = {
 }
 
 
+RIVAL: dict[str, Any] = {
+    tier: {"path": [{"rank": 3, "band": 2}], "solveAt": 1} for tier in ("even", "chill", "sharp")
+}
+
+
 def _gz(obj: object) -> bytes:
     return gzip.compress(json.dumps(obj).encode())
 
@@ -75,12 +80,57 @@ def test_404_is_missing() -> None:
         _gz({**GOOD, "words": {"x": ["a", 1]}}),
         _gz({**GOOD, "hints": [[1, 2]]}),
         _gz({**GOOD, "v": True}),
+        # bool elements in [int,int] pairs: Dart `true as int` throws (models.dart:178-180)
+        _gz({**GOOD, "words": {"x": [True, 1]}}),
+        _gz({**GOOD, "words": {"x": [1, False]}}),
+        _gz({**GOOD, "hints": [[True, "w"]]}),
+        # alt present but malformed (models.dart:187-196), incl. explicit null
+        _gz({**GOOD, "alt": None}),
+        _gz({**GOOD, "alt": [[1, 2]]}),
+        _gz({**GOOD, "alt": {"x": ["a", 1]}}),
+        _gz({**GOOD, "alt": {"x": [True, 1]}}),
+        # rival present but malformed when v>=2 (models.dart:210-212, 451-488)
+        _gz({**GOOD, "rival": None}),
+        _gz({**GOOD, "rival": {}}),
+        _gz({**GOOD, "rival": {**RIVAL, "sharp": {"path": [], "solveAt": "3"}}}),
+        _gz({**GOOD, "rival": {**RIVAL, "even": {"path": [{"rank": 1}], "solveAt": 1}}}),
+        _gz(
+            {
+                **GOOD,
+                "rival": {**RIVAL, "chill": {"path": [{"rank": True, "band": 1}], "solveAt": 1}},
+            }
+        ),
+        # wrong-typed clue / maxGuesses / parGuesses (models.dart:214, 220-223)
+        _gz({**GOOD, "clue": 5}),
+        _gz({**GOOD, "maxGuesses": "10"}),
+        _gz({**GOOD, "maxGuesses": True}),
+        _gz({**GOOD, "parGuesses": 1.5}),
     ],
 )
 def test_invalid(body: bytes) -> None:
     status, detail = pc.check_puzzle("en", "2026-11-03", _fake(200, body))
     assert status is pc.PuzzleStatus.INVALID
     assert detail.startswith("en:")
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"alt": {"x": [1, 2]}},
+        {"alt": {}},
+        {"rival": RIVAL, "parGuesses": 4},
+        {"parGuesses": None, "clue": None, "maxGuesses": None},
+        {"clue": "a clue", "maxGuesses": 12},
+        {"pack": "animals", "idx": 3},
+        # Dart ignores these when v is below the gating version (models.dart:208, 219)
+        {"v": 1, "rival": "junk", "parGuesses": "junk", "clue": 5, "maxGuesses": "x"},
+        {"v": 2, "clue": 5, "maxGuesses": "x"},
+        {"unknown_key": 1},
+    ],
+)
+def test_valid_optionals_accepted(extra: dict[str, Any]) -> None:
+    status, detail = pc.check_puzzle("en", "2026-11-03", _fake(200, _gz({**GOOD, **extra})))
+    assert status is pc.PuzzleStatus.OK, detail
 
 
 def test_network_error_and_500_raise() -> None:
@@ -136,6 +186,8 @@ def _load_sender(monkeypatch: pytest.MonkeyPatch) -> tuple[ModuleType, list[str]
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     mod.run = lambda *a, **k: log.append("run") or 0  # type: ignore[attr-defined]
+    # Credential loading is a send-path step: log it (and never touch the real env var).
+    mod._load_service_account_dict = lambda: log.append("load_credentials") or {}  # type: ignore[attr-defined]
     return mod, log
 
 
@@ -165,7 +217,9 @@ def test_main_network_error_fails_closed(
         mod.main(["--date", "2026-11-03"])
     assert exc.value.code == 1
     assert "no puzzle for" not in capsys.readouterr().out
+    # Neither credentials, firebase init, Firestore, nor run() (the send path) was reached.
     assert log == []
+    assert "load_credentials" not in log
 
 
 def test_main_valid_puzzle_proceeds_to_send(monkeypatch: pytest.MonkeyPatch) -> None:
