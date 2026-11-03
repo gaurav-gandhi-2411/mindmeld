@@ -148,6 +148,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   String? _inputError;
   bool _loading = true;
   String? _loadError;
+
+  /// Date (yyyy-MM-dd) of the older puzzle being shown when today's payload
+  /// was missing (B2 lookback); null when today's own puzzle is served.
+  /// Display only: day_state stays keyed under [PuzzleScreen.date].
+  String? _fallbackDate;
   bool _showingAd = false;
   bool _submitting = false;
   bool _rivalEnabled = true;
@@ -229,6 +234,11 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       if (mounted) {
         setState(() {
           _payload = payloadResult.payload;
+          _fallbackDate = (!_isPackMode &&
+                  !widget.isOnboarding &&
+                  payloadResult.isFallbackDate)
+              ? payloadResult.servedDate
+              : null;
           _entitlements = entitlements;
           _dayState = existing ??
               DayState(
@@ -926,6 +936,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
     );
   }
 
+  String _formatFallbackDate(String date) {
+    try {
+      return DateFormat('MMM d').format(DateTime.parse(date));
+    } catch (_) {
+      return date;
+    }
+  }
+
   String _formatDate() {
     try {
       final dt = DateTime.parse(widget.date);
@@ -1046,6 +1064,22 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                 ),
               ),
             ),
+
+          // B2: today's payload was missing, so an older puzzle is shown.
+          if (_fallbackDate != null)
+            Builder(builder: (ctx) {
+              final tokens =
+                  Theme.of(ctx).extension<WarmerTokens>() ?? WarmerTokens.light;
+              return Padding(
+                key: const Key('fallback-puzzle-label'),
+                padding: const EdgeInsets.fromLTRB(
+                    WarmerSpacing.lg, WarmerSpacing.sm, WarmerSpacing.lg, 0),
+                child: Text(
+                  'Puzzle from ${_formatFallbackDate(_fallbackDate!)}',
+                  style: microLabel(tokens),
+                ),
+              );
+            }),
 
           // "View result" — re-entry into the win/loss result screen (share
           // card, Copy & Share, Image) after tapping Back on it. Daily mode
