@@ -27,7 +27,7 @@ embeds both vocabs (cached to `generator/.model-cache/`, so subsequent builds ta
 Output: `payloads/{lang}/{yyyy-mm-dd}.json.gz` + `payloads/manifest.json`.
 
 ```powershell
-uv run pytest            # 160 unit tests + Hinglish eval gate
+uv run pytest            # unit tests + Hinglish eval gate (counts: see Results > Tests)
 uv run python evals/run_evals.py   # eval fixtures standalone
 ```
 
@@ -213,8 +213,12 @@ tracked separately, not counted against the own-domain bundle budget.
   `paraphrase-multilingual-MiniLM-L12-v2`, scored ~random on romanized Hinglish (it
   clusters by script, not meaning) and was replaced; its old figures are not comparable to
   the held-out number above. See `docs/known-limitations.md` for the residual gaps.
-- **Tests:** generator 160/160; app 94/94 widget/unit; 2/2 emulator integration tests
-  (full guess→feedback→win loop in both languages, bundled payloads).
+- **Tests** (CI, main at `e31e43c`, [Unit tests run 41598947746](https://github.com/gaurav-gandhi-2411/mindmeld/actions/runs/41598947746)):
+  generator 782 passed, 0 failed, 5 skipped; app 539 passed, 0 failed, 0 skipped, with
+  `flutter analyze` clean. The 5 generator skips need a locally warmed embedding cache or the
+  local Ollama judge. Integration tests `app_test.dart` (full guess→win loop in both languages)
+  and `first_session_test.dart` (onboarding) run on every PR in the `e2e-web` and
+  `e2e-web-wasm` jobs. Counts come from each run's job summary; update this line from a newer main run.
 
 ## Repo layout
 
