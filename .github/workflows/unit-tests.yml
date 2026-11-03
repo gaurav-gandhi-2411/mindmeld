@@ -51,6 +51,12 @@ jobs:
           path: .hf-cache
           key: hf-models-minilm-1110a243-hinglish-4b06ad91-indicnli-aab1d6a0
 
+      # mindmeld-payloads validates published payloads against its ci/blocklist.txt,
+      # which is generated from this repo's blocklist; fail if the two have drifted.
+      - name: Blocklist parity with mindmeld-payloads
+        working-directory: generator
+        run: uv run --frozen python ../scripts/ci/check_blocklist_parity.py
+
       - name: Fetch pinned models (fails on upstream drift)
         working-directory: generator
         run: uv run --frozen python ../scripts/ci/fetch_pinned_models.py
