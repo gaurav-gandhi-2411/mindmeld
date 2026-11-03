@@ -31,7 +31,7 @@ from build_onboarding import (
     write_onboarding_payload,
 )
 from build_packs import aliases_for_secret, clue_leak_reason
-from config import CACHE_DIR, MODELS, ONBOARDING_MAX_GUESSES
+from config import CACHE_DIR, MODEL_REVISIONS, MODELS, ONBOARDING_MAX_GUESSES
 from embeddings import _cache_key, cosine_similarities, embed_vocab
 from payload import decode_secret
 from rival import band_for_rank
@@ -287,7 +287,7 @@ def _cache_available(vocab: list[str], lang: str) -> bool:
     never has .model-cache — it's gitignored and CI makes no network calls to
     download models) instead of triggering an unwanted model download.
     """
-    key = _cache_key(vocab, MODELS[lang])
+    key = _cache_key(vocab, MODELS[lang], MODEL_REVISIONS[lang])
     return (CACHE_DIR / f"{lang}-{key}.npy").exists()
 
 

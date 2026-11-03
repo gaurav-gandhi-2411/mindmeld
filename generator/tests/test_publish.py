@@ -26,7 +26,7 @@ from pathlib import Path
 
 import pytest
 
-from config import CACHE_DIR, MODELS
+from config import CACHE_DIR, MODEL_REVISIONS, MODELS
 from embeddings import _cache_key
 from publish import (  # noqa: I001 — conftest adds generator/ to sys.path
     _apply_sync,
@@ -696,7 +696,7 @@ def _cache_available(vocab: list[str], lang: str) -> bool:
     has .model-cache (gitignored, no network calls in CI), so this test is
     real-vocab/real-embedding but self-skips instead of triggering a download.
     """
-    key = _cache_key(vocab, MODELS[lang])
+    key = _cache_key(vocab, MODELS[lang], MODEL_REVISIONS[lang])
     return (CACHE_DIR / f"{lang}-{key}.npy").exists()
 
 

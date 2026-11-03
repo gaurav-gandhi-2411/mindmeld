@@ -52,7 +52,7 @@ def derive_en_vocab() -> list[str]:
     """
     from wordfreq import top_n_list  # local import so test stubs can avoid it
 
-    profanity = load_en_profanity()
+    profanity = load_en_profanity() | load_hi_profanity()
     raw = top_n_list("en", EN_TOP_N)
     filtered = [w.lower() for w in raw if _is_valid_en_word(w, profanity)]
     # Cap to spec range — wordfreq order is frequency order, so truncation keeps the most common.
@@ -69,7 +69,9 @@ def load_en_vocab() -> list[str]:
     """
     cache_path = VOCAB_DIR / "en.txt"
     if cache_path.exists():
-        profanity = load_en_profanity()
+        # Union EN+HI (India-first audience), same as hi-en: HI-only entries such as
+        # "randi" must not be guessable in EN either.
+        profanity = load_en_profanity() | load_hi_profanity()
         words: list[str] = []
         for line in cache_path.read_text(encoding="utf-8").splitlines():
             w = line.strip()

@@ -22,14 +22,26 @@ def _load_blocklist(path: Path) -> frozenset[str]:
     return frozenset(words)
 
 
+_EN_BLOCKLIST_FILES = (
+    "profanity_en.txt",
+    "blocklist_ldnoobw_en.txt",  # vendored, CC-BY-4.0 -- see file header
+    "blocklist_supplement_en.txt",  # curated hate/abuse terms LDNOOBW misses
+)
+_HI_BLOCKLIST_FILES = (
+    "profanity_hi.txt",
+    "blocklist_ldnoobw_hi.txt",  # vendored, CC-BY-4.0 -- see file header
+    "blocklist_supplement_hi.txt",  # curated romanized slurs incl. casteist
+)
+
+
 def load_en_profanity() -> frozenset[str]:
-    """Return the English profanity blocklist as a frozenset of lowercase strings."""
-    return _load_blocklist(VOCAB_DIR / "profanity_en.txt")
+    """Return the English blocklist (union of all EN files) as lowercase strings."""
+    return frozenset().union(*(_load_blocklist(VOCAB_DIR / f) for f in _EN_BLOCKLIST_FILES))
 
 
 def load_hi_profanity() -> frozenset[str]:
-    """Return the romanized Hindi/Hinglish profanity blocklist as a frozenset."""
-    return _load_blocklist(VOCAB_DIR / "profanity_hi.txt")
+    """Return the romanized Hindi/Hinglish blocklist (union of all HI files)."""
+    return frozenset().union(*(_load_blocklist(VOCAB_DIR / f) for f in _HI_BLOCKLIST_FILES))
 
 
 def is_profane(word: str, blocklist: frozenset[str]) -> bool:

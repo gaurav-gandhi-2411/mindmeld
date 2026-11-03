@@ -6,7 +6,7 @@ Embedding computation with persistent file-based cache.
 Cache key = SHA-1 of (model name, vocab list IN ORDER), stored as:
   .model-cache/{lang}-{cache_key}.npy   (float32 matrix, shape [N, D])
 
-The model name is part of the key so that swapping MODELS[lang] to a
+The model name and pinned HF revision are part of the key so that swapping MODELS[lang] to a
 different checkpoint can never silently reuse a previous model's cached
 vectors for the same vocab.
 
@@ -32,19 +32,22 @@ import logging
 import numpy as np
 from numpy.typing import NDArray
 
-from config import CACHE_DIR, MODELS
+from config import CACHE_DIR, MODEL_REVISIONS, MODELS
 
 logger = logging.getLogger(__name__)
 
 
-def _cache_key(vocab: list[str], model_name: str) -> str:
-    """Stable SHA-1 of (model name, vocab list in order) for cache keying.
+def _cache_key(vocab: list[str], model_name: str, revision: str) -> str:
+    """Stable SHA-1 of (model name, revision, vocab list in order) for cache keying.
+
+    The HF revision is part of the key so repinning a model can never reuse
+    vectors computed by a different checkpoint.
 
     Order-sensitive by design: the cached matrix's rows are positionally
     tied to `vocab`'s order at embedding time, so the key must change
     whenever that order changes, even if the word SET is identical.
     """
-    joined = model_name + "\n" + "\n".join(vocab)
+    joined = model_name + "\n" + revision + "\n" + "\n".join(vocab)
     return hashlib.sha1(joined.encode()).hexdigest()  # noqa: S324
 
 
@@ -64,7 +67,8 @@ def embed_vocab(
     """
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     model_name = MODELS[lang]
-    key = _cache_key(vocab, model_name)
+    revision = MODEL_REVISIONS[lang]
+    key = _cache_key(vocab, model_name, revision)
     cache_path = CACHE_DIR / f"{lang}-{key}.npy"
 
     if cache_path.exists():
@@ -83,7 +87,7 @@ def embed_vocab(
     # Hub repo (the fine-tuned checkpoint) once shipped, and this makes the
     # auth path visible/greppable here instead of magic. token=None for a
     # public repo (the off-the-shelf models) is a no-op, same as before.
-    model = SentenceTransformer(model_name, token=os.environ.get("HF_TOKEN"))
+    model = SentenceTransformer(model_name, revision=revision, token=os.environ.get("HF_TOKEN"))
 
     logger.info("embedding %d words (batch_size=%d)", len(vocab), batch_size)
     raw: NDArray[np.float32] = model.encode(
