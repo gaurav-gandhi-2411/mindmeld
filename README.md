@@ -4,8 +4,11 @@ A daily word-guessing game: players guess a secret word and an embedding model s
 semantically close each guess is (rank + temperature feedback). English + Hinglish editions.
 All ML is offline — payloads are precomputed, so marginal cost per DAU is ~$0.
 
-The Firebase project ID (`mindmeld-c4bba`) and the payload CDN path (`mindmeld-payloads`) are
-unchanged internal infrastructure — only user-facing branding was renamed.
+The payload CDN path (`mindmeld-payloads`) is unchanged internal infrastructure. The Firebase
+project was originally kept as `mindmeld-c4bba` when the app was rebranded (see
+[spec-warmer-rename.md](spec-warmer-rename.md)), then moved to `warmer-prod-260813` on
+2026-08-13 as part of the estate-wide GCP sole-identity migration (`.firebaserc`'s `default`
+is the source of truth for which project is live).
 
 Phase 1 build: playable Flutter app (Android-first) + Python payload generator. Ads and IAP
 are **stubs behind config flags** (`ads_enabled=false`, `iap_enabled=false`) — no SDK
@@ -100,7 +103,7 @@ uv run python scripts\check_web_plugin_registrant.py --project-dir app
 # Guard: fails loudly if the deploy domain isn't in Firebase Auth's authorized
 # domains — see scripts/check_authorized_domains.py docstring and the
 # "Authorized domains" section in docs/firebase-setup.md.
-uv run python scripts\check_authorized_domains.py --project-id mindmeld-c4bba --domain playwarmer.vercel.app
+uv run python scripts\check_authorized_domains.py --project-id warmer-prod-260813 --domain playwarmer.vercel.app
 # Flutter ≥ 3.35 no longer ships a caching SW; generate one and patch the bootstrap.
 # This also copies the tracked app/web/vercel.json (rewrites + Cache-Control
 # headers) into the build dir — web-dist/ is gitignored deploy staging only,

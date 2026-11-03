@@ -63,6 +63,24 @@ class _FixedClient extends PayloadClient {
       );
 }
 
+/// [PayloadClient] that serves [_payload] as the puzzle for [servedDate]
+/// regardless of the requested date (models the B2 lookback result).
+class _ServedDateClient extends PayloadClient {
+  _ServedDateClient(this._payload, this.servedDate);
+  final DailyPayload _payload;
+  final String servedDate;
+
+  @override
+  Future<PayloadResult> fetch(String lang, String date) => Future.value(
+        PayloadResult(
+          payload: _payload,
+          source: PayloadSource.network,
+          servedDate: servedDate,
+          requestedDate: date,
+        ),
+      );
+}
+
 /// [PayloadClient] whose [fetch] throws on its first call and succeeds with
 /// [_payload] on every subsequent call — models a transient network failure
 /// that a "Retry" tap resolves.
@@ -203,6 +221,37 @@ void main() {
       expect(find.textContaining('Failed to load puzzle'), findsNothing);
       expect(find.text('Enter a word…'), findsOneWidget,
           reason: 'the second (successful) fetch must render the live puzzle board');
+    },
+  );
+
+  testWidgets(
+    'fallback-date puzzle shows a "Puzzle from <date>" label; same-day does not',
+    (tester) async {
+      final payload = _buildOceanPayload();
+
+      Future<void> pumpWith(String servedDate) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            key: UniqueKey(),
+            home: PuzzleScreen(
+              lang: 'en',
+              date: '2099-01-02',
+              onWin: () {},
+              onLoss: () {},
+              payloadClient: _ServedDateClient(payload, servedDate),
+            ),
+          ),
+        );
+        await _settle(tester);
+      }
+
+      await pumpWith('2099-01-01');
+      expect(find.byKey(const Key('fallback-puzzle-label')), findsOneWidget);
+      expect(find.text('Puzzle from Jan 1'), findsOneWidget);
+
+      await pumpWith('2099-01-02');
+      expect(find.byKey(const Key('fallback-puzzle-label')), findsNothing);
+      expect(find.textContaining('Puzzle from'), findsNothing);
     },
   );
 }

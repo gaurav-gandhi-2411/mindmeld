@@ -1,0 +1,129 @@
+name: Unit tests
+
+# Runs the generator (pytest) and app (flutter analyze + flutter test) unit suites,
+# which previously ran only on developer machines. Both jobs are intended as REQUIRED
+# checks on main. Each writes pass/fail/skip counts to the job summary and uploads
+# them as an artifact -- that run is the citable source for README test counts.
+#
+# Generator models: tests load models by name with no revision, so the fetch step
+# asserts each model's upstream `main` is the pinned SHA, and pytest then runs with
+# HF_HUB_OFFLINE=1 against that cached snapshot (see scripts/ci/fetch_pinned_models.py).
+#
+# Tests that need a locally warmed embedding cache (generator/.model-cache, gitignored)
+# or the local Ollama judge skip here by design; the skip count is in the summary.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+concurrency:
+  group: unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  generator-tests:
+    name: generator-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      HF_HOME: ${{ github.workspace }}/.hf-cache
+      HF_HUB_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: generator/uv.lock
+
+      - name: uv sync (frozen lockfile)
+        working-directory: generator
+        run: uv sync --frozen --python 3.13
+
+      # Key names every pinned revision: changing a pin changes the key.
+      - uses: actions/cache@v4
+        with:
+          path: .hf-cache
+          key: hf-models-minilm-1110a243-hinglish-4b06ad91-indicnli-aab1d6a0
+
+      - name: Fetch pinned models (fails on upstream drift)
+        working-directory: generator
+        run: uv run --frozen python ../scripts/ci/fetch_pinned_models.py
+
+      - name: pytest
+        working-directory: generator
+        env:
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+        run: >-
+          uv run --frozen pytest -q -p no:cacheprovider
+          --junitxml="${{ runner.temp }}/results/generator-junit.xml"
+
+      - name: Test counts to job summary
+        if: always()
+        run: >-
+          python3 scripts/ci/test_summary.py junit
+          "${{ runner.temp }}/results/generator-junit.xml"
+          --label generator --out "${{ runner.temp }}/results/generator-counts.json"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generator-test-results
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+
+  app-tests:
+    name: app-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.44.2'
+          cache: true
+
+      # flutter-action resolves the version from a release index; assert the exact
+      # SDK so a resolver change can't silently move the toolchain.
+      - name: Assert Flutter 3.44.2
+        run: flutter --version | head -1 | grep -q '^Flutter 3\.44\.2 '
+
+      - name: flutter pub get
+        working-directory: app
+        run: flutter pub get
+
+      - name: flutter analyze
+        working-directory: app
+        run: flutter analyze
+
+      - name: flutter test --coverage
+        working-directory: app
+        run: |
+          mkdir -p "${{ runner.temp }}/results"
+          flutter test --coverage --file-reporter "json:${{ runner.temp }}/results/app-tests.json"
+
+      - name: Test counts to job summary
+        if: always()
+        run: >-
+          python3 scripts/ci/test_summary.py flutter
+          "${{ runner.temp }}/results/app-tests.json"
+          --label app --out "${{ runner.temp }}/results/app-counts.json"
+
+      - name: Collect coverage
+        if: always()
+        run: cp app/coverage/lcov.info "${{ runner.temp }}/results/" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: app-test-results
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error

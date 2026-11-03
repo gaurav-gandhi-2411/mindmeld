@@ -28,6 +28,7 @@ writing into the payloads repo or executing any git mutating commands.
 """
 
 import argparse
+import json
 import shutil
 import subprocess
 import sys
@@ -197,8 +198,23 @@ def _collect_sync_plan(
                 plan.append((src_file, dst_lang_dir / src_file.name))
 
     src_manifest = src_dir / "manifest.json"
+    dst_manifest = payloads_repo / "manifest.json"
     if src_manifest.exists():
-        plan.append((src_manifest, payloads_repo / "manifest.json"))
+        # Merge into the published manifest instead of overwriting it: a
+        # partial (single-lang / short date range) build must not drop the
+        # langs and dates it didn't regenerate. Rewrites the build's own
+        # temp-dir copy so dry-run and real sync see the same merged file.
+        if dst_manifest.exists():
+            from manifest import merge_manifests
+
+            merged = merge_manifests(
+                json.loads(dst_manifest.read_text(encoding="utf-8")),
+                json.loads(src_manifest.read_text(encoding="utf-8")),
+            )
+            src_manifest.write_text(
+                json.dumps(merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
+        plan.append((src_manifest, dst_manifest))
 
     # Themed packs (Phase 6c): sync the whole packs/ tree verbatim if the
     # pack builder produced one. No packs built this run → plan is unchanged.
