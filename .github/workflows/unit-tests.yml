@@ -71,7 +71,7 @@ jobs:
           "${{ runner.temp }}/results/generator-junit.xml"
           --label generator --out "${{ runner.temp }}/results/generator-counts.json"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: generator-test-results
@@ -121,7 +121,7 @@ jobs:
         if: always()
         run: cp app/coverage/lcov.info "${{ runner.temp }}/results/" || true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: app-test-results
