@@ -171,7 +171,7 @@ jobs:
       # Pinned to the Node/npm the lockfile is maintained with. Without it the runner's bundled
       # npm rejected package-lock.json as "not in sync" (Missing: proxy-agent@8.0.2 ...) on every
       # run since 2026-08-16, while `npm ci` with Node 24.15.0 / npm 11.13.0 installs it cleanly.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '24.15.0'
 
