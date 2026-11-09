@@ -46,7 +46,7 @@ jobs:
         run: uv sync --frozen --python 3.13
 
       # Key names every pinned revision: changing a pin changes the key.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .hf-cache
           key: hf-models-minilm-1110a243-hinglish-4b06ad91-indicnli-aab1d6a0
