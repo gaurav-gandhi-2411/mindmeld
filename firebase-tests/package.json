@@ -11,7 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@firebase/rules-unit-testing": "^5.0.1",
+    "@firebase/rules-unit-testing": "^6.0.0",
     "firebase": "^12.15.0",
     "firebase-tools": "^15.33.0",
     "puppeteer-core": "^25.13.0"
